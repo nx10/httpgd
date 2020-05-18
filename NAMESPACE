@@ -1,0 +1,5 @@
+useDynLib(httpgd, .registration=TRUE)
+export("dummygd_")
+export("httpgd")
+export("httpgd_playDisplayList")
+importFrom(Rcpp, evalCpp)

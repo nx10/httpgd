@@ -1,0 +1,58 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>R Plot</title>
+</head>
+
+<body>
+    <img id="drawing"></img>
+  <script>
+      
+const host = 'localhost';
+const port = 1234;
+
+const intervall_check = 2000;
+const api = 'http://'+host+':'+port;
+const api_svg = api + '/svg';
+const api_check = api + '/check';
+const api_resize = api + '/rs';
+let api_upid = -1;
+
+let draw_w = window.innerWidth - 16;
+let draw_h = window.innerHeight - 16;
+let resize_poss = true;
+
+function checkcycle() {
+  fetch(api_check)
+    .then(res => res.json())
+    .then((out) => {
+      let w = window.innerWidth - 16;
+      let h = window.innerHeight - 16;
+      if (resize_poss && (draw_w != w || draw_h != h)) {
+        draw_w = w;
+        draw_h = h;
+        console.log('Update size to '+w+'*'+h);
+        resize_poss = false;
+        setTimeout(() => resize_poss = true, 4000);
+        fetch(api_resize, {
+          method: 'post',
+          body: 'w='+w+'&h='+h
+        });
+      }
+
+      if (api_upid !== out.upid) {
+        console.log("Refresh SVG.")
+        api_upid = out.upid;
+        const wp = document.getElementById('drawing');
+        wp.src = api_svg + '?upid=' + api_upid;
+      }
+    }).catch((error) => {
+      console.warn('Server offline.');
+    });
+}
+
+setInterval(checkcycle, intervall_check);
+  </script>
+</body>
+</html>
