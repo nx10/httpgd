@@ -47,6 +47,17 @@ Stop the server with:
 dev.off()
 ```
 
+### HTTP API
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/`        | `GET`  | Server status |
+| `/live`    | `GET`  | Returns HTML/Javascript live server page. |
+| `/svg`     | `GET`  | Get rendered SVG |
+| `/check`   | `GET`  | Get current update id.<br/> This can be checked periodically if a newer SVG can be accessed |
+| `/rs`      | `POST` | Trigger graphics device resize. Params are width `w` and height `h` in pixels. |
+
+
 ## Limitations (Need help!)
 
 I can't get refreshes from the server thread to the R session working. For this reason the user hat to manually call a function after resize while updates from R to the servers are no problem.
