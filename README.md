@@ -54,3 +54,4 @@ It has to be possible to asynchronously trigger an event in R somehow.
 
 The code is very experimental, I am not a very experienced C++ programmer and am not too familiar with the R/C++ API. Any advice and suggestions are welcome!
 
+
