@@ -1,13 +1,15 @@
 Package: httpgd
 Type: Package
-Title: Virtual http server graphics device
-Version: 1.0
+Title: Http server graphics device
+Version: 0.1.1
 Date: 2020-05-10
 Author: Florian Rupprecht
-Maintainer: Florian Rupprecht <a@a.com>
-Description: One paragraph description of what the package does as one or more
-         full sentences.
+Maintainer: Florian Rupprecht <floruppr@gmail.com>
+Description: Http server graphics device.
 License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.4)
+Imports: Rcpp (>= 1.0.4),
+    gdtools (>= 0.1.6)
 LinkingTo: Rcpp, RcppThread, 
     gdtools
+RoxygenNote: 7.1.0
+Encoding: UTF-8

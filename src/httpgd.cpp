@@ -618,6 +618,7 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
   getDev(dev)->start_server();
 }
 
+
 // [[Rcpp::export]]
 bool httpgd_(Rcpp::String host, int port, std::string bg, double width, double height,
              double pointsize, Rcpp::List aliases)
@@ -627,6 +628,9 @@ bool httpgd_(Rcpp::String host, int port, std::string bg, double width, double h
   return true;
 }
 
+//' Trigger graphics device replay
+//' 
+//' @export
 // [[Rcpp::export]]
 void httpgd_playDisplayList()
 {

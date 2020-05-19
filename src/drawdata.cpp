@@ -326,7 +326,7 @@ namespace httpgd
     }
 
     Page::Page(double width, double height)
-        : m_dcs(), m_upid(0), m_width(width), m_height(height)
+        : m_width(width), m_height(height), m_dcs(), m_upid(0)
     {
     }
 

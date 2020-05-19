@@ -202,6 +202,10 @@ void makeDummyDevice() {
   //} END_SUSPEND_INTERRUPTS;
 }
 
+
+//' Dummy graphics device for debug purposes.
+//' 
+//' @export
 // [[Rcpp::export]]
 bool dummygd_() {
   
