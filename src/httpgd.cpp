@@ -2,7 +2,9 @@
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(RcppThread)]]
 
+#ifdef _WIN32
 #include <winsock2.h>
+#endif
 
 #include <Rcpp.h>
 #include <RcppThread.h>
@@ -22,6 +24,7 @@ using namespace httpgd;
 pGEDevDesc httpgd_pGEDevDesc = nullptr;
 
 
+// returns system path to {package}/inst/www/index.html
 std::string get_htmlpath(){
   Rcpp::Environment base("package:base");
   Rcpp::Function sys_file = base["system.file"];
@@ -41,6 +44,7 @@ public:
   Rcpp::List m_system_aliases;
   Rcpp::List m_user_aliases;
   XPtrCairoContext m_cc;
+  std::string m_livehtml;
 
   HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height)
       : m_dd(dd), m_system_aliases(Rcpp::wrap(aliases["system"])),
@@ -48,6 +52,10 @@ public:
         m_cc(gdtools::context_create()), 
         m_svr_thread(), m_page(width, height), m_host(host), m_port(port)
   {
+    std::ifstream t(get_htmlpath());
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+    m_livehtml = std::string(buffer.str());
   }
   ~HttpgdDev()
   {
@@ -115,14 +123,9 @@ private:
       res.set_header("Access-Control-Allow-Origin", "*");
       res.set_content("httpgd server running.", "text/plain");
     });
-    m_svr.Get("/live", [](const Request & /*req*/, Response &res) {
+    m_svr.Get("/live", [this](const Request & /*req*/, Response &res) {
       res.set_header("Access-Control-Allow-Origin", "*");
-      
-      std::ifstream t(get_htmlpath());
-      std::stringstream buffer;
-      buffer << t.rdbuf();
-      
-      res.set_content(buffer.str(), "text/html");
+      res.set_content(m_livehtml, "text/html");
     });
     m_svr.Get("/svg", [this](const Request & /*req*/, Response &res) {
       res.set_header("Access-Control-Allow-Origin", "*");
