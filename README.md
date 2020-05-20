@@ -1,16 +1,16 @@
 # httpgd
 
-Http server graphics device for R.
+(Experimental) Http server graphics device for R.
 
 ## Installation
 
 ```R
-install_github("nx10/httpgd")
+devtools::install_github("nx10/httpgd")
 ```
 
-This depends on `Rcpp`, `RcppThread` and `gdtools`.
+Depends on `Rcpp`, `later` and `gdtools`.
 
-Heavily based on `svglite` (https://github.com/r-lib/svglite).
+SVG rendering heavily based on `svglite` (https://github.com/r-lib/svglite).
 
 Includes `cpp-httplib` (https://github.com/yhirose/cpp-httplib).
 
@@ -58,11 +58,12 @@ dev.off()
 | `/rs`      | `POST` | Trigger graphics device resize. Params are width `w` and height `h` in pixels. |
 
 
-## Limitations (Need help!)
+## Limitations
 
-I can't get refreshes from the server thread to the R session working. For this reason the user hat to manually call a function after resize while updates from R to the servers are no problem.
-It has to be possible to asynchronously trigger an event in R somehow.
+The code is very experimental. Any advice and suggestions are welcome!
 
-The code is very experimental, I am not a very experienced C++ programmer and am not too familiar with the R/C++ API. Any advice and suggestions are welcome!
+## ToDo
 
-
+* Implement the rest of the `svglite` functionality (raster graphics, clipping)
+* Use websockets for updates
+* Clean up code
