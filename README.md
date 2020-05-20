@@ -66,4 +66,5 @@ The code is very experimental. Any advice and suggestions are welcome!
 
 * Implement the rest of the `svglite` functionality (raster graphics, clipping)
 * Use websockets for updates
+* Plot history
 * Clean up code
