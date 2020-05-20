@@ -185,12 +185,11 @@ pDevDesc dummy_driver_new() {
 
 void makeDummyDevice() {
   
-  //int bg = R_GE_str2col(bg_.c_str());
-  
   R_GE_checkVersionOrDie(R_GE_version);
   R_CheckDeviceAvailable();
   
-  //BEGIN_SUSPEND_INTERRUPTS {
+  BEGIN_SUSPEND_INTERRUPTS {
+
   pDevDesc dev = dummy_driver_new();
   if (dev == NULL)
     Rcpp::stop("Failed to start dummy device");
@@ -199,7 +198,7 @@ void makeDummyDevice() {
   GEaddDevice2(dd, "devDummy");
   GEinitDisplayList(dd);
   
-  //} END_SUSPEND_INTERRUPTS;
+  } END_SUSPEND_INTERRUPTS;
 }
 
 

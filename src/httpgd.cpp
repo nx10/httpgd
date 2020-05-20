@@ -601,8 +601,11 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
   R_GE_checkVersionOrDie(R_GE_version);
   R_CheckDeviceAvailable();
 
-  //BEGIN_SUSPEND_INTERRUPTS {
-  pDevDesc dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases);
+  pDevDesc dev;
+
+  BEGIN_SUSPEND_INTERRUPTS {
+
+  dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases);
   if (dev == NULL)
     Rcpp::stop("Failed to start httpgd.");
   if (httpgd_pGEDevDesc != nullptr)
@@ -613,7 +616,7 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
   GEinitDisplayList(dd);
   httpgd_pGEDevDesc = dd;
 
-  //} END_SUSPEND_INTERRUPTS;
+  } END_SUSPEND_INTERRUPTS;
 
   getDev(dev)->start_server();
 }
