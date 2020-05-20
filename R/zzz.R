@@ -4,6 +4,7 @@
 #'
 #' @docType package
 #' @name httpgd-package
+#' @import later
 #' @useDynLib httpgd, .registration=TRUE
 NULL
 

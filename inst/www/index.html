@@ -12,15 +12,15 @@
 const host = 'localhost';
 const port = 1234;
 
-const intervall_check = 2000;
+const intervall_check = 1500;
 const api = 'http://'+host+':'+port;
 const api_svg = api + '/svg';
 const api_check = api + '/check';
 const api_resize = api + '/rs';
 let api_upid = -1;
 
-let draw_w = window.innerWidth - 16;
-let draw_h = window.innerHeight - 16;
+let draw_w = 0 - 16;
+let draw_h = 0 - 16;
 let resize_poss = true;
 
 function checkcycle() {
@@ -34,7 +34,7 @@ function checkcycle() {
         draw_h = h;
         console.log('Update size to '+w+'*'+h);
         resize_poss = false;
-        setTimeout(() => resize_poss = true, 4000);
+        setTimeout(() => resize_poss = true, 500);
         fetch(api_resize, {
           method: 'post',
           body: 'w='+w+'&h='+h

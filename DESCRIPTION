@@ -8,8 +8,10 @@ Maintainer: Florian Rupprecht <floruppr@gmail.com>
 Description: Http server graphics device.
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.4),
+    later (>= 1.0.0),
     gdtools (>= 0.1.6)
-LinkingTo: Rcpp, RcppThread, 
+LinkingTo: Rcpp, 
+    later,
     gdtools
 RoxygenNote: 7.1.0
 Encoding: UTF-8

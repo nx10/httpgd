@@ -1,3 +1,6 @@
+#ifndef HTTPGD_DRAWDATA_H
+#define HTTPGD_DRAWDATA_H
+
 //#include <iostream>
 #include <string>
 #include <vector>
@@ -159,3 +162,5 @@ namespace httpgd
 
   } // namespace dc
 } // namespace httpgd
+
+#endif /* HTTPGD_DRAWDATA_H */

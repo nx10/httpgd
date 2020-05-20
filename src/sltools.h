@@ -1,4 +1,8 @@
+#ifndef HTTPGD_SLTOOLS_H
+#define HTTPGD_SLTOOLS_H
+
 /*
+
 inline bool is_black(int col);
 inline bool is_filled(int col);
 
@@ -116,3 +120,5 @@ inline std::string fontfile(const char* family_, int face,
   
   return find_user_alias(family, user_aliases, face, "file");
 }
+
+#endif /* HTTPGD_SLTOOLS_H */

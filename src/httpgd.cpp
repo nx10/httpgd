@@ -1,13 +1,14 @@
 
-// [[Rcpp::plugins(cpp11)]]
-// [[Rcpp::depends(RcppThread)]]
+
 
 #ifdef _WIN32
 #include <winsock2.h>
 #endif
 
 #include <Rcpp.h>
-#include <RcppThread.h>
+#include <R_ext/GraphicsDevice.h>
+#include <R_ext/GraphicsEngine.h> 
+#include <later_api.h>
 #include <gdtools.h>
 #include "httplib.h"
 
@@ -21,7 +22,7 @@
 
 using namespace httpgd;
 
-pGEDevDesc httpgd_pGEDevDesc = nullptr;
+//pGEDevDesc httpgd_pGEDevDesc = nullptr;
 
 
 // returns system path to {package}/inst/www/index.html
@@ -191,12 +192,15 @@ private:
          * f();
          */
 
-        dc::Text * dc = new dc::Text(8.0, page_height()*0.33, "Window resized!", 0, 0);
+        later::later([](void* dd){GEplayDisplayList(desc2GEDesc((pDevDesc) dd));}, m_dd, 1.0);
+        
+
+        /*dc::Text * dc = new dc::Text(8.0, page_height()*0.33, "Window resized!", 0, 0);
         dc::Text * dc2 = new dc::Text(8.0, page_height()*0.66, "Plot anything or call httpgd_playDisplayList().", 0, 0);
         dc->m_fontsize = 24;
         dc2->m_fontsize = 24;
         page_put(dc);
-        page_put(dc2);
+        page_put(dc2);*/
       }
       
       res.set_content("{ \"status\": \"ok\" }", "application/json");
@@ -608,13 +612,13 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
   dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases);
   if (dev == NULL)
     Rcpp::stop("Failed to start httpgd.");
-  if (httpgd_pGEDevDesc != nullptr)
-    Rcpp::stop("Running multiple instances of httpgd is currently not supported.");
+  //if (httpgd_pGEDevDesc != nullptr)
+  //  Rcpp::stop("Running multiple instances of httpgd is currently not supported.");
   
   pGEDevDesc dd = GEcreateDevDesc(dev);
   GEaddDevice2(dd, "httpgd");
   GEinitDisplayList(dd);
-  httpgd_pGEDevDesc = dd;
+  //httpgd_pGEDevDesc = dd;
 
   } END_SUSPEND_INTERRUPTS;
 
@@ -637,5 +641,9 @@ bool httpgd_(Rcpp::String host, int port, std::string bg, double width, double h
 // [[Rcpp::export]]
 void httpgd_playDisplayList()
 {
-  GEplayDisplayList(httpgd_pGEDevDesc);
+  //GEplayDisplayList(httpgd_pGEDevDesc);
+}
+
+void httpgd_playDisplayList_later(void*) {
+  //GEplayDisplayList(httpgd_pGEDevDesc);
 }
