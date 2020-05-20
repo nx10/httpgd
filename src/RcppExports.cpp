@@ -32,20 +32,10 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// httpgd_playDisplayList
-void httpgd_playDisplayList();
-RcppExport SEXP _httpgd_httpgd_playDisplayList() {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    httpgd_playDisplayList();
-    return R_NilValue;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 7},
-    {"_httpgd_httpgd_playDisplayList", (DL_FUNC) &_httpgd_httpgd_playDisplayList, 0},
     {NULL, NULL, 0}
 };
 

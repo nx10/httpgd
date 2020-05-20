@@ -9,13 +9,12 @@
 NULL
 
 
-#' @importFrom grDevices dev.cur dev.off
+#' @importFrom grDevices dev.list dev.off
 .onUnload <- function (libpath) {
   
-  # todo: search for all active servers and close them
-  if (names(dev.cur()) == "httpgd") {
-    dev.off() 
-  }
+  # search for all active servers and close them
+  ds <- dev.list()
+  lapply(ds[names(ds) == "httpgd"], dev.off)
   
   library.dynam.unload("httpgd", libpath)
 }

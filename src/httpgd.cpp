@@ -177,30 +177,9 @@ private:
       if (w != m_page.m_width || h !=  m_page.m_height) {
         page_resize(w, h);
         m_dd->size(&(m_dd->left), &(m_dd->right), &(m_dd->bottom), &(m_dd->top), m_dd);	
-        
-        /* Notifying R of the changes seems to produce multithreading problems.
-         * Neither this:
-         *
-         * pGEDevDesc gdd = desc2GEDesc(m_dd);
-         * if(gdd->dirty) {
-         *   GEplayDisplayList(gdd);
-         * }
-         * 
-         * Nor this works reliable:
-         * 
-         * Rcpp::Function f("httpgd_playDisplayList");
-         * f();
-         */
 
         later::later([](void* dd){GEplayDisplayList(desc2GEDesc((pDevDesc) dd));}, m_dd, 1.0);
         
-
-        /*dc::Text * dc = new dc::Text(8.0, page_height()*0.33, "Window resized!", 0, 0);
-        dc::Text * dc2 = new dc::Text(8.0, page_height()*0.66, "Plot anything or call httpgd_playDisplayList().", 0, 0);
-        dc->m_fontsize = 24;
-        dc2->m_fontsize = 24;
-        page_put(dc);
-        page_put(dc2);*/
       }
       
       res.set_content("{ \"status\": \"ok\" }", "application/json");
@@ -612,13 +591,10 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
   dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases);
   if (dev == NULL)
     Rcpp::stop("Failed to start httpgd.");
-  //if (httpgd_pGEDevDesc != nullptr)
-  //  Rcpp::stop("Running multiple instances of httpgd is currently not supported.");
   
   pGEDevDesc dd = GEcreateDevDesc(dev);
   GEaddDevice2(dd, "httpgd");
   GEinitDisplayList(dd);
-  //httpgd_pGEDevDesc = dd;
 
   } END_SUSPEND_INTERRUPTS;
 
@@ -633,17 +609,4 @@ bool httpgd_(Rcpp::String host, int port, std::string bg, double width, double h
   makehttpgdDevice(host, port, bg, width, height, pointsize, aliases);
 
   return true;
-}
-
-//' Trigger graphics device replay
-//' 
-//' @export
-// [[Rcpp::export]]
-void httpgd_playDisplayList()
-{
-  //GEplayDisplayList(httpgd_pGEDevDesc);
-}
-
-void httpgd_playDisplayList_later(void*) {
-  //GEplayDisplayList(httpgd_pGEDevDesc);
 }

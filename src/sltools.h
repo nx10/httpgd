@@ -1,32 +1,8 @@
+// convenience functions copied from svglite
+
 #ifndef HTTPGD_SLTOOLS_H
 #define HTTPGD_SLTOOLS_H
 
-/*
-
-inline bool is_black(int col);
-inline bool is_filled(int col);
-
-inline bool is_bold(int face);
-inline bool is_italic(int face);
-inline bool is_bolditalic(int face);
-inline bool is_symbol(int face);
-
-inline std::string find_alias_field(std::string& family, Rcpp::List& alias,
-                                    const char* face, const char* field);
-
-inline std::string find_user_alias(std::string& family,
-                                   Rcpp::List const& aliases,
-                                   int face, const char* field);
-
-inline std::string find_system_alias(std::string& family,
-                                     Rcpp::List const& aliases);
-
-inline std::string fontname(const char* family_, int face,
-                            Rcpp::List const& system_aliases,
-                            Rcpp::List const& user_aliases);
-
-inline std::string fontfile(const char* family_, int face,
-                            Rcpp::List user_aliases);*/
 
 inline bool is_black(int col) {
   return (R_RED(col) == 0) && (R_GREEN(col) == 0) && (R_BLUE(col) == 0) &&

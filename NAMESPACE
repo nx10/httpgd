@@ -2,8 +2,7 @@
 
 export(dummygd_)
 export(httpgd)
-export(httpgd_playDisplayList)
 import(later)
-importFrom(grDevices,dev.cur)
+importFrom(grDevices,dev.list)
 importFrom(grDevices,dev.off)
 useDynLib(httpgd, .registration=TRUE)

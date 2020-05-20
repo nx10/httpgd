@@ -24,34 +24,6 @@ namespace httpgd
       GC_BEVEL_JOIN = 3
     } GC_linejoin;
 
-    // struct GContext
-    // {
-    //     /*
-    //      * Colours
-    //      *
-    //      * NOTE:  Alpha transparency included in col & fill
-    //      */
-    //     int col;             /* pen colour (lines, text, borders, ...) */
-    //     int fill;            /* fill colour (for polygons, circles, rects, ...) */
-    //     double gamma;        /* Gamma correction */
-    //     /*
-    //      * Line characteristics
-    //      */
-    //     double lwd;          /* Line width (roughly number of pixels) */
-    //     int lty;             /* Line type (solid, dashed, dotted, ...) */
-    //     GC_lineend lend;     /* Line end */
-    //     GC_linejoin ljoin;   /* line join */
-    //     double lmitre;       /* line mitre */
-    //     /*
-    //      * Text characteristics
-    //      */
-    //     double cex;          /* Character expansion (font size = fontsize*cex) */
-    //     double ps;           /* Font size in points */
-    //     double lineheight;   /* Line height (multiply by font size) */
-    //     int fontface;        /* Font face (plain, italic, bold, ...) */
-    //     char fontfamily[201]; /* Font family */
-    // }
-
     class DrawCall
     {
     public:

@@ -12,10 +12,3 @@ httpgd_ <- function(host, port, bg, width, height, pointsize, aliases) {
     .Call(`_httpgd_httpgd_`, host, port, bg, width, height, pointsize, aliases)
 }
 
-#' Trigger graphics device replay
-#' 
-#' @export
-httpgd_playDisplayList <- function() {
-    invisible(.Call(`_httpgd_httpgd_playDisplayList`))
-}
-

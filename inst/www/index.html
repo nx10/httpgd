@@ -1,4 +1,5 @@
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
 
@@ -6,53 +7,54 @@
 </head>
 
 <body>
-    <img id="drawing"></img>
+  <img id="drawing"></img>
   <script>
-      
-const host = 'localhost';
-const port = 1234;
 
-const intervall_check = 1500;
-const api = 'http://'+host+':'+port;
-const api_svg = api + '/svg';
-const api_check = api + '/check';
-const api_resize = api + '/rs';
-let api_upid = -1;
+    const host = 'localhost';
+    const port = 1234;
 
-let draw_w = 0 - 16;
-let draw_h = 0 - 16;
-let resize_poss = true;
+    const intervall_check = 1500;
+    const api = 'http://' + host + ':' + port;
+    const api_svg = api + '/svg';
+    const api_check = api + '/check';
+    const api_resize = api + '/rs';
+    let api_upid = -1;
 
-function checkcycle() {
-  fetch(api_check)
-    .then(res => res.json())
-    .then((out) => {
-      let w = window.innerWidth - 16;
-      let h = window.innerHeight - 16;
-      if (resize_poss && (draw_w != w || draw_h != h)) {
-        draw_w = w;
-        draw_h = h;
-        console.log('Update size to '+w+'*'+h);
-        resize_poss = false;
-        setTimeout(() => resize_poss = true, 500);
-        fetch(api_resize, {
-          method: 'post',
-          body: 'w='+w+'&h='+h
+    let draw_w = 0 - 16;
+    let draw_h = 0 - 16;
+    let resize_poss = true;
+
+    function checkcycle() {
+      fetch(api_check)
+        .then(res => res.json())
+        .then((out) => {
+          let w = window.innerWidth - 16;
+          let h = window.innerHeight - 16;
+          if (resize_poss && (draw_w != w || draw_h != h)) {
+            draw_w = w;
+            draw_h = h;
+            console.log('Update size to ' + w + '*' + h);
+            resize_poss = false;
+            setTimeout(() => resize_poss = true, 500);
+            fetch(api_resize, {
+              method: 'post',
+              body: 'w=' + w + '&h=' + h
+            });
+          }
+
+          if (api_upid !== out.upid) {
+            console.log("Refresh SVG.")
+            api_upid = out.upid;
+            const wp = document.getElementById('drawing');
+            wp.src = api_svg + '?upid=' + api_upid;
+          }
+        }).catch((error) => {
+          console.warn('Server offline.');
         });
-      }
+    }
 
-      if (api_upid !== out.upid) {
-        console.log("Refresh SVG.")
-        api_upid = out.upid;
-        const wp = document.getElementById('drawing');
-        wp.src = api_svg + '?upid=' + api_upid;
-      }
-    }).catch((error) => {
-      console.warn('Server offline.');
-    });
-}
-
-setInterval(checkcycle, intervall_check);
+    setInterval(checkcycle, intervall_check);
   </script>
 </body>
+
 </html>
