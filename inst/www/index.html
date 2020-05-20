@@ -9,19 +9,17 @@
 <body>
   <img id="drawing"></img>
   <script>
-
-    const host = 'localhost';
-    const port = 1234;
+    const params = __SRVRPARAMS__;
 
     const intervall_check = 1500;
-    const api = 'http://' + host + ':' + port;
+    const api = 'http://' + params.host + ':' + params.port;
     const api_svg = api + '/svg';
     const api_check = api + '/check';
     const api_resize = api + '/rs';
     let api_upid = -1;
 
-    let draw_w = 0 - 16;
-    let draw_h = 0 - 16;
+    let draw_w = params.width;
+    let draw_h = params.height;
     let resize_poss = true;
 
     function checkcycle() {
