@@ -64,7 +64,11 @@ The code is very experimental. Any advice and suggestions are welcome!
 
 ## ToDo
 
-* Implement the rest of the `svglite` functionality (raster graphics, clipping)
+httpgd is under active development.
+
+* Implement the rest of the `svglite` functionality (path, clipping)
+* Live server control bar (zoom in/out, save file)
 * Use websockets for updates
 * Plot history
 * Clean up code
+* Optimization

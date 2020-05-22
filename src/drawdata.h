@@ -36,13 +36,11 @@ namespace httpgd
       GC_linejoin m_ljoin;
       double m_lmitre;
 
-      DrawCall(const std::string &name);
+      DrawCall();
       virtual ~DrawCall();
 
       virtual void to_svg(std::string &buf);
 
-    protected:
-      std::string m_name;
     };
 
     class Text : public DrawCall
@@ -113,6 +111,41 @@ namespace httpgd
       int m_n;
       std::vector<double> m_x;
       std::vector<double> m_y;
+    };
+    class Path : public DrawCall
+    {
+    public:
+      Path(std::vector<double> &x, std::vector<double> &y, int npoly, std::vector<int> &nper, bool winding);
+      void to_svg(std::string &buf);
+
+    private:
+      std::vector<double> m_x;
+      std::vector<double> m_y;
+      int m_npoly;
+      std::vector<int> m_nper;
+      bool m_winding;
+    };
+
+    class Raster : public DrawCall
+    {
+    public:
+      Raster(std::vector<unsigned int> &raster, int w, int h,
+             double x, double y,
+             double width, double height,
+             double rot,
+             bool interpolate);
+      void to_svg(std::string &buf);
+
+    private:
+      std::vector<unsigned int> m_raster;
+      int m_w;
+      int m_h;
+      double m_x;
+      double m_y;
+      double m_width;
+      double m_height;
+      double m_rot;
+      bool m_interpolate;
     };
 
     class Page

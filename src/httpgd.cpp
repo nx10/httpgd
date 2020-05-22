@@ -398,7 +398,7 @@ void httpgd_path(double *x, double *y,
                  const pGEcontext gc, pDevDesc dd)
 {
 
-  getDev(dd)->page_put(new dc::DrawCall("path")); // todo
+  getDev(dd)->page_put(new dc::DrawCall()); // todo
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "PATH \n";
@@ -495,7 +495,11 @@ void httpgd_raster(unsigned int *raster, int w, int h,
                    const pGEcontext gc, pDevDesc dd)
 {
 
-  getDev(dd)->page_put(new dc::DrawCall("raster")); // todo
+  std::vector<unsigned int> raster_(raster, raster + (w*h));
+
+  dc::Raster *dc = new dc::Raster(raster_,w,h,x,y,width,height,rot,interpolate);
+  copyGc(gc, dc);
+  getDev(dd)->page_put(dc);
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "RASTER \n";

@@ -3,6 +3,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <gdtools.h>
+
 #include "drawdata.h"
 
 #define R_RGB(r, g, b) ((r) | ((g) << 8) | ((b) << 16) | 0xFF000000)
@@ -167,20 +169,19 @@ namespace httpgd
 
     // DRAW CALL OBJECTS
 
-    DrawCall::DrawCall(const std::string &name)
-        : m_name(name)
+    DrawCall::DrawCall()
     {
     }
     DrawCall::~DrawCall() {}
     void DrawCall::to_svg(std::string &buf)
     {
-      buf.append("<").append(m_name).append("/>");
+      buf.append("<!-- unknown draw call -->");
     }
 
     Text::Text(double x, double y,
                    const std::string &str,
                    double rot, double hadj)
-        : DrawCall("text"),
+        : DrawCall(),
           m_x(x), m_y(y), m_rot(rot), m_hadj(hadj), m_str(str)
     {
     }
@@ -216,13 +217,13 @@ namespace httpgd
     }
 
     Circle::Circle(double x, double y, double r)
-        : DrawCall("circle"),
+        : DrawCall(),
           m_x(x), m_y(y), m_r(r)
     {
     }
     void Circle::to_svg(std::string &buf)
     {
-      svg_elem(buf, m_name);
+      svg_elem(buf, "circle");
       svg_field(buf, "cx", m_x);
       svg_field(buf, "cy", m_y);
       svg_field(buf, "r", m_r);
@@ -237,7 +238,7 @@ namespace httpgd
     }
 
     Line::Line(double x1, double y1, double x2, double y2)
-        : DrawCall("line"),
+        : DrawCall(),
           m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2)
     {
     }
@@ -257,7 +258,7 @@ namespace httpgd
     }
 
     Rect::Rect(double x0, double y0, double x1, double y1)
-        : DrawCall("rect"),
+        : DrawCall(),
           m_x0(x0), m_y0(y0), m_x1(x1), m_y1(y1)
     {
     }
@@ -279,7 +280,7 @@ namespace httpgd
     }
 
     Polyline::Polyline(int n, std::vector<double> &x, std::vector<double> &y)
-        : DrawCall("polyline"),
+        : DrawCall(),
           m_n(n), m_x(x), m_y(y)
     {
     }
@@ -301,7 +302,7 @@ namespace httpgd
       buf.append("/>");
     }
     Polygon::Polygon(int n, std::vector<double> &x, std::vector<double> &y)
-        : DrawCall("polygon"),
+        : DrawCall(),
           m_n(n), m_x(x), m_y(y)
     {
     }
@@ -324,12 +325,57 @@ namespace httpgd
 
       buf.append("/>");
     }
+    Path::Path(std::vector<double> &x, std::vector<double> &y, int npoly, std::vector<int> &nper, bool winding)
+        : DrawCall(),
+          m_x(x), m_y(y), m_npoly(npoly), m_nper(nper), m_winding(winding)
+    {
+    }
+    void Path::to_svg(std::string &buf)
+    {
+    }
+    
+    Raster::Raster(std::vector<unsigned int> &raster, int w, int h,
+             double x, double y,
+             double width, double height,
+             double rot,
+             bool interpolate)
+        : DrawCall(),
+          m_raster(raster), m_w(w), m_h(h), m_x(x), m_y(y), m_width(width), m_height(height), m_rot(rot), m_interpolate(interpolate)
+    {
+    }
+    void Raster::to_svg(std::string &buf)
+    {
+      double imageHeight = m_height;
+      double imageWidth = m_width;
+
+      if (m_height < 0)
+        imageHeight = -m_height;
+      if (m_width < 0)
+        imageWidth = -m_width;
+
+      svg_elem(buf, "image");
+      svg_field(buf, "width", imageWidth);
+      svg_field(buf, "height", imageHeight);
+      svg_field(buf, "x", m_x);
+      svg_field(buf, "y", m_y - imageHeight);
+      if (m_rot != 0) {
+        buf.append("transform=\"rotate(");
+        buf.append(std::to_string(-1.0 * m_rot));
+        buf.append(",");
+        buf.append(std::to_string(m_x));
+        buf.append(",");
+        buf.append(std::to_string(m_y));
+        buf.append(")\" ");
+      }
+      buf.append(" xlink:href=\"data:image/png;base64,");
+      buf.append(gdtools::raster_to_str(m_raster, m_w, m_h, imageWidth, imageHeight, m_interpolate));
+      buf.append("\"/>");
+    }
 
     Page::Page(double width, double height)
         : m_width(width), m_height(height), m_dcs(), m_upid(0)
     {
     }
-
     Page::~Page()
     {
       for (DrawCall *p : m_dcs)
