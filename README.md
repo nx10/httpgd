@@ -58,7 +58,7 @@ dev.off()
 | `/rs`      | `POST` | Trigger graphics device resize. Params are width `w` and height `h` in pixels. |
 
 
-## Limitations
+## Note
 
 The code is very experimental. Any advice and suggestions are welcome!
 
@@ -67,7 +67,6 @@ The code is very experimental. Any advice and suggestions are welcome!
 httpgd is under active development.
 
 * Implement the rest of the `svglite` functionality (path, clipping)
-* Live server control bar (zoom in/out, save file)
 * Use websockets for updates
 * Plot history
 * Clean up code
