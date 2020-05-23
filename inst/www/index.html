@@ -2,14 +2,61 @@
 
 <head>
   <meta charset="utf-8">
-
   <title>R Plot</title>
+  <style>
+    /*body {
+      background-color: powderblue;
+    }*/
+    #drawing {
+      width: 100%;
+      height: 100%;
+    }
+
+    #toolbar {
+      float: left;
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      font-family: arial, sans-serif;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #discon {
+      padding: 2px 6px 2px 6px;
+      border-radius: 2px;
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      display: none;
+    }
+
+    #tb-tools>a {
+      padding: 2px 6px 2px 6px;
+      border-radius: 2px;
+      color: #818182;
+      background-color: #fefefe;
+      border-color: #fdfdfe;
+      cursor: pointer;
+    }
+
+    #tb-tools>a:hover {
+      color: #07c;
+    }
+  </style>
 </head>
 
 <body>
-  <img id="drawing"></img>
+  <div id="container">
+    <div id="toolbar">
+      <div id="tb-tools">
+        <a id="tb-plus">&plus;</a> <a id="tb-minus">&minus;</a> <a id="tb-save">Save</a></div> <span
+        id="discon">Disconnected!</span>
+    </div>
+    <object id="drawing"></object>
+  </div>
   <script>
-    const params = __SRVRPARAMS__;
+    const params = __SRVRPARAMS__;//{ width: 0, height: 0, host: 'localhost', port: 1234 };
 
     const intervall_check = 1500;
     const api = 'http://' + params.host + ':' + params.port;
@@ -18,40 +65,82 @@
     const api_resize = api + '/rs';
     let api_upid = -1;
 
-    let draw_w = params.width;
-    let draw_h = params.height;
+    let scale = 0.8;
+    let draw_w = params.width * scale;
+    let draw_h = params.height * scale;
     let resize_poss = true;
 
+    function save_plot() {
+      let dl = document.createElement('a');
+      dl.href = api_svg;
+      dl.download = "plot.svg";
+      document.body.appendChild(dl);
+      dl.click();
+      document.body.removeChild(dl);
+    }
+
+    function zoom(x) {
+      if (scale + x > 0) {
+        scale += x;
+      }
+    }
+
     function checkcycle() {
+      let elem_drw = document.getElementById("drawing");
+
+
+      drw_rect = elem_drw.getBoundingClientRect();
+      const w = drw_rect.width * scale;
+      const h = drw_rect.height * scale;
+      if (resize_poss && (draw_w != w || draw_h != h)) {
+        draw_w = w;
+        draw_h = h;
+        resize_poss = false;
+        fetch(api_resize, {
+          method: 'post',
+          body: 'w=' + w + '&h=' + h
+        }).then(() => {
+          resize_poss = true;
+          setTimeout(checkcycle, 500);
+        });
+      }
+
+
       fetch(api_check)
         .then(res => res.json())
         .then((out) => {
-          let w = window.innerWidth - 16;
-          let h = window.innerHeight - 16;
-          if (resize_poss && (draw_w != w || draw_h != h)) {
-            draw_w = w;
-            draw_h = h;
-            console.log('Update size to ' + w + '*' + h);
-            resize_poss = false;
-            setTimeout(() => resize_poss = true, 500);
-            fetch(api_resize, {
-              method: 'post',
-              body: 'w=' + w + '&h=' + h
-            });
-          }
-
           if (api_upid !== out.upid) {
-            console.log("Refresh SVG.")
             api_upid = out.upid;
-            const wp = document.getElementById('drawing');
-            wp.src = api_svg + '?upid=' + api_upid;
+            elem_drw.data = api_svg + '?upid=' + api_upid;
+            const ti = document.getElementById("discon");
+            ti.style.display = "none";
           }
         }).catch((error) => {
           console.warn('Server offline.');
+          const ti = document.getElementById("discon");
+          ti.style.display = "inline";
         });
     }
 
-    setInterval(checkcycle, intervall_check);
+    window.onload = function () {
+
+      document.getElementById("tb-save").onclick = save_plot;
+      document.getElementById("tb-plus").onclick = function () { zoom(-0.1); checkcycle(); };
+      document.getElementById("tb-minus").onclick = function () { zoom(0.1); checkcycle(); };
+
+      let elem_tb = document.getElementById("toolbar");
+      let elem_tbt = document.getElementById("tb-tools");
+      let elem_cnt = document.getElementById("container");
+
+      elem_cnt.onmouseenter = function (mouseEvent) {
+        elem_tbt.style.display = "inline";
+      }
+      elem_cnt.onmouseleave = function (mouseEvent) {
+        elem_tbt.style.display = "none";
+      }
+
+      setInterval(checkcycle, intervall_check);
+    }
   </script>
 </body>
 

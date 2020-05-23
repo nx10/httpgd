@@ -51,23 +51,16 @@ public:
         m_cc(gdtools::context_create()),
         m_svr_thread(), m_page(width, height), m_host(host), m_port(port)
   {
-    // read server html
+    // read live server html
     std::ifstream t(get_htmlpath());
     std::stringstream buffer;
     buffer << t.rdbuf();
     m_livehtml = std::string(buffer.str());
 
-    // build params
-    std::string sparams = std::string("{ host: \"").append(host);
-    sparams.append("\", port: ").append(std::to_string(port));
-    sparams.append(", width: ").append(std::to_string(width));
-    sparams.append(", height: ").append(std::to_string(height));
-    sparams.append(" }");
+    
+    m_page.m_fill = dd->startfill;
 
-    // inject params
-    size_t start_pos = m_livehtml.find("__SRVRPARAMS__");
-    if (start_pos != std::string::npos)
-      m_livehtml.replace(start_pos, sizeof("__SRVRPARAMS__") - 1, sparams);
+   
   }
   ~HttpgdDev()
   {
@@ -97,10 +90,15 @@ public:
     m_page.clear();
     m_page_mutex.unlock();
   }
+  void page_fill(int fill)
+  {
+    m_page_mutex.lock();
+    m_page.m_fill = fill;
+    m_page_mutex.unlock();
+  }
   void get_svg(std::string &buf)
   {
     m_page_mutex.lock();
-    std::string s;
     m_page.to_svg(buf);
     m_page_mutex.unlock();
   }
@@ -139,7 +137,24 @@ private:
     });
     m_svr.Get("/live", [this](const Request & /*req*/, Response &res) {
       res.set_header("Access-Control-Allow-Origin", "*");
-      res.set_content(m_livehtml, "text/html");
+
+       // build params
+      std::string sparams = std::string("{ host: \"").append(m_host);
+      sparams.append("\", port: ").append(std::to_string(m_port));
+      m_page_mutex.lock();
+      sparams.append(", width: ").append(std::to_string(m_page.m_width));
+      sparams.append(", height: ").append(std::to_string(m_page.m_height));
+      m_page_mutex.unlock();
+      sparams.append(" }");
+
+      // inject params
+      std::string html(m_livehtml);
+      size_t start_pos = m_livehtml.find("__SRVRPARAMS__");
+      if (start_pos != std::string::npos) {
+        html.replace(start_pos, sizeof("__SRVRPARAMS__") - 1, sparams);
+      }
+
+      res.set_content(html, "text/html");
     });
     m_svr.Get("/svg", [this](const Request & /*req*/, Response &res) {
       res.set_header("Access-Control-Allow-Origin", "*");
@@ -306,8 +321,8 @@ void httpgd_clip(double x0, double x1, double y0, double y1, pDevDesc dd)
  */
 void httpgd_new_page(const pGEcontext gc, pDevDesc dd)
 {
-
   getDev(dd)->page_clear();
+  getDev(dd)->page_fill(dd->startfill); // todo should this be gc->fill ?
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "NEW_PAGE \n";

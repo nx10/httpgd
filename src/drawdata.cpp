@@ -179,8 +179,8 @@ namespace httpgd
     }
 
     Text::Text(double x, double y,
-                   const std::string &str,
-                   double rot, double hadj)
+               const std::string &str,
+               double rot, double hadj)
         : DrawCall(),
           m_x(x), m_y(y), m_rot(rot), m_hadj(hadj), m_str(str)
     {
@@ -333,12 +333,12 @@ namespace httpgd
     void Path::to_svg(std::string &buf)
     {
     }
-    
+
     Raster::Raster(std::vector<unsigned int> &raster, int w, int h,
-             double x, double y,
-             double width, double height,
-             double rot,
-             bool interpolate)
+                   double x, double y,
+                   double width, double height,
+                   double rot,
+                   bool interpolate)
         : DrawCall(),
           m_raster(raster), m_w(w), m_h(h), m_x(x), m_y(y), m_width(width), m_height(height), m_rot(rot), m_interpolate(interpolate)
     {
@@ -358,7 +358,8 @@ namespace httpgd
       svg_field(buf, "height", imageHeight);
       svg_field(buf, "x", m_x);
       svg_field(buf, "y", m_y - imageHeight);
-      if (m_rot != 0) {
+      if (m_rot != 0)
+      {
         buf.append("transform=\"rotate(");
         buf.append(std::to_string(-1.0 * m_rot));
         buf.append(",");
@@ -425,6 +426,12 @@ namespace httpgd
              "    }"
              "  ]]></style>"
              "</defs>\n";
+
+      buf += "<rect width='100%' height='100%' "
+             "style=\"stroke: none; ";
+      css_field_color(buf, "fill", m_fill);
+      buf += "\"/>\n";
+
       std::for_each(m_dcs.begin(), m_dcs.end(), [&](DrawCall *piece) { buf.append("  "); piece->to_svg(buf); buf.append("\n"); });
       buf += "\n</svg>";
     }

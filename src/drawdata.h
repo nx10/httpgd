@@ -153,6 +153,7 @@ namespace httpgd
     public:
       double m_width;
       double m_height;
+      int m_fill;
       Page(double width, double height);
       ~Page();
       void put(DrawCall *dc);
