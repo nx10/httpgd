@@ -142,13 +142,13 @@ private:
       sparams.append(", width: ").append(std::to_string(m_page.m_width));
       sparams.append(", height: ").append(std::to_string(m_page.m_height));
       m_page_mutex.unlock();
-      sparams.append(" }");
+      sparams.append(" }/*");
 
       // inject params
       std::string html(m_livehtml);
-      size_t start_pos = m_livehtml.find("__SRVRPARAMS__");
+      size_t start_pos = m_livehtml.find("/*SRVRPARAMS*/");
       if (start_pos != std::string::npos) {
-        html.replace(start_pos, sizeof("__SRVRPARAMS__") - 1, sparams);
+        html.replace(start_pos, sizeof("/*SRVRPARAMS*/") - 1, sparams);
       }
 
       res.set_content(html, "text/html");
@@ -163,8 +163,15 @@ private:
     m_svr.Get("/check", [this](const Request & /*req*/, Response &res) {
       res.set_header("Access-Control-Allow-Origin", "*");
 
-      char buffer[200];
-      std::sprintf(buffer, "{ \"upid\": %i }", m_page.get_upid());
+      std::string buffer;
+      buffer.reserve(200);
+      m_page_mutex.lock();
+      buffer.append("{ \"upid\": ").append(std::to_string(m_page.get_upid()));
+      buffer.append(", \"width\": ").append(std::to_string(m_page.m_width));
+      buffer.append(", \"height\": ").append(std::to_string(m_page.m_height));
+      buffer.append(" }");
+      m_page_mutex.unlock();
+      
       res.set_content(buffer, "application/json");
     });
     m_svr.Post("/rs", [this](const Request &req, Response &res) {
@@ -204,7 +211,7 @@ private:
         page_resize(w, h);
         m_dd->size(&(m_dd->left), &(m_dd->right), &(m_dd->bottom), &(m_dd->top), m_dd);
 
-        later::later([](void *dd) { GEplayDisplayList(desc2GEDesc((pDevDesc)dd)); }, m_dd, 1.0);
+        later::later([](void *dd) { GEplayDisplayList(desc2GEDesc((pDevDesc)dd)); }, m_dd, 0.0);
       }
 
       res.set_content("{ \"status\": \"ok\" }", "application/json");

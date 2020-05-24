@@ -56,7 +56,7 @@
     <object id="drawing"></object>
   </div>
   <script>
-    const params = __SRVRPARAMS__;//{ width: 0, height: 0, host: 'localhost', port: 1234 };
+    const params = /*SRVRPARAMS*/{ width: 0, height: 0, host: 'localhost', port: 1234 }/**/;
 
     const intervall_check = 1500;
     const api = 'http://' + params.host + ':' + params.port;
@@ -65,9 +65,9 @@
     const api_resize = api + '/rs';
     let api_upid = -1;
 
-    let scale = 0.8;
-    let draw_w = params.width * scale;
-    let draw_h = params.height * scale;
+    let cli_scale = 0.8;
+    let srv_w = params.width;
+    let srv_h = params.height;
     let resize_poss = true;
 
     function save_plot() {
@@ -80,43 +80,43 @@
     }
 
     function zoom(x) {
-      if (scale + x > 0) {
-        scale += x;
+      if (cli_scale + x > 0) {
+        cli_scale += x;
       }
     }
 
     function checkcycle() {
       let elem_drw = document.getElementById("drawing");
-
-
       drw_rect = elem_drw.getBoundingClientRect();
-      const w = drw_rect.width * scale;
-      const h = drw_rect.height * scale;
-      if (resize_poss && (draw_w != w || draw_h != h)) {
-        draw_w = w;
-        draw_h = h;
+      const w = drw_rect.width * cli_scale;
+      const h = drw_rect.height * cli_scale;
+
+      if (resize_poss && (Math.abs(srv_w - w) > 0.001 || Math.abs(srv_h - h) > 0.001)) {
+        console.log("resize");
+        //console.log(srv_w+","+srv_h+" -> "+w+","+h);
         resize_poss = false;
         fetch(api_resize, {
           method: 'post',
           body: 'w=' + w + '&h=' + h
         }).then(() => {
-          resize_poss = true;
-          setTimeout(checkcycle, 500);
+          setTimeout(() => { checkcycle(); resize_poss = true; }, 500);
         });
       }
-
 
       fetch(api_check)
         .then(res => res.json())
         .then((out) => {
           if (api_upid !== out.upid) {
             api_upid = out.upid;
+            srv_w = out.width;
+            srv_h = out.height;
             elem_drw.data = api_svg + '?upid=' + api_upid;
             const ti = document.getElementById("discon");
             ti.style.display = "none";
           }
         }).catch((error) => {
           console.warn('Server offline.');
+          console.warn(error);
           const ti = document.getElementById("discon");
           ti.style.display = "inline";
         });

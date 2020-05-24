@@ -24,7 +24,7 @@
 #' @export
 httpgd <-
   function(host = "localhost",
-           port = 1234,
+           port = 8288,
            width = 720,
            height = 576,
            bg = "white",
