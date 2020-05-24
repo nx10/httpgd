@@ -57,10 +57,7 @@ public:
     buffer << t.rdbuf();
     m_livehtml = std::string(buffer.str());
 
-    
     m_page.m_fill = dd->startfill;
-
-   
   }
   ~HttpgdDev()
   {
@@ -584,8 +581,6 @@ pDevDesc httpgd_driver_new(std::string host, int port, int bg, double width,
   dd->textUTF8 = httpgd_text;
   dd->strWidthUTF8 = httpgd_strwidth;
 
-  R_ProcessEvents();
-
   // Screen Dimensions in pts
   dd->left = 0;
   dd->top = 0;
@@ -605,10 +600,10 @@ pDevDesc httpgd_driver_new(std::string host, int port, int bg, double width,
   dd->ipr[1] = 1.0 / 72.0;
 
   // Capabilities
-  dd->canClip = (Rboolean)0;
+  dd->canClip = Rboolean::TRUE;
   dd->canHAdj = 0;
-  dd->canChangeGamma = (Rboolean)0;
-  dd->displayListOn = (Rboolean)1; // THIS TOGGLES REPLAYABILITY !!!
+  dd->canChangeGamma = Rboolean::FALSE;
+  dd->displayListOn = Rboolean::TRUE; // THIS TOGGLES REPLAYABILITY !!!
   dd->haveTransparency = 2;
   dd->haveTransparentBg = 2;
 

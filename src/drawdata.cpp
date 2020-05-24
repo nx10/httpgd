@@ -5,26 +5,11 @@
 
 #include <gdtools.h>
 
+#include <R_ext/GraphicsDevice.h>
+#include <R_ext/GraphicsEngine.h>
+
 #include "drawdata.h"
 
-#define R_RGB(r, g, b) ((r) | ((g) << 8) | ((b) << 16) | 0xFF000000)
-#define R_RGBA(r, g, b, a) ((r) | ((g) << 8) | ((b) << 16) | ((a) << 24))
-#define R_RED(col) (((col)) & 255)
-#define R_GREEN(col) (((col) >> 8) & 255)
-#define R_BLUE(col) (((col) >> 16) & 255)
-#define R_ALPHA(col) (((col) >> 24) & 255)
-#define R_OPAQUE(col) (R_ALPHA(col) == 255)
-#define R_TRANSPARENT(col) (R_ALPHA(col) == 0)
-#define R_TRANWHITE (R_RGBA(255, 255, 255, 0))
-#define R_BLACK (R_RGBA(0, 0, 0, 255))
-
-#define LTY_BLANK -1
-#define LTY_SOLID 0
-#define LTY_DASHED 4 + (4 << 4)
-#define LTY_DOTTED 1 + (3 << 4)
-#define LTY_DOTDASH 1 + (3 << 4) + (4 << 8) + (3 << 12)
-#define LTY_LONGDASH 7 + (3 << 4)
-#define LTY_TWODASH 2 + (2 << 4) + (6 << 8) + (2 << 12)
 
 namespace httpgd
 {
@@ -108,7 +93,7 @@ namespace httpgd
       css_field(buf, "stroke-width", dc->m_lwd / 96.0 * 72);
 
       // Default is "stroke: #000000;" as declared in <style>
-      if (dc->m_col != R_BLACK)
+      if (dc->m_col != R_RGBA(0, 0, 0, 255))
         css_field_color(buf, "stroke", dc->m_col);
 
       // Set line pattern type
@@ -187,6 +172,13 @@ namespace httpgd
     }
     void Text::to_svg(std::string &buf)
     {
+      // If we specify the clip path inside <image>, the "transform" also
+      // affects the clip path, so we need to specify clip path at an outer level
+      // (according to svglite)
+      svg_elem(buf, "g");
+      m_clip->to_svg_attr(buf);
+      buf.append(">");
+
       svg_elem(buf, "text");
       if (m_rot == 0.0)
       {
@@ -213,7 +205,7 @@ namespace httpgd
       {
         svg_field(buf, "font-style", "italic");
       }
-      buf.append(">").append(m_str).append("</text>");
+      buf.append(">").append(m_str).append("</text></g>");
     }
 
     Circle::Circle(double x, double y, double r)
@@ -224,6 +216,7 @@ namespace httpgd
     void Circle::to_svg(std::string &buf)
     {
       svg_elem(buf, "circle");
+      m_clip->to_svg_attr(buf);
       svg_field(buf, "cx", m_x);
       svg_field(buf, "cy", m_y);
       svg_field(buf, "r", m_r);
@@ -245,6 +238,7 @@ namespace httpgd
     void Line::to_svg(std::string &buf)
     {
       svg_elem(buf, "line");
+      m_clip->to_svg_attr(buf);
       svg_field(buf, "x1", m_x1);
       svg_field(buf, "y1", m_y1);
       svg_field(buf, "x2", m_x2);
@@ -265,6 +259,7 @@ namespace httpgd
     void Rect::to_svg(std::string &buf)
     {
       svg_elem(buf, "rect");
+      m_clip->to_svg_attr(buf);
       svg_field(buf, "x", std::min(m_x0, m_x1));
       svg_field(buf, "y", std::min(m_y0, m_y1));
       svg_field(buf, "width", std::abs(m_x0 - m_x1));
@@ -287,6 +282,7 @@ namespace httpgd
     void Polyline::to_svg(std::string &buf)
     {
       svg_elem(buf, "polyline");
+      m_clip->to_svg_attr(buf);
       std::string pts = "";
       for (int i = 0; i < m_n; i++)
       {
@@ -309,6 +305,7 @@ namespace httpgd
     void Polygon::to_svg(std::string &buf)
     {
       svg_elem(buf, "polygon");
+      m_clip->to_svg_attr(buf);
       std::string pts = "";
       for (int i = 0; i < m_n; i++)
       {
@@ -333,6 +330,7 @@ namespace httpgd
     void Path::to_svg(std::string &buf)
     {
       svg_elem(buf, "path");
+      m_clip->to_svg_attr(buf);
       // Create path data
       buf += "d=\"";
       int ind = 0;
@@ -359,7 +357,7 @@ namespace httpgd
         buf.append("Z");
       }
       // Finish path data
-        buf.append("\" ");
+      buf.append("\" ");
 
       std::string style;
       write_style_linetype(style, this);
@@ -392,6 +390,13 @@ namespace httpgd
       if (m_width < 0)
         imageWidth = -m_width;
 
+      // If we specify the clip path inside <image>, the "transform" also
+      // affects the clip path, so we need to specify clip path at an outer level
+      // (according to svglite)
+      svg_elem(buf, "g");
+      m_clip->to_svg_attr(buf);
+      buf.append(">");
+
       svg_elem(buf, "image");
       svg_field(buf, "width", imageWidth);
       svg_field(buf, "height", imageHeight);
@@ -409,12 +414,38 @@ namespace httpgd
       }
       buf.append(" xlink:href=\"data:image/png;base64,");
       buf.append(gdtools::raster_to_str(m_raster, m_w, m_h, imageWidth, imageHeight, m_interpolate));
-      buf.append("\"/>");
+      buf.append("\"/></g>");
+    }
+
+    Clip::Clip(int id, double x0, double x1, double y0, double y1)
+        : m_id(id), m_x0(x0), m_x1(x1), m_y0(y0), m_y1(y1)
+    {
+    }
+    bool Clip::equals(double x0, double x1, double y0, double y1)
+    {
+      return std::abs(x0 - m_x0) < 0.01 &&
+             std::abs(x1 - m_x1) < 0.01 &&
+             std::abs(y0 - m_y0) < 0.01 &&
+             std::abs(y1 - m_y1) < 0.01;
+    };
+    void Clip::to_svg_def(std::string &buf)
+    {
+      buf.append("<clipPath id=\"cp").append(std::to_string(m_id)).append("\">");
+      buf.append("<rect x=\"").append(std::to_string(std::min(m_x0, m_x1)));
+      buf.append("\" y=\"").append(std::to_string(std::min(m_y0, m_y1)));
+      buf.append("\" width=\"").append(std::to_string(std::abs(m_x1 - m_x0)));
+      buf.append("\" height=\"").append(std::to_string(std::abs(m_y1 - m_y0)));
+      buf.append("\" /></clipPath>");
+    }
+    void Clip::to_svg_attr(std::string &buf)
+    {
+      buf.append("clip-path=\"url(#cp").append(std::to_string(m_id)).append(")\" ");
     }
 
     Page::Page(double width, double height)
-        : m_width(width), m_height(height), m_dcs(), m_upid(0)
+        : m_width(width), m_height(height), m_dcs(), m_cps(), m_upid(0)
     {
+      m_cps.push_back(Clip(m_cps.size(), 0, m_width, 0, m_height));
     }
     Page::~Page()
     {
@@ -424,9 +455,18 @@ namespace httpgd
       }
     }
 
+    void Page::clip(double x0, double x1, double y0, double y1)
+    {
+      Clip last = m_cps.back();
+      if (!last.equals(x0,x1,y0,y1)) {
+        m_cps.push_back(Clip(m_cps.size(), x0, x1, y0, y1));
+      }
+    }
+
     void Page::put(DrawCall *dc)
     {
       m_dcs.push_back(dc);
+      dc->m_clip = &m_cps.back();
       m_upid++;
     }
 
@@ -437,6 +477,8 @@ namespace httpgd
         delete p;
       }
       m_dcs.clear();
+      m_cps.clear();
+      m_cps.push_back(Clip(m_cps.size(), 0, m_width, 0, m_height));
       m_upid++;
     }
     int Page::get_upid()
@@ -454,17 +496,20 @@ namespace httpgd
       buf.append(std::to_string(m_width)).append(" ").append(std::to_string(m_height));
       buf.append("\"");
 
-      buf += "><defs>"
-             "  <style type='text/css'><![CDATA["
-             "    line, polyline, polygon, path, rect, circle {"
-             "      fill: none;"
-             "      stroke: #000000;"
-             "      stroke-linecap: round;"
-             "      stroke-linejoin: round;"
-             "      stroke-miterlimit: 10.00;"
-             "    }"
-             "  ]]></style>"
-             "</defs>\n";
+      buf += "><defs>\n"
+             "  <style type='text/css'><![CDATA[\n"
+             "    line, polyline, polygon, path, rect, circle {\n"
+             "      fill: none;\n"
+             "      stroke: #000000;\n"
+             "      stroke-linecap: round;\n"
+             "      stroke-linejoin: round;\n"
+             "      stroke-miterlimit: 10.00;\n"
+             "    }\n"
+             "  ]]></style>\n";
+
+      std::for_each(m_cps.begin(), m_cps.end(), [&](Clip &asd) { buf.append("  "); asd.to_svg_def(buf); buf.append("\n"); });
+
+      buf.append("</defs>\n");
 
       buf += "<rect width='100%' height='100%' "
              "style=\"stroke: none; ";
@@ -472,7 +517,7 @@ namespace httpgd
       buf += "\"/>\n";
 
       std::for_each(m_dcs.begin(), m_dcs.end(), [&](DrawCall *piece) { buf.append("  "); piece->to_svg(buf); buf.append("\n"); });
-      buf += "\n</svg>";
+      buf += "</svg>";
     }
 
   } // namespace dc

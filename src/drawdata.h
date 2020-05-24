@@ -6,6 +6,7 @@
 #include <vector>
 //#include <algorithm>
 
+
 namespace httpgd
 {
   namespace dc
@@ -24,6 +25,8 @@ namespace httpgd
       GC_BEVEL_JOIN = 3
     } GC_linejoin;
 
+    class Clip;
+
     class DrawCall
     {
     public:
@@ -35,12 +38,12 @@ namespace httpgd
       GC_lineend m_lend;
       GC_linejoin m_ljoin;
       double m_lmitre;
+      Clip *m_clip;
 
       DrawCall();
       virtual ~DrawCall();
 
       virtual void to_svg(std::string &buf);
-
     };
 
     class Text : public DrawCall
@@ -148,6 +151,22 @@ namespace httpgd
       bool m_interpolate;
     };
 
+    class Clip
+    {
+    public:
+      Clip(int id, double x0, double x1, double y0, double y1);
+      bool equals(double x0, double x1, double y0, double y1);
+      void to_svg_def(std::string &buf);
+      void to_svg_attr(std::string &buf);
+
+    protected:
+      int m_id;
+      double m_x0;
+      double m_x1;
+      double m_y0;
+      double m_y1;
+    };
+
     class Page
     {
     public:
@@ -159,10 +178,12 @@ namespace httpgd
       void put(DrawCall *dc);
       void clear();
       void to_svg(std::string &buf);
+      void clip(double x0, double x1, double y0, double y1);
       int get_upid();
 
     private:
       std::vector<DrawCall *> m_dcs;
+      std::vector<Clip> m_cps;
       int m_upid;
     };
 
