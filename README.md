@@ -66,7 +66,7 @@ The code is very experimental. Any advice and suggestions are welcome!
 
 httpgd is under active development.
 
-* Implement the rest of the `svglite` functionality (path, clipping)
+* Implement the rest of the `svglite` functionality (clipping)
 * Use websockets for updates
 * Plot history
 * Clean up code

@@ -412,8 +412,17 @@ void httpgd_path(double *x, double *y,
                  Rboolean winding,
                  const pGEcontext gc, pDevDesc dd)
 {
+  std::vector<int> vnper(nper, nper + npoly);
+  int npoints = 0;
+  for (int i = 0; i < npoly; i++) {
+    npoints += vnper[i];
+  }
+  std::vector<double> vx(x, x + npoints);
+  std::vector<double> vy(y, y + npoints);
 
-  getDev(dd)->page_put(new dc::DrawCall()); // todo
+  dc::Path *dc = new dc::Path(vx,vy, npoly, vnper, winding);
+  copyGc(gc, dc);
+  getDev(dd)->page_put(dc);
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "PATH \n";

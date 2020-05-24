@@ -332,6 +332,45 @@ namespace httpgd
     }
     void Path::to_svg(std::string &buf)
     {
+      svg_elem(buf, "path");
+      // Create path data
+      buf += "d=\"";
+      int ind = 0;
+      for (int i = 0; i < m_npoly; i++)
+      {
+        // Move to the first point of the sub-path
+        buf.append("M ");
+        buf.append(std::to_string(m_x[ind]));
+        buf.append(" ");
+        buf.append(std::to_string(m_y[ind]));
+        buf.append(" ");
+        ind++;
+        // Draw the sub-path
+        for (int j = 1; j < m_nper[i]; j++)
+        {
+          buf.append("L ");
+          buf.append(std::to_string(m_x[ind]));
+          buf.append(" ");
+          buf.append(std::to_string(m_y[ind]));
+          buf.append(" ");
+          ind++;
+        }
+        // Close the sub-path
+        buf.append("Z");
+      }
+      // Finish path data
+        buf.append("\" ");
+
+      std::string style;
+      write_style_linetype(style, this);
+      if (R_ALPHA(m_fill) != 0)
+        write_style_col(style, this);
+      style.append("fill-rule: ");
+      style.append(m_winding ? "nonzero" : "evenodd");
+      style.append(";");
+      svg_field(buf, "style", style);
+
+      buf.append("/>");
     }
 
     Raster::Raster(std::vector<unsigned int> &raster, int w, int h,
