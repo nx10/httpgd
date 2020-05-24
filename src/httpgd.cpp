@@ -115,6 +115,12 @@ public:
   {
     return m_page.m_height;
   }
+  void page_clip(double x0, double x1, double y0, double y1)
+  {
+    m_page_mutex.lock();
+    m_page.clip(x0, x1, y0, y1);
+    m_page_mutex.unlock();
+  }
 
 private:
   std::thread m_svr_thread;
@@ -313,8 +319,7 @@ double httpgd_strwidth(const char *str, const pGEcontext gc, pDevDesc dd)
  */
 void httpgd_clip(double x0, double x1, double y0, double y1, pDevDesc dd)
 {
-  // todo
-
+  getDev(dd)->page_clip(x0, x1, y0, y1);
 #if LOGDRAW == 1
   Rprintf("CLIP x0=%f x1=%f y0=%f y1=%f\n", x0, x1, y0, y1);
 #endif

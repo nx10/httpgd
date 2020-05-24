@@ -10,7 +10,6 @@
 
 #include "drawdata.h"
 
-
 namespace httpgd
 {
   namespace dc
@@ -445,7 +444,7 @@ namespace httpgd
     Page::Page(double width, double height)
         : m_width(width), m_height(height), m_dcs(), m_cps(), m_upid(0)
     {
-      m_cps.push_back(Clip(m_cps.size(), 0, m_width, 0, m_height));
+      clip(0, m_width, 0, m_height);
     }
     Page::~Page()
     {
@@ -457,8 +456,8 @@ namespace httpgd
 
     void Page::clip(double x0, double x1, double y0, double y1)
     {
-      Clip last = m_cps.back();
-      if (!last.equals(x0,x1,y0,y1)) {
+      if (m_cps.size() == 0 || !m_cps.back().equals(x0, x1, y0, y1))
+      {
         m_cps.push_back(Clip(m_cps.size(), x0, x1, y0, y1));
       }
     }
@@ -478,7 +477,7 @@ namespace httpgd
       }
       m_dcs.clear();
       m_cps.clear();
-      m_cps.push_back(Clip(m_cps.size(), 0, m_width, 0, m_height));
+      clip(0, m_width, 0, m_height);
       m_upid++;
     }
     int Page::get_upid()
