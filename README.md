@@ -71,3 +71,9 @@ httpgd is under active development.
 * Plot history
 * Clean up code
 * Optimization
+
+## Mac OS
+
+It seems like a recent mac OS update (Catalina) removed shared libraries used by the package `systemfonts` we depend on (see: https://github.com/yixuan/showtext/issues/13).
+
+You can install XQuartz as a workaround (https://www.xquartz.org/).
