@@ -1,234 +1,63 @@
 
-#ifdef _WIN32
-#include <winsock2.h>
-#endif
 
 #include <Rcpp.h>
-#include <R_ext/GraphicsDevice.h>
 #include <R_ext/GraphicsEngine.h>
+#include <R_ext/GraphicsDevice.h>
 #include <later_api.h>
 #include <gdtools.h>
-#include "httplib.h"
 
 #include <vector>
 #include <mutex>
 
 #include "drawdata.h"
 #include "sltools.h"
+#include "HttpgdServer.h"
+#include "HttpgdDev.h"
 
-#define LOGDRAW 0
+#include "fixsuspinter.h"
 
-using namespace httpgd;
-
-//pGEDevDesc httpgd_pGEDevDesc = nullptr;
-
-// returns system path to {package}/inst/www/index.html
-std::string get_htmlpath()
+namespace httpgd
 {
-  Rcpp::Environment base("package:base");
-  Rcpp::Function sys_file = base["system.file"];
-  Rcpp::StringVector res = sys_file("www", "index.html",
-                                    Rcpp::_["package"] = "httpgd");
-  return std::string(res[0]);
-}
+  //pGEDevDesc httpgd_pGEDevDesc = nullptr;
 
-/** 
- * httpgd device data.
- * This runs the server and owns the draw call "DOM".
- */
-class HttpgdDev
-{
-public:
-  pDevDesc m_dd;
-  Rcpp::List m_system_aliases;
-  Rcpp::List m_user_aliases;
-  XPtrCairoContext m_cc;
-  std::string m_livehtml;
+  // returns system path to {package}/inst/www/index.html
+  std::string get_wwwpath(const std::string &filename)
+  {
+    Rcpp::Environment base("package:base");
+    Rcpp::Function sys_file = base["system.file"];
+    Rcpp::StringVector res = sys_file("www", filename,
+                                      Rcpp::_["package"] = "httpgd");
+    return std::string(res[0]);
+  }
 
-  HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height)
+  HttpgdDev::HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height)
       : m_dd(dd), m_system_aliases(Rcpp::wrap(aliases["system"])),
         m_user_aliases(Rcpp::wrap(aliases["user"])),
         m_cc(gdtools::context_create()),
-        m_svr_thread(), m_page(width, height), m_host(host), m_port(port)
+        m_server(host, port, width, height, [&]() { userResized(); })
   {
     // read live server html
-    std::ifstream t(get_htmlpath());
+    std::ifstream t(get_wwwpath("index.html"));
     std::stringstream buffer;
     buffer << t.rdbuf();
-    m_livehtml = std::string(buffer.str());
+    std::string livehtml = std::string(buffer.str());
+    m_server.set_livehtml(livehtml);
 
-    m_page.m_fill = dd->startfill;
+    m_server.page_fill(dd->startfill);
   }
-  ~HttpgdDev()
+
+  HttpgdDev::~HttpgdDev()
   {
-    stop_server();
   }
-  void start_server()
+
+  void HttpgdDev::userResized()
   {
-    m_svr_thread = std::thread(&HttpgdDev::ThreadMain, this);
+    m_dd->size(&(m_dd->left), &(m_dd->right), &(m_dd->bottom), &(m_dd->top), m_dd);
+    later::later([](void *m_dd) { GEplayDisplayList(desc2GEDesc((pDevDesc)m_dd)); }, m_dd, 0.0);
   }
-  void stop_server()
-  {
-    m_svr.stop();
-    if (m_svr_thread.joinable())
-    {
-      m_svr_thread.join();
-    }
-  }
-  void page_put(dc::DrawCall *dc)
-  {
-    m_page_mutex.lock();
-    m_page.put(dc);
-    m_page_mutex.unlock();
-  }
-  void page_clear()
-  {
-    m_page_mutex.lock();
-    m_page.clear();
-    m_page_mutex.unlock();
-  }
-  void page_fill(int fill)
-  {
-    m_page_mutex.lock();
-    m_page.m_fill = fill;
-    m_page_mutex.unlock();
-  }
-  void get_svg(std::string &buf)
-  {
-    m_page_mutex.lock();
-    m_page.to_svg(buf);
-    m_page_mutex.unlock();
-  }
-  void page_resize(double w, double h)
-  {
-    m_page_mutex.lock();
-    m_page.m_width = w;
-    m_page.m_height = h;
-    m_page.clear();
-    m_page_mutex.unlock();
-  }
-  double page_width()
-  {
-    return m_page.m_width;
-  }
-  double page_height()
-  {
-    return m_page.m_height;
-  }
-  void page_clip(double x0, double x1, double y0, double y1)
-  {
-    m_page_mutex.lock();
-    m_page.clip(x0, x1, y0, y1);
-    m_page_mutex.unlock();
-  }
+} // namespace httpgd
 
-private:
-  std::thread m_svr_thread;
-  httplib::Server m_svr;
-  dc::Page m_page;
-  std::mutex m_page_mutex;
-  std::string m_host;
-  int m_port;
-
-  void ThreadMain()
-  {
-    using namespace httplib;
-
-    m_svr.Get("/", [](const Request & /*req*/, Response &res) {
-      res.set_header("Access-Control-Allow-Origin", "*");
-      res.set_content("httpgd server running.", "text/plain");
-    });
-    m_svr.Get("/live", [this](const Request & /*req*/, Response &res) {
-      res.set_header("Access-Control-Allow-Origin", "*");
-
-       // build params
-      std::string sparams = std::string("{ host: \"").append(m_host);
-      sparams.append("\", port: ").append(std::to_string(m_port));
-      m_page_mutex.lock();
-      sparams.append(", width: ").append(std::to_string(m_page.m_width));
-      sparams.append(", height: ").append(std::to_string(m_page.m_height));
-      m_page_mutex.unlock();
-      sparams.append(" }/*");
-
-      // inject params
-      std::string html(m_livehtml);
-      size_t start_pos = m_livehtml.find("/*SRVRPARAMS*/");
-      if (start_pos != std::string::npos) {
-        html.replace(start_pos, sizeof("/*SRVRPARAMS*/") - 1, sparams);
-      }
-
-      res.set_content(html, "text/html");
-    });
-    m_svr.Get("/svg", [this](const Request & /*req*/, Response &res) {
-      res.set_header("Access-Control-Allow-Origin", "*");
-      std::string s;
-      s.reserve(1000000);
-      this->get_svg(s);
-      res.set_content(s, "image/svg+xml");
-    });
-    m_svr.Get("/check", [this](const Request & /*req*/, Response &res) {
-      res.set_header("Access-Control-Allow-Origin", "*");
-
-      std::string buffer;
-      buffer.reserve(200);
-      m_page_mutex.lock();
-      buffer.append("{ \"upid\": ").append(std::to_string(m_page.get_upid()));
-      buffer.append(", \"width\": ").append(std::to_string(m_page.m_width));
-      buffer.append(", \"height\": ").append(std::to_string(m_page.m_height));
-      buffer.append(" }");
-      m_page_mutex.unlock();
-      
-      res.set_content(buffer, "application/json");
-    });
-    m_svr.Post("/rs", [this](const Request &req, Response &res) {
-      res.set_header("Access-Control-Allow-Origin", "*");
-      Params par;
-      detail::parse_query_text(req.body, par);
-
-      double w = m_page.m_width;
-      double h = m_page.m_height;
-
-      for (const auto &e : par)
-      {
-        if (e.first == "w")
-        {
-          try
-          {
-            w = std::stod(e.second);
-          }
-          catch (const std::exception &e)
-          {
-          }
-        }
-        else if (e.first == "h")
-        {
-          try
-          {
-            h = std::stod(e.second);
-          }
-          catch (const std::exception &e)
-          {
-          }
-        }
-      }
-
-      if (w != m_page.m_width || h != m_page.m_height)
-      {
-        page_resize(w, h);
-        m_dd->size(&(m_dd->left), &(m_dd->right), &(m_dd->bottom), &(m_dd->top), m_dd);
-
-        later::later([](void *dd) { GEplayDisplayList(desc2GEDesc((pDevDesc)dd)); }, m_dd, 0.0);
-      }
-
-      res.set_content("{ \"status\": \"ok\" }", "application/json");
-    });
-
-    //m_svr.Get("/stop",
-    //        [&](const Request & /*req*/, Response & /*res*/) { m_svr.stop(); });
-
-    m_svr.listen(m_host.c_str(), m_port);
-  }
-};
+using namespace httpgd;
 
 inline HttpgdDev *getDev(pDevDesc dd)
 {
@@ -319,7 +148,7 @@ double httpgd_strwidth(const char *str, const pGEcontext gc, pDevDesc dd)
  */
 void httpgd_clip(double x0, double x1, double y0, double y1, pDevDesc dd)
 {
-  getDev(dd)->page_clip(x0, x1, y0, y1);
+  getDev(dd)->m_server.page_clip(x0, x1, y0, y1);
 #if LOGDRAW == 1
   Rprintf("CLIP x0=%f x1=%f y0=%f y1=%f\n", x0, x1, y0, y1);
 #endif
@@ -330,8 +159,8 @@ void httpgd_clip(double x0, double x1, double y0, double y1, pDevDesc dd)
  */
 void httpgd_new_page(const pGEcontext gc, pDevDesc dd)
 {
-  getDev(dd)->page_clear();
-  getDev(dd)->page_fill(dd->startfill); // todo should this be gc->fill ?
+  getDev(dd)->m_server.page_clear();
+  getDev(dd)->m_server.page_fill(dd->startfill); // todo should this be gc->fill ?
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "NEW_PAGE \n";
@@ -346,7 +175,7 @@ void httpgd_close(pDevDesc dd)
   Rcpp::Rcout << "Server closing... ";
 
   HttpgdDev *svgd = getDev(dd);
-  svgd->stop_server();
+  svgd->m_server.stop();
   free(svgd);
 
   Rcpp::Rcout << "Closed.\n";
@@ -368,7 +197,7 @@ void httpgd_line(double x1, double y1, double x2, double y2,
 {
   dc::Line *dc = new dc::Line(x1, y1, x2, y2);
   copyGc(gc, dc);
-  getDev(dd)->page_put(dc);
+  getDev(dd)->m_server.page_put(dc);
 
 #if LOGDRAW == 1
   Rprintf("LINE x1=%f y1=%f x2=%f y2=%f\n", x1, y1, x2, y2);
@@ -387,7 +216,7 @@ void httpgd_polyline(int n, double *x, double *y, const pGEcontext gc,
 
   dc::Polyline *dc = new dc::Polyline(n, vx, vy);
   copyGc(gc, dc);
-  getDev(dd)->page_put(dc);
+  getDev(dd)->m_server.page_put(dc);
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "POLYLINE \n";
@@ -406,7 +235,7 @@ void httpgd_polygon(int n, double *x, double *y, const pGEcontext gc,
 
   dc::Polygon *dc = new dc::Polygon(n, vx, vy);
   copyGc(gc, dc);
-  getDev(dd)->page_put(dc);
+  getDev(dd)->m_server.page_put(dc);
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "POLYGON \n";
@@ -423,15 +252,16 @@ void httpgd_path(double *x, double *y,
 {
   std::vector<int> vnper(nper, nper + npoly);
   int npoints = 0;
-  for (int i = 0; i < npoly; i++) {
+  for (int i = 0; i < npoly; i++)
+  {
     npoints += vnper[i];
   }
   std::vector<double> vx(x, x + npoints);
   std::vector<double> vy(y, y + npoints);
 
-  dc::Path *dc = new dc::Path(vx,vy, npoly, vnper, winding);
+  dc::Path *dc = new dc::Path(vx, vy, npoly, vnper, winding);
   copyGc(gc, dc);
-  getDev(dd)->page_put(dc);
+  getDev(dd)->m_server.page_put(dc);
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "PATH \n";
@@ -446,7 +276,7 @@ void httpgd_rect(double x0, double y0, double x1, double y1,
 {
   dc::Rect *dc = new dc::Rect(x0, y0, x1, y1);
   copyGc(gc, dc);
-  getDev(dd)->page_put(dc);
+  getDev(dd)->m_server.page_put(dc);
 
 #if LOGDRAW == 1
   Rprintf("RECT x0=%f y0=%f x1=%f y1=%f\n", x0, y0, x1, y1);
@@ -462,7 +292,7 @@ void httpgd_circle(double x, double y, double r, const pGEcontext gc,
 
   dc::Circle *dc = new dc::Circle(x, y, r);
   copyGc(gc, dc);
-  getDev(dd)->page_put(dc);
+  getDev(dd)->m_server.page_put(dc);
 
 #if LOGDRAW == 1
   Rprintf("CIRCLE x=%f y=%f r=%f\n", x, y, r);
@@ -496,7 +326,7 @@ void httpgd_text(double x, double y, const char *str, double rot,
   Rprintf("TEXT x=%f y=%f str=\"%s\" rot=%f hadj=%f\n", x, y, str, rot, hadj);
 #endif
 
-  dev->page_put(dc);
+  dev->m_server.page_put(dc);
 }
 
 /**
@@ -508,8 +338,8 @@ void httpgd_size(double *left, double *right, double *bottom, double *top,
   HttpgdDev *dev = getDev(dd);
 
   *left = 0.0;
-  *right = dev->page_width();
-  *bottom = dev->page_height();
+  *right = dev->m_server.page_width();
+  *bottom = dev->m_server.page_height();
   *top = 0.0;
 
 #if LOGDRAW == 1
@@ -528,11 +358,11 @@ void httpgd_raster(unsigned int *raster, int w, int h,
                    const pGEcontext gc, pDevDesc dd)
 {
 
-  std::vector<unsigned int> raster_(raster, raster + (w*h));
+  std::vector<unsigned int> raster_(raster, raster + (w * h));
 
-  dc::Raster *dc = new dc::Raster(raster_,w,h,x,y,width,height,rot,interpolate);
+  dc::Raster *dc = new dc::Raster(raster_, w, h, x, y, width, height, rot, interpolate);
   copyGc(gc, dc);
-  getDev(dd)->page_put(dc);
+  getDev(dd)->m_server.page_put(dc);
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "RASTER \n";
@@ -612,10 +442,10 @@ pDevDesc httpgd_driver_new(std::string host, int port, int bg, double width,
   dd->ipr[1] = 1.0 / 72.0;
 
   // Capabilities
-  dd->canClip = Rboolean::TRUE;
+  dd->canClip = (Rboolean)1;
   dd->canHAdj = 0;
-  dd->canChangeGamma = Rboolean::FALSE;
-  dd->displayListOn = Rboolean::TRUE; // THIS TOGGLES REPLAYABILITY !!!
+  dd->canChangeGamma = (Rboolean)0;
+  dd->displayListOn = (Rboolean)1; // THIS TOGGLES REPLAYABILITY !!!
   dd->haveTransparency = 2;
   dd->haveTransparentBg = 2;
 
@@ -634,7 +464,7 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
 
   pDevDesc dev;
 
-  BEGIN_SUSPEND_INTERRUPTS
+  HTTPGD_BEGIN_SUSPEND_INTERRUPTS
   {
 
     dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases);
@@ -645,9 +475,9 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
     GEaddDevice2(dd, "httpgd");
     GEinitDisplayList(dd);
   }
-  END_SUSPEND_INTERRUPTS;
+  HTTPGD_END_SUSPEND_INTERRUPTS;
 
-  getDev(dev)->start_server();
+  getDev(dev)->m_server.start();
 }
 
 // [[Rcpp::export]]
@@ -658,3 +488,5 @@ bool httpgd_(Rcpp::String host, int port, std::string bg, double width, double h
 
   return true;
 }
+
+// namespace httpgd

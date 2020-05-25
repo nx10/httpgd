@@ -426,7 +426,7 @@ namespace httpgd
              std::abs(x1 - m_x1) < 0.01 &&
              std::abs(y0 - m_y0) < 0.01 &&
              std::abs(y1 - m_y1) < 0.01;
-    };
+    }
     void Clip::to_svg_def(std::string &buf)
     {
       buf.append("<clipPath id=\"cp").append(std::to_string(m_id)).append("\">");
