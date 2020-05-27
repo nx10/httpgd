@@ -20,5 +20,3 @@ LibExtern int R_interrupts_pending;
 extern void Rf_onintr(void);
 LibExtern Rboolean mbcslocale;
 #endif
-
-#define LOGDRAW 0

@@ -1,4 +1,4 @@
-
+// [[Rcpp::plugins("cpp11")]]
 
 #include <Rcpp.h>
 #include <R_ext/GraphicsEngine.h>
@@ -16,11 +16,15 @@
 
 #include "fixsuspinter.h"
 
+#define LOGDRAW 0
+
+static void hist_play(pDevDesc dd);
+static void hist_clear(pDevDesc dd);
+
 namespace httpgd
 {
-  //pGEDevDesc httpgd_pGEDevDesc = nullptr;
 
-  // returns system path to {package}/inst/www/index.html
+  // returns system path to {package}/inst/www/{filename}
   std::string get_wwwpath(const std::string &filename)
   {
     Rcpp::Environment base("package:base");
@@ -30,12 +34,25 @@ namespace httpgd
     return std::string(res[0]);
   }
 
-  HttpgdDev::HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height)
+  inline HttpgdDev *getDev(pDevDesc dd)
+  {
+    return (HttpgdDev *)dd->deviceSpecific;
+  }
+
+  HttpgdDev::HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height, bool recording)
       : m_dd(dd), m_system_aliases(Rcpp::wrap(aliases["system"])),
         m_user_aliases(Rcpp::wrap(aliases["user"])),
         m_cc(gdtools::context_create()),
-        m_server(host, port, width, height, [&]() { userResized(); })
+        m_server(host, port, width, height, recording),
+        m_history(8927, 4, std::string(".httpgdPlots_").append(std::to_string(port))),
+        m_replaying(false), m_needsave(false)
   {
+    // setup callbacks
+    m_server.m_user_resized = [&]() { user_resized(); };
+    //m_server.m_user_hist_record = [&](bool recording){ user_hist_record(recording); };
+    m_server.m_user_hist_play = [&]() { user_hist_play(); };
+    m_server.m_user_hist_clear = [&]() { user_hist_clear(); };
+
     // read live server html
     std::ifstream t(get_wwwpath("index.html"));
     std::stringstream buffer;
@@ -43,6 +60,7 @@ namespace httpgd
     std::string livehtml = std::string(buffer.str());
     m_server.set_livehtml(livehtml);
 
+    // set start fill
     m_server.page_fill(dd->startfill);
   }
 
@@ -50,19 +68,82 @@ namespace httpgd
   {
   }
 
-  void HttpgdDev::userResized()
+  void HttpgdDev::user_resized()
   {
-    m_dd->size(&(m_dd->left), &(m_dd->right), &(m_dd->bottom), &(m_dd->top), m_dd);
-    later::later([](void *m_dd) { GEplayDisplayList(desc2GEDesc((pDevDesc)m_dd)); }, m_dd, 0.0);
+    m_replaying = true;
+    later::later([](void *ddp) {
+      pDevDesc dd = (pDevDesc)ddp;
+      dd->size(&(dd->left), &(dd->right), &(dd->bottom), &(dd->top), dd);
+      GEplayDisplayList(desc2GEDesc(dd));
+      getDev(dd)->m_replaying = false;
+    },
+                 m_dd, 0.0);
   }
+
+  void HttpgdDev::user_hist_play()
+  {
+    later::later([](void *ddp) {
+      pDevDesc dd = (pDevDesc)ddp;
+      hist_play(dd);
+    },
+                 m_dd, 0.0);
+  }
+  void HttpgdDev::user_hist_clear()
+  {
+    later::later([](void *ddp) {
+      pDevDesc dd = (pDevDesc)ddp;
+      hist_clear(dd);
+    },
+                 m_dd, 0.0);
+  }
+
 } // namespace httpgd
 
 using namespace httpgd;
 
-inline HttpgdDev *getDev(pDevDesc dd)
+// plot history
+
+static void hist_update_size(pDevDesc dd)
 {
-  return (HttpgdDev *)dd->deviceSpecific;
+  HttpgdDev *xd = (HttpgdDev *)dd->deviceSpecific;
+  int history_size = xd->m_history.size();
+  if (xd->m_needsave)
+  {
+    history_size += 1;
+  }
+  xd->m_server.set_history_size(history_size);
 }
+
+static void hist_play(pDevDesc dd)
+{
+  HttpgdDev *xd = (HttpgdDev *)dd->deviceSpecific;
+
+  if (xd->m_server.is_recording() && xd->m_needsave)
+    {
+      xd->m_history.push_current(dd);
+      xd->m_needsave = false;
+    }
+
+  int index = xd->m_server.get_history_index();
+  xd->m_replaying = true;
+  xd->m_history.play(index, dd);
+  xd->m_replaying = false;
+
+  hist_update_size(dd);
+}
+
+
+static void hist_clear(pDevDesc dd)
+{
+  HttpgdDev *xd = (HttpgdDev *)dd->deviceSpecific;
+  xd->m_history.clear();
+  xd->m_needsave = false;
+  xd->m_server.set_history_size(0);
+}
+
+/* end of plot history */
+
+// -------------------
 
 /**
  * Copy (stateful) graphics parameters.
@@ -159,8 +240,19 @@ void httpgd_clip(double x0, double x1, double y0, double y1, pDevDesc dd)
  */
 void httpgd_new_page(const pGEcontext gc, pDevDesc dd)
 {
-  getDev(dd)->m_server.page_clear();
-  getDev(dd)->m_server.page_fill(dd->startfill); // todo should this be gc->fill ?
+  HttpgdDev *dev = getDev(dd);
+
+  if (dev->m_server.is_recording() && dev->m_needsave)
+  {
+    dev->m_history.push_last(dd);
+  }
+  dev->m_needsave = !dev->m_replaying;
+  if (!dev->m_replaying) {
+    hist_update_size(dd);
+  }
+
+  dev->m_server.page_clear();
+  dev->m_server.page_fill(dd->startfill); // todo should this be gc->fill ?
 
 #if LOGDRAW == 1
   Rcpp::Rcout << "NEW_PAGE \n";
@@ -174,9 +266,10 @@ void httpgd_close(pDevDesc dd)
 {
   Rcpp::Rcout << "Server closing... ";
 
-  HttpgdDev *svgd = getDev(dd);
-  svgd->m_server.stop();
-  free(svgd);
+  HttpgdDev *dev = getDev(dd);
+  dev->m_history.clear();
+  dev->m_server.stop();
+  free(dev);
 
   Rcpp::Rcout << "Closed.\n";
 
@@ -383,7 +476,7 @@ static void httpgd_mode(int mode, pDevDesc dd)
 // --------------------------------------
 
 pDevDesc httpgd_driver_new(std::string host, int port, int bg, double width,
-                           double height, double pointsize, Rcpp::List &aliases)
+                           double height, double pointsize, Rcpp::List &aliases, bool recording)
 {
 
   pDevDesc dd = (DevDesc *)calloc(1, sizeof(DevDesc));
@@ -449,12 +542,12 @@ pDevDesc httpgd_driver_new(std::string host, int port, int bg, double width,
   dd->haveTransparency = 2;
   dd->haveTransparentBg = 2;
 
-  dd->deviceSpecific = new HttpgdDev(dd, host, port, aliases, width, height);
+  dd->deviceSpecific = new HttpgdDev(dd, host, port, aliases, width, height, recording);
   return dd;
 }
 
 void makehttpgdDevice(std::string host, int port, std::string bg_, double width, double height,
-                      double pointsize, Rcpp::List &aliases)
+                      double pointsize, Rcpp::List &aliases, bool recording)
 {
 
   int bg = R_GE_str2col(bg_.c_str());
@@ -467,7 +560,7 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
   HTTPGD_BEGIN_SUSPEND_INTERRUPTS
   {
 
-    dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases);
+    dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases, recording);
     if (dev == NULL)
       Rcpp::stop("Failed to start httpgd.");
 
@@ -482,9 +575,9 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
 
 // [[Rcpp::export]]
 bool httpgd_(Rcpp::String host, int port, std::string bg, double width, double height,
-             double pointsize, Rcpp::List aliases)
+             double pointsize, Rcpp::List aliases, bool recording)
 {
-  makehttpgdDevice(host, port, bg, width, height, pointsize, aliases);
+  makehttpgdDevice(host, port, bg, width, height, pointsize, aliases, recording);
 
   return true;
 }

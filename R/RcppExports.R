@@ -8,7 +8,7 @@ dummygd_ <- function() {
     .Call(`_httpgd_dummygd_`)
 }
 
-httpgd_ <- function(host, port, bg, width, height, pointsize, aliases) {
-    .Call(`_httpgd_httpgd_`, host, port, bg, width, height, pointsize, aliases)
+httpgd_ <- function(host, port, bg, width, height, pointsize, aliases, recording) {
+    .Call(`_httpgd_httpgd_`, host, port, bg, width, height, pointsize, aliases, recording)
 }
 

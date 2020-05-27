@@ -11,6 +11,7 @@
 #include <mutex>
 
 #include "HttpgdServer.h"
+#include "PlotHistory.h"
 
 namespace httpgd
 {
@@ -24,11 +25,19 @@ namespace httpgd
     Rcpp::List m_user_aliases;
     XPtrCairoContext m_cc;
     HttpgdServer m_server;
+    PlotHistory m_history;
 
-    HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height);
+    bool m_replaying; // Is the device replaying
+    bool m_needsave; // Should a snapshot be saved when the plot changes
+    // see also m_recording in HttpgdServer
+
+    HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height, bool recording);
     ~HttpgdDev();
 
-    void userResized();
+    void user_resized();
+    //void user_hist_record(bool recording);
+    void user_hist_play();
+    void user_hist_clear();
 
   private:
   };

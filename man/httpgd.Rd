@@ -12,7 +12,8 @@ httpgd(
   bg = "white",
   pointsize = 12,
   system_fonts = list(),
-  user_fonts = list()
+  user_fonts = list(),
+  recording = TRUE
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ strings containing a path to a font file, or a list containing
 \code{name} and \code{file} elements with \code{name} indicating
 the font alias in the SVG output and \code{file} the path to a
 font file.}
+
+\item{recording}{Toggles plot history}
 }
 \description{
 Initialize httpgd graphics device and start server.

@@ -1,7 +1,7 @@
 Package: httpgd
 Type: Package
 Title: Http server graphics device
-Version: 0.2.0
+Version: 0.3.0
 Date: 2020-05-10
 Author: Florian Rupprecht
 Maintainer: Florian Rupprecht <floruppr@gmail.com>
@@ -17,3 +17,4 @@ Suggests:
     svglite
 RoxygenNote: 7.1.0
 Encoding: UTF-8
+SystemRequirements: C++11
