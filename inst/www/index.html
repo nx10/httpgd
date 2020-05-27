@@ -57,6 +57,7 @@
     <object id="drawing"></object>
   </div>
   <script>
+
     const svr = /*SRVRPARAMS*/{ "host": "localhost", "port": 8288, "upid": 1, "width": 736.000000, "height": 590.720020, "recording": true, "hsize": 0, "hindex": -1 }/**/;
 
     const intervall_check = 1500;
@@ -191,6 +192,20 @@
       }
 
       setInterval(checkcycle, intervall_check);
+
+      var hidden, visibilityChange;
+      if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 
+        hidden = "hidden";
+        visibilityChange = "visibilitychange";
+      } else if (typeof document.msHidden !== "undefined") {
+        hidden = "msHidden";
+        visibilityChange = "msvisibilitychange";
+      } else if (typeof document.webkitHidden !== "undefined") {
+        hidden = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
+      }
+      // Handle page visibility change   
+      document.addEventListener(visibilityChange, () => { if (!document[hidden]) { cli.elem_drw.data = api.svg + '?vchange=1'; } }, false);
     }
   </script>
 </body>
