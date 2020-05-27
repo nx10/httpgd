@@ -276,4 +276,14 @@ namespace httpgd
     m_svr.listen(m_host.c_str(), m_port);
   }
 
+  bool check_server_started(std::string host, int port) {
+    httplib::Client cli(host, port);
+    cli.set_connection_timeout(0, 300000); // 300 milliseconds
+    auto res = cli.Get("/");
+    if (res && res->status == 200) {
+      return true;
+    }
+    return false;
+  }
+
 } // namespace httpgd

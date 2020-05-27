@@ -559,6 +559,10 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
 
   HTTPGD_BEGIN_SUSPEND_INTERRUPTS
   {
+    if (check_server_started(host, port)) // todo: it should be possible to check if the port is occupied instead
+    {
+      Rcpp::stop("Failed to start httpgd. Server already running at this address!");
+    }
 
     dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases, recording);
     if (dev == NULL)
@@ -567,10 +571,10 @@ void makehttpgdDevice(std::string host, int port, std::string bg_, double width,
     pGEDevDesc dd = GEcreateDevDesc(dev);
     GEaddDevice2(dd, "httpgd");
     GEinitDisplayList(dd);
+    
+    getDev(dev)->m_server.start();
   }
   HTTPGD_END_SUSPEND_INTERRUPTS;
-
-  getDev(dev)->m_server.start();
 }
 
 // [[Rcpp::export]]

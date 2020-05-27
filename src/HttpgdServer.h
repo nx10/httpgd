@@ -64,6 +64,8 @@ namespace httpgd
     void svr_main();
   };
 
+  bool check_server_started(std::string host, int port);
+
 } // namespace httpgd
 
 #endif // HTTPGD_SERVER_H
