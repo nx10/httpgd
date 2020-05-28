@@ -5,5 +5,5 @@
 \alias{httpgd-package}
 \title{httpgd: Http server graphics device}
 \description{
-Http server graphics device
+Asynchronous http server graphics device.
 }

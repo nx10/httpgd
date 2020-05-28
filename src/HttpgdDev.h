@@ -27,7 +27,7 @@ namespace httpgd
 
         HttpgdDev(pDevDesc t_dd, const std::string &t_host, int t_port,
                   const Rcpp::List &t_aliases,
-                  double t_width, double t_height, bool t_recording);
+                  double t_width, double t_height, bool t_recording, bool t_cors);
         ~HttpgdDev();
 
         void hist_new_page();

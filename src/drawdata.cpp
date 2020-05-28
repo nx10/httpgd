@@ -482,7 +482,7 @@ namespace httpgd
                 delete p;
             } 
             m_dcs.clear();
-        };
+        }
 
         void Page::clip(double x0, double x1, double y0, double y1)
         {

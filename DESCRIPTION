@@ -1,11 +1,11 @@
 Package: httpgd
 Type: Package
 Title: Http server graphics device
-Version: 0.3.0
+Version: 0.3.1
 Date: 2020-05-10
 Author: Florian Rupprecht
 Maintainer: Florian Rupprecht <floruppr@gmail.com>
-Description: Http server graphics device.
+Description: Asynchronous http server graphics device. Much of the svg rendering (especially the font handling) is based on svglite.
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.4),
     later (>= 1.0.0),

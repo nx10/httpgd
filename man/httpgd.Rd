@@ -13,21 +13,22 @@ httpgd(
   pointsize = 12,
   system_fonts = list(),
   user_fonts = list(),
-  recording = TRUE
+  recording = TRUE,
+  cors = FALSE
 )
 }
 \arguments{
-\item{host}{Hostname}
+\item{host}{Hostname.}
 
-\item{port}{Port}
+\item{port}{Port.}
 
-\item{width}{Graphics device width (pixels)}
+\item{width}{Graphics device width (pixels).}
 
-\item{height}{Graphics device height (pixels)}
+\item{height}{Graphics device height (pixels).}
 
-\item{bg}{Background color}
+\item{bg}{Background color.}
 
-\item{pointsize}{Graphics device point size}
+\item{pointsize}{Graphics device point size.}
 
 \item{system_fonts}{Named list of font names to be aliased with
 fonts installed on your system. If unspecified, the R default
@@ -43,7 +44,10 @@ strings containing a path to a font file, or a list containing
 the font alias in the SVG output and \code{file} the path to a
 font file.}
 
-\item{recording}{Toggles plot history}
+\item{recording}{Should a plot history be recorded.}
+
+\item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
+When set to TRUE, CORS header will be set to "*".}
 }
 \description{
 Initialize httpgd graphics device and start server.

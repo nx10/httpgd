@@ -286,7 +286,7 @@ namespace httpgd
     // --------------------------------------
 
     pDevDesc httpgd_driver_new(const std::string &host, int port, int bg, double width,
-                               double height, double pointsize, const Rcpp::List &aliases, bool recording)
+                               double height, double pointsize, const Rcpp::List &aliases, bool recording, bool cors)
     {
 
         pDevDesc dd = (DevDesc *)calloc(1, sizeof(DevDesc));
@@ -354,12 +354,12 @@ namespace httpgd
         dd->haveTransparency = 2;
         dd->haveTransparentBg = 2;
 
-        dd->deviceSpecific = new HttpgdDev(dd, host, port, aliases, width, height, recording);
+        dd->deviceSpecific = new HttpgdDev(dd, host, port, aliases, width, height, recording, cors);
         return dd;
     }
 
     void makehttpgdDevice(const std::string &host, int port, const std::string &bg_, double width, double height,
-                          double pointsize, const Rcpp::List &aliases, bool recording)
+                          double pointsize, const Rcpp::List &aliases, bool recording, bool cors)
     {
 
         int bg = R_GE_str2col(bg_.c_str());
@@ -374,7 +374,7 @@ namespace httpgd
                 Rcpp::stop("Failed to start httpgd. Server already running at this address!");
             }
 
-            pDevDesc dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases, recording);
+            pDevDesc dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases, recording, cors);
             if (dev == nullptr)
             {
                 Rcpp::stop("Failed to start httpgd.");
@@ -393,9 +393,9 @@ namespace httpgd
 
 // [[Rcpp::export]]
 bool httpgd_(Rcpp::String host, int port, Rcpp::String bg, double width, double height,
-             double pointsize, Rcpp::List aliases, bool recording)
+             double pointsize, Rcpp::List aliases, bool recording, bool cors)
 {
-    httpgd::makehttpgdDevice(host, port, bg, width, height, pointsize, aliases, recording);
+    httpgd::makehttpgdDevice(host, port, bg, width, height, pointsize, aliases, recording, cors);
 
     return true;
 }

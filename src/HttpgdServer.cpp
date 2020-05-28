@@ -15,8 +15,8 @@
 
 namespace httpgd
 {
-    HttpgdServer::HttpgdServer(const std::string &t_host, int t_port, double t_width, double t_height, bool t_recording)
-        : m_host(t_host), m_port(t_port),
+    HttpgdServer::HttpgdServer(const std::string &t_host, int t_port, double t_width, double t_height, bool t_recording, bool t_cors)
+        : m_host(t_host), m_port(t_port), m_svr_cors(t_cors),
           m_page(t_width, t_height), m_history_recording(t_recording),
           m_history_index(-1), m_history_size(0)
     {
@@ -158,6 +158,7 @@ namespace httpgd
         }
     }
 
+    #define HTTPGD_CORS(res) if (m_svr_cors) { res.set_header("Access-Control-Allow-Origin", "*"); }
     void HttpgdServer::m_svr_main()
     {
         using httplib::Params;
@@ -165,12 +166,12 @@ namespace httpgd
         using httplib::Response;
         using httplib::detail::parse_query_text;
 
-        m_svr.Get("/", [](const Request & /*req*/, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Get("/", [&](const Request & /*req*/, Response &res) {
+            HTTPGD_CORS(res);
             res.set_content("httpgd server running.", "text/plain");
         });
-        m_svr.Get("/live", [this](const Request & /*req*/, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Get("/live", [&](const Request & /*req*/, Response &res) {
+            HTTPGD_CORS(res);
 
             // build params
             std::string sparams = build_state_json(true);
@@ -186,19 +187,19 @@ namespace httpgd
 
             res.set_content(html, "text/html");
         });
-        m_svr.Get("/svg", [this](const Request & /*req*/, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Get("/svg", [&](const Request & /*req*/, Response &res) {
+            HTTPGD_CORS(res);
             std::string s = "";
             s.reserve(1000000);
             this->build_svg(&s);
             res.set_content(s, "image/svg+xml");
         });
-        m_svr.Get("/state", [this](const Request & /*req*/, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Get("/state", [&](const Request & /*req*/, Response &res) {
+            HTTPGD_CORS(res);
             res.set_content(build_state_json(false), "application/json");
         });
-        m_svr.Post("/resize", [this](const Request &req, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Post("/resize", [&](const Request &req, Response &res) {
+            HTTPGD_CORS(res);
             Params par;
             parse_query_text(req.body, par);
 
@@ -216,7 +217,7 @@ namespace httpgd
                     trystod(e.second, &user_h);
                 }
             }
-            
+
             m_page_mutex.lock();
             double old_w = m_page.width;
             double old_h = m_page.height; // todo mutex lock
@@ -233,8 +234,8 @@ namespace httpgd
 
             res.set_content(build_state_json(false), "application/json");
         });
-        m_svr.Post("/next", [this](const Request &req, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Post("/next", [&](const Request &req, Response &res) {
+            HTTPGD_CORS(res);
 
             if (m_history_index < m_history_size - 1)
             {
@@ -244,8 +245,8 @@ namespace httpgd
 
             res.set_content(build_state_json(false), "application/json");
         });
-        m_svr.Post("/prev", [this](const Request &req, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Post("/prev", [&](const Request &req, Response &res) {
+            HTTPGD_CORS(res);
 
             if (m_history_index > 0)
             {
@@ -255,16 +256,16 @@ namespace httpgd
 
             res.set_content(build_state_json(false), "application/json");
         });
-        m_svr.Post("/clear", [this](const Request &req, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Post("/clear", [&](const Request &req, Response &res) {
+            HTTPGD_CORS(res);
 
             page_clear();
             notify_hist_clear();
 
             res.set_content(build_state_json(false), "application/json");
         });
-        m_svr.Post("/record", [this](const Request &req, Response &res) {
-            res.set_header("Access-Control-Allow-Origin", "*");
+        m_svr.Post("/record", [&](const Request &req, Response &res) {
+            HTTPGD_CORS(res);
 
             Params par;
             parse_query_text(req.body, par);

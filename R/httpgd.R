@@ -2,12 +2,12 @@
 
 #' Initialize httpgd graphics device and start server.
 #'
-#' @param host Hostname
-#' @param port Port
-#' @param width Graphics device width (pixels)
-#' @param height Graphics device height (pixels)
-#' @param bg Background color
-#' @param pointsize Graphics device point size
+#' @param host Hostname.
+#' @param port Port.
+#' @param width Graphics device width (pixels).
+#' @param height Graphics device height (pixels).
+#' @param bg Background color.
+#' @param pointsize Graphics device point size.
 #' @param system_fonts Named list of font names to be aliased with
 #'   fonts installed on your system. If unspecified, the R default
 #'   families \code{sans}, \code{serif}, \code{mono} and \code{symbol}
@@ -20,7 +20,9 @@
 #'   \code{name} and \code{file} elements with \code{name} indicating
 #'   the font alias in the SVG output and \code{file} the path to a
 #'   font file.
-#' @param recording Toggles plot history
+#' @param recording Should a plot history be recorded.
+#' @param cors Toggles Cross-Origin Resource Sharing (CORS) header.
+#'   When set to TRUE, CORS header will be set to "*".
 #'
 #' @export
 httpgd <-
@@ -32,9 +34,10 @@ httpgd <-
            pointsize = 12,
            system_fonts = list(),
            user_fonts = list(),
-           recording = TRUE) {
+           recording = TRUE,
+           cors = FALSE) {
     aliases <- validate_aliases(system_fonts, user_fonts)
-    httpgd_(host, port, bg, width, height, pointsize, aliases, recording)
+    httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors)
     surl <- paste0("http://", host, ":", port)
     writeLines(paste0("httpgd live server running at:\n  ",surl,"/live"))
   }

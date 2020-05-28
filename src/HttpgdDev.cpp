@@ -17,9 +17,9 @@ namespace httpgd
 
     const int HISTORY_MAGIC = 8927;
 
-    HttpgdDev::HttpgdDev(pDevDesc t_dd, const std::string &t_host, int t_port, const Rcpp::List &t_aliases, double t_width, double t_height, bool t_recording)
+    HttpgdDev::HttpgdDev(pDevDesc t_dd, const std::string &t_host, int t_port, const Rcpp::List &t_aliases, double t_width, double t_height, bool t_recording, bool t_cors)
         : dd(t_dd),
-          server(t_host, t_port, t_width, t_height, t_recording),
+          server(t_host, t_port, t_width, t_height, t_recording, t_cors),
           history(HISTORY_MAGIC, 4, std::string(".httpgdPlots_").append(std::to_string(t_port))),
           font(t_aliases),
           m_replaying(false), m_needsave(false)
