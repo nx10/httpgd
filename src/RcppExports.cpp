@@ -5,6 +5,24 @@
 
 using namespace Rcpp;
 
+// httpgd_
+bool httpgd_(Rcpp::String host, int port, Rcpp::String bg, double width, double height, double pointsize, Rcpp::List aliases, bool recording);
+RcppExport SEXP _httpgd_httpgd_(SEXP hostSEXP, SEXP portSEXP, SEXP bgSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP pointsizeSEXP, SEXP aliasesSEXP, SEXP recordingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::String >::type host(hostSEXP);
+    Rcpp::traits::input_parameter< int >::type port(portSEXP);
+    Rcpp::traits::input_parameter< Rcpp::String >::type bg(bgSEXP);
+    Rcpp::traits::input_parameter< double >::type width(widthSEXP);
+    Rcpp::traits::input_parameter< double >::type height(heightSEXP);
+    Rcpp::traits::input_parameter< double >::type pointsize(pointsizeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type aliases(aliasesSEXP);
+    Rcpp::traits::input_parameter< bool >::type recording(recordingSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_(host, port, bg, width, height, pointsize, aliases, recording));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dummygd_
 bool dummygd_();
 RcppExport SEXP _httpgd_dummygd_() {
@@ -15,28 +33,10 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// httpgd_
-bool httpgd_(Rcpp::String host, int port, std::string bg, double width, double height, double pointsize, Rcpp::List aliases, bool recording);
-RcppExport SEXP _httpgd_httpgd_(SEXP hostSEXP, SEXP portSEXP, SEXP bgSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP pointsizeSEXP, SEXP aliasesSEXP, SEXP recordingSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::String >::type host(hostSEXP);
-    Rcpp::traits::input_parameter< int >::type port(portSEXP);
-    Rcpp::traits::input_parameter< std::string >::type bg(bgSEXP);
-    Rcpp::traits::input_parameter< double >::type width(widthSEXP);
-    Rcpp::traits::input_parameter< double >::type height(heightSEXP);
-    Rcpp::traits::input_parameter< double >::type pointsize(pointsizeSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type aliases(aliasesSEXP);
-    Rcpp::traits::input_parameter< bool >::type recording(recordingSEXP);
-    rcpp_result_gen = Rcpp::wrap(httpgd_(host, port, bg, width, height, pointsize, aliases, recording));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 8},
+    {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {NULL, NULL, 0}
 };
 

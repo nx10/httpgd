@@ -8,63 +8,63 @@
 #include <mutex>
 #include <functional>
 
-#include "drawdata.h"
+#include "DrawData.h"
 
 namespace httpgd
 {
 
-  class HttpgdServer
-  {
-  public:
-    // callbacks
-    std::function<void()> m_user_resized;
-    //std::function<void(bool)> m_user_hist_record;
-    std::function<void()> m_user_hist_play;
-    std::function<void()> m_user_hist_clear;
+    class HttpgdServer
+    {
+    public:
+        // callbacks
+        std::function<void()> notify_resized;
+        //std::function<void(bool)> notify_record;
+        std::function<void()> notify_hist_play;
+        std::function<void()> notify_hist_clear;
 
-    HttpgdServer(std::string host, int port, double width, double height, bool recording);
-    ~HttpgdServer();
+        HttpgdServer(const std::string &t_host, int t_port, double t_width, double t_height, bool t_recording);
+        ~HttpgdServer();
 
-    void start();
-    void stop();
+        void start();
+        void stop();
 
-    void page_put(dc::DrawCall *dc);
-    void page_clear();
-    void page_fill(int fill);
-    void page_resize(double w, double h);
-    double page_width();
-    double page_height();
-    void page_clip(double x0, double x1, double y0, double y1);
-    
-    void get_svg(std::string &buf);
-    std::string get_state_json(bool include_host);
+        void page_put(dc::DrawCall *dc);
+        void page_clear();
+        void page_fill(int fill);
+        void page_resize(double w, double h);
+        double page_get_width();
+        double page_get_height();
+        void page_clip(double x0, double x1, double y0, double y1);
 
-    void set_livehtml(const std::string &livehtml);
+        void build_svg(std::string *buf);
+        std::string build_state_json(bool include_host);
 
-    bool is_recording();
-    void set_history_size(int history_size);
-    int get_history_index();
+        void set_livehtml(const std::string &livehtml);
 
-  private:
-    std::string m_host;
-    int m_port;
-    std::string m_livehtml;
+        bool is_recording();
+        void set_history_size(int history_size);
+        int get_history_index();
 
-    std::thread m_svr_thread;
-    httplib::Server m_svr;
+    private:
+        std::string m_host;
+        int m_port;
+        std::string m_livehtml;
 
-    dc::Page m_page;
-    std::mutex m_page_mutex;
+        std::thread m_svr_thread;
+        httplib::Server m_svr;
 
-    bool m_recording; // Is the device recording
-    int m_history_index;
-    int m_history_size;
-    
+        dc::Page m_page;
+        std::mutex m_page_mutex;
 
-    void svr_main();
-  };
+        bool m_history_recording;
+        int m_history_index;
+        int m_history_size;
+        std::mutex m_history_mutex;
 
-  bool check_server_started(std::string host, int port);
+        void m_svr_main();
+    };
+
+    bool check_server_started(const std::string &host, int port);
 
 } // namespace httpgd
 

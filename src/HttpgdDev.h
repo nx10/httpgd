@@ -5,42 +5,44 @@
 #include <R_ext/GraphicsDevice.h>
 #include <R_ext/GraphicsEngine.h>
 #include <later_api.h>
-#include <gdtools.h>
 #include "httplib.h"
 
 #include <mutex>
 
 #include "HttpgdServer.h"
 #include "PlotHistory.h"
+#include "FontAnalyzer.h"
 
 namespace httpgd
 {
-  class HttpgdServer;
+    class HttpgdServer;
 
-  class HttpgdDev
-  {
-  public:
-    pDevDesc m_dd;
-    Rcpp::List m_system_aliases;
-    Rcpp::List m_user_aliases;
-    XPtrCairoContext m_cc;
-    HttpgdServer m_server;
-    PlotHistory m_history;
+    class HttpgdDev
+    {
+    public:
+        pDevDesc dd;
+        HttpgdServer server;
+        PlotHistory history;
+        FontAnalyzer font;
 
-    bool m_replaying; // Is the device replaying
-    bool m_needsave; // Should a snapshot be saved when the plot changes
-    // see also m_recording in HttpgdServer
+        HttpgdDev(pDevDesc t_dd, const std::string &t_host, int t_port,
+                  const Rcpp::List &t_aliases,
+                  double t_width, double t_height, bool t_recording);
+        ~HttpgdDev();
 
-    HttpgdDev(pDevDesc dd, std::string host, int port, Rcpp::List aliases, double width, double height, bool recording);
-    ~HttpgdDev();
+        void hist_new_page();
+        void hist_update_size();
 
-    void user_resized();
-    //void user_hist_record(bool recording);
-    void user_hist_play();
-    void user_hist_clear();
+        void event_resized();
+        //void user_hist_record(bool recording);
+        void event_hist_play();
+        void event_hist_clear();
 
-  private:
-  };
+    private:
+        bool m_replaying; // Is the device replaying
+        bool m_needsave;  // Should a snapshot be saved when the plot changes
+                          // see also m_recording in HttpgdServer
+    };
 
 } // namespace httpgd
 

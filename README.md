@@ -1,10 +1,9 @@
 # httpgd
 
-Http server graphics device for R.
+Asynchronous http server graphics device for R.
 
 ## Features
 
-* Asynchronous graphics server.
 * SVG over HTTP.
 * Automatic resizing.
 * HTML live server.
@@ -81,14 +80,11 @@ dev.off()
 
 ## Note
 
-The code is still experimental (and messy). Any advice and suggestions are welcome!
+Any advice and suggestions are welcome!
 
-## ToDo
+## Planned features
 
-httpgd is under active development.
-
-* Clean up code.
-* Use websockets to push changes directly/faster.
+* Use websockets to push changes directly/faster (maybe switch http server backend library).
 * Optimization.
 
 ## Mac OS
