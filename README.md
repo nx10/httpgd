@@ -57,7 +57,20 @@ Stop the server with:
 dev.off()
 ```
 
+### Keyboard shortcuts
+
+| Keys | Result |
+|------|--------|
+| <kbd>&#8592;</kbd> / <kbd>&#8594;</kbd> | Navigate plot history |
+| <kbd>del</kbd> | Clear plot history |
+| <kbd>+</kbd> / <kbd>-</kbd> | Zoom |
+| <kbd>0</kbd> | Reset zoom level |
+| <kbd>ctrl</kbd> + <kbd>S</kbd> | Save |
+
+
 ### HTTP API
+
+_The API will change soon, as it is currently being redesigned to be stateless. This will make it possible to have multiple concurrent viewers with different resolutions view different plots of the same plot history._
 
 | Endpoint  | Method | Description |
 |-----------|--------|-------------|
