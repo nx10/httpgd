@@ -57,6 +57,7 @@
     const svr = /*SRVRPARAMS*/{ "host": "127.0.0.1", "port": 8288, "upid": 1, "width": 736.000000, "height": 590.720020, "recording": true, "hsize": 0, "hindex": -1 }/**/;
 
     const intervall_check = 1000;
+    const default_scale = 0.8;
     const baseapi = 'http://' + svr.host + ':' + svr.port;
     const api = {
       svg: baseapi + '/svg',
@@ -71,7 +72,7 @@
     };
 
     const cli = {
-      scale: 0.8,
+      scale: default_scale,
       resize_poss: true,
       width: null,
       height: null,
@@ -215,6 +216,10 @@
             save_plot();
             e.preventDefault();
           }
+          break;
+        case 48:
+          cli.scale = default_scale;
+          checkcycle();
           break;
       }
     }
