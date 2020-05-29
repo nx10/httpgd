@@ -15,8 +15,12 @@
 
 namespace httpgd
 {
-    HttpgdServer::HttpgdServer(const std::string &t_host, int t_port, double t_width, double t_height, bool t_recording, bool t_cors)
+    HttpgdServer::HttpgdServer(const std::string &t_host, int t_port,
+                               double t_width, double t_height,
+                               bool t_recording,
+                               bool t_cors, bool t_use_token, std::string t_token)
         : m_host(t_host), m_port(t_port), m_svr_cors(t_cors),
+          m_svr_use_token(t_use_token), m_svr_token(t_token),
           m_page(t_width, t_height), m_history_recording(t_recording),
           m_history_index(-1), m_history_size(0)
     {
@@ -132,6 +136,11 @@ namespace httpgd
             buf.append("\"host\": \"").append(m_host);
             buf.append("\", \"port\": ").append(std::to_string(m_port));
             buf.append(", ");
+            if (m_svr_use_token)
+            {
+                buf.append("\"token\": \"").append(m_svr_token);
+                buf.append("\", ");
+            }
         }
         m_page_mutex.lock();
         buf.append("\"upid\": ").append(std::to_string(m_page.get_upid()));
@@ -158,7 +167,26 @@ namespace httpgd
         }
     }
 
-    #define HTTPGD_CORS(res) if (m_svr_cors) { res.set_header("Access-Control-Allow-Origin", "*"); }
+    const std::string SVR_INJECT_KEYWORD = "/*SRVRPARAMS*/";
+    const std::string SVR_403 = "Forbidden.";
+
+    bool HttpgdServer::prepare_req(const httplib::Request &req, httplib::Response &res) const
+    {
+        if (m_svr_cors)
+        {
+            res.set_header("Access-Control-Allow-Origin", "*");
+        }
+        if (m_svr_use_token &&
+            !(req.get_header_value("X-HTTPGD-TOKEN") == m_svr_token ||
+              req.get_param_value("token") == m_svr_token))
+        {
+            res.set_content(SVR_403, "text/plain");
+            res.status = 403;
+            return false;
+        }
+        return true;
+    }
+
     void HttpgdServer::m_svr_main()
     {
         using httplib::Params;
@@ -166,131 +194,146 @@ namespace httpgd
         using httplib::Response;
         using httplib::detail::parse_query_text;
 
-        m_svr.Get("/", [&](const Request & /*req*/, Response &res) {
-            HTTPGD_CORS(res);
-            res.set_content("httpgd server running.", "text/plain");
-        });
-        m_svr.Get("/live", [&](const Request & /*req*/, Response &res) {
-            HTTPGD_CORS(res);
-
-            // build params
-            std::string sparams = build_state_json(true);
-            sparams.append("/*");
-
-            // inject params
-            std::string html(m_livehtml);
-            size_t start_pos = m_livehtml.find("/*SRVRPARAMS*/");
-            if (start_pos != std::string::npos)
+        m_svr.Get("/", [&](const Request &req, Response &res) {
+            if (prepare_req(req, res))
             {
-                html.replace(start_pos, sizeof("/*SRVRPARAMS*/") - 1, sparams);
+                res.set_content("httpgd server running.", "text/plain");
             }
+        });
+        m_svr.Get("/live", [&](const Request &req, Response &res) {
+            if (prepare_req(req, res))
+            {
 
-            res.set_content(html, "text/html");
+                // build params
+                std::string sparams = build_state_json(true);
+                sparams.append("/*");
+
+                // inject params
+                std::string html(m_livehtml);
+                size_t start_pos = m_livehtml.find(SVR_INJECT_KEYWORD);
+                if (start_pos != std::string::npos)
+                {
+                    html.replace(start_pos, sizeof(SVR_INJECT_KEYWORD) - 1, sparams);
+                }
+
+                res.set_content(html, "text/html");
+            }
         });
-        m_svr.Get("/svg", [&](const Request & /*req*/, Response &res) {
-            HTTPGD_CORS(res);
-            std::string s = "";
-            s.reserve(1000000);
-            this->build_svg(&s);
-            res.set_content(s, "image/svg+xml");
+        m_svr.Get("/svg", [&](const Request &req, Response &res) {
+            if (prepare_req(req, res))
+            {
+                std::string s = "";
+                s.reserve(1000000);
+                this->build_svg(&s);
+                res.set_content(s, "image/svg+xml");
+            }
         });
-        m_svr.Get("/state", [&](const Request & /*req*/, Response &res) {
-            HTTPGD_CORS(res);
-            res.set_content(build_state_json(false), "application/json");
+        m_svr.Get("/state", [&](const Request &req, Response &res) {
+            if (prepare_req(req, res))
+            {
+                res.set_content(build_state_json(false), "application/json");
+            }
         });
         m_svr.Post("/resize", [&](const Request &req, Response &res) {
-            HTTPGD_CORS(res);
-            Params par;
-            parse_query_text(req.body, par);
-
-            double user_w = -1;
-            double user_h = -1;
-
-            for (const auto &e : par)
+            if (prepare_req(req, res))
             {
-                if (e.first == "width")
+                Params par;
+                parse_query_text(req.body, par);
+
+                double user_w = -1;
+                double user_h = -1;
+
+                for (const auto &e : par)
                 {
-                    trystod(e.second, &user_w);
+                    if (e.first == "width")
+                    {
+                        trystod(e.second, &user_w);
+                    }
+                    else if (e.first == "height")
+                    {
+                        trystod(e.second, &user_h);
+                    }
                 }
-                else if (e.first == "height")
+
+                m_page_mutex.lock();
+                double old_w = m_page.width;
+                double old_h = m_page.height; // todo mutex lock
+                m_page_mutex.unlock();
+
+                double new_w = (user_w > 0) && (user_w != old_w) ? user_w : old_w;
+                double new_h = (user_h > 0) && (user_h != old_h) ? user_h : old_h;
+
+                if (new_w != old_w || new_h != old_h)
                 {
-                    trystod(e.second, &user_h);
+                    page_resize(new_w, new_h);
+                    notify_resized();
                 }
+
+                res.set_content(build_state_json(false), "application/json");
             }
-
-            m_page_mutex.lock();
-            double old_w = m_page.width;
-            double old_h = m_page.height; // todo mutex lock
-            m_page_mutex.unlock();
-
-            double new_w = (user_w > 0) && (user_w != old_w) ? user_w : old_w;
-            double new_h = (user_h > 0) && (user_h != old_h) ? user_h : old_h;
-
-            if (new_w != old_w || new_h != old_h)
-            {
-                page_resize(new_w, new_h);
-                notify_resized();
-            }
-
-            res.set_content(build_state_json(false), "application/json");
         });
         m_svr.Post("/next", [&](const Request &req, Response &res) {
-            HTTPGD_CORS(res);
-
-            if (m_history_index < m_history_size - 1)
+            if (prepare_req(req, res))
             {
-                m_history_index += 1;
-                notify_hist_play();
-            }
 
-            res.set_content(build_state_json(false), "application/json");
+                if (m_history_index < m_history_size - 1)
+                {
+                    m_history_index += 1;
+                    notify_hist_play();
+                }
+
+                res.set_content(build_state_json(false), "application/json");
+            }
         });
         m_svr.Post("/prev", [&](const Request &req, Response &res) {
-            HTTPGD_CORS(res);
-
-            if (m_history_index > 0)
+            if (prepare_req(req, res))
             {
-                m_history_index -= 1;
-                notify_hist_play();
-            }
 
-            res.set_content(build_state_json(false), "application/json");
+                if (m_history_index > 0)
+                {
+                    m_history_index -= 1;
+                    notify_hist_play();
+                }
+
+                res.set_content(build_state_json(false), "application/json");
+            }
         });
         m_svr.Post("/clear", [&](const Request &req, Response &res) {
-            HTTPGD_CORS(res);
+            if (prepare_req(req, res))
+            {
 
-            page_clear();
-            notify_hist_clear();
+                page_clear();
+                notify_hist_clear();
 
-            res.set_content(build_state_json(false), "application/json");
+                res.set_content(build_state_json(false), "application/json");
+            }
         });
         m_svr.Post("/record", [&](const Request &req, Response &res) {
-            HTTPGD_CORS(res);
-
-            Params par;
-            parse_query_text(req.body, par);
-
-            for (const auto &e : par)
+            if (prepare_req(req, res))
             {
-                if (e.first == "recording")
+
+                Params par;
+                parse_query_text(req.body, par);
+
+                for (const auto &e : par)
                 {
-                    if (e.second == "true")
+                    if (e.first == "recording")
                     {
-                        m_history_recording = true;
+                        if (e.second == "true")
+                        {
+                            m_history_recording = true;
+                        }
+                        else if (e.second == "false")
+                        {
+                            m_history_recording = false;
+                        }
+                        break;
                     }
-                    else if (e.second == "false")
-                    {
-                        m_history_recording = false;
-                    }
-                    break;
                 }
+
+                res.set_content(build_state_json(false), "application/json");
             }
-
-            res.set_content(build_state_json(false), "application/json");
         });
-
-        //m_svr.Get("/stop",
-        //        [&](const Request & /*req*/, Response & /*res*/) { m_svr.stop(); });
 
         m_svr.listen(m_host.c_str(), m_port);
     }
@@ -301,7 +344,7 @@ namespace httpgd
         httplib::Client cli(host, port);
         cli.set_connection_timeout(0, CHECK_OCCUPIED_TIMEOUT); // 300 milliseconds
         auto res = cli.Get("/");
-        if (res && res->status == 200)
+        if (res)
         {
             return true;
         }

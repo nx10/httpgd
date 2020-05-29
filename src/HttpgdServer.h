@@ -22,7 +22,10 @@ namespace httpgd
         std::function<void()> notify_hist_play;
         std::function<void()> notify_hist_clear;
 
-        HttpgdServer(const std::string &t_host, int t_port, double t_width, double t_height, bool t_recording, bool t_cors);
+        HttpgdServer(const std::string &t_host, int t_port,
+                     double t_width, double t_height,
+                     bool t_recording,
+                     bool t_cors, bool t_use_token, std::string t_token);
         ~HttpgdServer();
 
         void start();
@@ -53,6 +56,8 @@ namespace httpgd
         std::thread m_svr_thread;
         httplib::Server m_svr;
         bool m_svr_cors;
+        bool m_svr_use_token;
+        std::string m_svr_token;
 
         dc::Page m_page;
         std::mutex m_page_mutex;
@@ -62,6 +67,7 @@ namespace httpgd
         int m_history_size;
         std::mutex m_history_mutex;
 
+        bool prepare_req(const httplib::Request &req, httplib::Response &res) const;
         void m_svr_main();
     };
 

@@ -6,21 +6,22 @@
 using namespace Rcpp;
 
 // httpgd_
-bool httpgd_(Rcpp::String host, int port, Rcpp::String bg, double width, double height, double pointsize, Rcpp::List aliases, bool recording, bool cors);
-RcppExport SEXP _httpgd_httpgd_(SEXP hostSEXP, SEXP portSEXP, SEXP bgSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP pointsizeSEXP, SEXP aliasesSEXP, SEXP recordingSEXP, SEXP corsSEXP) {
+bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, Rcpp::List aliases, bool recording, bool cors, std::string token);
+RcppExport SEXP _httpgd_httpgd_(SEXP hostSEXP, SEXP portSEXP, SEXP bgSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP pointsizeSEXP, SEXP aliasesSEXP, SEXP recordingSEXP, SEXP corsSEXP, SEXP tokenSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::String >::type host(hostSEXP);
+    Rcpp::traits::input_parameter< std::string >::type host(hostSEXP);
     Rcpp::traits::input_parameter< int >::type port(portSEXP);
-    Rcpp::traits::input_parameter< Rcpp::String >::type bg(bgSEXP);
+    Rcpp::traits::input_parameter< std::string >::type bg(bgSEXP);
     Rcpp::traits::input_parameter< double >::type width(widthSEXP);
     Rcpp::traits::input_parameter< double >::type height(heightSEXP);
     Rcpp::traits::input_parameter< double >::type pointsize(pointsizeSEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type aliases(aliasesSEXP);
     Rcpp::traits::input_parameter< bool >::type recording(recordingSEXP);
     Rcpp::traits::input_parameter< bool >::type cors(corsSEXP);
-    rcpp_result_gen = Rcpp::wrap(httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors));
+    Rcpp::traits::input_parameter< std::string >::type token(tokenSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors, token));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -36,7 +37,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 9},
+    {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 10},
     {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {NULL, NULL, 0}
 };

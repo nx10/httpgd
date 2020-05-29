@@ -23,6 +23,9 @@
 #' @param recording Should a plot history be recorded.
 #' @param cors Toggles Cross-Origin Resource Sharing (CORS) header.
 #'   When set to TRUE, CORS header will be set to "*".
+#' @param token (Optional) security token string. When set all requests
+#'   need to include this token to be allowed. (Either in a request header 
+#'   (X-HTTPGD-TOKEN) field or as a query parameter.)
 #'
 #' @export
 httpgd <-
@@ -35,9 +38,10 @@ httpgd <-
            system_fonts = list(),
            user_fonts = list(),
            recording = TRUE,
-           cors = FALSE) {
+           cors = FALSE,
+           token = "") {
     aliases <- validate_aliases(system_fonts, user_fonts)
-    httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors)
+    httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors, token)
     surl <- paste0("http://", host, ":", port)
-    writeLines(paste0("httpgd live server running at:\n  ",surl,"/live"))
+    writeLines(paste0("httpgd live server running at:\n  ",surl,"/live",ifelse(nchar(token)==0,"",paste0("?token=",token))))
   }

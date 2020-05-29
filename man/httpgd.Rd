@@ -14,7 +14,8 @@ httpgd(
   system_fonts = list(),
   user_fonts = list(),
   recording = TRUE,
-  cors = FALSE
+  cors = FALSE,
+  token = ""
 )
 }
 \arguments{
@@ -48,6 +49,10 @@ font file.}
 
 \item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
 When set to TRUE, CORS header will be set to "*".}
+
+\item{token}{(Optional) security token string. When set all requests
+need to include this token to be allowed. (Either in a request header 
+(X-HTTPGD-TOKEN) field or as a query parameter.)}
 }
 \description{
 Initialize httpgd graphics device and start server.

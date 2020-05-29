@@ -1,6 +1,5 @@
 // [[Rcpp::plugins("cpp11")]]
 
-
 #include <Rcpp.h>
 #include <R_ext/GraphicsEngine.h>
 #include <R_ext/GraphicsDevice.h>
@@ -84,7 +83,6 @@ namespace httpgd
 
         dev->server.page_clear();
         dev->server.page_fill(dd->startfill); // todo should this be gc->fill ?
-
 
 #if LOGDRAW == 1
         Rcpp::Rcout << "NEW_PAGE \n";
@@ -222,12 +220,12 @@ namespace httpgd
 
         dev->font.analyze(std::string(str), gc);
         dev->server.page_put(new dc::Text(gc, x, y, str, rot, hadj,
-                                      dc::TextInfo{
-                                          dev->font.get_font_family(),
-                                          dev->font.get_fontsize(),
-                                          dev->font.is_bold(),
-                                          dev->font.is_italic(),
-                                          dev->font.get_width()}));
+                                          dc::TextInfo{
+                                              dev->font.get_font_family(),
+                                              dev->font.get_fontsize(),
+                                              dev->font.is_bold(),
+                                              dev->font.is_italic(),
+                                              dev->font.get_width()}));
 
 #if LOGDRAW == 1
         Rprintf("TEXT x=%f y=%f str=\"%s\" rot=%f hadj=%f\n", x, y, str, rot, hadj);
@@ -283,10 +281,11 @@ namespace httpgd
 #endif
     }
 
-    // --------------------------------------
+    // R graphics device initialization procedure
 
-    pDevDesc httpgd_driver_new(const std::string &host, int port, int bg, double width,
-                               double height, double pointsize, const Rcpp::List &aliases, bool recording, bool cors)
+    
+
+    pDevDesc httpgd_driver_new(const HttpgdDevStartParams &params)
     {
 
         pDevDesc dd = (DevDesc *)calloc(1, sizeof(DevDesc));
@@ -295,9 +294,9 @@ namespace httpgd
             return dd;
         }
 
-        dd->startfill = bg;
+        dd->startfill = params.bg;
         dd->startcol = R_RGB(0, 0, 0);
-        dd->startps = pointsize;
+        dd->startps = params.pointsize;
         dd->startlty = 0;
         dd->startfont = 1;
         dd->startgamma = 1;
@@ -323,21 +322,21 @@ namespace httpgd
         dd->raster = httpgd_raster;
 
         // UTF-8 support
-        dd->wantSymbolUTF8 = (Rboolean)1;
-        dd->hasTextUTF8 = (Rboolean)1;
+        dd->wantSymbolUTF8 = static_cast<Rboolean>(1);
+        dd->hasTextUTF8 = static_cast<Rboolean>(1);
         dd->textUTF8 = httpgd_text;
         dd->strWidthUTF8 = httpgd_strwidth;
 
         // Screen Dimensions in pts
         dd->left = 0;
         dd->top = 0;
-        dd->right = width;
-        dd->bottom = height;
+        dd->right = params.width;
+        dd->bottom = params.height;
 
         // Magic constants copied from other graphics devices
         // nominal character sizes in pts
-        dd->cra[0] = 0.9 * pointsize;
-        dd->cra[1] = 1.2 * pointsize;
+        dd->cra[0] = 0.9 * params.pointsize;
+        dd->cra[1] = 1.2 * params.pointsize;
         // character alignment offsets
         dd->xCharOffset = 0.4900;
         dd->yCharOffset = 0.3333;
@@ -347,34 +346,31 @@ namespace httpgd
         dd->ipr[1] = 1.0 / 72.0;
 
         // Capabilities
-        dd->canClip = (Rboolean)1;
+        dd->canClip = static_cast<Rboolean>(1);
         dd->canHAdj = 0;
-        dd->canChangeGamma = (Rboolean)0;
-        dd->displayListOn = (Rboolean)1; // THIS TOGGLES REPLAYABILITY !!!
+        dd->canChangeGamma = static_cast<Rboolean>(0);
+        dd->displayListOn = static_cast<Rboolean>(1); // toggles replayability
         dd->haveTransparency = 2;
         dd->haveTransparentBg = 2;
 
-        dd->deviceSpecific = new HttpgdDev(dd, host, port, aliases, width, height, recording, cors);
+        dd->deviceSpecific = new HttpgdDev(dd, params);
         return dd;
     }
 
-    void makehttpgdDevice(const std::string &host, int port, const std::string &bg_, double width, double height,
-                          double pointsize, const Rcpp::List &aliases, bool recording, bool cors)
+    void makehttpgdDevice(const HttpgdDevStartParams &params)
     {
-
-        int bg = R_GE_str2col(bg_.c_str());
 
         R_GE_checkVersionOrDie(R_GE_version);
         R_CheckDeviceAvailable();
 
         HTTPGD_BEGIN_SUSPEND_INTERRUPTS
         {
-            if (check_server_started(host, port)) // todo: it should be possible to check if the port is occupied instead
+            if (check_server_started(params.host, params.port)) // todo: it should be possible to check if the port is occupied instead
             {
                 Rcpp::stop("Failed to start httpgd. Server already running at this address!");
             }
 
-            pDevDesc dev = httpgd_driver_new(host, port, bg, width, height, pointsize, aliases, recording, cors);
+            pDevDesc dev = httpgd_driver_new(params);
             if (dev == nullptr)
             {
                 Rcpp::stop("Failed to start httpgd.");
@@ -392,10 +388,20 @@ namespace httpgd
 } // namespace httpgd
 
 // [[Rcpp::export]]
-bool httpgd_(Rcpp::String host, int port, Rcpp::String bg, double width, double height,
-             double pointsize, Rcpp::List aliases, bool recording, bool cors)
+bool httpgd_(std::string host, int port, std::string bg, double width, double height,
+             double pointsize, Rcpp::List aliases, bool recording, bool cors, std::string token)
 {
-    httpgd::makehttpgdDevice(host, port, bg, width, height, pointsize, aliases, recording, cors);
+    bool use_token = token.length();
+    int ibg = R_GE_str2col(bg.c_str());
+
+    httpgd::makehttpgdDevice({host, port,
+                              ibg,
+                              width, height,
+                              pointsize,
+                              aliases,
+                              recording,
+                              cors,
+                              use_token, token});
 
     return true;
 }

@@ -68,7 +68,10 @@
       resize: baseapi + '/resize',
       next: baseapi + '/next',
       prev: baseapi + '/prev',
-      clear: baseapi + '/clear'
+      clear: baseapi + '/clear',
+      headers: svr.token ? {
+        'X-HTTPGD-TOKEN': svr.token
+      } : {}
     };
 
     const cli = {
@@ -81,21 +84,28 @@
       elem_discon: null
     };
 
+    function refresh_svg(vchange) {
+      cli.elem_drw.data = api.svg + '?upid=' + svr.upid + '&token=' + api.token + (vchange ? '&vchange=1' : '');
+      cli.elem_drw.addEventListener('keydown', handleToolKeys);
+    }
+
     function update_svr(state) {
       cli.elem_pnum.textContent = (state.hindex + 1) + "/" + state.hsize;
       if (svr.upid !== state.upid) {
-        cli.elem_drw.data = api.svg + '?upid=' + state.upid;
+        Object.assign(svr, state);
+        refresh_svg();
         if (cli.discon) {
           cli.discon = false;
           cli.elem_discon.style.display = "none";
         }
+        return;
       }
       Object.assign(svr, state);
     }
 
     function save_plot() {
       let dl = document.createElement('a');
-      dl.href = api.svg;
+      dl.href = api.svg + '?token=' + api.token;
       dl.download = "plot.svg";
       document.body.appendChild(dl);
       dl.click();
@@ -114,11 +124,14 @@
       cli.height = drw_rect.height * cli.scale;
 
       // check resized
-      if (cli.resize_poss && (Math.abs(svr.width - cli.width) > 0.001 || Math.abs(svr.height - cli.height) > 0.001)) {
+      if (cli.resize_poss &&
+        (Math.abs(svr.width - cli.width) > 0.001 ||
+          Math.abs(svr.height - cli.height) > 0.001)) {
         console.log("resize");
         cli.resize_poss = false;
         fetch(api.resize, {
           method: 'post',
+          headers: api.headers,
           body: 'width=' + cli.width + '&height=' + cli.height
         }).then(res => res.json()).then((out) => {
           update_svr(out);
@@ -130,7 +143,10 @@
       }
 
       // fetch server state
-      fetch(api.state)
+      fetch(api.state, {
+        method: 'get',
+        headers: api.headers
+      })
         .then(res => res.json())
         .then((out) => {
           update_svr(out);
@@ -146,6 +162,7 @@
     function nav_next() {
       fetch(api.next, {
         method: 'post',
+        headers: api.headers
       }).then(res => res.json())
         .then((out) => {
           update_svr(out);
@@ -155,6 +172,7 @@
     function nav_prev() {
       fetch(api.prev, {
         method: 'post',
+        headers: api.headers
       }).then(res => res.json())
         .then((out) => {
           update_svr(out);
@@ -164,6 +182,7 @@
     function nav_clear() {
       fetch(api.clear, {
         method: 'post',
+        headers: api.headers
       }).then(res => res.json())
         .then((out) => {
           update_svr(out);
@@ -179,6 +198,32 @@
       checkcycle();
     }
 
+    function handleToolKeys(e) {
+      switch (e.keyCode) {
+        case 37: // left arrow
+          nav_prev();
+          break;
+        case 39: // right arrow
+          nav_next();
+          break;
+        case 187: // plus
+          nav_zoom_in();
+          break;
+        case 189: // minus
+          nav_zoom_out();
+          break;
+        case 46: // del
+          nav_clear();
+          break;
+        case 83:
+          if (e.ctrlKey) { // ctrl+s 
+            save_plot();
+            e.preventDefault();
+          }
+          break;
+      }
+    }
+
     window.onload = function () {
 
       cli.elem_drw = document.getElementById("drawing");
@@ -192,31 +237,7 @@
       document.getElementById("tb-right").onclick = nav_next;
       document.getElementById("tb-clear").onclick = nav_clear;
 
-      window.addEventListener('keydown', (e) => {
-        switch (e.keyCode) {
-          case 37: // left arrow
-            nav_prev();
-            break;
-          case 39: // right arrow
-            nav_next();
-            break;
-          case 187: // plus
-            nav_zoom_in();
-            break;
-          case 189: // minus
-            nav_zoom_out();
-            break;
-          case 46: // del
-            nav_clear();
-            break;
-          case 83:
-            if (e.ctrlKey) { // ctrl+s 
-              save_plot();
-              e.preventDefault();
-            }
-            break;
-        }
-      });
+      window.addEventListener('keydown', handleToolKeys);
 
       let elem_tb = document.getElementById("toolbar");
       let elem_tbt = document.getElementById("tb-tools");
@@ -243,7 +264,11 @@
         visibilityChange = "webkitvisibilitychange";
       }
       // Handle page visibility change   
-      document.addEventListener(visibilityChange, () => { if (!document[hidden]) { cli.elem_drw.data = api.svg + '?vchange=1'; } }, false);
+      document.addEventListener(visibilityChange, () => {
+        if (!document[hidden]) {
+          refresh_svg();
+        }
+      }, false);
     }
   </script>
 </body>
