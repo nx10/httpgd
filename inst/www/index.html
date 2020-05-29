@@ -4,14 +4,10 @@
   <meta charset="utf-8">
   <title>R Plot</title>
   <style>
-    /*body {
-      background-color: powderblue;
-    }*/
     #drawing {
       width: 100%;
       height: 100%;
     }
-
     #toolbar {
       float: left;
       position: absolute;
@@ -20,8 +16,10 @@
       font-family: arial, sans-serif;
       font-size: 20px;
       font-weight: bold;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
-
     #discon {
       padding: 2px 6px 2px 6px;
       border-radius: 2px;
@@ -30,7 +28,6 @@
       border-color: #f5c6cb;
       display: none;
     }
-
     #tb-tools>a {
       padding: 2px 6px 2px 6px;
       border-radius: 2px;
@@ -39,7 +36,6 @@
       border-color: #fdfdfe;
       cursor: pointer;
     }
-
     #tb-tools>a:hover {
       color: #07c;
     }
@@ -54,13 +50,13 @@
           id="tb-minus">&minus;</a> <a id="tb-save">Save</a> <a id="tb-clear">Clear</a></div> <span
         id="discon">Disconnected!</span>
     </div>
-    <object id="drawing"></object>
+    <img id="drawing"></img>
   </div>
   <script>
 
     const svr = /*SRVRPARAMS*/{ "host": "127.0.0.1", "port": 8288, "upid": 1, "width": 736.000000, "height": 590.720020, "recording": true, "hsize": 0, "hindex": -1 }/**/;
 
-    const intervall_check = 1500;
+    const intervall_check = 1000;
     const baseapi = 'http://' + svr.host + ':' + svr.port;
     const api = {
       svg: baseapi + '/svg',
@@ -85,8 +81,7 @@
     };
 
     function refresh_svg(vchange) {
-      cli.elem_drw.data = api.svg + '?upid=' + svr.upid + '&token=' + api.token + (vchange ? '&vchange=1' : '');
-      cli.elem_drw.addEventListener('keydown', handleToolKeys);
+      cli.elem_drw.src = api.svg + '?upid=' + svr.upid + '&token=' + api.token + (vchange ? '&vchange=1' : '');
     }
 
     function update_svr(state) {
@@ -266,7 +261,7 @@
       // Handle page visibility change   
       document.addEventListener(visibilityChange, () => {
         if (!document[hidden]) {
-          refresh_svg();
+          refresh_svg(1);
         }
       }, false);
     }
