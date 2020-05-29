@@ -46,7 +46,7 @@
   <div id="container">
     <div id="toolbar">
       <div id="tb-tools">
-        <a id="tb-left">&lt;</a> <span id="tb-pnum"></span> <a id="tb-right">&gt;</a> <a id="tb-plus">&plus;</a> <a
+        <a id="tb-left">&lt;</a> <span id="tb-pnum"></span> <a id="tb-right">&gt;</a> <a id="tb-plus">&plus;</a><a id="tb-zlvl"></a><a
           id="tb-minus">&minus;</a> <a id="tb-save">Save</a> <a id="tb-clear">Clear</a></div> <span
         id="discon">Disconnected!</span>
     </div>
@@ -58,6 +58,7 @@
 
     const intervall_check = 1000;
     const default_scale = 0.8;
+    const scale_step = default_scale / 12;
     const baseapi = 'http://' + svr.host + ':' + svr.port;
     const api = {
       svg: baseapi + '/svg',
@@ -87,6 +88,7 @@
 
     function update_svr(state) {
       cli.elem_pnum.textContent = (state.hindex + 1) + "/" + state.hsize;
+      cli.elem_zlvl.textContent = Math.ceil(default_scale / cli.scale * 100) + '%';
       if (svr.upid !== state.upid) {
         Object.assign(svr, state);
         refresh_svg();
@@ -186,11 +188,15 @@
         });
     }
     function nav_zoom_in() {
-      zoom(-0.1);
+      zoom(-scale_step);
       checkcycle();
     }
     function nav_zoom_out() {
-      zoom(0.1);
+      zoom(scale_step);
+      checkcycle();
+    }
+    function nav_zoom_reset() {
+      cli.scale = default_scale;
       checkcycle();
     }
 
@@ -218,8 +224,7 @@
           }
           break;
         case 48:
-          cli.scale = default_scale;
-          checkcycle();
+          nav_zoom_reset();
           break;
       }
     }
@@ -229,10 +234,12 @@
       cli.elem_drw = document.getElementById("drawing");
       cli.elem_discon = document.getElementById("discon");
       cli.elem_pnum = document.getElementById("tb-pnum");
+      cli.elem_zlvl = document.getElementById("tb-zlvl");
 
       document.getElementById("tb-save").onclick = save_plot;
       document.getElementById("tb-plus").onclick = nav_zoom_in;
       document.getElementById("tb-minus").onclick = nav_zoom_out;
+      document.getElementById("tb-zlvl").onclick = nav_zoom_reset;
       document.getElementById("tb-left").onclick = nav_prev;
       document.getElementById("tb-right").onclick = nav_next;
       document.getElementById("tb-clear").onclick = nav_clear;
