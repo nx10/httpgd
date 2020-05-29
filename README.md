@@ -10,6 +10,10 @@ Asynchronous http server graphics device for R.
 * Plot history.
 * Run multiple servers concurrently.
 
+## Demo
+
+![demo](https://user-images.githubusercontent.com/33600480/83210273-b4c29100-a15a-11ea-8757-052dcf259a1c.gif)
+
 ## Installation
 
 ```R
