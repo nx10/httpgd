@@ -143,6 +143,42 @@
         });
     }
 
+    function nav_next() {
+      fetch(api.next, {
+        method: 'post',
+      }).then(res => res.json())
+        .then((out) => {
+          update_svr(out);
+          setTimeout(() => { checkcycle(); }, 500);
+        });
+    }
+    function nav_prev() {
+      fetch(api.prev, {
+        method: 'post',
+      }).then(res => res.json())
+        .then((out) => {
+          update_svr(out);
+          setTimeout(() => { checkcycle(); }, 500);
+        });
+    }
+    function nav_clear() {
+      fetch(api.clear, {
+        method: 'post',
+      }).then(res => res.json())
+        .then((out) => {
+          update_svr(out);
+          setTimeout(() => { checkcycle(); }, 500);
+        });
+    }
+    function nav_zoom_in() {
+      zoom(-0.1);
+      checkcycle();
+    }
+    function nav_zoom_out() {
+      zoom(0.1);
+      checkcycle();
+    }
+
     window.onload = function () {
 
       cli.elem_drw = document.getElementById("drawing");
@@ -150,35 +186,37 @@
       cli.elem_pnum = document.getElementById("tb-pnum");
 
       document.getElementById("tb-save").onclick = save_plot;
-      document.getElementById("tb-plus").onclick = function () { zoom(-0.1); checkcycle(); };
-      document.getElementById("tb-minus").onclick = function () { zoom(0.1); checkcycle(); };
-      document.getElementById("tb-left").onclick = function () {
-        fetch(api.prev, {
-          method: 'post',
-        }).then(res => res.json())
-          .then((out) => {
-            update_svr(out);
-            setTimeout(() => { checkcycle(); }, 500);
-          });
-      };
-      document.getElementById("tb-right").onclick = function () {
-        fetch(api.next, {
-          method: 'post',
-        }).then(res => res.json())
-          .then((out) => {
-            update_svr(out);
-            setTimeout(() => { checkcycle(); }, 500);
-          });
-      };
-      document.getElementById("tb-clear").onclick = function () {
-        fetch(api.clear, {
-          method: 'post',
-        }).then(res => res.json())
-          .then((out) => {
-            update_svr(out);
-            setTimeout(() => { checkcycle(); }, 500);
-          });
-      };
+      document.getElementById("tb-plus").onclick = nav_zoom_in;
+      document.getElementById("tb-minus").onclick = nav_zoom_out;
+      document.getElementById("tb-left").onclick = nav_prev;
+      document.getElementById("tb-right").onclick = nav_next;
+      document.getElementById("tb-clear").onclick = nav_clear;
+
+      window.addEventListener('keydown', (e) => {
+        switch (e.keyCode) {
+          case 37: // left arrow
+            nav_prev();
+            break;
+          case 39: // right arrow
+            nav_next();
+            break;
+          case 187: // plus
+            nav_zoom_in();
+            break;
+          case 189: // minus
+            nav_zoom_out();
+            break;
+          case 46: // del
+            nav_clear();
+            break;
+          case 83:
+            if (e.ctrlKey) { // ctrl+s 
+              save_plot();
+              e.preventDefault();
+            }
+            break;
+        }
+      });
 
       let elem_tb = document.getElementById("toolbar");
       let elem_tbt = document.getElementById("tb-tools");
