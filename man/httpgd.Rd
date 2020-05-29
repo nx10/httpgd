@@ -5,7 +5,7 @@
 \title{Initialize httpgd graphics device and start server.}
 \usage{
 httpgd(
-  host = "localhost",
+  host = "127.0.0.1",
   port = 8288,
   width = 720,
   height = 576,
