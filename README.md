@@ -81,6 +81,19 @@ dev.off()
 | `hsize`     | `int`    | Number of plot history entries. |
 | `hindex`    | `int`    | Index of the displayed plot entry. |
 
+#### Security
+
+A security token can be set when starting the device: 
+```R
+httpgd(..., token = "secret")
+```
+When set, each API request has to include this token inside the header `X-HTTPGD-TOKEN` or as a query param `?token=secret`.
+
+CORS is off by default but can be enabled on startup:
+
+```R
+httpgd(..., cors = TRUE)
+```
 
 ## Note
 
