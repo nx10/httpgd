@@ -29,7 +29,7 @@ namespace httpgd
             if (server.replaying) // this should always be true (can't assert)
             { 
                 later::later([](void *ddp) {
-                    Rcpp::Rcout << "Replay\n";
+                    //Rcpp::Rcout << "Replay\n";
                     auto dd = static_cast<pDevDesc>(ddp);
                     auto xd = static_cast<HttpgdDev *>(dd->deviceSpecific);
 
