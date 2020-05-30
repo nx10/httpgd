@@ -5,6 +5,10 @@ httpgd_ <- function(host, port, bg, width, height, pointsize, aliases, recording
     .Call(`_httpgd_httpgd_`, host, port, bg, width, height, pointsize, aliases, recording, cors, token)
 }
 
+httpgd_state_ <- function(devnum) {
+    .Call(`_httpgd_httpgd_state_`, devnum)
+}
+
 #' Dummy graphics device for debug purposes.
 #'
 #' @export

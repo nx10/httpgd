@@ -19,10 +19,12 @@ namespace httpgd
                                double t_width, double t_height,
                                bool t_recording,
                                bool t_cors, bool t_use_token, std::string t_token)
-        : m_host(t_host), m_port(t_port), m_svr_cors(t_cors),
+        : replaying(false), needsave(false),
+          history_index(-1), history_size(0),
+          history_recording(t_recording),
+          m_host(t_host), m_port(t_port), m_svr_cors(t_cors),
           m_svr_use_token(t_use_token), m_svr_token(t_token),
-          m_page(t_width, t_height), m_history_recording(t_recording),
-          m_history_index(-1), m_history_size(0)
+          m_page(t_width, t_height)
     {
     }
     HttpgdServer::~HttpgdServer()
@@ -99,32 +101,6 @@ namespace httpgd
         m_page.clip(x0, x1, y0, y1);
         m_page_mutex.unlock();
     }
-    bool HttpgdServer::is_recording()
-    {
-        bool rec = false;
-        m_history_mutex.lock();
-        rec = m_history_recording;
-        m_history_mutex.unlock();
-        return rec;
-    }
-    void HttpgdServer::set_history_size(int history_size)
-    {
-        m_history_mutex.lock();
-        if (m_history_size != history_size)
-        {
-            m_history_size = history_size;
-            m_history_index = m_history_size - 1; // jump to newest
-        }
-        m_history_mutex.unlock();
-    }
-    int HttpgdServer::get_history_index()
-    {
-        int i = 0;
-        m_history_mutex.lock();
-        i = m_history_index;
-        m_history_mutex.unlock();
-        return i;
-    }
 
     std::string HttpgdServer::build_state_json(bool include_host)
     {
@@ -147,24 +123,54 @@ namespace httpgd
         buf.append(", \"width\": ").append(std::to_string(m_page.width));
         buf.append(", \"height\": ").append(std::to_string(m_page.height));
         m_page_mutex.unlock();
-        m_history_mutex.lock();
-        buf.append(", \"recording\": ").append(m_history_recording ? "true" : "false");
-        buf.append(", \"hsize\": ").append(std::to_string(m_history_size));
-        buf.append(", \"hindex\": ").append(std::to_string(m_history_index));
-        m_history_mutex.unlock();
+        buf.append(", \"hrecording\": ").append(history_recording ? "true" : "false");
+        buf.append(", \"hsize\": ").append(std::to_string(history_size));
+        buf.append(", \"hindex\": ").append(std::to_string(history_index));
+        buf.append(", \"needsave\": ").append(needsave ? "true" : "false");
         buf.append(" }");
         return buf;
     }
 
-    inline void trystod(const std::string &parse, double *out)
+    inline bool trystod(const std::string &parse, double *out)
     {
         try
         {
             *out = std::stod(parse);
+            return true;
         }
         catch (const std::exception &e)
         {
+            return false;
         }
+    }
+    inline bool trystoi(const std::string &parse, int *out)
+    {
+        try
+        {
+            *out = std::stoi(parse);
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            return false;
+        }
+    }
+
+    bool HttpgdServer::last_page() const
+    {
+        return history_index == history_size - 1;
+    }
+    std::string HttpgdServer::get_host() const
+    {
+        return m_host;
+    }
+    int HttpgdServer::get_port() const
+    {
+        return m_port;
+    }
+    std::string HttpgdServer::get_token() const
+    {
+        return m_svr_use_token ? m_svr_token : "";
     }
 
     const std::string SVR_INJECT_KEYWORD = "/*SRVRPARAMS*/";
@@ -203,7 +209,6 @@ namespace httpgd
         m_svr.Get("/live", [&](const Request &req, Response &res) {
             if (prepare_req(req, res))
             {
-
                 // build params
                 std::string sparams = build_state_json(true);
                 sparams.append("/*");
@@ -222,6 +227,72 @@ namespace httpgd
         m_svr.Get("/svg", [&](const Request &req, Response &res) {
             if (prepare_req(req, res))
             {
+                // get current state
+                m_page_mutex.lock();
+                double old_width = m_page.width;
+                double old_height = m_page.height;
+                m_page_mutex.unlock();
+                int old_index = history_index;
+
+                double cli_width = old_width;
+                double cli_height = old_height;
+                int cli_index = old_index;
+
+                // get params
+                if (req.has_param("width"))
+                {
+                    std::string ptxt = req.get_param_value("width");
+                    double pval = 0.0;
+                    if (trystod(ptxt, &pval) && pval > 0)
+                    {
+                        cli_width = pval;
+                    }
+                }
+                if (req.has_param("height"))
+                {
+                    std::string ptxt = req.get_param_value("height");
+                    double pval = 0.0;
+                    if (trystod(ptxt, &pval) && pval > 0)
+                    {
+                        cli_height = pval;
+                    }
+                }
+                if (req.has_param("index"))
+                {
+                    std::string ptxt = req.get_param_value("index");
+                    int pval = 0;
+                    if (trystoi(ptxt, &pval))
+                    {
+                        if (pval == -1 || pval < 0 || pval >= history_size)
+                        {
+                            cli_index = history_size - 1;
+                        }
+                        else
+                        {
+                            cli_index = pval;
+                        }
+                    }
+                }
+
+                // Check if replay needed
+                if (std::abs(cli_width - old_width) > 0.01 ||
+                    std::abs(cli_height - old_height) > 0.01 ||
+                    cli_index != old_index)
+                {
+                    m_page_mutex.lock();
+                    m_page.width = cli_width;
+                    m_page.height = cli_height;
+                    m_page.clear();
+                    m_page_mutex.unlock();
+                    history_index = cli_index; // todo
+
+                    replaying = true;
+                    notify_replay();
+                    while (replaying)
+                    {
+                    } // block while replaying
+                }
+
                 std::string s = "";
                 s.reserve(1000000);
                 this->build_svg(&s);
@@ -234,102 +305,16 @@ namespace httpgd
                 res.set_content(build_state_json(false), "application/json");
             }
         });
-        m_svr.Post("/resize", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
-            {
-                Params par;
-                parse_query_text(req.body, par);
-
-                double user_w = -1;
-                double user_h = -1;
-
-                for (const auto &e : par)
-                {
-                    if (e.first == "width")
-                    {
-                        trystod(e.second, &user_w);
-                    }
-                    else if (e.first == "height")
-                    {
-                        trystod(e.second, &user_h);
-                    }
-                }
-
-                m_page_mutex.lock();
-                double old_w = m_page.width;
-                double old_h = m_page.height; // todo mutex lock
-                m_page_mutex.unlock();
-
-                double new_w = (user_w > 0) && (user_w != old_w) ? user_w : old_w;
-                double new_h = (user_h > 0) && (user_h != old_h) ? user_h : old_h;
-
-                if (new_w != old_w || new_h != old_h)
-                {
-                    page_resize(new_w, new_h);
-                    notify_resized();
-                }
-
-                res.set_content(build_state_json(false), "application/json");
-            }
-        });
-        m_svr.Post("/next", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
-            {
-
-                if (m_history_index < m_history_size - 1)
-                {
-                    m_history_index += 1;
-                    notify_hist_play();
-                }
-
-                res.set_content(build_state_json(false), "application/json");
-            }
-        });
-        m_svr.Post("/prev", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
-            {
-
-                if (m_history_index > 0)
-                {
-                    m_history_index -= 1;
-                    notify_hist_play();
-                }
-
-                res.set_content(build_state_json(false), "application/json");
-            }
-        });
-        m_svr.Post("/clear", [&](const Request &req, Response &res) {
+        m_svr.Get("/clear", [&](const Request &req, Response &res) {
             if (prepare_req(req, res))
             {
 
                 page_clear();
+                replaying = true;
                 notify_hist_clear();
-
-                res.set_content(build_state_json(false), "application/json");
-            }
-        });
-        m_svr.Post("/record", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
-            {
-
-                Params par;
-                parse_query_text(req.body, par);
-
-                for (const auto &e : par)
+                while (replaying)
                 {
-                    if (e.first == "recording")
-                    {
-                        if (e.second == "true")
-                        {
-                            m_history_recording = true;
-                        }
-                        else if (e.second == "false")
-                        {
-                            m_history_recording = false;
-                        }
-                        break;
-                    }
-                }
+                } // block while replaying
 
                 res.set_content(build_state_json(false), "application/json");
             }

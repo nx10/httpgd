@@ -2,7 +2,10 @@
 
 export(dummygd_)
 export(httpgd)
+export(httpgdState)
+export(httpgdURL)
 import(later)
+importFrom(grDevices,dev.cur)
 importFrom(grDevices,dev.list)
 importFrom(grDevices,dev.off)
 useDynLib(httpgd, .registration=TRUE)

@@ -8,6 +8,7 @@
       width: 100%;
       height: 100%;
     }
+
     #toolbar {
       float: left;
       position: absolute;
@@ -20,6 +21,7 @@
       -ms-user-select: none;
       user-select: none;
     }
+
     #discon {
       padding: 2px 6px 2px 6px;
       border-radius: 2px;
@@ -28,7 +30,8 @@
       border-color: #f5c6cb;
       display: none;
     }
-    #tb-tools>a {
+
+    #tb-tools>span {
       padding: 2px 6px 2px 6px;
       border-radius: 2px;
       color: #818182;
@@ -36,7 +39,12 @@
       border-color: #fdfdfe;
       cursor: pointer;
     }
-    #tb-tools>a:hover {
+
+    #tb-tools>span>a {
+      padding: 2px 2px 2px 2px;
+    }
+
+    #tb-tools>span>a:hover {
       color: #07c;
     }
   </style>
@@ -46,26 +54,25 @@
   <div id="container">
     <div id="toolbar">
       <div id="tb-tools">
-        <a id="tb-left">&lt;</a> <span id="tb-pnum"></span> <a id="tb-right">&gt;</a> <a id="tb-plus">&plus;</a><a id="tb-zlvl"></a><a
-          id="tb-minus">&minus;</a> <a id="tb-save">Save</a> <a id="tb-clear">Clear</a></div> <span
+        <span><a id="tb-left">&lt;</a><a id="tb-pnum"></a><a id="tb-right">&gt;</a></span> <span><a id="tb-plus">&plus;</a><a
+          id="tb-zlvl"></a><a id="tb-minus">&minus;</a></span> <span><a id="tb-save">Save</a></span> <span><a id="tb-clear">Clear</a></span></div> <span
         id="discon">Disconnected!</span>
     </div>
     <img id="drawing"></img>
   </div>
   <script>
 
-    const svr = /*SRVRPARAMS*/{ "host": "127.0.0.1", "port": 8288, "upid": 1, "width": 736.000000, "height": 590.720020, "recording": true, "hsize": 0, "hindex": -1 }/**/;
+    // The server injects its state when loading the page here.
+    const svr = /*SRVRPARAMS*/{ "host": "127.0.0.1", "port": 8288, "upid": 1, "width": 720.0, "height": 576.0, "hrecording": true, "hsize": 0, "hindex": -1, "needsave": false }/**/;
 
-    const intervall_check = 1000;
-    const default_scale = 0.8;
-    const scale_step = default_scale / 12;
+    const CHECK_INTERVAL = 500;
+    const SCALE_DEFAULT = 0.8;
+    const SCALE_STEP = SCALE_DEFAULT / 12;
+
     const baseapi = 'http://' + svr.host + ':' + svr.port;
     const api = {
       svg: baseapi + '/svg',
       state: baseapi + '/state',
-      resize: baseapi + '/resize',
-      next: baseapi + '/next',
-      prev: baseapi + '/prev',
       clear: baseapi + '/clear',
       headers: svr.token ? {
         'X-HTTPGD-TOKEN': svr.token
@@ -73,32 +80,75 @@
     };
 
     const cli = {
-      scale: default_scale,
-      resize_poss: true,
-      width: null,
-      height: null,
+      scale: SCALE_DEFAULT,
+      reloading: false,
       discon: false,
       elem_drw: null,
-      elem_discon: null
+      elem_discon: null,
+      width: null,
+      height: null,
+      hindex: -1,
+      plot: {hsize: 0}
     };
 
     function refresh_svg(vchange) {
-      cli.elem_drw.src = api.svg + '?upid=' + svr.upid + '&token=' + api.token + (vchange ? '&vchange=1' : '');
+      let s = api.svg +
+        '?width=' + cli.width +
+        '&height=' + cli.height +
+        '&index=' + cli.hindex +
+        '&upid=' + svr.upid +
+        (api.token ? ('&token=' + api.token) : '') +
+        (vchange ? 'v' : '');
+
+      cli.reloading = true;
+      cli.elem_drw.src = s;
+    }
+
+    function svg_loaded() {
+      if (!cli.reloading) return;
+      console.log("SVG loaded!");
+      cli.plot.width = cli.width;
+      cli.plot.height = cli.height;
+      cli.plot.hindex = cli.hindex;
+      cli.plot.hsize = svr.hsize;
+      cli.reloading = false;
+      update_toolbar();
+    }
+    function svg_loaded_error() {
+      if (!cli.reloading) return;
+      warn_disconnected(true);
+      cli.reloading = false;
+    }
+
+    function warn_disconnected(disconnected) {
+      if (cli.discon != disconnected) {
+        cli.discon = disconnected;
+        cli.elem_discon.style.display = disconnected ? "inline" : "none";
+      }
+    }
+
+    function update_toolbar() {
+      cli.elem_pnum.textContent = (cli.hindex === -1 ? cli.plot.hsize : (cli.hindex + 1)) + "/" + svr.hsize;
+      cli.elem_zlvl.textContent = Math.ceil(SCALE_DEFAULT / cli.scale * 100) + '%';
     }
 
     function update_svr(state) {
-      cli.elem_pnum.textContent = (state.hindex + 1) + "/" + state.hsize;
-      cli.elem_zlvl.textContent = Math.ceil(default_scale / cli.scale * 100) + '%';
-      if (svr.upid !== state.upid) {
+      if (cli.reloading) return;
+
+      if ((state.needsave && svr.upid !== cli.plot.upid) ||
+        cli.hindex !== cli.plot.hindex ||
+        Math.abs(cli.width - cli.plot.width) > 0.01 ||
+        Math.abs(cli.height - cli.plot.height) > 0.01) {
         Object.assign(svr, state);
-        refresh_svg();
-        if (cli.discon) {
-          cli.discon = false;
-          cli.elem_discon.style.display = "none";
+
+        if (state.needsave) {
+          cli.hindex = -1;
         }
-        return;
+
+        refresh_svg();
+
+        warn_disconnected(false);
       }
-      Object.assign(svr, state);
     }
 
     function save_plot() {
@@ -117,96 +167,85 @@
     }
 
     function checkcycle() {
-      drw_rect = cli.elem_drw.getBoundingClientRect();
-      cli.width = drw_rect.width * cli.scale;
-      cli.height = drw_rect.height * cli.scale;
+      update_toolbar();
+      if (cli.reloading) return;
 
-      // check resized
-      if (cli.resize_poss &&
-        (Math.abs(svr.width - cli.width) > 0.001 ||
-          Math.abs(svr.height - cli.height) > 0.001)) {
-        console.log("resize");
-        cli.resize_poss = false;
-        fetch(api.resize, {
-          method: 'post',
-          headers: api.headers,
-          body: 'width=' + cli.width + '&height=' + cli.height
-        }).then(res => res.json()).then((out) => {
-          update_svr(out);
-          setTimeout(() => {
-            checkcycle();
-            cli.resize_poss = true;
-          }, 500);
-        });
-      }
+      drw_rect = cli.elem_drw.getBoundingClientRect();
+      cli.width = Math.round(drw_rect.width * cli.scale);
+      cli.height = Math.round(drw_rect.height * cli.scale);
 
       // fetch server state
       fetch(api.state, {
-        method: 'get',
         headers: api.headers
       })
         .then(res => res.json())
         .then((out) => {
           update_svr(out);
-        }).catch((error) => {
-          console.warn('Server offline.');
-          if (!cli.discon) {
-            cli.elem_discon.style.display = "inline";
-            cli.discon = true;
-          }
+        }).catch((e) => {
+          console.warn(e)
+          warn_disconnected(true);
         });
     }
 
-    function nav_next() {
-      fetch(api.next, {
-        method: 'post',
-        headers: api.headers
-      }).then(res => res.json())
-        .then((out) => {
-          update_svr(out);
-          setTimeout(() => { checkcycle(); }, 500);
-        });
-    }
-    function nav_prev() {
-      fetch(api.prev, {
-        method: 'post',
-        headers: api.headers
-      }).then(res => res.json())
-        .then((out) => {
-          update_svr(out);
-          setTimeout(() => { checkcycle(); }, 500);
-        });
-    }
     function nav_clear() {
       fetch(api.clear, {
-        method: 'post',
         headers: api.headers
       }).then(res => res.json())
         .then((out) => {
+          cli.elem_drw.src = api.svg;
           update_svr(out);
-          setTimeout(() => { checkcycle(); }, 500);
         });
     }
+
     function nav_zoom_in() {
-      zoom(-scale_step);
+      zoom(-SCALE_STEP);
       checkcycle();
     }
     function nav_zoom_out() {
-      zoom(scale_step);
+      zoom(SCALE_STEP);
       checkcycle();
     }
     function nav_zoom_reset() {
-      cli.scale = default_scale;
+      cli.scale = SCALE_DEFAULT;
+      checkcycle();
+    }
+    function nav_hist_prev() {
+      if (cli.hindex > 0) {
+        cli.hindex -= 1;
+      } else if (svr.hsize >= 2) {
+        cli.hindex = svr.hsize-(cli.hindex == -1 ? 2 : 1);
+      }
+      update_toolbar();
+      checkcycle();
+    }
+    function nav_hist_next() {
+      if (cli.hindex >= 0 && cli.hindex < svr.hsize - 1) {
+        cli.hindex += 1;
+      } else {
+        cli.hindex = 0;
+      } 
+      update_toolbar();
+      checkcycle();
+    }
+    function nav_hist_first() {
+      cli.hindex = -1;
+      update_toolbar();
       checkcycle();
     }
 
     function handleToolKeys(e) {
       switch (e.keyCode) {
         case 37: // left arrow
-          nav_prev();
+          nav_hist_prev();
           break;
         case 39: // right arrow
-          nav_next();
+          nav_hist_next();
+          break;
+        case 38: // up arrow
+          nav_hist_next();
+          break;
+        case 40: // down arrow
+          nav_hist_prev();
           break;
         case 187: // plus
           nav_zoom_in();
@@ -236,12 +275,16 @@
       cli.elem_pnum = document.getElementById("tb-pnum");
       cli.elem_zlvl = document.getElementById("tb-zlvl");
 
+      cli.elem_drw.addEventListener('load', svg_loaded);
+      cli.elem_drw.addEventListener('error', svg_loaded_error);
+
+      document.getElementById("tb-left").onclick = nav_hist_prev;
+      document.getElementById("tb-right").onclick = nav_hist_next;
+      document.getElementById("tb-pnum").onclick = nav_hist_first;
       document.getElementById("tb-save").onclick = save_plot;
       document.getElementById("tb-plus").onclick = nav_zoom_in;
       document.getElementById("tb-minus").onclick = nav_zoom_out;
       document.getElementById("tb-zlvl").onclick = nav_zoom_reset;
-      document.getElementById("tb-left").onclick = nav_prev;
-      document.getElementById("tb-right").onclick = nav_next;
       document.getElementById("tb-clear").onclick = nav_clear;
 
       window.addEventListener('keydown', handleToolKeys);
@@ -257,7 +300,8 @@
         elem_tbt.style.display = "none";
       }
 
-      setInterval(checkcycle, intervall_check);
+      refresh_svg();
+      setInterval(checkcycle, CHECK_INTERVAL);
 
       var hidden, visibilityChange;
       if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 

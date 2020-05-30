@@ -45,3 +45,42 @@ httpgd <-
     surl <- paste0("http://", host, ":", port)
     writeLines(paste0("httpgd live server running at:\n  ",surl,"/live",ifelse(nchar(token)==0,"",paste0("?token=",token))))
   }
+
+
+#' Returns status information of a httpgd graphics device.
+#'
+#' @param which Which device (id)
+#'
+#' @return List of status variables
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+httpgdState <- function(which = dev.cur()) {
+  if (names(which) != "httpgd") {
+    stop("Device is not of type httpgd")
+  }
+  else {
+    return(httpgd_state_(which))
+  }
+}
+
+
+#' Returns the url by which a httpgd device is accessible.
+#'
+#' @param endpoint API endpoint
+#' @param which Which device (id)
+#'
+#' @return URL
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+httpgdURL <- function(endpoint = "live", which = dev.cur()) {
+  l <- httpgdState(which)
+  paste0("http://",
+         l$host,
+         ":",
+         l$port,
+         "/",
+         endpoint,
+         ifelse(nchar(l$token) == 0, "", paste0("?token=", l$token)))
+}

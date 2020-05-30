@@ -283,8 +283,6 @@ namespace httpgd
 
     // R graphics device initialization procedure
 
-    
-
     pDevDesc httpgd_driver_new(const HttpgdDevStartParams &params)
     {
 
@@ -404,4 +402,38 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
                               use_token, token});
 
     return true;
+}
+
+// [[Rcpp::export]]
+Rcpp::List httpgd_state_(int devnum)
+{
+    if (devnum < 1 || devnum > 64) // R_MaxDevices
+    {
+        Rcpp::stop("invalid graphical device number");
+    }
+
+    pGEDevDesc gdd = GEgetDevice(devnum-1);
+    if (!gdd)
+    {
+        Rcpp::stop("invalid device");
+    }
+    pDevDesc dd = gdd->dev;
+    if (!dd)
+    {
+        Rcpp::stop("invalid device");
+    }
+    auto dev = static_cast<httpgd::HttpgdDev *>(dd->deviceSpecific);
+    if (!dev)
+    {
+        Rcpp::stop("invalid device");
+    }
+
+    Rcpp::CharacterVector rhost = { dev->server.get_host() };
+    Rcpp::IntegerVector rport = { dev->server.get_port() };
+    Rcpp::CharacterVector rtoken = { dev->server.get_token() };
+
+    return Rcpp::List::create(
+        Rcpp::Named("host") = rhost,
+        Rcpp::Named("port") = rport,
+        Rcpp::Named("token") = rtoken);
 }

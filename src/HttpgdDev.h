@@ -52,8 +52,6 @@ namespace httpgd
         void event_hist_clear();
 
     private:
-        bool m_replaying; // Is the device replaying
-        bool m_needsave;  // Should a snapshot be saved when the plot changes
                           // see also m_recording in HttpgdServer
     };
 

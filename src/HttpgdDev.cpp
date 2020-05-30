@@ -21,14 +21,37 @@ namespace httpgd
         : dd(t_dd),
           server(params.host, params.port, params.width, params.height, params.recording, params.cors, params.use_token, params.token),
           history(HISTORY_MAGIC, 4, std::string(".httpgdPlots_").append(std::to_string(params.port))),
-          font(params.aliases),
-          m_replaying(false), m_needsave(false)
+          font(params.aliases)
     {
         // setup callbacks
-        server.notify_resized = [&]() { event_resized(); };
-        //server.m_user_hist_record = [&](bool recording){ user_hist_record(recording); };
-        server.notify_hist_play = [&]() { event_hist_play(); };
         server.notify_hist_clear = [&]() { event_hist_clear(); };
+        server.notify_replay = [&]() {
+            if (server.replaying) // this should always be true (can't assert)
+            { 
+                later::later([](void *ddp) {
+                    Rcpp::Rcout << "Replay\n";
+                    auto dd = static_cast<pDevDesc>(ddp);
+                    auto xd = static_cast<HttpgdDev *>(dd->deviceSpecific);
+
+                    if (xd->server.needsave && xd->server.history_recording)
+                    {
+                        xd->history.push_current(dd);
+                        xd->server.needsave = false;
+                    }
+
+                    // resize
+                    dd->size(&(dd->left), &(dd->right), &(dd->bottom), &(dd->top), dd);
+                    
+                    if (xd->server.last_page() && xd->server.needsave) {
+                        GEplayDisplayList(desc2GEDesc(dd)); // replay active page
+                    } else {
+                        xd->history.play(xd->server.history_index, dd); // replay from history
+                    }
+                    xd->server.replaying = false;
+                },
+                             dd, 0.0);
+            }
+        };
 
         // read live server html
         std::ifstream t(get_wwwpath("index.html"));
@@ -45,35 +68,30 @@ namespace httpgd
 
     void HttpgdDev::hist_new_page()
     {
-        if (server.is_recording() && m_needsave)
+        if (server.history_recording && server.needsave)
         {
             history.push_last(dd);
         }
-        m_needsave = !m_replaying;
-        if (!m_replaying)
+        server.needsave = !server.replaying;
+        if (!server.replaying)
         {
             hist_update_size();
         }
     }
     void HttpgdDev::hist_update_size()
     {
-        int history_size = history.size();
-        if (m_needsave)
-        {
-            history_size += 1;
-        }
-        server.set_history_size(history_size);
+        server.history_size = history.size() + (server.needsave ? 1 : 0);
     }
 
     void HttpgdDev::event_resized()
     {
-        m_replaying = true;
+        //m_replaying = true; // replaying should already be true at this point
         later::later([](void *ddp) {
             auto dd = static_cast<pDevDesc>(ddp);
             auto xd = static_cast<HttpgdDev *>(dd->deviceSpecific);
             dd->size(&(dd->left), &(dd->right), &(dd->bottom), &(dd->top), dd);
             GEplayDisplayList(desc2GEDesc(dd));
-            xd->m_replaying = false;
+            xd->server.replaying = false;
         },
                      dd, 0.0);
     }
@@ -84,16 +102,16 @@ namespace httpgd
             auto dd = static_cast<pDevDesc>(ddp);
             auto xd = static_cast<HttpgdDev *>(dd->deviceSpecific);
 
-            if (xd->server.is_recording() && xd->m_needsave)
+            if (xd->server.history_recording && xd->server.needsave)
             {
                 xd->history.push_current(dd);
-                xd->m_needsave = false;
+                xd->server.needsave = false;
             }
 
-            int index = xd->server.get_history_index();
-            xd->m_replaying = true;
+            int index = xd->server.history_index;
+            xd->server.replaying = true;
             xd->history.play(index, dd);
-            xd->m_replaying = false;
+            xd->server.replaying = false;
 
             // notify size
             xd->hist_update_size();
@@ -106,8 +124,11 @@ namespace httpgd
             auto dd = static_cast<pDevDesc>(ddp);
             auto xd = static_cast<HttpgdDev *>(dd->deviceSpecific);
             xd->history.clear();
-            xd->m_needsave = false;
-            xd->server.set_history_size(0);
+            xd->server.needsave = false;
+            xd->server.history_size = 0;
+            xd->server.history_index = -1;
+
+            xd->server.replaying = false;
         },
                      dd, 0.0);
     }

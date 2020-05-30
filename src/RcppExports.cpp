@@ -25,6 +25,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// httpgd_state_
+Rcpp::List httpgd_state_(int devnum);
+RcppExport SEXP _httpgd_httpgd_state_(SEXP devnumSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type devnum(devnumSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_state_(devnum));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dummygd_
 bool dummygd_();
 RcppExport SEXP _httpgd_dummygd_() {
@@ -38,6 +49,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 10},
+    {"_httpgd_httpgd_state_", (DL_FUNC) &_httpgd_httpgd_state_, 1},
     {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {NULL, NULL, 0}
 };

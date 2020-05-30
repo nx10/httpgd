@@ -17,10 +17,17 @@ namespace httpgd
     {
     public:
         // callbacks
-        std::function<void()> notify_resized;
+        std::function<void()> notify_replay;
+        //std::function<void()> notify_resized;
         //std::function<void(bool)> notify_record;
-        std::function<void()> notify_hist_play;
+        //std::function<void()> notify_hist_play;
         std::function<void()> notify_hist_clear;
+        
+        std::atomic<bool> replaying; // Is the device replaying
+        std::atomic<bool> needsave;  // Should a snapshot be saved when the plot changes
+        std::atomic<int> history_index; // last draw history index
+        std::atomic<int> history_size; // last draw history index
+        std::atomic<bool> history_recording; // should new pages be added to plot history
 
         HttpgdServer(const std::string &t_host, int t_port,
                      double t_width, double t_height,
@@ -44,9 +51,10 @@ namespace httpgd
 
         void set_livehtml(const std::string &livehtml);
 
-        bool is_recording();
-        void set_history_size(int history_size);
-        int get_history_index();
+        bool last_page() const;
+        std::string get_host() const;
+        int get_port() const;
+        std::string get_token() const;
 
     private:
         std::string m_host;
@@ -61,11 +69,6 @@ namespace httpgd
 
         dc::Page m_page;
         std::mutex m_page_mutex;
-
-        bool m_history_recording;
-        int m_history_index;
-        int m_history_size;
-        std::mutex m_history_mutex;
 
         bool prepare_req(const httplib::Request &req, httplib::Response &res) const;
         void m_svr_main();
