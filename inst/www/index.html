@@ -88,7 +88,7 @@
       width: null,
       height: null,
       hindex: -1,
-      plot: {hsize: 0}
+      plot: { hsize: 0 }
     };
 
     function refresh_svg(vchange) {
@@ -111,6 +111,7 @@
       cli.plot.height = cli.height;
       cli.plot.hindex = cli.hindex;
       cli.plot.hsize = svr.hsize;
+      cli.plot.upid = svr.upid;
       cli.reloading = false;
       update_toolbar();
     }
@@ -135,13 +136,13 @@
     function update_svr(state) {
       if (cli.reloading) return;
 
-      if ((svr.upid !== cli.plot.upid) ||
+      if ((state.upid !== cli.plot.upid) ||
         cli.hindex !== cli.plot.hindex ||
         Math.abs(cli.width - cli.plot.width) > 0.01 ||
         Math.abs(cli.height - cli.plot.height) > 0.01) {
         Object.assign(svr, state);
 
-        if (state.needsave) {
+        if (svr.upid !== cli.plot.upid) {
           cli.hindex = -1;
         }
 

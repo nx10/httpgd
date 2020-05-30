@@ -46,9 +46,6 @@ namespace httpgd
         void hist_new_page();
         void hist_update_size();
 
-        void event_resized();
-        //void user_hist_record(bool recording);
-        void event_hist_play();
         void event_hist_clear();
 
     private:

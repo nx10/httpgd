@@ -306,6 +306,9 @@ namespace httpgd
                     m_page_mutex.unlock();
                     history_index = cli_index; // todo
 
+                    while (replaying)
+                    {
+                    } // make sure we dont replay already
                     replaying = true;
                     notify_replay();
                     while (replaying)
@@ -330,6 +333,10 @@ namespace httpgd
             {
 
                 page_clear();
+
+                while (replaying)
+                {
+                } // make sure we dont replay already
                 replaying = true;
                 notify_hist_clear();
                 while (replaying)

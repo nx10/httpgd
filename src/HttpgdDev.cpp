@@ -83,41 +83,6 @@ namespace httpgd
         server.history_size = history.size() + (server.needsave ? 1 : 0);
     }
 
-    void HttpgdDev::event_resized()
-    {
-        //m_replaying = true; // replaying should already be true at this point
-        later::later([](void *ddp) {
-            auto dd = static_cast<pDevDesc>(ddp);
-            auto xd = static_cast<HttpgdDev *>(dd->deviceSpecific);
-            dd->size(&(dd->left), &(dd->right), &(dd->bottom), &(dd->top), dd);
-            GEplayDisplayList(desc2GEDesc(dd));
-            xd->server.replaying = false;
-        },
-                     dd, 0.0);
-    }
-
-    void HttpgdDev::event_hist_play()
-    {
-        later::later([](void *ddp) {
-            auto dd = static_cast<pDevDesc>(ddp);
-            auto xd = static_cast<HttpgdDev *>(dd->deviceSpecific);
-
-            if (xd->server.history_recording && xd->server.needsave)
-            {
-                xd->history.push_current(dd);
-                xd->server.needsave = false;
-            }
-
-            int index = xd->server.history_index;
-            xd->server.replaying = true;
-            xd->history.play(index, dd);
-            xd->server.replaying = false;
-
-            // notify size
-            xd->hist_update_size();
-        },
-                     dd, 0.0);
-    }
     void HttpgdDev::event_hist_clear()
     {
         later::later([](void *ddp) {
