@@ -69,8 +69,10 @@ namespace httpgd
 
         dc::Page m_page;
         std::mutex m_page_mutex;
+        std::atomic<unsigned int> m_upid;
+        void m_inc_upid();
 
-        bool prepare_req(const httplib::Request &req, httplib::Response &res) const;
+        bool m_prepare_req(const httplib::Request &req, httplib::Response &res) const;
         void m_svr_main();
     };
 

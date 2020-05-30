@@ -24,7 +24,7 @@ namespace httpgd
           history_recording(t_recording),
           m_host(t_host), m_port(t_port), m_svr_cors(t_cors),
           m_svr_use_token(t_use_token), m_svr_token(t_token),
-          m_page(t_width, t_height)
+          m_page(t_width, t_height), m_upid(0)
     {
     }
     HttpgdServer::~HttpgdServer()
@@ -47,12 +47,20 @@ namespace httpgd
     {
         m_page_mutex.lock();
         m_page.put(dc);
+        if (!replaying)
+        {
+            m_inc_upid();
+        }
         m_page_mutex.unlock();
     }
     void HttpgdServer::page_clear()
     {
         m_page_mutex.lock();
         m_page.clear();
+        if (!replaying)
+        {
+            m_inc_upid();
+        }
         m_page_mutex.unlock();
     }
     void HttpgdServer::page_fill(int fill)
@@ -119,7 +127,7 @@ namespace httpgd
             }
         }
         m_page_mutex.lock();
-        buf.append("\"upid\": ").append(std::to_string(m_page.get_upid()));
+        buf.append("\"upid\": ").append(std::to_string(m_upid));
         buf.append(", \"width\": ").append(std::to_string(m_page.width));
         buf.append(", \"height\": ").append(std::to_string(m_page.height));
         m_page_mutex.unlock();
@@ -176,7 +184,19 @@ namespace httpgd
     const std::string SVR_INJECT_KEYWORD = "/*SRVRPARAMS*/";
     const std::string SVR_403 = "Forbidden.";
 
-    bool HttpgdServer::prepare_req(const httplib::Request &req, httplib::Response &res) const
+    void HttpgdServer::m_inc_upid()
+    {
+        if (m_upid < 1000000)
+        {
+            m_upid += 1;
+        }
+        else
+        {
+            m_upid = 0;
+        }
+    }
+
+    bool HttpgdServer::m_prepare_req(const httplib::Request &req, httplib::Response &res) const
     {
         if (m_svr_cors)
         {
@@ -201,13 +221,13 @@ namespace httpgd
         using httplib::detail::parse_query_text;
 
         m_svr.Get("/", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
+            if (m_prepare_req(req, res))
             {
                 res.set_content("httpgd server running.", "text/plain");
             }
         });
         m_svr.Get("/live", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
+            if (m_prepare_req(req, res))
             {
                 // build params
                 std::string sparams = build_state_json(true);
@@ -225,7 +245,7 @@ namespace httpgd
             }
         });
         m_svr.Get("/svg", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
+            if (m_prepare_req(req, res))
             {
                 // get current state
                 m_page_mutex.lock();
@@ -300,13 +320,13 @@ namespace httpgd
             }
         });
         m_svr.Get("/state", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
+            if (m_prepare_req(req, res))
             {
                 res.set_content(build_state_json(false), "application/json");
             }
         });
         m_svr.Get("/clear", [&](const Request &req, Response &res) {
-            if (prepare_req(req, res))
+            if (m_prepare_req(req, res))
             {
 
                 page_clear();

@@ -135,7 +135,7 @@
     function update_svr(state) {
       if (cli.reloading) return;
 
-      if ((state.needsave && svr.upid !== cli.plot.upid) ||
+      if ((svr.upid !== cli.plot.upid) ||
         cli.hindex !== cli.plot.hindex ||
         Math.abs(cli.width - cli.plot.width) > 0.01 ||
         Math.abs(cli.height - cli.plot.height) > 0.01) {

@@ -184,12 +184,10 @@ namespace httpgd
             void clear();
             void build_svg(std::string *buf) const;
             void clip(double x0, double x1, double y0, double y1);
-            int get_upid();
 
         private:
             std::vector<DrawCall *> m_dcs;
             std::vector<Clip> m_cps;
-            int m_upid;
         };
 
     } // namespace dc

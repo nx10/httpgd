@@ -471,7 +471,7 @@ namespace httpgd
         }
 
         Page::Page(double t_width, double t_height)
-            : width(t_width), height(t_height), m_dcs(), m_cps(), m_upid(0)
+            : width(t_width), height(t_height), m_dcs(), m_cps()
         {
             clip(0, width, 0, height);
         }
@@ -496,7 +496,6 @@ namespace httpgd
         {
             m_dcs.emplace_back(dc);
             dc->m_clip = &m_cps.back();
-            m_upid++;
         }
 
         void Page::clear()
@@ -508,11 +507,6 @@ namespace httpgd
             m_dcs.clear();
             m_cps.clear();
             clip(0, width, 0, height);
-            m_upid++;
-        }
-        int Page::get_upid()
-        {
-            return m_upid;
         }
         void Page::build_svg(std::string *buf) const
         {
