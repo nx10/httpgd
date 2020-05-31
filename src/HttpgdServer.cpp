@@ -213,6 +213,12 @@ namespace httpgd
         return true;
     }
 
+    // If the graphics engine scales any lower
+    // it shows "figure margins too large"
+    // and gets permanently in an invalid state.
+    const double MIN_WIDTH = 200;
+    const double MIN_HEIGHT = 200;
+
     void HttpgdServer::m_svr_main()
     {
         using httplib::Params;
@@ -265,6 +271,8 @@ namespace httpgd
                     double pval = 0.0;
                     if (trystod(ptxt, &pval) && pval > 0)
                     {
+                        if (pval < MIN_WIDTH) { pval = MIN_WIDTH; }
+
                         cli_width = pval;
                     }
                 }
@@ -274,6 +282,8 @@ namespace httpgd
                     double pval = 0.0;
                     if (trystod(ptxt, &pval) && pval > 0)
                     {
+                        if (pval < MIN_HEIGHT) { pval = MIN_HEIGHT; }
+
                         cli_height = pval;
                     }
                 }
