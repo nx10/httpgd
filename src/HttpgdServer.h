@@ -24,9 +24,9 @@ namespace httpgd
         std::function<void()> notify_hist_clear;
         
         std::atomic<bool> replaying; // Is the device replaying
-        std::atomic<bool> needsave;  // Should a snapshot be saved when the plot changes
-        std::atomic<int> history_index; // last draw history index
-        std::atomic<int> history_size; // last draw history index
+        std::atomic<unsigned int> replaying_index; // Index to replay
+        //std::atomic<bool> needsave;  // Should a snapshot be saved when the plot changes
+        //std::atomic<int> history_index; // last draw history index
         std::atomic<bool> history_recording; // should new pages be added to plot history
 
         HttpgdServer(const std::string &t_host, int t_port,
@@ -38,23 +38,28 @@ namespace httpgd
         void start();
         void stop();
 
-        void page_put(dc::DrawCall *dc);
-        void page_clear();
-        void page_fill(int fill);
-        void page_resize(double w, double h);
-        double page_get_width();
-        double page_get_height();
-        void page_clip(double x0, double x1, double y0, double y1);
+        unsigned int page_new(double width, double height);
+        void page_put(unsigned int index, std::shared_ptr<dc::DrawCall> dc);
+        void page_clear(unsigned int index);
+        void page_clear_all();
+        void page_fill(unsigned int index, int fill);
+        void page_resize(unsigned int index, double w, double h);
+        double page_get_width(unsigned int index);
+        double page_get_height(unsigned int index);
+        void page_clip(unsigned int index, double x0, double x1, double y0, double y1);
+        unsigned int page_count();
 
-        void build_svg(std::string *buf);
+        void build_svg(unsigned int index, std::string *buf);
         std::string build_state_json(bool include_host);
 
         void set_livehtml(const std::string &livehtml);
 
-        bool last_page() const;
+        //bool last_page() const;
         std::string get_host() const;
         int get_port() const;
         std::string get_token() const;
+        unsigned int get_upid() const;
+
 
     private:
         std::string m_host;
@@ -67,7 +72,7 @@ namespace httpgd
         bool m_svr_use_token;
         std::string m_svr_token;
 
-        dc::Page m_page;
+        std::vector<dc::Page> m_pages;
         std::mutex m_page_mutex;
         std::atomic<unsigned int> m_upid;
         void m_inc_upid();

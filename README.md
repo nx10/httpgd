@@ -11,6 +11,7 @@ Asynchronous http server graphics device for R.
 * Stateless API.
 * Multiple concurrent device server.
 * Multiple concurrent clients for each device.
+* Fast plot history navigation (caching).
 
 ## Demo
 
@@ -81,11 +82,15 @@ dev.off()
 
 #### Query parameter
 
+A query could look like this:
+
+`http://[host]:[port]/svg?width=400&height=300`
+
 | Key      | Value | 
 |----------|-------|
 | `width`  | With in pixels. |
 | `height` | Height in pixels. |
-| `index`  | Plot history index. If set to `-1`, the last available plot will be returned. |
+| `index`  | Plot history index. If omitted, the newest plot will be returned. |
 | `token`  | If security tokens are used this should be equal to the previously secret token. |
 
 #### Server state
@@ -93,12 +98,8 @@ dev.off()
 | Field        | Type     | Description |
 |--------------|----------|-------------|
 | `upid`       | `int`    | Update id. |
-| `width`      | `double` | Graphics device width (pixel). |
-| `height`     | `double` | Graphics device height (pixel). |
 | `hrecording` | `bool`   | Whether the graphics device is recording a plot history. |
 | `hsize`      | `int`    | Number of plot history entries. |
-| `hindex`     | `int`    | Index of the displayed plot entry. |
-| `needsave`   | `bool`   | If this is set to true the opened plot was not yet added to the history. (The plot can still be added to.) |
 
 #### Security
 

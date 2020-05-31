@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 // Do not include any R headers here !
 
@@ -179,14 +180,13 @@ namespace httpgd
             int fill;
 
             Page(double t_width, double t_height);
-            ~Page();
-            void put(DrawCall *dc);
+            void put(std::shared_ptr<DrawCall> dc);
             void clear();
             void build_svg(std::string *buf) const;
             void clip(double x0, double x1, double y0, double y1);
 
         private:
-            std::vector<DrawCall *> m_dcs;
+            std::vector<std::shared_ptr<DrawCall>> m_dcs;
             std::vector<Clip> m_cps;
         };
 

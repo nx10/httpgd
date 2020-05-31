@@ -43,13 +43,18 @@ namespace httpgd
         HttpgdDev(pDevDesc t_dd, const HttpgdDevStartParams &params);
         ~HttpgdDev();
 
-        void hist_new_page();
-        void hist_update_size();
+        void put(std::shared_ptr<dc::DrawCall> dc);
+
+        void new_page(double width, double height, int fill);
+        void page_size(double *width, double *height);
+        void render_page(unsigned int target);
+        void clip_page(double x0, double x1, double y0, double y1);
 
         void event_hist_clear();
 
     private:
-                          // see also m_recording in HttpgdServer
+        unsigned int m_target; // current draw target. target = index + 1 (0 reserved for special case)
+        unsigned int m_target_open; // open draw target. New draw calls from R always target this. target = index + 1 (0 reserved for special case)
     };
 
 } // namespace httpgd

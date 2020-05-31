@@ -475,14 +475,6 @@ namespace httpgd
         {
             clip(0, width, 0, height);
         }
-        Page::~Page()
-        {
-            for (auto p : m_dcs)
-            {
-                delete p;
-            } 
-            m_dcs.clear();
-        }
 
         void Page::clip(double x0, double x1, double y0, double y1)
         {
@@ -492,7 +484,7 @@ namespace httpgd
             }
         }
 
-        void Page::put(DrawCall *dc)
+        void Page::put(std::shared_ptr<DrawCall> dc)
         {
             m_dcs.emplace_back(dc);
             dc->m_clip = &m_cps.back();
@@ -500,10 +492,6 @@ namespace httpgd
 
         void Page::clear()
         {
-            for (auto p : m_dcs)
-            {
-                delete p;
-            } 
             m_dcs.clear();
             m_cps.clear();
             clip(0, width, 0, height);
@@ -530,7 +518,11 @@ namespace httpgd
                       "    }\n"
                       "  ]]></style>\n";
 
-            std::for_each(m_cps.begin(), m_cps.end(), [&](const Clip &asd) { buf->append("  "); asd.build_svg_def(buf); buf->append("\n"); });
+            for (const auto &cp : m_cps) {
+                buf->append("  "); 
+                cp.build_svg_def(buf); 
+                buf->append("\n");
+            }
 
             buf->append("</defs>\n");
 
@@ -539,7 +531,11 @@ namespace httpgd
             css_field_color(buf, "fill", fill);
             buf->append("\"/>\n");
 
-            std::for_each(m_dcs.begin(), m_dcs.end(), [&](const DrawCall *const piece) { buf->append("  "); piece->build_svg(buf); buf->append("\n"); });
+            for (const auto &dc : m_dcs) {
+                buf->append("  "); 
+                dc->build_svg(buf); 
+                buf->append("\n");
+            }
             buf->append("</svg>");
         }
 

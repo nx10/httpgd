@@ -19,12 +19,12 @@ namespace httpgd
                                double t_width, double t_height,
                                bool t_recording,
                                bool t_cors, bool t_use_token, std::string t_token)
-        : replaying(false), needsave(false),
-          history_index(-1), history_size(0),
+        : replaying(false), //needsave(false),
+          //history_index(-1), history_size(0),
           history_recording(t_recording),
           m_host(t_host), m_port(t_port), m_svr_cors(t_cors),
           m_svr_use_token(t_use_token), m_svr_token(t_token),
-          m_page(t_width, t_height), m_upid(0)
+          m_pages(), m_upid(0)
     {
     }
     HttpgdServer::~HttpgdServer()
@@ -43,59 +43,87 @@ namespace httpgd
             m_svr_thread.join();
         }
     }
-    void HttpgdServer::page_put(dc::DrawCall *dc)
+    unsigned int HttpgdServer::page_count()
+    {
+        unsigned int i;
+        m_page_mutex.lock();
+        i = static_cast<int>(m_pages.size());
+        m_page_mutex.unlock();
+        return i;
+    }
+    unsigned int HttpgdServer::page_new(double width, double height)
+    {
+        unsigned int i;
+        m_page_mutex.lock();
+        m_pages.push_back(dc::Page(width, height));
+        i =  static_cast<int>(m_pages.size()) - 1;
+        m_page_mutex.unlock();
+        return i;
+    }
+    void HttpgdServer::page_put(unsigned int index, std::shared_ptr<dc::DrawCall> dc)
     {
         m_page_mutex.lock();
-        m_page.put(dc);
+        m_pages[index].put(dc);
         if (!replaying)
         {
             m_inc_upid();
         }
         m_page_mutex.unlock();
     }
-    void HttpgdServer::page_clear()
+    void HttpgdServer::page_clear(unsigned int index)
     {
         m_page_mutex.lock();
-        m_page.clear();
+        m_pages[index].clear();
         if (!replaying)
         {
             m_inc_upid();
         }
         m_page_mutex.unlock();
     }
-    void HttpgdServer::page_fill(int fill)
+    void HttpgdServer::page_clear_all()
     {
         m_page_mutex.lock();
-        m_page.fill = fill;
+        for (auto p : m_pages)
+        {
+            p.clear();
+        }
+        m_pages.clear();
+        m_inc_upid();
         m_page_mutex.unlock();
     }
-    void HttpgdServer::build_svg(std::string *buf)
+    void HttpgdServer::page_fill(unsigned int index, int fill)
     {
         m_page_mutex.lock();
-        m_page.build_svg(buf);
+        m_pages[index].fill = fill;
         m_page_mutex.unlock();
     }
-    void HttpgdServer::page_resize(double w, double h)
+    void HttpgdServer::build_svg(unsigned int index, std::string *buf)
     {
         m_page_mutex.lock();
-        m_page.width = w;
-        m_page.height = h;
-        m_page.clear();
+        m_pages[index].build_svg(buf);
         m_page_mutex.unlock();
     }
-    double HttpgdServer::page_get_width()
+    void HttpgdServer::page_resize(unsigned int index, double w, double h)
+    {
+        m_page_mutex.lock();
+        m_pages[index].width = w;
+        m_pages[index].height = h;
+        m_pages[index].clear();
+        m_page_mutex.unlock();
+    }
+    double HttpgdServer::page_get_width(unsigned int index)
     {
         double d = 0.0;
         m_page_mutex.lock();
-        d = m_page.width;
+        d = m_pages[index].width;
         m_page_mutex.unlock();
         return d;
     }
-    double HttpgdServer::page_get_height()
+    double HttpgdServer::page_get_height(unsigned int index)
     {
         double d = 0.0;
         m_page_mutex.lock();
-        d = m_page.height;
+        d = m_pages[index].height;
         m_page_mutex.unlock();
         return d;
     }
@@ -103,10 +131,10 @@ namespace httpgd
     {
         m_livehtml = livehtml;
     }
-    void HttpgdServer::page_clip(double x0, double x1, double y0, double y1)
+    void HttpgdServer::page_clip(unsigned int index, double x0, double x1, double y0, double y1)
     {
         m_page_mutex.lock();
-        m_page.clip(x0, x1, y0, y1);
+        m_pages[index].clip(x0, x1, y0, y1);
         m_page_mutex.unlock();
     }
 
@@ -126,15 +154,11 @@ namespace httpgd
                 buf.append("\", ");
             }
         }
-        m_page_mutex.lock();
         buf.append("\"upid\": ").append(std::to_string(m_upid));
-        buf.append(", \"width\": ").append(std::to_string(m_page.width));
-        buf.append(", \"height\": ").append(std::to_string(m_page.height));
-        m_page_mutex.unlock();
         buf.append(", \"hrecording\": ").append(history_recording ? "true" : "false");
-        buf.append(", \"hsize\": ").append(std::to_string(history_size));
-        buf.append(", \"hindex\": ").append(std::to_string(history_index));
-        buf.append(", \"needsave\": ").append(needsave ? "true" : "false");
+        m_page_mutex.lock();
+        buf.append(", \"hsize\": ").append(std::to_string(m_pages.size()));
+        m_page_mutex.unlock();
         buf.append(" }");
         return buf;
     }
@@ -164,10 +188,6 @@ namespace httpgd
         }
     }
 
-    bool HttpgdServer::last_page() const
-    {
-        return history_index == history_size - 1;
-    }
     std::string HttpgdServer::get_host() const
     {
         return m_host;
@@ -194,6 +214,10 @@ namespace httpgd
         {
             m_upid = 0;
         }
+    }
+    unsigned int HttpgdServer::get_upid() const
+    {
+        return m_upid;
     }
 
     bool HttpgdServer::m_prepare_req(const httplib::Request &req, httplib::Response &res) const
@@ -253,83 +277,94 @@ namespace httpgd
         m_svr.Get("/svg", [&](const Request &req, Response &res) {
             if (m_prepare_req(req, res))
             {
-                // get current state
-                m_page_mutex.lock();
-                double old_width = m_page.width;
-                double old_height = m_page.height;
-                m_page_mutex.unlock();
-                int old_index = history_index;
+                unsigned int pcount = page_count();
 
-                double cli_width = old_width;
-                double cli_height = old_height;
-                int cli_index = old_index;
-
-                // get params
-                if (req.has_param("width"))
+                if (pcount == 0)
                 {
-                    std::string ptxt = req.get_param_value("width");
-                    double pval = 0.0;
-                    if (trystod(ptxt, &pval) && pval > 0)
-                    {
-                        if (pval < MIN_WIDTH) { pval = MIN_WIDTH; }
-
-                        cli_width = pval;
-                    }
+                    res.set_content("<svg width=\"10\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"></svg>", "image/svg+xml");
                 }
-                if (req.has_param("height"))
+                else
                 {
-                    std::string ptxt = req.get_param_value("height");
-                    double pval = 0.0;
-                    if (trystod(ptxt, &pval) && pval > 0)
-                    {
-                        if (pval < MIN_HEIGHT) { pval = MIN_HEIGHT; }
+                    unsigned int cli_index = pcount - 1;
 
-                        cli_height = pval;
-                    }
-                }
-                if (req.has_param("index"))
-                {
-                    std::string ptxt = req.get_param_value("index");
-                    int pval = 0;
-                    if (trystoi(ptxt, &pval))
+                    if (req.has_param("index"))
                     {
-                        if (pval == -1 || pval < 0 || pval >= history_size)
+                        std::string ptxt = req.get_param_value("index");
+                        int pval = 0;
+                        if (trystoi(ptxt, &pval))
                         {
-                            cli_index = history_size - 1;
-                        }
-                        else
-                        {
-                            cli_index = pval;
+                            unsigned int upval = pval;
+                            if (upval >= 0 && upval < pcount)
+                            {
+                                cli_index = upval;
+                            }
                         }
                     }
-                }
 
-                // Check if replay needed
-                if (std::abs(cli_width - old_width) > 0.01 ||
-                    std::abs(cli_height - old_height) > 0.01 ||
-                    cli_index != old_index)
-                {
+                    // get current state
                     m_page_mutex.lock();
-                    m_page.width = cli_width;
-                    m_page.height = cli_height;
-                    m_page.clear();
+                    double old_width = m_pages[cli_index].width;
+                    double old_height = m_pages[cli_index].height;
                     m_page_mutex.unlock();
-                    history_index = cli_index; // todo
 
-                    while (replaying)
+                    double cli_width = old_width;
+                    double cli_height = old_height;
+
+                    // get params
+                    if (req.has_param("width"))
                     {
-                    } // make sure we dont replay already
-                    replaying = true;
-                    notify_replay();
-                    while (replaying)
+                        std::string ptxt = req.get_param_value("width");
+                        double pval = 0.0;
+                        if (trystod(ptxt, &pval))
+                        {
+                            if (pval < MIN_WIDTH)
+                            {
+                                pval = MIN_WIDTH;
+                            }
+                            cli_width = pval;
+                        }
+                    }
+                    if (req.has_param("height"))
                     {
-                    } // block while replaying
+                        std::string ptxt = req.get_param_value("height");
+                        double pval = 0.0;
+                        if (trystod(ptxt, &pval))
+                        {
+                            if (pval < MIN_HEIGHT)
+                            {
+                                pval = MIN_HEIGHT;
+                            }
+                            cli_height = pval;
+                        }
+                    }
+
+                    // Check if replay needed
+                    if (std::abs(cli_width - old_width) > 0.1 ||
+                        std::abs(cli_height - old_height) > 0.1)
+                    {
+
+                        m_page_mutex.lock();
+                        m_pages[cli_index].width = cli_width;
+                        m_pages[cli_index].height = cli_height;
+                        m_pages[cli_index].clear(); // todo is this needed?
+                        m_page_mutex.unlock();
+
+                        while (replaying)
+                        {
+                        } // make sure we dont replay already
+                        replaying_index = cli_index;
+                        replaying = true;
+                        notify_replay();
+                        while (replaying)
+                        {
+                        } // block while replaying
+                    }
+
+                    std::string s = "";
+                    s.reserve(1000000);
+                    this->build_svg(cli_index, &s);
+                    res.set_content(s, "image/svg+xml");
                 }
-
-                std::string s = "";
-                s.reserve(1000000);
-                this->build_svg(&s);
-                res.set_content(s, "image/svg+xml");
             }
         });
         m_svr.Get("/state", [&](const Request &req, Response &res) {
@@ -342,7 +377,7 @@ namespace httpgd
             if (m_prepare_req(req, res))
             {
 
-                page_clear();
+                page_clear_all();
 
                 while (replaying)
                 {
