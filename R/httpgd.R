@@ -2,8 +2,9 @@
 
 #' Initialize httpgd graphics device and start server.
 #'
-#' @param host Hostname.
-#' @param port Port.
+#' @param host Server hostname.
+#' @param port Server port. If this is set to 0, an open port 
+#'   will be assigned.
 #' @param width Graphics device width (pixels).
 #' @param height Graphics device height (pixels).
 #' @param bg Background color.
@@ -23,14 +24,17 @@
 #' @param recording Should a plot history be recorded.
 #' @param cors Toggles Cross-Origin Resource Sharing (CORS) header.
 #'   When set to TRUE, CORS header will be set to "*".
-#' @param token (Optional) security token string. When set all requests
-#'   need to include this token to be allowed. (Either in a request header 
+#' @param token (Optional) security token. When set, all requests
+#'   need to include a token to be allowed. (Either in a request header 
 #'   (X-HTTPGD-TOKEN) field or as a query parameter.)
+#'   This parameter can be set to TRUE to generate a random 8 character
+#'   alphanumeric token. A random token of the specified length is generated
+#'   when it is set to a number. 
 #'
 #' @export
 httpgd <-
   function(host = "127.0.0.1",
-           port = 8288,
+           port = 0,
            width = 720,
            height = 576,
            bg = "white",
@@ -39,11 +43,20 @@ httpgd <-
            user_fonts = list(),
            recording = TRUE,
            cors = FALSE,
-           token = "") {
+           token = FALSE) {
+    
+    tok <- ""
+    if (is.character(token)) {
+      tok <- token
+    } else if (is.numeric(token)) {
+      tok <- httpgd_random_token_(token)
+    } else if (is.logical(token) && token) {
+      tok <- httpgd_random_token_(8)
+    }
+    
     aliases <- validate_aliases(system_fonts, user_fonts)
-    httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors, token)
-    surl <- paste0("http://", host, ":", port)
-    writeLines(paste0("httpgd live server running at:\n  ",surl,"/live",ifelse(nchar(token)==0,"",paste0("?token=",token))))
+    httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors, tok)
+    writeLines(paste0("httpgd live server running at:\n  ", httpgdURL()))
   }
 
 

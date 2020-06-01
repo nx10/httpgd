@@ -28,6 +28,8 @@ namespace httpgd
         //std::atomic<bool> needsave;  // Should a snapshot be saved when the plot changes
         //std::atomic<int> history_index; // last draw history index
         std::atomic<bool> history_recording; // should new pages be added to plot history
+        
+        std::atomic<bool> server_ready; // server is bound to a port
 
         HttpgdServer(const std::string &t_host, int t_port,
                      double t_width, double t_height,

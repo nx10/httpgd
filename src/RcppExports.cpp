@@ -36,6 +36,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// httpgd_random_token_
+std::string httpgd_random_token_(int len);
+RcppExport SEXP _httpgd_httpgd_random_token_(SEXP lenSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type len(lenSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_random_token_(len));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dummygd_
 bool dummygd_();
 RcppExport SEXP _httpgd_dummygd_() {
@@ -50,6 +61,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 10},
     {"_httpgd_httpgd_state_", (DL_FUNC) &_httpgd_httpgd_state_, 1},
+    {"_httpgd_httpgd_random_token_", (DL_FUNC) &_httpgd_httpgd_random_token_, 1},
     {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {NULL, NULL, 0}
 };

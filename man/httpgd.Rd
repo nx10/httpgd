@@ -6,7 +6,7 @@
 \usage{
 httpgd(
   host = "127.0.0.1",
-  port = 8288,
+  port = 0,
   width = 720,
   height = 576,
   bg = "white",
@@ -15,13 +15,14 @@ httpgd(
   user_fonts = list(),
   recording = TRUE,
   cors = FALSE,
-  token = ""
+  token = FALSE
 )
 }
 \arguments{
-\item{host}{Hostname.}
+\item{host}{Server hostname.}
 
-\item{port}{Port.}
+\item{port}{Server port. If this is set to 0, an open port 
+will be assigned.}
 
 \item{width}{Graphics device width (pixels).}
 
@@ -50,9 +51,12 @@ font file.}
 \item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
 When set to TRUE, CORS header will be set to "*".}
 
-\item{token}{(Optional) security token string. When set all requests
-need to include this token to be allowed. (Either in a request header 
-(X-HTTPGD-TOKEN) field or as a query parameter.)}
+\item{token}{(Optional) security token. When set, all requests
+need to include a token to be allowed. (Either in a request header 
+(X-HTTPGD-TOKEN) field or as a query parameter.)
+This parameter can be set to TRUE to generate a random 8 character
+alphanumeric token. A random token of the specified length is generated
+when it is set to a number.}
 }
 \description{
 Initialize httpgd graphics device and start server.

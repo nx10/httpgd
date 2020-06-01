@@ -98,7 +98,7 @@
         '&height=' + cli.height +
         '&index=' + cli.hindex +
         '&upid=' + svr.upid +
-        (api.token ? ('&token=' + api.token) : '') +
+        (svr.token ? ('&token=' + svr.token) : '') +
         (vchange ? 'v' : '');
 
       cli.reloading = true;

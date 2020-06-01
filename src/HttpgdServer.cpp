@@ -19,9 +19,9 @@ namespace httpgd
                                double t_width, double t_height,
                                bool t_recording,
                                bool t_cors, bool t_use_token, std::string t_token)
-        : replaying(false), //needsave(false),
-          //history_index(-1), history_size(0),
+        : replaying(false),
           history_recording(t_recording),
+          server_ready(false),
           m_host(t_host), m_port(t_port), m_svr_cors(t_cors),
           m_svr_use_token(t_use_token), m_svr_token(t_token),
           m_pages(), m_upid(0)
@@ -56,7 +56,7 @@ namespace httpgd
         unsigned int i;
         m_page_mutex.lock();
         m_pages.push_back(dc::Page(width, height));
-        i =  static_cast<int>(m_pages.size()) - 1;
+        i = static_cast<int>(m_pages.size()) - 1;
         m_page_mutex.unlock();
         return i;
     }
@@ -392,7 +392,16 @@ namespace httpgd
             }
         });
 
-        m_svr.listen(m_host.c_str(), m_port);
+        if (m_port <= 0)
+        {
+            m_port = m_svr.bind_to_any_port(m_host.c_str());
+        }
+        else
+        {
+            m_svr.bind_to_port(m_host.c_str(), m_port);
+        }
+        server_ready = true;
+        m_svr.listen_after_bind();
     }
 
     const time_t CHECK_OCCUPIED_TIMEOUT = 300000;

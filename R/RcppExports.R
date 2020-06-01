@@ -9,6 +9,10 @@ httpgd_state_ <- function(devnum) {
     .Call(`_httpgd_httpgd_state_`, devnum)
 }
 
+httpgd_random_token_ <- function(len) {
+    .Call(`_httpgd_httpgd_random_token_`, len)
+}
+
 #' Dummy graphics device for debug purposes.
 #'
 #' @export

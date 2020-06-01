@@ -81,7 +81,6 @@ namespace httpgd
 
         dev->new_page(dd->right, dd->bottom, dd->startfill);
 
-
 #if LOGDRAW == 1
         Rcpp::Rcout << "NEW_PAGE \n";
 #endif
@@ -219,12 +218,12 @@ namespace httpgd
 
         dev->font.analyze(std::string(str), gc);
         dev->put(std::make_shared<dc::Text>(gc, x, y, str, rot, hadj,
-                                          dc::TextInfo{
-                                              dev->font.get_font_family(),
-                                              dev->font.get_fontsize(),
-                                              dev->font.is_bold(),
-                                              dev->font.is_italic(),
-                                              dev->font.get_width()}));
+                                            dc::TextInfo{
+                                                dev->font.get_font_family(),
+                                                dev->font.get_fontsize(),
+                                                dev->font.is_bold(),
+                                                dev->font.is_italic(),
+                                                dev->font.get_width()}));
 
 #if LOGDRAW == 1
         Rprintf("TEXT x=%f y=%f str=\"%s\" rot=%f hadj=%f\n", x, y, str, rot, hadj);
@@ -430,6 +429,10 @@ Rcpp::List httpgd_state_(int devnum)
         Rcpp::stop("invalid device");
     }
 
+    while (!dev->server.server_ready)
+    {
+    }
+
     Rcpp::CharacterVector rhost = {dev->server.get_host()};
     Rcpp::IntegerVector rport = {dev->server.get_port()};
     Rcpp::CharacterVector rtoken = {dev->server.get_token()};
@@ -442,4 +445,23 @@ Rcpp::List httpgd_state_(int devnum)
         Rcpp::Named("token") = rtoken,
         Rcpp::Named("hsize") = rhsize,
         Rcpp::Named("upid") = rupid);
+}
+
+// [[Rcpp::export]]
+std::string httpgd_random_token_(int len)
+{
+    if (len < 0)
+    {
+        Rcpp::stop("Length needs to be 0 or higher.");
+    }
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string s(len, 'a');
+    for (int i = 0; i < len; i++)
+    {
+        s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    return s;
 }
