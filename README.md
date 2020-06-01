@@ -108,6 +108,7 @@ A security token can be set when starting the device:
 httpgd(..., token = "secret")
 ```
 When set, each API request has to include this token inside the header `X-HTTPGD-TOKEN` or as a query param `?token=secret`.
+`token` is by default set to `TRUE` to generate a random 8 character alphanumeric token. If it is set to a number, a random token of that length will be generated. `FALSE` deactivates the security token.
 
 CORS is off by default but can be enabled on startup:
 

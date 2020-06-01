@@ -29,7 +29,7 @@
 #'   (X-HTTPGD-TOKEN) field or as a query parameter.)
 #'   This parameter can be set to TRUE to generate a random 8 character
 #'   alphanumeric token. A random token of the specified length is generated
-#'   when it is set to a number. 
+#'   when it is set to a number. FALSE deactivates the token.
 #'
 #' @export
 httpgd <-
@@ -43,7 +43,7 @@ httpgd <-
            user_fonts = list(),
            recording = TRUE,
            cors = FALSE,
-           token = FALSE) {
+           token = TRUE) {
     
     tok <- ""
     if (is.character(token)) {
