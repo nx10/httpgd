@@ -23,7 +23,7 @@
       right: 4px;
       top: 4px;
       font-family: arial, sans-serif;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       -webkit-user-select: none;
       -ms-user-select: none;
@@ -64,8 +64,8 @@
       <div id="tb-tools">
         <span><a id="tb-left">&lt;</a><a id="tb-pnum"></a><a id="tb-right">&gt;</a></span> <span><a
             id="tb-plus">&plus;</a><a id="tb-zlvl"></a><a id="tb-minus">&minus;</a></span> <span><a
-            id="tb-save">Save</a></span> <span><a id="tb-clear">Clear</a></span></div> <span
-        id="discon">Disconnected!</span>
+            id="tb-save">Save</a></span> <span><a id="tb-remove">Remove</a></span> <span><a
+            id="tb-clear">Clear</a></span></div> <span id="discon">Disconnected!</span>
     </div>
     <img id="drawing"></img>
   </div>
@@ -83,6 +83,7 @@
       svg: baseapi + '/svg',
       state: baseapi + '/state',
       clear: baseapi + '/clear',
+      remove: baseapi + '/remove',
       headers: svr.token ? {
         'X-HTTPGD-TOKEN': svr.token
       } : {}
@@ -100,14 +101,14 @@
       plot: { hsize: 0 }
     };
 
-    function refresh_svg(vchange) {
+    function refresh_svg(force) {
       let s = api.svg +
         '?width=' + cli.width +
         '&height=' + cli.height +
         '&index=' + cli.hindex +
         '&upid=' + svr.upid +
-        (svr.token ? ('&token=' + svr.token) : '') +
-        (vchange ? 'v' : '');
+        (force ? 'f' : '') +
+        (svr.token ? ('&token=' + svr.token) : '');
 
       cli.reloading = true;
       cli.elem_drw.src = s;
@@ -209,6 +210,17 @@
         });
     }
 
+    function nav_remove() {
+      fetch(api.remove + '?index=' + cli.hindex, {
+        headers: api.headers
+      }).then(res => res.json())
+        .then((out) => {
+          cli.hindex--;
+          refresh_svg(true);
+          update_svr(out);
+        });
+    }
+
     function nav_zoom_in() {
       zoom(-SCALE_STEP);
       checkcycle();
@@ -266,7 +278,7 @@
           nav_zoom_out();
           break;
         case 46: // del
-          nav_clear();
+          nav_remove();
           break;
         case 83:
           if (e.ctrlKey) { // ctrl+s 
@@ -298,6 +310,7 @@
       document.getElementById("tb-minus").onclick = nav_zoom_out;
       document.getElementById("tb-zlvl").onclick = nav_zoom_reset;
       document.getElementById("tb-clear").onclick = nav_clear;
+      document.getElementById("tb-remove").onclick = nav_remove;
 
       window.addEventListener('keydown', handleToolKeys);
 
@@ -329,7 +342,7 @@
       // Handle page visibility change   
       document.addEventListener(visibilityChange, () => {
         if (!document[hidden]) {
-          refresh_svg(1);
+          refresh_svg(true);
         }
       }, false);
     }

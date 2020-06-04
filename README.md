@@ -79,6 +79,7 @@ dev.off()
 | `/svg`    | `GET`  | Get rendered SVG. Query parameters are listed below. |
 | `/state`  | `GET`  | Get current server state. This can be used to check if there were new draw calls in R. |
 | `/clear`  | `GET`  | Clear plot history. |
+| `/remove`  | `GET`  | Remove a single plot from the history. Index specified with query param `index`. |
 
 #### Query parameter
 

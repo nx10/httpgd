@@ -431,6 +431,7 @@ Rcpp::List httpgd_state_(int devnum)
 
     while (!dev->server.server_ready)
     {
+        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
     }
 
     Rcpp::CharacterVector rhost = {dev->server.get_host()};
@@ -454,14 +455,5 @@ std::string httpgd_random_token_(int len)
     {
         Rcpp::stop("Length needs to be 0 or higher.");
     }
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-    std::string s(len, 'a');
-    for (int i = 0; i < len; i++)
-    {
-        s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
-    return s;
+    return httpgd::random_token(len);
 }

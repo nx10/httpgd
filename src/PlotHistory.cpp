@@ -115,4 +115,23 @@ namespace httpgd
         return true;
     }
 
+    bool PlotHistory::remove(int index)
+    {
+        if (!m_read_data())
+        {
+            return false;
+        }
+        else if (index >= m_vdl.size())
+        {
+            return false;
+        }
+        m_vdl[index] = R_NilValue;
+        for (int i = index; i < m_vdl.size() - 1; i++)
+        {
+            m_vdl[i] = m_vdl[i + 1];
+        }
+        m_write_data();
+        return true;
+    }
+
 } // namespace httpgd

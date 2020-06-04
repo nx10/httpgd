@@ -43,24 +43,24 @@ namespace httpgd
             m_svr_thread.join();
         }
     }
-    unsigned int HttpgdServer::page_count()
+    int HttpgdServer::page_count()
     {
-        unsigned int i;
+        int i;
         m_page_mutex.lock();
         i = static_cast<int>(m_pages.size());
         m_page_mutex.unlock();
         return i;
     }
-    unsigned int HttpgdServer::page_new(double width, double height)
+    int HttpgdServer::page_new(double width, double height)
     {
-        unsigned int i;
+        int i;
         m_page_mutex.lock();
         m_pages.push_back(dc::Page(width, height));
         i = static_cast<int>(m_pages.size()) - 1;
         m_page_mutex.unlock();
         return i;
     }
-    void HttpgdServer::page_put(unsigned int index, std::shared_ptr<dc::DrawCall> dc)
+    void HttpgdServer::page_put(int index, std::shared_ptr<dc::DrawCall> dc)
     {
         m_page_mutex.lock();
         m_pages[index].put(dc);
@@ -70,7 +70,7 @@ namespace httpgd
         }
         m_page_mutex.unlock();
     }
-    void HttpgdServer::page_clear(unsigned int index)
+    void HttpgdServer::page_clear(int index)
     {
         m_page_mutex.lock();
         m_pages[index].clear();
@@ -80,7 +80,22 @@ namespace httpgd
         }
         m_page_mutex.unlock();
     }
-    void HttpgdServer::page_clear_all()
+    void HttpgdServer::page_remove(int index)
+    {
+        m_page_mutex.lock();
+        if (index >= static_cast<int>(m_pages.size()))
+        {
+            return;
+        }
+        m_pages[index].clear();
+        m_pages.erase(m_pages.begin() + index);
+        if (!replaying && index >= static_cast<int>(m_pages.size())) // if it was the last page
+        {
+            m_inc_upid();
+        }
+        m_page_mutex.unlock();
+    }
+    void HttpgdServer::page_remove_all()
     {
         m_page_mutex.lock();
         for (auto p : m_pages)
@@ -91,19 +106,19 @@ namespace httpgd
         m_inc_upid();
         m_page_mutex.unlock();
     }
-    void HttpgdServer::page_fill(unsigned int index, int fill)
+    void HttpgdServer::page_fill(int index, int fill)
     {
         m_page_mutex.lock();
         m_pages[index].fill = fill;
         m_page_mutex.unlock();
     }
-    void HttpgdServer::build_svg(unsigned int index, std::string *buf)
+    void HttpgdServer::build_svg(int index, std::string *buf)
     {
         m_page_mutex.lock();
         m_pages[index].build_svg(buf);
         m_page_mutex.unlock();
     }
-    void HttpgdServer::page_resize(unsigned int index, double w, double h)
+    void HttpgdServer::page_resize(int index, double w, double h)
     {
         m_page_mutex.lock();
         m_pages[index].width = w;
@@ -111,7 +126,7 @@ namespace httpgd
         m_pages[index].clear();
         m_page_mutex.unlock();
     }
-    double HttpgdServer::page_get_width(unsigned int index)
+    double HttpgdServer::page_get_width(int index)
     {
         double d = 0.0;
         m_page_mutex.lock();
@@ -119,7 +134,7 @@ namespace httpgd
         m_page_mutex.unlock();
         return d;
     }
-    double HttpgdServer::page_get_height(unsigned int index)
+    double HttpgdServer::page_get_height(int index)
     {
         double d = 0.0;
         m_page_mutex.lock();
@@ -131,7 +146,7 @@ namespace httpgd
     {
         m_livehtml = livehtml;
     }
-    void HttpgdServer::page_clip(unsigned int index, double x0, double x1, double y0, double y1)
+    void HttpgdServer::page_clip(int index, double x0, double x1, double y0, double y1)
     {
         m_page_mutex.lock();
         m_pages[index].clip(x0, x1, y0, y1);
@@ -202,7 +217,8 @@ namespace httpgd
     }
 
     const std::string SVR_INJECT_KEYWORD = "/*SRVRPARAMS*/";
-    const std::string SVR_403 = "Forbidden.";
+    const std::string SVR_401 = "Unauthorized.";
+    const std::string SVR_404 = "Not found.";
 
     void HttpgdServer::m_inc_upid()
     {
@@ -215,7 +231,7 @@ namespace httpgd
             m_upid = 0;
         }
     }
-    unsigned int HttpgdServer::get_upid() const
+    int HttpgdServer::get_upid() const
     {
         return m_upid;
     }
@@ -230,8 +246,8 @@ namespace httpgd
             !(req.get_header_value("X-HTTPGD-TOKEN") == m_svr_token ||
               req.get_param_value("token") == m_svr_token))
         {
-            res.set_content(SVR_403, "text/plain");
-            res.status = 403;
+            res.set_content(SVR_401, "text/plain");
+            res.status = 401;
             return false;
         }
         return true;
@@ -277,7 +293,7 @@ namespace httpgd
         m_svr.Get("/svg", [&](const Request &req, Response &res) {
             if (m_prepare_req(req, res))
             {
-                unsigned int pcount = page_count();
+                int pcount = page_count();
 
                 if (pcount == 0)
                 {
@@ -285,7 +301,7 @@ namespace httpgd
                 }
                 else
                 {
-                    unsigned int cli_index = pcount - 1;
+                    int cli_index = pcount - 1;
 
                     if (req.has_param("index"))
                     {
@@ -293,10 +309,9 @@ namespace httpgd
                         int pval = 0;
                         if (trystoi(ptxt, &pval))
                         {
-                            unsigned int upval = pval;
-                            if (upval >= 0 && upval < pcount)
+                            if (pval >= 0 && pval < pcount)
                             {
-                                cli_index = upval;
+                                cli_index = pval;
                             }
                         }
                     }
@@ -351,12 +366,14 @@ namespace httpgd
 
                         while (replaying)
                         {
+                            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
                         } // make sure we dont replay already
                         replaying_index = cli_index;
                         replaying = true;
                         notify_replay();
                         while (replaying)
                         {
+                            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
                         } // block while replaying
                     }
 
@@ -377,18 +394,59 @@ namespace httpgd
             if (m_prepare_req(req, res))
             {
 
-                page_clear_all();
+                page_remove_all();
 
                 while (replaying)
                 {
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
                 } // make sure we dont replay already
                 replaying = true;
                 notify_hist_clear();
                 while (replaying)
                 {
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
                 } // block while replaying
 
                 res.set_content(build_state_json(false), "application/json");
+            }
+        });
+        m_svr.Get("/remove", [&](const Request &req, Response &res) {
+            if (m_prepare_req(req, res))
+            {
+                int cli_index = -1;
+                if (req.has_param("index"))
+                {
+                    std::string ptxt = req.get_param_value("index");
+                    trystoi(ptxt, &cli_index);
+                }
+                int pcount = page_count();
+                if (cli_index < 0)
+                {
+                    cli_index = pcount - 1;
+                }
+                if (pcount == 0 || cli_index >= pcount)
+                {
+                    res.set_content(SVR_404, "text/plain");
+                    res.status = 404;
+                }
+                else
+                {
+                    page_remove(cli_index);
+
+                    while (replaying)
+                    {
+                        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                    } // make sure we dont replay already
+                    replaying = true;
+                    replaying_index = cli_index;
+                    notify_hist_remove();
+                    while (replaying)
+                    {
+                        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+                    } // block while replaying
+
+                    res.set_content(build_state_json(false), "application/json");
+                }
             }
         });
 
@@ -415,6 +473,20 @@ namespace httpgd
             return true;
         }
         return false;
+    }
+
+    std::string random_token(int len)
+    {
+        static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+        std::string s(len, 'a');
+        for (int i = 0; i < len; i++)
+        {
+            s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+        }
+        return s;
     }
 
 } // namespace httpgd

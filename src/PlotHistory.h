@@ -18,6 +18,8 @@ namespace httpgd
         void set_last(int index, pDevDesc dd);
         bool get(int index, SEXP *snapshot);
 
+        bool remove(int index);
+
         void clear();
         bool play(int index, pDevDesc dd);
 
