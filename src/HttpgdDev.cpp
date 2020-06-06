@@ -166,7 +166,7 @@ namespace httpgd
         if (target == m_target_open && target > 0)
         {
             //Rcpp::Rcout << "   -> last removed replay new last\n";
-            m_target = -1;
+            m_target = m_target_open - 1;
             dd->size(&(dd->left), &(dd->right), &(dd->bottom), &(dd->top), dd);
             history.play(m_target_open - 1, dd); // recreate state of the element before last element
         }
