@@ -15,7 +15,7 @@ Asynchronous http server graphics device for R.
 
 ## Demo
 
-![demo](https://user-images.githubusercontent.com/33600480/83210273-b4c29100-a15a-11ea-8757-052dcf259a1c.gif)
+![demo](https://user-images.githubusercontent.com/33600480/83944385-6587fa80-a803-11ea-8f4a-7808d144309d.gif)
 
 ## Installation
 
