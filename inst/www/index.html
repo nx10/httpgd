@@ -30,8 +30,9 @@
       user-select: none;
     }
 
-    #discon {
-      padding: 2px 6px 2px 6px;
+    #tb-tools>span#discon {
+      padding: 2px 2px 2px 2px;
+      margin: 0px 2px 0px 2px;
       border-radius: 2px;
       color: #721c24;
       background-color: #f8d7da;
@@ -40,7 +41,8 @@
     }
 
     #tb-tools>span {
-      padding: 2px 6px 2px 6px;
+      padding: 2px 2px 2px 2px;
+      margin: 0px 2px 0px 2px;
       border-radius: 2px;
       color: #818182;
       background-color: #fefefe;
@@ -49,11 +51,27 @@
     }
 
     #tb-tools>span>a {
-      padding: 2px 2px 2px 2px;
+      margin: 0px -2px 0px -2px;
     }
 
     #tb-tools>span>a:hover {
       color: #07c;
+    }
+    .icon, .icon-warn {
+      position: relative;
+      top: 5px;
+      fill: #818182;
+    }
+    .icon:hover {
+      fill: #07c;
+    }
+    .icon-warn:hover {
+      fill: #DA4567;
+    }
+    .icon-error {
+      position: relative;
+      top: 5px;
+      fill: #DA4567;
     }
   </style>
 </head>
@@ -62,10 +80,29 @@
   <div id="container">
     <div id="toolbar">
       <div id="tb-tools">
-        <span><a id="tb-left">&lt;</a><a id="tb-pnum"></a><a id="tb-right">&gt;</a></span> <span><a
-            id="tb-plus">&plus;</a><a id="tb-zlvl"></a><a id="tb-minus">&minus;</a></span> <span><a
-            id="tb-save">Save</a></span> <span><a id="tb-remove">Remove</a></span> <span><a
-            id="tb-clear">Clear</a></span></div> <span id="discon">Disconnected!</span>
+        <span>
+          <a title="Previous" id="tb-left"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+          <a title="Newest" id="tb-pnum"></a>
+          <a title="Next" id="tb-right"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></a><!--
+        --></span>
+        <span>
+          <a title="Zoom out" id="tb-minus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z"/></svg></a>
+          <a title="Reset zoom" id="tb-zlvl"></a>
+          <a title="Zoom in" id="tb-plus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></a><!--
+        --></span>
+        <span>
+          <a title="Download" id="tb-save"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg></a><!--
+        --></span>
+        <span>
+          <a title="Delete plot" id="tb-remove"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></a><!--
+        --></span>
+        <span>
+          <a title="Clear all plots" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/></svg></a><!--
+        --></span>
+        <span id="discon">
+          <svg class="icon-error" height="24" viewBox="0 0 24 24" width="24"><path d="M24 .01c0-.01 0-.01 0 0L0 0v24h24V.01zM0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none"/><path d="M22.99 9C19.15 5.16 13.8 3.76 8.84 4.78l2.52 2.52c3.47-.17 6.99 1.05 9.63 3.7l2-2zm-4 4c-1.29-1.29-2.84-2.13-4.49-2.56l3.53 3.53.96-.97zM2 3.05L5.07 6.1C3.6 6.82 2.22 7.78 1 9l1.99 2c1.24-1.24 2.67-2.16 4.2-2.77l2.24 2.24C7.81 10.89 6.27 11.73 5 13v.01L6.99 15c1.36-1.36 3.14-2.04 4.92-2.06L18.98 20l1.27-1.26L3.29 1.79 2 3.05zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0z"/></svg><!--
+        --></span>
+      </div>
     </div>
     <img id="drawing"></img>
   </div>

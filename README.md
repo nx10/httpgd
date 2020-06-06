@@ -44,7 +44,7 @@ x = seq(0, 3 * pi, by = 0.1)
 plot(x, sin(x), type = "l")
 ```
 
-Every plotting library should work.
+Every plotting library will work.
 
 ```R
 library(ggplot2)
@@ -52,7 +52,7 @@ ggplot(mpg, aes(displ, hwy, colour = class)) +
   geom_point()
 ```
 
-The live server should refresh automatically and detect window size changes.
+The client will refresh automatically and detect window size changes.
 
 Stop the server with:
 
@@ -83,7 +83,7 @@ dev.off()
 
 #### Query parameter
 
-A query could look like this:
+A query looks like this:
 
 `http://[host]:[port]/svg?width=400&height=300`
 
@@ -123,7 +123,7 @@ Any advice and suggestions are welcome!
 
 ## Planned features
 
-* Use websockets to push changes directly/faster (maybe switch http server backend library).
+* Use websockets to push changes directly/faster.
 * Optimization.
 
 ## Mac OS
@@ -131,3 +131,9 @@ Any advice and suggestions are welcome!
 It seems like a recent mac OS update (Catalina) removed shared libraries used by the package `systemfonts` we depend on (see: https://github.com/r-lib/systemfonts/issues/17).
 
 You can install XQuartz as a workaround (https://www.xquartz.org/).
+
+## License
+
+This project is licensed GPL v2.0.
+
+It includes [Material Design icons by Google](https://github.com/google/material-design-icons).
