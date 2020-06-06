@@ -161,17 +161,15 @@ namespace httpgd
 
     void HttpgdDev::hist_remove(int target)
     {
+        //Rcpp::Rcout << "[hist_remove] target = " << target << "\n";
         history.remove(target);
         if (target == m_target_open && target > 0)
         {
+            //Rcpp::Rcout << "   -> last removed replay new last\n";
             m_target = -1;
             dd->size(&(dd->left), &(dd->right), &(dd->bottom), &(dd->top), dd);
-            history.play(m_target_open -1, dd); // recreate state of the element before last element
+            history.play(m_target_open - 1, dd); // recreate state of the element before last element
         }
         m_target_open--;
-        if (m_target >= target)
-        {
-            m_target--;
-        }
     }
 } // namespace httpgd

@@ -130,6 +130,7 @@ namespace httpgd
         {
             m_vdl[i] = m_vdl[i + 1];
         }
+        m_vdl[m_vdl.size() - 1] = R_NilValue;
         m_write_data();
         return true;
     }

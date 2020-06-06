@@ -87,7 +87,7 @@ namespace httpgd
         {
             return;
         }
-        m_pages[index].clear();
+        //m_pages[index].clear();
         m_pages.erase(m_pages.begin() + index);
         if (!replaying && index >= static_cast<int>(m_pages.size())) // if it was the last page
         {

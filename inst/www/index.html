@@ -98,7 +98,8 @@
       width: null,
       height: null,
       hindex: -1,
-      plot: { hsize: 0 }
+      plot: { hsize: 0 },
+      rmcount: 0
     };
 
     function refresh_svg(force) {
@@ -106,9 +107,9 @@
         '?width=' + cli.width +
         '&height=' + cli.height +
         '&index=' + cli.hindex +
-        '&upid=' + svr.upid +
-        (force ? 'f' : '') +
-        (svr.token ? ('&token=' + svr.token) : '');
+        (svr.token ? ('&token=' + svr.token) : '') +
+        '&upid=' + (svr.upid + cli.rmcount) +
+        (force ? 'f' : '');
 
       cli.reloading = true;
       cli.elem_drw.src = s;
@@ -211,6 +212,7 @@
     }
 
     function nav_remove() {
+      cli.rmcount++;
       fetch(api.remove + '?index=' + cli.hindex, {
         headers: api.headers
       }).then(res => res.json())
