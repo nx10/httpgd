@@ -134,6 +134,6 @@ You can install XQuartz as a workaround (https://www.xquartz.org/).
 
 ## License
 
-This project is licensed GPL v2.0.
+This project is licensed GPL v2.0. (Because it currently includes some code parts that are licensed this way. When I get around to rewrite these parts I will consider switching to a more permissive license. Contact me if you have further questions.)
 
-It includes [Material Design icons by Google](https://github.com/google/material-design-icons).
+The html client includes [Material Design icons by Google](https://github.com/google/material-design-icons).
