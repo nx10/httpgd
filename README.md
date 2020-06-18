@@ -65,7 +65,7 @@ dev.off()
 | Keys | Result |
 |:----:|--------|
 | <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> <kbd>&#8593;</kbd> <kbd>&#8595;</kbd> | Navigate plot history. |
-| <kbd>del</kbd> | Clear plot history. |
+| <kbd>del</kbd> | Remove current plot. |
 | <kbd>+</kbd> / <kbd>-</kbd> | Zoom in and out. |
 | <kbd>0</kbd> | Reset zoom level. |
 | <kbd>ctrl</kbd> + <kbd>S</kbd> | Download the currently visible plot. |
