@@ -1,3 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^.vscode.*$
+^\docs$
+^\docs\.*$

@@ -30,6 +30,8 @@
 #'   This parameter can be set to TRUE to generate a random 8 character
 #'   alphanumeric token. A random token of the specified length is generated
 #'   when it is set to a number. FALSE deactivates the token.
+#' @param silent When set to FALSE no information will be printed to the 
+#'   console after startup.
 #'
 #' @export
 httpgd <-
@@ -43,7 +45,8 @@ httpgd <-
            user_fonts = list(),
            recording = TRUE,
            cors = FALSE,
-           token = TRUE) {
+           token = TRUE,
+           silent = FALSE) {
     
     tok <- ""
     if (is.character(token)) {
@@ -56,7 +59,9 @@ httpgd <-
     
     aliases <- validate_aliases(system_fonts, user_fonts)
     httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors, tok)
-    writeLines(paste0("httpgd live server running at:\n  ", httpgdURL()))
+    if (!silent) {
+      writeLines(paste0("httpgd live server running at:\n  ", httpgdURL()))
+    }
   }
 
 
@@ -74,6 +79,61 @@ httpgdState <- function(which = dev.cur()) {
   }
   else {
     return(httpgd_state_(which))
+  }
+}
+
+#' Returns a plot rendered as a SVG string.
+#'
+#' @param page Plot page to render. If this is set to 0, the last page will be selected. 
+#' @param width Width of the plot. If this is set to -1, the last width will be selected. 
+#' @param height Height of the plot. If this is set to -1, the last height will be selected. 
+#' @param which Which device (id)
+#'
+#' @return Rendered SVG string.
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+httpgdSVG <- function(page = 0, width = -1, height = -1, which = dev.cur()) {
+  if (names(which) != "httpgd") {
+    stop("Device is not of type httpgd")
+  }
+  else {
+    return(httpgd_svg_(which, page - 1, width, height))
+  }
+}
+
+#' Removes a plot page.
+#'
+#' @param page Plot page to remove. If this is set to 0, the last page will be selected. 
+#' @param which Which device (id)
+#'
+#' @return Whether the page existed (and thereby was successfully removed).
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+httpgdRemove <- function(page = 0, which = dev.cur()) {
+  if (names(which) != "httpgd") {
+    stop("Device is not of type httpgd")
+  }
+  else {
+    return(httpgd_remove_(which, page - 1))
+  }
+}
+
+#' Clears all plot pages.
+#'
+#' @param which Which device (id)
+#'
+#' @return Whether there were any pages to remove.
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+httpgdClear <- function(which = dev.cur()) {
+  if (names(which) != "httpgd") {
+    stop("Device is not of type httpgd")
+  }
+  else {
+    return(httpgd_clear_(which))
   }
 }
 
@@ -96,4 +156,39 @@ httpgdURL <- function(endpoint = "live", which = dev.cur()) {
          "/",
          endpoint,
          ifelse(nchar(l$token) == 0, "", paste0("?token=", l$token)))
+}
+
+#' Opens the url by which a httpgd device is accessible in a browser.
+#'
+#' @param endpoint API endpoint
+#' @param which Which device (id)
+#'
+#' @return URL
+#'
+#' @importFrom grDevices dev.cur
+#' @importFrom utils browseURL
+#' @export
+httpgdBrowse <- function(endpoint = "live", which = dev.cur()) {
+  browseURL(httpgdURL(endpoint, which))
+}
+
+#' Closes a graphics device if it is a httpgd server.
+#' This achieves the same effect as dev.off().
+#'
+#' @param which Which device (id)
+#' 
+#' @importFrom grDevices dev.cur dev.list dev.off
+#' @export
+httpgdCloseServer <- function(which = dev.cur()) {
+  if (names(which(dev.list() == which)) == "httpgd") {
+    dev.off(which)
+  }
+}
+
+#' Search for all active servers and close them.
+#'
+#' @export
+httpgdCloseAllServers <- function() {
+  ds <- dev.list()
+  invisible(lapply(ds[names(ds) == "httpgd"], dev.off))
 }

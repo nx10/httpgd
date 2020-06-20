@@ -15,7 +15,8 @@ httpgd(
   user_fonts = list(),
   recording = TRUE,
   cors = FALSE,
-  token = FALSE
+  token = TRUE,
+  silent = FALSE
 )
 }
 \arguments{
@@ -56,7 +57,10 @@ need to include a token to be allowed. (Either in a request header
 (X-HTTPGD-TOKEN) field or as a query parameter.)
 This parameter can be set to TRUE to generate a random 8 character
 alphanumeric token. A random token of the specified length is generated
-when it is set to a number.}
+when it is set to a number. FALSE deactivates the token.}
+
+\item{silent}{When set to FALSE no information will be printed to the 
+console after startup.}
 }
 \description{
 Initialize httpgd graphics device and start server.

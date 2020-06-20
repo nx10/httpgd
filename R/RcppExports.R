@@ -13,6 +13,18 @@ httpgd_random_token_ <- function(len) {
     .Call(`_httpgd_httpgd_random_token_`, len)
 }
 
+httpgd_svg_ <- function(devnum, page, width, height) {
+    .Call(`_httpgd_httpgd_svg_`, devnum, page, width, height)
+}
+
+httpgd_remove_ <- function(devnum, page) {
+    .Call(`_httpgd_httpgd_remove_`, devnum, page)
+}
+
+httpgd_clear_ <- function(devnum) {
+    .Call(`_httpgd_httpgd_clear_`, devnum)
+}
+
 #' Dummy graphics device for debug purposes.
 #'
 #' @export

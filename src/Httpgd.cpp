@@ -9,14 +9,33 @@
 
 #include "HttpgdDev.h"
 #include "DrawData.h"
-#include "HttpgdServer.h"
 
 #include "fixsuspinter.h"
+
+#include "RSync.h"
 
 #define LOGDRAW 0
 
 namespace httpgd
 {
+
+    // returns system path to {package}/inst/www/{filename}
+    std::string get_wwwpath(const std::string &filename)
+    {
+        Rcpp::Environment base("package:base");
+        Rcpp::Function sys_file = base["system.file"];
+        Rcpp::StringVector res = sys_file("www", filename,
+                                          Rcpp::_["package"] = "httpgd");
+        return std::string(res[0]);
+    }
+
+    std::string read_txt(const std::string &filepath)
+    {
+        std::ifstream t(get_wwwpath("index.html"));
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        return std::string(buffer.str());
+    }
 
     inline HttpgdDev *getDev(pDevDesc dd)
     {
@@ -92,12 +111,16 @@ namespace httpgd
     void httpgd_close(pDevDesc dd)
     {
         Rcpp::Rcout << "Server closing... ";
+        rsync::awaitLater();
+        rsync::lock();
+        rsync::unlock();
 
         HttpgdDev *dev = getDev(dd);
-        dev->history.clear();
-        dev->server.replaying = false; // todo remove (?)
-        dev->server.stop();
-        free(dev);
+        dev->hist_clear();
+
+        //dev->server.replaying = false; // todo remove (?)
+        dev->shutdown_server();
+        delete dev;
 
         Rcpp::Rcout << "Closed.\n";
 
@@ -276,6 +299,7 @@ namespace httpgd
      */
     static void httpgd_mode(int mode, pDevDesc dd)
     {
+        getDev(dd)->mode(mode);
 
 #if LOGDRAW == 1
         Rprintf("MODE mode=%i\n", mode);
@@ -284,7 +308,7 @@ namespace httpgd
 
     // R graphics device initialization procedure
 
-    pDevDesc httpgd_driver_new(const HttpgdDevStartParams &params)
+    pDevDesc httpgd_driver_new(const HttpgdDevStartParams &t_params, const HttpgdServerConfig &t_config)
     {
 
         pDevDesc dd = (DevDesc *)calloc(1, sizeof(DevDesc));
@@ -293,9 +317,9 @@ namespace httpgd
             return dd;
         }
 
-        dd->startfill = params.bg;
+        dd->startfill = t_params.bg;
         dd->startcol = R_RGB(0, 0, 0);
-        dd->startps = params.pointsize;
+        dd->startps = t_params.pointsize;
         dd->startlty = 0;
         dd->startfont = 1;
         dd->startgamma = 1;
@@ -329,13 +353,13 @@ namespace httpgd
         // Screen Dimensions in pts
         dd->left = 0;
         dd->top = 0;
-        dd->right = params.width;
-        dd->bottom = params.height;
+        dd->right = t_params.width;
+        dd->bottom = t_params.height;
 
         // Magic constants copied from other graphics devices
         // nominal character sizes in pts
-        dd->cra[0] = 0.9 * params.pointsize;
-        dd->cra[1] = 1.2 * params.pointsize;
+        dd->cra[0] = 0.9 * t_params.pointsize;
+        dd->cra[1] = 1.2 * t_params.pointsize;
         // character alignment offsets
         dd->xCharOffset = 0.4900;
         dd->yCharOffset = 0.3333;
@@ -352,11 +376,11 @@ namespace httpgd
         dd->haveTransparency = 2;
         dd->haveTransparentBg = 2;
 
-        dd->deviceSpecific = new HttpgdDev(dd, params);
+        dd->deviceSpecific = new HttpgdDev(dd, t_config, t_params);
         return dd;
     }
 
-    void makehttpgdDevice(const HttpgdDevStartParams &params)
+    void makehttpgdDevice(const HttpgdDevStartParams &t_params, const HttpgdServerConfig &t_config)
     {
 
         R_GE_checkVersionOrDie(R_GE_version);
@@ -364,12 +388,12 @@ namespace httpgd
 
         HTTPGD_BEGIN_SUSPEND_INTERRUPTS
         {
-            if (check_server_started(params.host, params.port)) // todo: it should be possible to check if the port is occupied instead
+            if (check_server_started(t_config.host, t_config.port)) // todo: it should be possible to check if the port is occupied instead
             {
                 Rcpp::stop("Failed to start httpgd. Server already running at this address!");
             }
 
-            pDevDesc dev = httpgd_driver_new(params);
+            pDevDesc dev = httpgd_driver_new(t_params, t_config);
             if (dev == nullptr)
             {
                 Rcpp::stop("Failed to start httpgd.");
@@ -379,7 +403,7 @@ namespace httpgd
             GEaddDevice2(dd, "httpgd");
             GEinitDisplayList(dd);
 
-            getDev(dev)->server.start();
+            getDev(dev)->start_server();
         }
         HTTPGD_END_SUSPEND_INTERRUPTS;
     }
@@ -393,20 +417,25 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
     bool use_token = token.length();
     int ibg = R_GE_str2col(bg.c_str());
 
-    httpgd::makehttpgdDevice({host, port,
-                              ibg,
-                              width, height,
+    std::string livehtml = httpgd::read_txt(httpgd::get_wwwpath("index.html"));
+
+    httpgd::makehttpgdDevice({ibg,
+                              width,
+                              height,
                               pointsize,
-                              aliases,
-                              recording,
+                              aliases},
+                             {host,
+                              port,
+                              livehtml,
                               cors,
-                              use_token, token});
+                              use_token,
+                              token,
+                              recording});
 
     return true;
 }
 
-// [[Rcpp::export]]
-Rcpp::List httpgd_state_(int devnum)
+inline httpgd::HttpgdDev *validate_httpgddev(int devnum)
 {
     if (devnum < 1 || devnum > 64) // R_MaxDevices
     {
@@ -429,23 +458,28 @@ Rcpp::List httpgd_state_(int devnum)
         Rcpp::stop("invalid device");
     }
 
-    while (!dev->server.server_ready)
-    {
-        std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-    }
+    return dev;
+}
 
-    Rcpp::CharacterVector rhost = {dev->server.get_host()};
-    Rcpp::IntegerVector rport = {dev->server.get_port()};
-    Rcpp::CharacterVector rtoken = {dev->server.get_token()};
-    Rcpp::IntegerVector rhsize = {static_cast<int>(dev->server.page_count())};
-    Rcpp::IntegerVector rupid = {static_cast<int>(dev->server.get_upid())};
+// [[Rcpp::export]]
+Rcpp::List httpgd_state_(int devnum)
+{
+    auto dev = validate_httpgddev(devnum);
+
+    auto svr_config = dev->get_server_config();
+
+    /*Rcpp::CharacterVector rhost = {svr_config->host};
+    Rcpp::IntegerVector rport = {dev->server_await_port()};
+    Rcpp::CharacterVector rtoken = {svr_config->token};
+    Rcpp::IntegerVector rhsize = {dev->store_get_page_count()};
+    Rcpp::IntegerVector rupid = {dev->store_get_upid()};*/
 
     return Rcpp::List::create(
-        Rcpp::Named("host") = rhost,
-        Rcpp::Named("port") = rport,
-        Rcpp::Named("token") = rtoken,
-        Rcpp::Named("hsize") = rhsize,
-        Rcpp::Named("upid") = rupid);
+        Rcpp::Named("host") = svr_config->host,
+        Rcpp::Named("port") = dev->server_await_port(),
+        Rcpp::Named("token") = svr_config->token,
+        Rcpp::Named("hsize") = dev->store_get_page_count(),
+        Rcpp::Named("upid") = dev->store_get_upid());
 }
 
 // [[Rcpp::export]]
@@ -456,4 +490,25 @@ std::string httpgd_random_token_(int len)
         Rcpp::stop("Length needs to be 0 or higher.");
     }
     return httpgd::random_token(len);
+}
+
+// [[Rcpp::export]]
+std::string httpgd_svg_(int devnum, int page, double width, double height)
+{
+    auto dev = validate_httpgddev(devnum);
+    return dev->store_svg(page, width, height);
+}
+
+// [[Rcpp::export]]
+bool httpgd_remove_(int devnum, int page)
+{
+    auto dev = validate_httpgddev(devnum);
+    return dev->store_remove(page);
+}
+
+// [[Rcpp::export]]
+bool httpgd_clear_(int devnum)
+{
+    auto dev = validate_httpgddev(devnum);
+    return dev->store_clear();
 }

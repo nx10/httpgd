@@ -70,39 +70,17 @@ dev.off()
 | <kbd>0</kbd> | Reset zoom level. |
 | <kbd>ctrl</kbd> + <kbd>S</kbd> | Download the currently visible plot. |
 
-### HTTP API
 
-| Endpoint  | Method | Description |
-|-----------|--------|-------------|
-| `/`       | `GET`  | Welcome message. |
-| `/live`   | `GET`  | Returns HTML/Javascript live server page. |
-| `/svg`    | `GET`  | Get rendered SVG. Query parameters are listed below. |
-| `/state`  | `GET`  | Get current server state. This can be used to check if there were new draw calls in R. |
-| `/clear`  | `GET`  | Clear plot history. |
-| `/remove`  | `GET`  | Remove a single plot from the history. Index specified with query param `index`. |
+### API
 
-#### Query parameter
+![structure](docs/httpgd_structure.svg)
 
-A query looks like this:
+httpgd can be accessed both from R and from HTTP:
 
-`http://[host]:[port]/svg?width=400&height=300`
+* [R API](docs/RApi.md)
+* [HTTP API](docs/HttpApi.md)
 
-| Key      | Value | 
-|----------|-------|
-| `width`  | With in pixels. |
-| `height` | Height in pixels. |
-| `index`  | Plot history index. If omitted, the newest plot will be returned. |
-| `token`  | If security tokens are used this should be equal to the previously secret token. |
-
-#### Server state
-
-| Field        | Type     | Description |
-|--------------|----------|-------------|
-| `upid`       | `int`    | Update id. |
-| `hrecording` | `bool`   | Whether the graphics device is recording a plot history. |
-| `hsize`      | `int`    | Number of plot history entries. |
-
-#### Security
+### Security
 
 A security token can be set when starting the device: 
 ```R
@@ -117,23 +95,26 @@ CORS is off by default but can be enabled on startup:
 httpgd(..., cors = TRUE)
 ```
 
+## Planned features
+
+* Use websockets to push changes directly/faster.
+* Generate optimized (as small as possible) SVGs.
+* Render raster graphics.
+
 ## Note
 
 Any advice and suggestions are welcome!
 
-## Planned features
+## Mac OS issue
 
-* Use websockets to push changes directly/faster.
-* Optimization.
+~~It seems like a recent mac OS update (Catalina) removed shared libraries used by the package `systemfonts` we depend on (see: https://github.com/r-lib/systemfonts/issues/17).~~
 
-## Mac OS
+~~You can install XQuartz as a workaround (https://www.xquartz.org/).~~
 
-It seems like a recent mac OS update (Catalina) removed shared libraries used by the package `systemfonts` we depend on (see: https://github.com/r-lib/systemfonts/issues/17).
-
-You can install XQuartz as a workaround (https://www.xquartz.org/).
+Users have reported that Apple has released an update that fixes this issue.
 
 ## License
 
-This project is licensed GPL v2.0. (Because it currently includes some code parts that are licensed this way. When I get around to rewrite these parts I will consider switching to a more permissive license. Contact me if you have further questions.)
+This project is licensed GPL v2.0. (Because it currently includes some code parts that are licensed this way. When I get around to rewrite these parts I will consider switching to a more permissive license. This is however very low priority right now. Contact me if you have further questions.)
 
 The html client includes [Material Design icons by Google](https://github.com/google/material-design-icons).

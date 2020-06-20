@@ -47,6 +47,43 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// httpgd_svg_
+std::string httpgd_svg_(int devnum, int page, double width, double height);
+RcppExport SEXP _httpgd_httpgd_svg_(SEXP devnumSEXP, SEXP pageSEXP, SEXP widthSEXP, SEXP heightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type devnum(devnumSEXP);
+    Rcpp::traits::input_parameter< int >::type page(pageSEXP);
+    Rcpp::traits::input_parameter< double >::type width(widthSEXP);
+    Rcpp::traits::input_parameter< double >::type height(heightSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_svg_(devnum, page, width, height));
+    return rcpp_result_gen;
+END_RCPP
+}
+// httpgd_remove_
+bool httpgd_remove_(int devnum, int page);
+RcppExport SEXP _httpgd_httpgd_remove_(SEXP devnumSEXP, SEXP pageSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type devnum(devnumSEXP);
+    Rcpp::traits::input_parameter< int >::type page(pageSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_remove_(devnum, page));
+    return rcpp_result_gen;
+END_RCPP
+}
+// httpgd_clear_
+bool httpgd_clear_(int devnum);
+RcppExport SEXP _httpgd_httpgd_clear_(SEXP devnumSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type devnum(devnumSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_clear_(devnum));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dummygd_
 bool dummygd_();
 RcppExport SEXP _httpgd_dummygd_() {
@@ -62,6 +99,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 10},
     {"_httpgd_httpgd_state_", (DL_FUNC) &_httpgd_httpgd_state_, 1},
     {"_httpgd_httpgd_random_token_", (DL_FUNC) &_httpgd_httpgd_random_token_, 1},
+    {"_httpgd_httpgd_svg_", (DL_FUNC) &_httpgd_httpgd_svg_, 4},
+    {"_httpgd_httpgd_remove_", (DL_FUNC) &_httpgd_httpgd_remove_, 2},
+    {"_httpgd_httpgd_clear_", (DL_FUNC) &_httpgd_httpgd_clear_, 1},
     {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {NULL, NULL, 0}
 };
