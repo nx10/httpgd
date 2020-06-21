@@ -1,34 +1,37 @@
 
 #include <thread>
 
-namespace httpgd::rsync
+namespace httpgd
 {
-    class BackgroundTask
+    namespace rsync
     {
-    public:
-        virtual ~BackgroundTask()
+        class BackgroundTask
         {
-            if (m_background_thread.joinable())
+        public:
+            virtual ~BackgroundTask()
             {
-                m_background_thread.join();
+                if (m_background_thread.joinable())
+                {
+                    m_background_thread.join();
+                }
             }
-        }
 
-        void begin()
-        {
-            m_background_thread = std::thread(&BackgroundTask::m_run_task, this);
-        }
+            void begin()
+            {
+                m_background_thread = std::thread(&BackgroundTask::m_run_task, this);
+            }
 
-    protected:
-        virtual void execute() {};
-        virtual void complete() {};
+        protected:
+            virtual void execute(){};
+            virtual void complete(){};
 
-    private:
-        std::thread m_background_thread;
-        void m_run_task()
-        {
-            execute();
-            complete();
-        }
-    };
-} // namespace httpgd::rsync
+        private:
+            std::thread m_background_thread;
+            void m_run_task()
+            {
+                execute();
+                complete();
+            }
+        };
+    } // namespace rsync
+} // namespace httpgd

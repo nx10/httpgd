@@ -10,6 +10,10 @@ namespace httpgd
     HttpgdDev::HttpgdDev(pDevDesc t_dd, const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params)
         : dd(t_dd),
           font(t_params.aliases),
+          replaying(false),  
+          replaying_index(0),
+          replaying_width(0),
+          replaying_height(0),
           m_history(std::string(".httpgdPlots_").append(random_token(4))),
           m_data_store(),
           m_svr_config(t_config),

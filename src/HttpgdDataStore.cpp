@@ -1,6 +1,7 @@
 
 #include "HttpgdDataStore.h"
 #include "RSync.h"
+#include <cstdlib>
 
 // Do not include any R headers here!
 
