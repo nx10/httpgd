@@ -1,7 +1,7 @@
 
 #include "HttpgdDataStore.h"
 #include "RSync.h"
-#include <cstdlib>
+#include <cmath>
 
 // Do not include any R headers here!
 
@@ -202,8 +202,8 @@ namespace httpgd
         }
 
         // Check if replay needed
-        if (abs(width - old_width) > 0.1 ||
-            abs(height - old_height) > 0.1)
+        if (std::fabs(width - old_width) > 0.1 ||
+            std::fabs(height - old_height) > 0.1)
         {
             notify_replay(async, index, width, height);
         }
