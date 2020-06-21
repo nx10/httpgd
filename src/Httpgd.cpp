@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+#include "lib/svglite_utils.h"
+
 #include "HttpgdDev.h"
 #include "DrawData.h"
 
@@ -50,13 +52,25 @@ namespace httpgd
     void httpgd_metric_info(int c, const pGEcontext gc, double *ascent,
                             double *descent, double *width, pDevDesc dd)
     {
-        HttpgdDev *dev = getDev(dd);
 
-        dev->font.analyze(char_r_unicode(c), gc);
+        if (c < 0)
+        {
+            c = -c;
+        }
 
-        *ascent = dev->font.get_ascent();
-        *descent = dev->font.get_descent();
-        *width = dev->font.get_width();
+        std::pair<std::string, int> font = get_font_file(gc->fontfamily, gc->fontface, getDev(dd)->user_aliases);
+
+        int error = glyph_metrics(c, font.first.c_str(), font.second, gc->ps * gc->cex, 1e4, ascent, descent, width);
+        if (error != 0)
+        {
+            *ascent = 0;
+            *descent = 0;
+            *width = 0;
+        }
+        double mod = 72. / 1e4;
+        *ascent *= mod;
+        *descent *= mod;
+        *width *= mod;
 
 #if LOGDRAW == 1
         Rprintf("METRIC_INFO c=%i ascent=%f descent=%f width=%f\n", c, ascent, descent, width);
@@ -73,11 +87,18 @@ namespace httpgd
         Rprintf("STRWIDTH str=\"%s\"\n", str);
 #endif
 
-        HttpgdDev *dev = getDev(dd);
+        std::pair<std::string, int> font = get_font_file(gc->fontfamily, gc->fontface, getDev(dd)->user_aliases);
 
-        dev->font.analyze(std::string(str), gc);
+        double width = 0.0;
 
-        return dev->font.get_width();
+        int error = string_width(str, font.first.c_str(), font.second, gc->ps * gc->cex, 1e4, 1, &width);
+
+        if (error != 0)
+        {
+            width = 0.0;
+        }
+
+        return width * 72. / 1e4;
     }
 
     /**
@@ -239,14 +260,13 @@ namespace httpgd
 
         HttpgdDev *dev = getDev(dd);
 
-        dev->font.analyze(std::string(str), gc);
         dev->put(std::make_shared<dc::Text>(gc, x, y, str, rot, hadj,
                                             dc::TextInfo{
-                                                dev->font.get_font_family(),
-                                                dev->font.get_fontsize(),
-                                                dev->font.is_bold(),
-                                                dev->font.is_italic(),
-                                                dev->font.get_width()}));
+                                                fontname(gc->fontfamily, gc->fontface, dev->system_aliases, dev->user_aliases),
+                                                gc->cex * gc->ps,
+                                                is_bold(gc->fontface),
+                                                is_italic(gc->fontface),
+                                                httpgd_strwidth(str, gc, dd)}));
 
 #if LOGDRAW == 1
         Rprintf("TEXT x=%f y=%f str=\"%s\" rot=%f hadj=%f\n", x, y, str, rot, hadj);
@@ -467,12 +487,6 @@ Rcpp::List httpgd_state_(int devnum)
     auto dev = validate_httpgddev(devnum);
 
     auto svr_config = dev->get_server_config();
-
-    /*Rcpp::CharacterVector rhost = {svr_config->host};
-    Rcpp::IntegerVector rport = {dev->server_await_port()};
-    Rcpp::CharacterVector rtoken = {svr_config->token};
-    Rcpp::IntegerVector rhsize = {dev->store_get_page_count()};
-    Rcpp::IntegerVector rupid = {dev->store_get_upid()};*/
 
     return Rcpp::List::create(
         Rcpp::Named("host") = svr_config->host,

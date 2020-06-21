@@ -1,12 +1,12 @@
-#include <iostream>
+
 #include <string>
 #include <vector>
 #include <algorithm>
 
-#include <gdtools.h>
-
-#include <R_ext/GraphicsDevice.h>
+#include <Rcpp.h>
 #include <R_ext/GraphicsEngine.h>
+
+#include "lib/svglite_utils.h"
 
 #include "DrawData.h"
 
@@ -94,7 +94,8 @@ namespace httpgd
             css_field(buf, "stroke-width", dc->m_lwd / 96.0 * 72);
 
             // Default is "stroke: #000000;" as declared in <style>
-            if (dc->m_col != R_RGBA(0, 0, 0, 255)) {
+            if (dc->m_col != R_RGBA(0, 0, 0, 255))
+            {
                 css_field_color(buf, "stroke", dc->m_col);
             }
 
@@ -147,7 +148,8 @@ namespace httpgd
                 break;
             case GC_MITRE_JOIN:
                 css_field(buf, "stroke-linejoin", "miter");
-                if (std::abs(dc->m_lmitre - 10.0) > 1e-3) { // 10 is declared to be the default in <style>
+                if (std::abs(dc->m_lmitre - 10.0) > 1e-3)
+                { // 10 is declared to be the default in <style>
                     css_field(buf, "stroke-miterlimit", dc->m_lmitre);
                 }
                 break;
@@ -429,6 +431,11 @@ namespace httpgd
             svg_field(buf, "height", imageHeight);
             svg_field(buf, "x", m_x);
             svg_field(buf, "y", m_y - imageHeight);
+            svg_field(buf, "preserveAspectRatio", "none");
+            if (!m_interpolate)
+            {
+                svg_field(buf, "image-rendering", "pixelated");
+            }
             if (m_rot != 0)
             {
                 buf->append("transform=\"rotate(");
@@ -440,7 +447,7 @@ namespace httpgd
                 buf->append(")\" ");
             }
             buf->append(" xlink:href=\"data:image/png;base64,");
-            buf->append(gdtools::raster_to_str(m_raster, m_w, m_h, imageWidth, imageHeight, m_interpolate));
+            buf->append(raster_to_string(m_raster, m_w, m_h, imageWidth, imageHeight, m_interpolate));
             buf->append("\"/></g>");
         }
 
@@ -518,9 +525,10 @@ namespace httpgd
                       "    }\n"
                       "  ]]></style>\n";
 
-            for (const auto &cp : m_cps) {
-                buf->append("  "); 
-                cp.build_svg_def(buf); 
+            for (const auto &cp : m_cps)
+            {
+                buf->append("  ");
+                cp.build_svg_def(buf);
                 buf->append("\n");
             }
 
@@ -531,9 +539,10 @@ namespace httpgd
             css_field_color(buf, "fill", fill);
             buf->append("\"/>\n");
 
-            for (const auto &dc : m_dcs) {
-                buf->append("  "); 
-                dc->build_svg(buf); 
+            for (const auto &dc : m_dcs)
+            {
+                buf->append("  ");
+                dc->build_svg(buf);
                 buf->append("\n");
             }
             buf->append("</svg>");
