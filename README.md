@@ -6,14 +6,11 @@ Asynchronous http server graphics device for R.
 
 ## Features
 
-* SVG over HTTP.
-* Automatic resizing.
-* Plot history.
-* HTML live server.
-* Stateless API.
-* Multiple concurrent device server.
-* Multiple concurrent clients for each device.
-* Fast plot history navigation (caching).
+* Stateless HTTP SVG API
+* Supports multiple concurrent clients
+* Plot resizing
+* Plot history
+* HTML/JavaScript client included
 
 ## Demo
 
@@ -40,6 +37,14 @@ Initialize graphics device and start live server with:
 ```R
 httpgd::httpgd()
 ```
+
+Copy the shown link in the browser or call
+
+```R
+httpgd::httpgdBrowse()
+```
+
+to open a browser window automatically.
 
 Plot anything.
 
@@ -131,6 +136,6 @@ Install [XQuartz](https://www.xquartz.org/).
 
 ## License
 
-This project is licensed GPL v2.0. (Because it currently includes some code parts that are licensed this way. When I get around to rewrite these parts I will consider switching to a more permissive license. This is however very low priority right now. Contact me if you have further questions.)
+This project is licensed GPL v2.0.
 
-The html client includes [Material Design icons by Google](https://github.com/google/material-design-icons).
+The html client includes [Material Design icons by Google](https://github.com/google/material-design-icons) which are licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt).
