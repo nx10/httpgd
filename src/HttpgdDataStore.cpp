@@ -202,8 +202,8 @@ namespace httpgd
         }
 
         // Check if replay needed
-        if (std::abs(width - old_width) > 0.1 ||
-            std::abs(height - old_height) > 0.1)
+        if (abs(width - old_width) > 0.1 ||
+            abs(height - old_height) > 0.1)
         {
             notify_replay(async, index, width, height);
         }
