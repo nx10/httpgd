@@ -1,5 +1,7 @@
 # httpgd
 
+[![R build status](https://github.com/nx10/httpgd/workflows/build/badge.svg)](https://github.com/nx10/httpgd/actions)
+
 Asynchronous http server graphics device for R.
 
 ## Features
