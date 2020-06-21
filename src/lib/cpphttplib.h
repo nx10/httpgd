@@ -10,6 +10,9 @@
 #undef Free
 #include <winsock2.h>
 #endif // _WIN32
+#ifdef CPPHTTPLIB_USE_POLL
+#undef CPPHTTPLIB_USE_POLL
+#endif
 #include "cpphttplib/httplib.h"
 
 #endif
