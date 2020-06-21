@@ -43,6 +43,7 @@ jobs:
     - name: Install httpgd
       run: |
         Rscript -e "install.packages(c('remotes', 'rcmdcheck'), repos = 'https://cloud.r-project.org', type = 'mac.binary.el-capitan')"
+        Rscript -e "install.packages(c('Rcpp'), repos = 'https://cloud.r-project.org', type = 'source')"
         Rscript -e "remotes::install_deps(dependencies = TRUE, type = 'mac.binary.el-capitan')"
     - name: Running Tests
       run: Rscript -e "rcmdcheck::rcmdcheck(args = c('--as-cran', '--no-manual', '--timings'), error_on = 'error')"

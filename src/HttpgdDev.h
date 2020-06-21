@@ -2,9 +2,8 @@
 #define HTTPGD_DEV_H
 
 #include <Rcpp.h>
-#include <R_ext/GraphicsDevice.h>
 #include <R_ext/GraphicsEngine.h>
-//#include "httplib.h"
+#include <R_ext/GraphicsDevice.h>
 
 #include <mutex>
 
@@ -13,7 +12,6 @@
 #include "HttpgdServerTask.h"
 
 #include "PlotHistory.h"
-#include "FontAnalyzer.h"
 
 namespace httpgd
 {
@@ -32,7 +30,10 @@ namespace httpgd
     {
     public:
         pDevDesc dd;
-        FontAnalyzer font;
+
+        // Font handling
+        Rcpp::List system_aliases;
+        Rcpp::List user_aliases;
         
         std::atomic<bool> replaying;      // Is the device replaying
         std::atomic<int> replaying_index; // Index to replay

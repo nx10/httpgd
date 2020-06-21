@@ -6,17 +6,17 @@ mini_plot <- function(...) graphics::plot(..., axes = FALSE, xlab = "", ylab = "
 plot_dim <- function(dim = c(NA, NA)) {
   if (any(is.na(dim))) {
     if (length(grDevices::dev.list()) == 0) {
-      default_dim <- c(7, 7)
+      default_dim <- c(10, 8)
     } else {
       default_dim <- grDevices::dev.size()
     }
-    
+
     dim[is.na(dim)] <- default_dim[is.na(dim)]
     dim_f <- prettyNum(dim, digits = 3)
-    
+
     message("Saving ", dim_f[1], "\" x ", dim_f[2], "\" image")
   }
-  
+
   dim
 }
 
@@ -71,17 +71,19 @@ zip <- function(.l) {
   })
 }
 
-svglite_manual_tests <- new.env()
-register_manual_test <- function(file) {
-  testthat_dir <- getwd()
-  testfile <- file.path(testthat_dir, file)
-  assign(file, testfile, svglite_manual_tests)
-}
-init_manual_tests <- function() {
-  remove(list = names(svglite_manual_tests), envir = svglite_manual_tests)
-}
-open_manual_tests <- function() {
-  lapply(names(svglite_manual_tests), function(test) {
-    utils::browseURL(svglite_manual_tests[[test]])
-  })
+invalid_filename <- function(filename) {
+
+  if (!is.character(filename) || length(filename) != 1)
+    return(TRUE)
+
+  # strip double occurences of %
+  stripped_file <- gsub("%{2}", "", filename)
+  # filename is fine if there are no % left
+  if (!grepl("%", stripped_file))
+    return(FALSE)
+  # remove first allowed pattern, % followed by digits followed by [diouxX]
+  stripped_file <- sub("%[#0 ,+-]*[0-9.]*[diouxX]", "", stripped_file)
+  # matching leftover % indicates multiple patterns or a single incorrect pattern (e.g., %s)
+  return(grepl("%", stripped_file))
+
 }

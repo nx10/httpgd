@@ -5,5 +5,5 @@
 src/*.o
 src/*.so
 src/*.dll
-
 .vscode
+windows

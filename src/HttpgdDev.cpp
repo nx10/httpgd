@@ -9,8 +9,9 @@ namespace httpgd
 
     HttpgdDev::HttpgdDev(pDevDesc t_dd, const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params)
         : dd(t_dd),
-          font(t_params.aliases),
-          replaying(false),  
+          system_aliases(Rcpp::wrap(t_params.aliases["system"])),
+          user_aliases(Rcpp::wrap(t_params.aliases["user"])),
+          replaying(false),
           replaying_index(0),
           replaying_width(0),
           replaying_height(0),

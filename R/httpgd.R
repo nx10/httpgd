@@ -13,7 +13,7 @@
 #'   fonts installed on your system. If unspecified, the R default
 #'   families \code{sans}, \code{serif}, \code{mono} and \code{symbol}
 #'   are aliased to the family returned by
-#'   \code{\link[gdtools]{match_family}()}.
+#'   \code{\link[systemfonts]{font_info}()}.
 #' @param user_fonts Named list of fonts to be aliased with font files
 #'   provided by the user rather than fonts properly installed on the
 #'   system. The aliases can be fonts from the fontquiver package,
@@ -33,6 +33,7 @@
 #' @param silent When set to FALSE no information will be printed to the 
 #'   console after startup.
 #'
+#' @importFrom systemfonts match_font
 #' @export
 httpgd <-
   function(host = "127.0.0.1",
