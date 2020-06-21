@@ -40,6 +40,10 @@ jobs:
     - uses: r-lib/actions/setup-r@v1
       with:
         r-version: ${{ matrix.r }}
+    - name: Install XQuartz
+      run: brew cask install xquartz
+    - name: Install required libraries
+      run: brew install libpng
     - name: Install httpgd
       run: |
         Rscript -e "install.packages(c('remotes', 'rcmdcheck'), repos = 'https://cloud.r-project.org', type = 'mac.binary.el-capitan')"
