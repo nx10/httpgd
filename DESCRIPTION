@@ -1,6 +1,6 @@
 Package: httpgd
 Type: Package
-Title: Http server graphics device
+Title: HTTP Server Graphics Device
 Version: 0.4.0
 Date: 2020-05-10
 Authors@R: 
@@ -12,10 +12,10 @@ Authors@R:
              family = "Ren",
              role = "ctb",
              email = "mail@renkun.me"))
-Description: Asynchronous http server graphics device.
+Description: Asynchronous HTTP server graphics device.
     Some of the SVG rendering (especially the font handling and
     raster image encoding) is based on svglite
-    (https://github.com/r-lib/svglite).
+    (<https://github.com/r-lib/svglite>).
 License: GPL-2
 Imports: Rcpp (>= 1.0.4),
     later (>= 1.0.0),
@@ -24,7 +24,6 @@ LinkingTo: Rcpp,
     later,
     systemfonts
 Suggests:
-    svglite,
     testthat
 RoxygenNote: 7.1.0
 Encoding: UTF-8
