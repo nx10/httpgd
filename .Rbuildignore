@@ -1,6 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^.vscode.*$
-^\docs$
-^\docs\.*$
+^docs/$
+^docs$
 ^.github$
+^.git$
+^LICENSE$
+^windows$

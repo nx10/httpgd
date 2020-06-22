@@ -3,10 +3,20 @@ Type: Package
 Title: Http server graphics device
 Version: 0.4.0
 Date: 2020-05-10
-Author: Florian Rupprecht
-Maintainer: Florian Rupprecht <floruppr@gmail.com>
-Description: Asynchronous http server graphics device. Some of the SVG rendering (especially the font handling & raster image encoding) is based on svglite.
-License: GPL (>= 2)
+Authors@R: 
+    c(person(given = "Florian", 
+             family = "Rupprecht", 
+             email = "floruppr@gmail.com", 
+             role = c("aut", "cre")),
+      person(given = "Kun",
+             family = "Ren",
+             role = "ctb",
+             email = "mail@renkun.me"))
+Description: Asynchronous http server graphics device.
+    Some of the SVG rendering (especially the font handling and
+    raster image encoding) is based on svglite
+    (https://github.com/r-lib/svglite).
+License: GPL-2
 Imports: Rcpp (>= 1.0.4),
     later (>= 1.0.0),
     systemfonts (>= 0.2.3)
