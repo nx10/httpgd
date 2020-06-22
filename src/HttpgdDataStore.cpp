@@ -136,13 +136,17 @@ namespace httpgd
         buf.append(" }");
         return buf;
     }
-    std::string HttpgdDataStore::api_state_json(const std::string &host)
+    std::string HttpgdDataStore::api_state_json(const HttpgdServerConfig *config, const std::string &host)
     {
         std::string buf;
         buf.reserve(200);
         buf.append("{ ");
         m_build_state_json(&buf);
         buf.append(", \"host\": \"").append(host).append("\"");
+        if (config->use_token)
+        {
+            buf.append(", \"token\": \"").append(config->token).append("\"");
+        }
         buf.append(" }");
         return buf;
     }

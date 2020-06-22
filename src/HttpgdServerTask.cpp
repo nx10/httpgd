@@ -99,7 +99,7 @@ namespace httpgd
             if (m_prepare_req(req, res))
             {
                 // build params
-                std::string sparams = m_data->api_state_json(req.get_header_value("Host"));
+                std::string sparams = m_data->api_state_json(m_config, req.get_header_value("Host"));
                 sparams.append("/*");
 
                 // inject params
