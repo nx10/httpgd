@@ -18,7 +18,7 @@ jobs:
     - name: Install apt-get dependencies
       run: |
         apt-get update
-        apt-get install git ssh curl bzip2 libffi-dev libfontconfig1-dev libcairo2-dev -y
+        apt-get install git ssh curl bzip2 libffi-dev libfontconfig1-dev libcairo2-dev libpng-dev -y
     - name: Install httpgd
       run: |
         Rscript -e "install.packages(c('remotes', 'rcmdcheck'), repos = 'https://cloud.r-project.org')"
