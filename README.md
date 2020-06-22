@@ -24,9 +24,9 @@ devtools::install_github("nx10/httpgd")
 
 Depends on `Rcpp`, `later` and `systemfonts`.
 
-SVG rendering (especially font rendering) based on `svglite` (https://github.com/r-lib/svglite).
+SVG rendering (especially font rendering) based on `svglite` (<https://github.com/r-lib/svglite>).
 
-Includes `cpp-httplib` (https://github.com/yhirose/cpp-httplib).
+Includes `cpp-httplib` (<https://github.com/yhirose/cpp-httplib>).
 
 See [system requirements](#System-requirements) for troubleshooting.
 
@@ -79,7 +79,6 @@ dev.off()
 | <kbd>0</kbd> | Reset zoom level. |
 | <kbd>ctrl</kbd> + <kbd>S</kbd> | Download the currently visible plot. |
 
-
 ### API
 
 ![structure](docs/httpgd_structure.svg)
@@ -91,10 +90,12 @@ httpgd can be accessed both from R and from HTTP:
 
 ### Security
 
-A security token can be set when starting the device: 
+A security token can be set when starting the device:
+
 ```R
 httpgd(..., token = "secret")
 ```
+
 When set, each API request has to include this token inside the header `X-HTTPGD-TOKEN` or as a query param `?token=secret`.
 `token` is by default set to `TRUE` to generate a random 8 character alphanumeric token. If it is set to a number, a random token of that length will be generated. `FALSE` deactivates the security token.
 
@@ -116,23 +117,24 @@ Any advice and suggestions are welcome!
 
 ## System requirements
 
-`libpng` and X11 are required on unix like systems (e.g. linux, mac os).
+`libpng` and X11 are required on unix like systems (e.g. Linux, macOS).
 
-### Mac OS
+### macOS
 
 If `libpng` is missing install it via:
-```
+
+```sh
 brew install libpng
 ```
 
 If X11 is missing the error message will include the text:
-```
+
+```sh
 unable to load shared object [...] systemfonts/libs/systemfonts.so [...]
 ```
 
 Install [XQuartz](https://www.xquartz.org/).
-(see: https://github.com/r-lib/systemfonts/issues/17)
-
+(see: <https://github.com/r-lib/systemfonts/issues/17>)
 
 ## License
 
