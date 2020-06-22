@@ -115,7 +115,7 @@
     const SCALE_DEFAULT = 0.8;
     const SCALE_STEP = SCALE_DEFAULT / 12;
 
-    const baseapi = 'http://' + svr.host + ':' + svr.port;
+    const baseapi = 'http://' + svr.host + (svr.port ? ':' + svr.port : '');
     const api = {
       svg: baseapi + '/svg',
       state: baseapi + '/state',

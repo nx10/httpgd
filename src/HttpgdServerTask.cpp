@@ -21,7 +21,7 @@ namespace httpgd
     {
         m_svr.stop();
     }
-    
+
     void HttpgdServerTask::execute()
     {
         m_run_server();
@@ -31,7 +31,8 @@ namespace httpgd
         //Rprintf("Background task ended.");
     }
 
-    int HttpgdServerTask::await_port() {
+    int HttpgdServerTask::await_port()
+    {
         while (!m_is_bound_to_port)
         {
             std::this_thread::sleep_for(std::chrono::nanoseconds(1));
@@ -98,7 +99,7 @@ namespace httpgd
             if (m_prepare_req(req, res))
             {
                 // build params
-                std::string sparams = m_data->api_state_json(m_config, await_port());
+                std::string sparams = m_data->api_state_json(req.get_header_value("Host"));
                 sparams.append("/*");
 
                 // inject params
