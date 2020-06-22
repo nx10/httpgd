@@ -24,9 +24,9 @@ devtools::install_github("nx10/httpgd")
 
 Depends on `Rcpp`, `later` and `systemfonts`.
 
-SVG rendering (especially font rendering) based on `svglite` (<https://github.com/r-lib/svglite).>
+SVG rendering (especially font rendering) based on `svglite` (<https://github.com/r-lib/svglite>).
 
-Includes `cpp-httplib` (<https://github.com/yhirose/cpp-httplib).>
+Includes `cpp-httplib` (<https://github.com/yhirose/cpp-httplib>).
 
 See [system requirements](#System-requirements) for troubleshooting.
 
@@ -134,7 +134,7 @@ unable to load shared object [...] systemfonts/libs/systemfonts.so [...]
 ```
 
 Install [XQuartz](https://www.xquartz.org/).
-(see: <https://github.com/r-lib/systemfonts/issues/17)>
+(see: <https://github.com/r-lib/systemfonts/issues/17>)
 
 ## License
 
