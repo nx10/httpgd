@@ -266,18 +266,4 @@ namespace httpgd
         return m_upid;
     }
 
-    std::string random_token(int len)
-    {
-        static const char alphanum[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        std::string s(len, 'a');
-        for (int i = 0; i < len; i++)
-        {
-            s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
-        }
-        return s;
-    }
-
 } // namespace httpgd

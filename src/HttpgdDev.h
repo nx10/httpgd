@@ -70,6 +70,8 @@ namespace httpgd
         int store_get_page_count();
 
         const HttpgdServerConfig *get_server_config();
+        
+        static std::string random_token(int len);
 
     private:
         PlotHistory m_history;

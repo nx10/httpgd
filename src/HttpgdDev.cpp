@@ -6,7 +6,6 @@
 
 namespace httpgd
 {
-
     HttpgdDev::HttpgdDev(pDevDesc t_dd, const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params)
         : dd(t_dd),
           system_aliases(Rcpp::wrap(t_params.aliases["system"])),
@@ -257,4 +256,21 @@ namespace httpgd
         return m_data_store.page_count();
     }
 
+    // Generate random alphanumeric string with R's built in RNG
+    // https://cran.rstudio.com/doc/manuals/r-devel/R-exts.html#Random-numbers
+    std::string HttpgdDev::random_token(int len)
+    {
+        static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+        std::string s(len, 'a');
+        GetRNGstate();
+        for (int i = 0; i < len; i++)
+        {
+            s[i] = alphanum[(int)(unif_rand() * (sizeof(alphanum) / sizeof(*alphanum) - 1))];
+        }
+        PutRNGstate();
+        return s;
+    }
 } // namespace httpgd

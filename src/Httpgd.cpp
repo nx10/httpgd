@@ -503,7 +503,7 @@ std::string httpgd_random_token_(int len)
     {
         Rcpp::stop("Length needs to be 0 or higher.");
     }
-    return httpgd::random_token(len);
+    return httpgd::HttpgdDev::random_token(len);
 }
 
 // [[Rcpp::export]]

@@ -55,10 +55,6 @@ namespace httpgd
         void m_build_state_json(std::string *buf);
     };
 
-    
-
-    std::string random_token(int len);
-
 } // namespace httpgd
 
 #endif // HTTPGD_SERVER_H
