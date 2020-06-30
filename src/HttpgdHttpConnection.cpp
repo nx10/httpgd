@@ -60,9 +60,13 @@ namespace httpgd
         {
             // Returns a bad request response
             auto const bad_request =
-                [&req](beast::string_view why) {
+                [&req, &conf](beast::string_view why) {
                     http::response<http::string_body> res{http::status::bad_request, req.version()};
                     res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                    if (conf->cors)
+                    {
+                        res.set(http::field::access_control_allow_origin, "*");
+                    }
                     res.set(http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
                     res.body() = std::string(why);
@@ -72,9 +76,13 @@ namespace httpgd
 
             // Returns a not found response
             auto const not_found =
-                [&req](beast::string_view target) {
+                [&req, &conf](beast::string_view target) {
                     http::response<http::string_body> res{http::status::not_found, req.version()};
                     res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                    if (conf->cors)
+                    {
+                        res.set(http::field::access_control_allow_origin, "*");
+                    }
                     res.set(http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
                     res.body() = "The resource '" + std::string(target) + "' was not found.";
@@ -84,9 +92,13 @@ namespace httpgd
 
             // Returns a server error response
             auto const server_error =
-                [&req](beast::string_view what) {
+                [&req, &conf](beast::string_view what) {
                     http::response<http::string_body> res{http::status::internal_server_error, req.version()};
                     res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                    if (conf->cors)
+                    {
+                        res.set(http::field::access_control_allow_origin, "*");
+                    }
                     res.set(http::field::content_type, "text/html");
                     res.keep_alive(req.keep_alive());
                     res.body() = "An error occurred: '" + std::string(what) + "'";
@@ -100,6 +112,24 @@ namespace httpgd
 
             TargetURI uri(std::string(req.target()));
 
+            // check token
+            if (conf->use_token &&
+                !((req["X-HTTPGD-TOKEN"] == conf->token) ||
+                  uri.qparams["token"] == conf->token))
+            {
+                http::response<http::string_body> res{http::status::unauthorized, req.version()};
+                res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                if (conf->cors)
+                {
+                    res.set(http::field::access_control_allow_origin, "*");
+                }
+                res.set(http::field::content_type, "text/html");
+                res.keep_alive(req.keep_alive());
+                res.body() = std::string("Unauthorized");
+                res.prepare_payload();
+                return send(std::move(res));
+            }
+
             // todo add not_allowed / token checking
             // todo add cors
 
@@ -107,9 +137,13 @@ namespace httpgd
             {
                 http::response<http::string_body> res{http::status::ok, req.version()};
                 res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                if (conf->cors)
+                {
+                    res.set(http::field::access_control_allow_origin, "*");
+                }
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
-                res.body() = std::string("Hello!" + conf->host);
+                res.body() = std::string("httpgd server running.");
                 res.prepare_payload();
                 return send(std::move(res));
             }
@@ -117,6 +151,10 @@ namespace httpgd
             {
                 http::response<http::string_body> res{http::status::ok, req.version()};
                 res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                if (conf->cors)
+                {
+                    res.set(http::field::access_control_allow_origin, "*");
+                }
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
 
@@ -163,6 +201,10 @@ namespace httpgd
 
                 http::response<http::string_body> res{http::status::ok, req.version()};
                 res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                if (conf->cors)
+                {
+                    res.set(http::field::access_control_allow_origin, "*");
+                }
                 res.set(http::field::content_type, "image/svg+xml");
                 res.keep_alive(req.keep_alive());
                 res.body() = dstore->api_svg(true, cli_index, cli_width, cli_height);
@@ -173,6 +215,10 @@ namespace httpgd
             {
                 http::response<http::string_body> res{http::status::ok, req.version()};
                 res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                if (conf->cors)
+                {
+                    res.set(http::field::access_control_allow_origin, "*");
+                }
                 res.set(http::field::content_type, "application/json");
                 res.keep_alive(req.keep_alive());
                 res.body() = dstore->api_state_json();
@@ -185,6 +231,10 @@ namespace httpgd
 
                 http::response<http::string_body> res{http::status::ok, req.version()};
                 res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                if (conf->cors)
+                {
+                    res.set(http::field::access_control_allow_origin, "*");
+                }
                 res.set(http::field::content_type, "application/json");
                 res.keep_alive(req.keep_alive());
                 res.body() = dstore->api_state_json();
@@ -206,6 +256,10 @@ namespace httpgd
                 {
                     http::response<http::string_body> res{http::status::ok, req.version()};
                     res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                    if (conf->cors)
+                    {
+                        res.set(http::field::access_control_allow_origin, "*");
+                    }
                     res.set(http::field::content_type, "application/json");
                     res.keep_alive(req.keep_alive());
                     res.body() = dstore->api_state_json();
