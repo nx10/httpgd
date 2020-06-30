@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 #include "lib/svglite_utils.h"
 
@@ -33,10 +34,10 @@ namespace httpgd
 
     std::string read_txt(const std::string &filepath)
     {
-        std::ifstream t(get_wwwpath("index.html"));
+        std::ifstream t(filepath);
         std::stringstream buffer;
         buffer << t.rdbuf();
-        return std::string(buffer.str());
+        return buffer.str();
     }
 
     inline HttpgdDev *getDev(pDevDesc dd)
@@ -139,7 +140,6 @@ namespace httpgd
         HttpgdDev *dev = getDev(dd);
         dev->hist_clear();
 
-        //dev->server.replaying = false; // todo remove (?)
         dev->shutdown_server();
         delete dev;
 
@@ -408,10 +408,10 @@ namespace httpgd
 
         HTTPGD_BEGIN_SUSPEND_INTERRUPTS
         {
-            if (check_server_started(t_config.host, t_config.port)) // todo: it should be possible to check if the port is occupied instead
+            /*todo if (check_server_started(t_config.host, t_config.port)) // todo: it should be possible to check if the port is occupied instead
             {
                 Rcpp::stop("Failed to start httpgd. Server already running at this address!");
-            }
+            }*/
 
             pDevDesc dev = httpgd_driver_new(t_params, t_config);
             if (dev == nullptr)
@@ -437,7 +437,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
     bool use_token = token.length();
     int ibg = R_GE_str2col(bg.c_str());
 
-    std::string livehtml = httpgd::read_txt(httpgd::get_wwwpath("index.html"));
+    std::string livehtml(httpgd::read_txt(httpgd::get_wwwpath("index.html")));
 
     httpgd::makehttpgdDevice({ibg,
                               width,

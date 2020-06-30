@@ -21,6 +21,7 @@ Imports: Rcpp (>= 1.0.4),
     later (>= 1.0.0),
     systemfonts (>= 0.2.3)
 LinkingTo: Rcpp, 
+    BH,
     later,
     systemfonts
 Suggests:

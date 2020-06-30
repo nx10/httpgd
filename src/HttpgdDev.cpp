@@ -15,13 +15,12 @@ namespace httpgd
           replaying_width(0),
           replaying_height(0),
           m_history(std::string(".httpgdPlots_").append(random_token(4))),
-          m_data_store(),
-          m_svr_config(t_config),
-          m_svr_task(&m_data_store, &m_svr_config),
           m_target(-1), m_target_open(-1)
     {
+        m_svr_config = std::make_shared<HttpgdServerConfig>(t_config);
+        m_data_store = std::make_shared<HttpgdDataStore>();
         // setup callbacks
-        m_data_store.notify_hist_clear = [&](bool async) {
+        m_data_store->notify_hist_clear = [&](bool async) {
             if (async)
             {
                 await_hist_clear();
@@ -31,7 +30,7 @@ namespace httpgd
                 hist_clear();
             }
         };
-        m_data_store.notify_replay = [&](bool async, int index, double width, double height) {
+        m_data_store->notify_replay = [&](bool async, int index, double width, double height) {
             if (async)
             {
                 await_render_page(index, width, height);
@@ -41,7 +40,7 @@ namespace httpgd
                 render_page(index, width, height);
             }
         };
-        m_data_store.notify_hist_remove = [&](bool async, int index) {
+        m_data_store->notify_hist_remove = [&](bool async, int index) {
             if (async)
             {
                 await_hist_remove(index);
@@ -51,6 +50,14 @@ namespace httpgd
                 hist_remove(index);
             }
         };
+        
+        // setup http server
+        m_svr_task = std::make_shared<http::HttpgdHttpTask>(m_svr_config, m_data_store);
+        //m_svr_task = new http::HttpgdHttpTask(m_svr_config, m_data_store);
+    }
+    HttpgdDev::~HttpgdDev()
+    {
+        Rcpp::Rcout << "Device destroyed! \n";
     }
 
     void HttpgdDev::await_render_page(int target, double width, double height)
@@ -94,14 +101,12 @@ namespace httpgd
         rsync::awaitLater();
     }
 
-    HttpgdDev::~HttpgdDev() = default;
-
     void HttpgdDev::put(std::shared_ptr<dc::DrawCall> dc)
     {
         if (m_target == -1)
             return;
 
-        m_data_store.page_put(m_target, dc, replaying);
+        m_data_store->page_put(m_target, dc, replaying);
     }
 
     void HttpgdDev::new_page(double width, double height, int fill)
@@ -115,7 +120,7 @@ namespace httpgd
                 m_history.set_last(m_target_open, dd);
             }
             // Rcpp::Rcout << "    -> add new page to server\n";
-            m_target = m_data_store.page_new(width, height);
+            m_target = m_data_store->page_new(width, height);
             m_target_open = m_target;
         }
         else
@@ -123,23 +128,23 @@ namespace httpgd
             // Rcpp::Rcout << "    -> rewrite target: " << m_target << "\n";
             // Rcpp::Rcout << "    -> clear page\n";
             if (m_target != -1)
-                m_data_store.page_clear(m_target, true);
+                m_data_store->page_clear(m_target, true);
         }
         if (m_target != -1)
-            m_data_store.page_fill(m_target, fill);
+            m_data_store->page_fill(m_target, fill);
     }
     void HttpgdDev::page_size(double *width, double *height)
     {
         int t = (m_target == -1) ? m_target_open : m_target;
 
-        *width = m_data_store.page_get_width(t);
-        *height = m_data_store.page_get_height(t);
+        *width = m_data_store->page_get_width(t);
+        *height = m_data_store->page_get_height(t);
     }
     void HttpgdDev::clip_page(double x0, double x1, double y0, double y1)
     {
         if (m_target == -1)
             return;
-        m_data_store.page_clip(m_target, x0, x1, y0, y1);
+        m_data_store->page_clip(m_target, x0, x1, y0, y1);
     }
     void HttpgdDev::mode(bool start_draw)
     {
@@ -160,7 +165,7 @@ namespace httpgd
             return;
 
         replaying = true;
-        m_data_store.page_resize(render_target, width, height); // this also clears
+        m_data_store->page_resize(render_target, width, height); // this also clears
         if (render_target == m_target_open)
         {
             m_target = render_target; //???
@@ -210,50 +215,50 @@ namespace httpgd
 
     void HttpgdDev::start_server()
     {
-        m_svr_task.begin();
+        m_svr_task->begin();
     }
     void HttpgdDev::shutdown_server()
     {
-        m_svr_task.stop();
+        m_svr_task->stop();
     }
     int HttpgdDev::server_await_port()
     {
-        return m_svr_task.await_port();
+        return m_svr_task->await_port();
     }
     std::string HttpgdDev::store_state_json(bool include_config)
     {
         if (include_config)
         {
-            return m_data_store.api_state_json(&m_svr_config, m_svr_task.await_port());
+            return m_data_store->api_state_json();//todo &m_svr_config, m_svr_task.await_port());
         }
         else
         {
-            return m_data_store.api_state_json();
+            return m_data_store->api_state_json();
         }
     }
     std::string HttpgdDev::store_svg(int index, double width, double height)
     {
-        return m_data_store.api_svg(false, index, width, height);
+        return m_data_store->api_svg(false, index, width, height);
     }
     bool HttpgdDev::store_remove(int index)
     {
-        return m_data_store.api_remove(false, index);
+        return m_data_store->api_remove(false, index);
     }
     bool HttpgdDev::store_clear()
     {
-        return m_data_store.api_clear(false);
+        return m_data_store->api_clear(false);
     }
-    const HttpgdServerConfig *HttpgdDev::get_server_config()
+    std::shared_ptr<HttpgdServerConfig> HttpgdDev::get_server_config()
     {
-        return &m_svr_config;
+        return m_svr_config;
     }
     int HttpgdDev::store_get_upid()
     {
-        return m_data_store.get_upid();
+        return m_data_store->get_upid();
     }
     int HttpgdDev::store_get_page_count()
     {
-        return m_data_store.page_count();
+        return m_data_store->page_count();
     }
 
     // Generate random alphanumeric string with R's built in RNG

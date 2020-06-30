@@ -136,7 +136,7 @@ namespace httpgd
         buf.append(" }");
         return buf;
     }
-    std::string HttpgdDataStore::api_state_json(const HttpgdServerConfig *config, const std::string &host)
+    std::string HttpgdDataStore::api_state_json(std::shared_ptr<HttpgdServerConfig> config, const std::string &host)
     {
         std::string buf;
         buf.reserve(200);
@@ -150,7 +150,7 @@ namespace httpgd
         buf.append(" }");
         return buf;
     }
-    std::string HttpgdDataStore::api_state_json(const HttpgdServerConfig *config, int port)
+    std::string HttpgdDataStore::api_state_json(std::shared_ptr<HttpgdServerConfig> config, int port)
     {
         std::string buf;
         buf.reserve(200);

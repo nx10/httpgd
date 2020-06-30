@@ -39,8 +39,8 @@ namespace httpgd
         int get_upid() const;
 
         std::string api_state_json();
-        std::string api_state_json(const HttpgdServerConfig *config, const std::string &host);
-        std::string api_state_json(const HttpgdServerConfig *config, int port);
+        std::string api_state_json(std::shared_ptr<HttpgdServerConfig> config, const std::string &host);
+        std::string api_state_json(std::shared_ptr<HttpgdServerConfig> config, int port);
         std::string api_svg(bool async, int index, double width, double height);
         bool api_remove(bool async, int index);
         bool api_clear(bool async);

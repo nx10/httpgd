@@ -6,10 +6,11 @@
 #include <R_ext/GraphicsDevice.h>
 
 #include <mutex>
+#include <memory>
 
 #include "HttpgdServerConfig.h"
 #include "HttpgdDataStore.h"
-#include "HttpgdServerTask.h"
+#include "HttpgdHttpTask.h"
 
 #include "PlotHistory.h"
 
@@ -69,15 +70,16 @@ namespace httpgd
         int store_get_upid();
         int store_get_page_count();
 
-        const HttpgdServerConfig *get_server_config();
+        std::shared_ptr<HttpgdServerConfig> get_server_config();
         
         static std::string random_token(int len);
 
     private:
         PlotHistory m_history;
-        HttpgdDataStore m_data_store;
-        const HttpgdServerConfig m_svr_config;
-        HttpgdServerTask m_svr_task;
+        std::shared_ptr<HttpgdServerConfig> m_svr_config;
+        std::shared_ptr<HttpgdDataStore> m_data_store;
+        std::shared_ptr<http::HttpgdHttpTask> m_svr_task;
+        //http::HttpgdHttpTask *m_svr_task;
 
         int m_target; // current draw target. target = index + 1 (0 reserved for special case)
         int m_target_open; // open draw target. New draw calls from R always target this. target = index + 1 (0 reserved for special case)
