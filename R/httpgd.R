@@ -151,7 +151,7 @@ httpgdClear <- function(which = dev.cur()) {
 httpgdURL <- function(endpoint = "live", which = dev.cur()) {
   l <- httpgdState(which)
   paste0("http://",
-         l$host,
+         sub('0.0.0.0', Sys.info()[['nodename']], l$host, fixed = TRUE),
          ":",
          l$port,
          "/",
