@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8">
   <title>R Plot</title>
+
+  <!--LIVEJSSCIPTTAG-->
+  <script src="./httpgd.js"></script>
+  <!---->
   <style>
     body {
       margin: 0;
@@ -44,7 +48,7 @@
       padding: 2px 2px 2px 2px;
       margin: 0px 2px 0px 2px;
       border-radius: 2px;
-      color: rgba(0,0,0,0.5);
+      color: rgba(0, 0, 0, 0.5);
       background-color: rgba(254, 254, 254, 0.2);
       border-color: rgba(253, 253, 254, 0.2);
       cursor: pointer;
@@ -57,50 +61,104 @@
     #tb-tools>span>a:hover {
       color: #07c;
     }
-    .icon, .icon-warn {
+
+    .icon,
+    .icon-warn {
       position: relative;
       top: 5px;
-      fill: rgba(0,0,0,0.5);
+      fill: rgba(0, 0, 0, 0.5);
     }
+
     .icon:hover {
       fill: #07c;
     }
+
     .icon-warn:hover {
       fill: #DA4567;
     }
+
     .icon-error {
       position: relative;
       top: 5px;
       fill: #DA4567;
+    }
+
+    #overlay {
+      position: fixed;
+      display:none;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(92, 92, 92, 0.685);
+      z-index: 2;
+    }
+
+    #overlay-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      font-size: 40px;
+      font-family: arial, sans-serif;
+      color: rgb(255, 255, 255);
+      text-shadow: 2px 2px 8px rgb(46, 46, 46);
     }
   </style>
 </head>
 
 <body>
   <div id="container">
+    <div id="overlay">
+      <div id="overlay-text">Disconnected</div>
+    </div>
     <div id="toolbar">
       <div id="tb-tools">
         <span>
-          <a title="Previous" id="tb-left"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></a>
+          <a title="Previous" id="tb-left"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg></a>
           <a title="Newest" id="tb-pnum"></a>
-          <a title="Next" id="tb-right"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></a><!--
+          <a title="Next" id="tb-right"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" /></svg></a>
+          <!--
         --></span>
         <span>
-          <a title="Zoom out" id="tb-minus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z"/></svg></a>
+          <a title="Zoom out" id="tb-minus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0V0z" fill="none" />
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z" />
+            </svg></a>
           <a title="Reset zoom" id="tb-zlvl"></a>
-          <a title="Zoom in" id="tb-plus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></a><!--
+          <a title="Zoom in" id="tb-plus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0V0z" fill="none" />
+              <path
+                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+              <path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z" /></svg></a>
+          <!--
         --></span>
         <span>
-          <a title="Download" id="tb-save"><svg class="icon" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/></svg></a><!--
+          <a title="Download" id="tb-save"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />
+            </svg></a>
+          <!--
         --></span>
         <span>
-          <a title="Delete plot" id="tb-remove"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></a><!--
+          <a title="Delete plot" id="tb-remove"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg></a>
+          <!--
         --></span>
         <span>
-          <a title="Clear all plots" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"/></svg></a><!--
-        --></span>
-        <span id="discon">
-          <svg class="icon-error" height="24" viewBox="0 0 24 24" width="24"><path d="M24 .01c0-.01 0-.01 0 0L0 0v24h24V.01zM0 0h24v24H0V0zm0 0h24v24H0V0z" fill="none"/><path d="M22.99 9C19.15 5.16 13.8 3.76 8.84 4.78l2.52 2.52c3.47-.17 6.99 1.05 9.63 3.7l2-2zm-4 4c-1.29-1.29-2.84-2.13-4.49-2.56l3.53 3.53.96-.97zM2 3.05L5.07 6.1C3.6 6.82 2.22 7.78 1 9l1.99 2c1.24-1.24 2.67-2.16 4.2-2.77l2.24 2.24C7.81 10.89 6.27 11.73 5 13v.01L6.99 15c1.36-1.36 3.14-2.04 4.92-2.06L18.98 20l1.27-1.26L3.29 1.79 2 3.05zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0z"/></svg><!--
+          <a title="Clear all plots" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M0 0h24v24H0V0z" fill="none" />
+              <path
+                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z" />
+            </svg></a>
+          <!--
         --></span>
       </div>
     </div>
@@ -109,253 +167,86 @@
   <script>
 
     // The server injects its state when loading the page here.
-    const svr = /*SRVRPARAMS*/{ "host": "127.0.0.1", "port": 8288, "upid": 0, "hrecording": true, "hsize": 0 }/**/;
-
-    const CHECK_INTERVAL = 500;
-    const SCALE_DEFAULT = 0.8;
-    const SCALE_STEP = SCALE_DEFAULT / 12;
-
-    const baseapi = 'http://' + svr.host + (svr.port ? ':' + svr.port : '');
-    const api = {
-      svg: baseapi + '/svg',
-      state: baseapi + '/state',
-      clear: baseapi + '/clear',
-      remove: baseapi + '/remove',
-      headers: svr.token ? {
-        'X-HTTPGD-TOKEN': svr.token
-      } : {}
-    };
-
-    const cli = {
-      scale: SCALE_DEFAULT,
-      reloading: false,
-      discon: false,
-      elem_drw: null,
-      elem_discon: null,
-      width: null,
-      height: null,
-      hindex: -1,
-      plot: { hsize: 0 },
-      rmcount: 0
-    };
-
-    function refresh_svg(force) {
-      let s = api.svg +
-        '?width=' + cli.width +
-        '&height=' + cli.height +
-        '&index=' + cli.hindex +
-        (svr.token ? ('&token=' + svr.token) : '') +
-        '&upid=' + (svr.upid + cli.rmcount) +
-        (force ? 'f' : '');
-
-      cli.reloading = true;
-      cli.elem_drw.src = s;
-    }
-
-    function svg_loaded() {
-      if (!cli.reloading) return;
-      console.log("SVG loaded!");
-      cli.plot.width = cli.width;
-      cli.plot.height = cli.height;
-      cli.plot.hindex = cli.hindex;
-      cli.plot.hsize = svr.hsize;
-      cli.plot.upid = svr.upid;
-      cli.reloading = false;
-      update_toolbar();
-    }
-    function svg_loaded_error() {
-      if (!cli.reloading) return;
-      warn_disconnected(true);
-      cli.reloading = false;
-    }
-
-    function warn_disconnected(disconnected) {
-      if (cli.discon != disconnected) {
-        cli.discon = disconnected;
-        cli.elem_discon.style.display = disconnected ? "inline" : "none";
-      }
-    }
-
-    function update_toolbar() {
-      cli.elem_pnum.textContent = (cli.hindex === -1 ? cli.plot.hsize : (cli.hindex + 1)) + "/" + svr.hsize;
-      cli.elem_zlvl.textContent = Math.ceil(SCALE_DEFAULT / cli.scale * 100) + '%';
-    }
-
-    function update_svr(state) {
-      if (cli.reloading) return;
-
-      if ((state.upid !== cli.plot.upid) ||
-        cli.hindex !== cli.plot.hindex ||
-        Math.abs(cli.width - cli.plot.width) > 0.01 ||
-        Math.abs(cli.height - cli.plot.height) > 0.01) {
-        Object.assign(svr, state);
-
-        if (svr.upid !== cli.plot.upid) {
-          cli.hindex = -1;
-        }
-
-        refresh_svg();
-
-        warn_disconnected(false);
-      } else {
-        svr.hsize = state.hsize;
-      }
-    }
-
-    function save_plot() {
-      let dl = document.createElement('a');
-      dl.href = api.svg + '?token=' + api.token;
-      dl.download = "plot.svg";
-      document.body.appendChild(dl);
-      dl.click();
-      document.body.removeChild(dl);
-    }
-
-    function zoom(x) {
-      if (cli.scale + x > 0) {
-        cli.scale += x;
-      }
-    }
-
-    function checkcycle() {
-      update_toolbar();
-      if (cli.reloading) return;
-
-      drw_rect = cli.elem_drw.getBoundingClientRect();
-      cli.width = Math.round(drw_rect.width * cli.scale);
-      cli.height = Math.round(drw_rect.height * cli.scale);
-
-      // fetch server state
-      fetch(api.state, {
-        headers: api.headers
-      })
-        .then(res => res.json())
-        .then((out) => {
-          update_svr(out);
-        }).catch((e) => {
-          console.warn(e)
-          warn_disconnected(true);
-        });
-    }
-
-    function nav_clear() {
-      fetch(api.clear, {
-        headers: api.headers
-      }).then(res => res.json())
-        .then((out) => {
-          cli.elem_drw.src = api.svg;
-          update_svr(out);
-        });
-    }
-
-    function nav_remove() {
-      cli.rmcount++;
-      fetch(api.remove + '?index=' + cli.hindex, {
-        headers: api.headers
-      }).then(res => res.json())
-        .then((out) => {
-          cli.hindex--;
-          refresh_svg(true);
-          update_svr(out);
-        });
-    }
-
-    function nav_zoom_in() {
-      zoom(-SCALE_STEP);
-      checkcycle();
-    }
-    function nav_zoom_out() {
-      zoom(SCALE_STEP);
-      checkcycle();
-    }
-    function nav_zoom_reset() {
-      cli.scale = SCALE_DEFAULT;
-      checkcycle();
-    }
-    function nav_hist_prev() {
-      if (cli.hindex > 0) {
-        cli.hindex -= 1;
-      } else if (svr.hsize >= 2) {
-        cli.hindex = svr.hsize - (cli.hindex == -1 ? 2 : 1);
-      }
-      update_toolbar();
-      checkcycle();
-    }
-    function nav_hist_next() {
-      if (cli.hindex >= 0 && cli.hindex < svr.hsize - 1) {
-        cli.hindex += 1;
-      } else {
-        cli.hindex = 0;
-      }
-      update_toolbar();
-      checkcycle();
-    }
-    function nav_hist_first() {
-      cli.hindex = -1;
-      update_toolbar();
-      checkcycle();
-    }
-
-    function handleToolKeys(e) {
-      switch (e.keyCode) {
-        case 37: // left arrow
-          nav_hist_prev();
-          break;
-        case 39: // right arrow
-          nav_hist_next();
-          break;
-        case 38: // up arrow
-          nav_hist_next();
-          break;
-        case 40: // down arrow
-          nav_hist_prev();
-          break;
-        case 187: // plus
-          nav_zoom_in();
-          break;
-        case 189: // minus
-          nav_zoom_out();
-          break;
-        case 46: // del
-          nav_remove();
-          break;
-        case 83:
-          if (e.ctrlKey) { // ctrl+s 
-            save_plot();
-            e.preventDefault();
-          }
-          break;
-        case 48:
-          nav_zoom_reset();
-          break;
-      }
-    }
+    const SERVER = /*SRVRPARAMS*/{ "host": "127.0.0.1", "port": 8288 }/**/;
+    const httpgdViewer = new HttpgdViewer(
+      SERVER.host,
+      SERVER.port ? SERVER.port : null,
+      SERVER.token ? SERVER.token : null
+    );
 
     window.onload = function () {
 
-      cli.elem_drw = document.getElementById("drawing");
-      cli.elem_discon = document.getElementById("discon");
-      cli.elem_pnum = document.getElementById("tb-pnum");
-      cli.elem_zlvl = document.getElementById("tb-zlvl");
+      httpgdViewer.onZoomStringChange = (s) => {
+        document.getElementById("tb-zlvl").textContent = s;
+      }
+      httpgdViewer.onIndexStringChange = (s) => {
+        document.getElementById("tb-pnum").textContent = s;
+      }
+      httpgdViewer.onDisconnectedChange = (d) => {
+        document.getElementById("overlay").style.display = d ? "inline" : "none";
+      }
+      window.addEventListener('resize', () => httpgdViewer.resize());
 
-      cli.elem_drw.addEventListener('load', svg_loaded);
-      cli.elem_drw.addEventListener('error', svg_loaded_error);
+      httpgdViewer.init(document.getElementById("drawing"));
 
-      document.getElementById("tb-left").onclick = nav_hist_prev;
-      document.getElementById("tb-right").onclick = nav_hist_next;
-      document.getElementById("tb-pnum").onclick = nav_hist_first;
-      document.getElementById("tb-save").onclick = save_plot;
-      document.getElementById("tb-plus").onclick = nav_zoom_in;
-      document.getElementById("tb-minus").onclick = nav_zoom_out;
-      document.getElementById("tb-zlvl").onclick = nav_zoom_reset;
-      document.getElementById("tb-clear").onclick = nav_clear;
-      document.getElementById("tb-remove").onclick = nav_remove;
+      document.getElementById("tb-left").onclick = () => httpgdViewer.navPrevious();
+      document.getElementById("tb-right").onclick = () => httpgdViewer.navNext();
+      document.getElementById("tb-pnum").onclick = () => httpgdViewer.navNewest();
+      document.getElementById("tb-save").onclick = () => httpgdViewer.downloadPlot();
+      document.getElementById("tb-plus").onclick = () => httpgdViewer.zoomIn();
+      document.getElementById("tb-minus").onclick = () => httpgdViewer.zoomOut();
+      document.getElementById("tb-zlvl").onclick = () => httpgdViewer.zoomReset();
+      document.getElementById("tb-clear").onclick = () => httpgdViewer.navClear();
+      document.getElementById("tb-remove").onclick = () => httpgdViewer.navRemove();
 
-      window.addEventListener('keydown', handleToolKeys);
+      const shortcuts = [
+        {
+          keys: [37, 40],
+          fun: () => httpgdViewer.navPrevious()
+        },
+        {
+          keys: [39, 38],
+          fun: () => httpgdViewer.navNext()
+        },
+        {
+          keys: [187],
+          fun: () => httpgdViewer.zoomIn()
+        },
+        {
+          keys: [189],
+          fun: () => httpgdViewer.zoomOut()
+        },
+        {
+          keys: [46],
+          fun: () => httpgdViewer.navRemove()
+        },
+        {
+          ctrl: true,
+          keys: [83],
+          fun: () => httpgdViewer.downloadPlot()
+        },
+        {
+          keys: [48],
+          fun: () => httpgdViewer.zoomReset()
+        }
+      ];
 
-      let elem_tb = document.getElementById("toolbar");
-      let elem_tbt = document.getElementById("tb-tools");
-      let elem_cnt = document.getElementById("container");
+      window.addEventListener('keydown', (e) => {
+        for (let action of shortcuts) {
+          for (let keyCode of action.keys) {
+            if (keyCode == e.keyCode) {
+              if (!action.ctrl || e.ctrlKey) {
+                action.fun();
+                e.preventDefault();
+                return;
+              }
+            }
+          }
+        }
+      });
+
+      const elem_tbt = document.getElementById("tb-tools");
+      const elem_cnt = document.getElementById("container");
 
       elem_cnt.onmouseenter = function (mouseEvent) {
         elem_tbt.style.display = "inline";
@@ -364,26 +255,6 @@
         elem_tbt.style.display = "none";
       }
 
-      refresh_svg();
-      setInterval(checkcycle, CHECK_INTERVAL);
-
-      var hidden, visibilityChange;
-      if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support 
-        hidden = "hidden";
-        visibilityChange = "visibilitychange";
-      } else if (typeof document.msHidden !== "undefined") {
-        hidden = "msHidden";
-        visibilityChange = "msvisibilitychange";
-      } else if (typeof document.webkitHidden !== "undefined") {
-        hidden = "webkitHidden";
-        visibilityChange = "webkitvisibilitychange";
-      }
-      // Handle page visibility change   
-      document.addEventListener(visibilityChange, () => {
-        if (!document[hidden]) {
-          refresh_svg(true);
-        }
-      }, false);
     }
   </script>
 </body>

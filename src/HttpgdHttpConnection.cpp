@@ -5,6 +5,7 @@
 #include <boost/asio/strand.hpp>
 
 #include "TargetURI.h"
+#include <fstream>
 
 #include "HttpgdHttpConnection.h"
 
@@ -12,6 +13,15 @@ namespace httpgd
 {
     namespace http
     {
+        
+        std::string read_txt(const std::string &filepath)
+        {
+            std::ifstream t(filepath);
+            std::stringstream buffer;
+            buffer << t.rdbuf();
+            return buffer.str();
+        }
+
         inline bool trystod(const std::string &parse, double *out)
         {
             try
@@ -158,18 +168,47 @@ namespace httpgd
                 res.set(http::field::content_type, "text/html");
                 res.keep_alive(req.keep_alive());
 
+                std::string path(conf->wwwpath + "/index.html");
+                std::string html(read_txt(path));
+
+                // inject params
                 std::string sparams = dstore->api_state_json(conf, std::string(req[http::field::host]));
                 sparams.append("/*");
 
-                // inject params
-                std::string html(conf->livehtml);
                 size_t start_pos = html.find("/*SRVRPARAMS*/");
                 if (start_pos != std::string::npos)
                 {
                     html.replace(start_pos, sizeof("/*SRVRPARAMS*/") - 1, sparams);
                 }
+                if (conf->use_token)
+                {
+                    start_pos = html.find("<!--LIVEJSSCIPTTAG-->");
+                    if (start_pos != std::string::npos)
+                    {
+                        html.replace(start_pos, sizeof("<!--LIVEJSSCIPTTAG-->") - 1, "<script src=\"httpgd.js?token=" + conf->token + "\"></script><!--");
+                    }
+                }
 
                 res.body() = html;
+                res.prepare_payload();
+                return send(std::move(res));
+            }
+            else if (uri.path == "/httpgd.js")
+            {
+                http::response<http::string_body> res{http::status::ok, req.version()};
+                res.set(http::field::server, HTTPGD_HTTP_VERSION);
+                if (conf->cors)
+                {
+                    res.set(http::field::access_control_allow_origin, "*");
+                }
+                res.set(http::field::content_type, "text/html");
+                res.keep_alive(req.keep_alive());
+
+                // inject params
+                std::string path(conf->wwwpath + "/httpgd.js");
+                std::string txt(read_txt(path));
+
+                res.body() = txt;
                 res.prepare_payload();
                 return send(std::move(res));
             }

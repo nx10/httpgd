@@ -437,7 +437,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
     bool use_token = token.length();
     int ibg = R_GE_str2col(bg.c_str());
 
-    std::string livehtml(httpgd::read_txt(httpgd::get_wwwpath("index.html")));
+    std::string wwwpath(httpgd::get_wwwpath(""));
 
     httpgd::makehttpgdDevice({ibg,
                               width,
@@ -446,7 +446,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
                               aliases},
                              {host,
                               port,
-                              livehtml,
+                              wwwpath,
                               cors,
                               use_token,
                               token,
