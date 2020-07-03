@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 #include <Rcpp.h>
 #include <R_ext/GraphicsEngine.h>
