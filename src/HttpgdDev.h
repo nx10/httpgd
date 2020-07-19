@@ -2,12 +2,11 @@
 #define HTTPGD_DEV_H
 
 #include <Rcpp.h>
-#include <R_ext/GraphicsEngine.h>
-#include <R_ext/GraphicsDevice.h>
 
 #include <mutex>
 #include <memory>
 
+#include "devGeneric.h"
 #include "HttpgdServerConfig.h"
 #include "HttpgdDataStore.h"
 #include "HttpgdHttpTask.h"
@@ -27,29 +26,21 @@ namespace httpgd
         Rcpp::List &aliases;
     };
 
-    class HttpgdDev
+    class HttpgdDev : public devGeneric
     {
     public:
-        pDevDesc dd;
 
         // Font handling
         Rcpp::List system_aliases;
         Rcpp::List user_aliases;
         
-        std::atomic<bool> replaying;      // Is the device replaying
-        std::atomic<int> replaying_index; // Index to replay
-        std::atomic<double> replaying_width; // Index to replay
-        std::atomic<double> replaying_height; // Index to replay
+        std::atomic<bool> replaying{false};      // Is the device replaying
+        std::atomic<int> replaying_index{0}; // Index to replay
+        std::atomic<double> replaying_width{0}; // Index to replay
+        std::atomic<double> replaying_height{0}; // Index to replay
 
-        HttpgdDev(pDevDesc t_dd, const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params);
-        ~HttpgdDev();
-
-        void put(std::shared_ptr<dc::DrawCall> dc);
-
-        void new_page(double width, double height, int fill);
-        void page_size(double *width, double *height);
-        void clip_page(double x0, double x1, double y0, double y1);
-        void mode(bool start_draw);
+        HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params);
+        virtual ~HttpgdDev();
 
         void render_page(int target, double width, double height);
         void hist_clear();
@@ -74,15 +65,38 @@ namespace httpgd
         
         static std::string random_token(int len);
 
+        // set device size
+        void resize_device_to_page(pDevDesc dd);
+
+    protected:
+        virtual void dev_activate(pDevDesc dd);
+        virtual void dev_deactivate(pDevDesc dd);
+        virtual void dev_close(pDevDesc dd);
+        virtual void dev_clip(double x0, double x1, double y0, double y1, pDevDesc dd);
+        virtual void dev_size(double *left, double *right, double *bottom, double *top, pDevDesc dd);
+        virtual void dev_newPage(pGEcontext gc, pDevDesc dd);
+        virtual void dev_line(double x1, double y1, double x2, double y2, pGEcontext gc, pDevDesc dd);
+        virtual void dev_text(double x, double y, const char *str, double rot, double hadj, pGEcontext gc, pDevDesc dd);
+        virtual double dev_strWidth(const char *str, pGEcontext gc, pDevDesc dd);
+        virtual void dev_rect(double x0, double y0, double x1, double y1, pGEcontext gc, pDevDesc dd);
+        virtual void dev_circle(double x, double y, double r, pGEcontext gc, pDevDesc dd);
+        virtual void dev_polygon(int n, double *x, double *y, pGEcontext gc, pDevDesc dd);
+        virtual void dev_polyline(int n, double *x, double *y, pGEcontext gc, pDevDesc dd);
+        virtual void dev_path(double *x, double *y, int npoly, int *nper, Rboolean winding, pGEcontext gc, pDevDesc dd);
+        virtual void dev_mode(int mode, pDevDesc dd);
+        virtual void dev_metricInfo(int c, pGEcontext gc, double *ascent, double *descent, double *width, pDevDesc dd);
+        virtual void dev_raster(unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd);
+
     private:
         PlotHistory m_history;
         std::shared_ptr<HttpgdServerConfig> m_svr_config;
         std::shared_ptr<HttpgdDataStore> m_data_store;
         std::shared_ptr<http::HttpgdHttpTask> m_svr_task;
-        //http::HttpgdHttpTask *m_svr_task;
 
-        int m_target; // current draw target. target = index + 1 (0 reserved for special case)
-        int m_target_open; // open draw target. New draw calls from R always target this. target = index + 1 (0 reserved for special case)
+        int m_target{-1}; // current draw target. target = index + 1 (0 reserved for special case)
+        int m_target_open{-1}; // open draw target. New draw calls from R always target this. target = index + 1 (0 reserved for special case)
+        
+        void put(std::shared_ptr<dc::DrawCall> dc);
     };
 
 } // namespace httpgd

@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include <Rcpp.h>
-#include <R_ext/GraphicsEngine.h>
+//#include <R_ext/GraphicsEngine.h>
 
 #include "lib/svglite_utils.h"
 
