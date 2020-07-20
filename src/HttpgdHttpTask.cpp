@@ -13,9 +13,8 @@ namespace httpgd
         namespace net = boost::asio; // from <boost/asio.hpp>
 
         HttpgdHttpTask::HttpgdHttpTask(
-            std::shared_ptr<HttpgdServerConfig> t_conf,
-            std::shared_ptr<HttpgdDataStore> t_data)
-            : m_conf(t_conf), m_data(t_data),
+            std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
+            : m_watcher(t_watcher),
               m_pioc(nullptr),
               m_port_bound(false), m_port(-1)
         {
@@ -30,8 +29,9 @@ namespace httpgd
         {
             try
             {
-                const auto port = static_cast<unsigned short>(m_conf->port);
-                const auto address = net::ip::make_address(m_conf->host);
+                const auto conf = m_watcher->api_server_config();
+                const auto port = static_cast<unsigned short>(conf->port);
+                const auto address = net::ip::make_address(conf->host);
 
                 net::io_context ioc{1};
                 m_pioc = &ioc;
@@ -40,7 +40,7 @@ namespace httpgd
                 auto lis = std::make_shared<listener>(
                     ioc,
                     tcp::endpoint{address, (unsigned short)port},
-                    m_conf, m_data);
+                    m_watcher);
                 m_port = lis->get_port_after_bind();
                 m_port_bound = true;
                 lis->run();

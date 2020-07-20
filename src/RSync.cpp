@@ -8,7 +8,7 @@ namespace httpgd
 {
     namespace rsync
     {
-        std::mutex sync_mutex;
+        //std::mutex sync_mutex;
         std::mutex later_mutex;
 
         struct RSyncData
@@ -17,14 +17,14 @@ namespace httpgd
             void *data;
         } rsdat;
 
-        void lock()
+        /*void lock()
         {
             sync_mutex.lock();
         }
         void unlock()
         {
             sync_mutex.unlock();
-        }
+        }*/
 
         void later(void (*func)(void *), void *data, double secs)
         {

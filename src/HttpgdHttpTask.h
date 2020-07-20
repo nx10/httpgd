@@ -6,8 +6,7 @@
 //#include <later_api.h>
 #include "BackgroundTask.h"
 #include <boost/beast/core.hpp>
-#include "HttpgdDataStore.h"
-#include "HttpgdServerConfig.h"
+#include "HttpgdApiAsyncWatcher.h"
 
 namespace httpgd
 {
@@ -19,7 +18,7 @@ namespace httpgd
         class HttpgdHttpTask : public rsync::BackgroundTask
         {
         public:
-            HttpgdHttpTask(std::shared_ptr<HttpgdServerConfig> t_conf, std::shared_ptr<HttpgdDataStore> t_data);
+            HttpgdHttpTask(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher);
             void stop();
             int await_port();
             
@@ -29,8 +28,7 @@ namespace httpgd
             void complete();
 
         private:
-            std::shared_ptr<HttpgdServerConfig> m_conf;
-            std::shared_ptr<HttpgdDataStore> m_data;
+            std::shared_ptr<HttpgdApiAsyncWatcher> m_watcher;
             net::io_context *m_pioc;
             std::atomic<bool> m_port_bound; // server is bound to a port
             unsigned int m_port;

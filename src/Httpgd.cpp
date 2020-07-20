@@ -107,14 +107,15 @@ Rcpp::List httpgd_state_(int devnum)
 {
     auto dev = validate_httpgddev(devnum);
 
-    auto svr_config = dev->get_server_config();
+    auto svr_config = dev->api_server_config();
 
     return Rcpp::List::create(
         Rcpp::Named("host") = svr_config->host,
         Rcpp::Named("port") = dev->server_await_port(),
         Rcpp::Named("token") = svr_config->token,
-        Rcpp::Named("hsize") = dev->store_get_page_count(),
-        Rcpp::Named("upid") = dev->store_get_upid());
+        Rcpp::Named("hsize") = dev->api_page_count(),
+        Rcpp::Named("upid") = dev->api_upid(),
+        Rcpp::Named("active") = dev->device_active());
 }
 
 // [[Rcpp::export]]
@@ -131,19 +132,23 @@ std::string httpgd_random_token_(int len)
 std::string httpgd_svg_(int devnum, int page, double width, double height)
 {
     auto dev = validate_httpgddev(devnum);
-    return dev->store_svg(page, width, height);
+
+    std::string buf = "";
+    buf.reserve(1000000);
+    dev->api_svg(&buf, page, width, height);
+    return buf;
 }
 
 // [[Rcpp::export]]
 bool httpgd_remove_(int devnum, int page)
 {
     auto dev = validate_httpgddev(devnum);
-    return dev->store_remove(page);
+    return dev->api_remove(page);
 }
 
 // [[Rcpp::export]]
 bool httpgd_clear_(int devnum)
 {
     auto dev = validate_httpgddev(devnum);
-    return dev->store_clear();
+    return dev->api_clear();
 }

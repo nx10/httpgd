@@ -7,15 +7,16 @@
 #include <memory>
 
 #include "devGeneric.h"
+#include "HttpgdApi.h"
 #include "HttpgdServerConfig.h"
 #include "HttpgdDataStore.h"
+#include "HttpgdApiAsyncWatcher.h"
 #include "HttpgdHttpTask.h"
 
 #include "PlotHistory.h"
 
 namespace httpgd
 {
-    class HttpgdServer;
 
     struct HttpgdDevStartParams
     {
@@ -26,49 +27,58 @@ namespace httpgd
         Rcpp::List &aliases;
     };
 
-    class HttpgdDev : public devGeneric
+    class DeviceTarget
+    {
+    public:
+        int get_index() const;
+        void set_index(int index);
+        int get_newest_index() const;
+        void set_newest_index(int index);
+        bool is_void() const;
+        void set_void();
+
+    private:
+        int m_index{-1};        // current draw target
+        int m_newest_index{-1}; // open draw target
+        bool m_void{true};
+    };
+
+    class HttpgdDev : public devGeneric,
+                      public HttpgdApi
     {
     public:
 
         // Font handling
         Rcpp::List system_aliases;
         Rcpp::List user_aliases;
-        
-        std::atomic<bool> replaying{false};      // Is the device replaying
-        std::atomic<int> replaying_index{0}; // Index to replay
-        std::atomic<double> replaying_width{0}; // Index to replay
-        std::atomic<double> replaying_height{0}; // Index to replay
 
         HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params);
         virtual ~HttpgdDev();
 
-        void render_page(int target, double width, double height);
-        void hist_clear();
-        void hist_remove(int target);
-        
-        void await_render_page(int target, double width, double height);
-        void await_hist_clear();
-        void await_hist_remove(int target);
-
+        // http server
         void start_server();
         void shutdown_server();
         int server_await_port();
 
-        std::string store_state_json(bool include_config);
-        std::string store_svg(int index, double width, double height);
-        bool store_remove(int index);
-        bool store_clear();
-        int store_get_upid();
-        int store_get_page_count();
+        // API functions
 
-        std::shared_ptr<HttpgdServerConfig> get_server_config();
-        
+        virtual void api_render(int index, double width, double height) override;
+        virtual bool api_remove(int index) override;
+        virtual bool api_clear() override;
+        virtual int api_upid() override;
+        virtual void api_svg(std::string *buf, int index, double width, double height) override;
+        virtual int api_page_count() override;
+        virtual std::shared_ptr<HttpgdServerConfig> api_server_config() override;
+
+        bool device_active();
+
+        // static 
+
         static std::string random_token(int len);
 
-        // set device size
-        void resize_device_to_page(pDevDesc dd);
-
     protected:
+        // Device callbacks
+
         virtual void dev_activate(pDevDesc dd);
         virtual void dev_deactivate(pDevDesc dd);
         virtual void dev_close(pDevDesc dd);
@@ -91,12 +101,18 @@ namespace httpgd
         PlotHistory m_history;
         std::shared_ptr<HttpgdServerConfig> m_svr_config;
         std::shared_ptr<HttpgdDataStore> m_data_store;
+        std::shared_ptr<HttpgdApiAsyncWatcher> m_api_async_watcher;
         std::shared_ptr<http::HttpgdHttpTask> m_svr_task;
 
-        int m_target{-1}; // current draw target. target = index + 1 (0 reserved for special case)
-        int m_target_open{-1}; // open draw target. New draw calls from R always target this. target = index + 1 (0 reserved for special case)
-        
+        bool replaying{false}; // Is the device replaying
+        DeviceTarget m_target;
+
+        bool m_device_active{true};
+
         void put(std::shared_ptr<dc::DrawCall> dc);
+
+        // set device size
+        void resize_device_to_page(pDevDesc dd);
     };
 
 } // namespace httpgd

@@ -13,7 +13,7 @@ namespace httpgd
 {
     namespace http
     {
-        
+
         std::string read_txt(const std::string &filepath)
         {
             std::ifstream t(filepath);
@@ -47,6 +47,40 @@ namespace httpgd
             }
         }
 
+        inline void json_state(std::string *buf, std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
+        {
+            buf->append("\"upid\": ").append(std::to_string(t_watcher->api_upid()));
+            buf->append(", \"hsize\": ").append(std::to_string(t_watcher->api_page_count()));
+        }
+        inline void json_state(std::string *buf, std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher, std::string host)
+        {
+            json_state(buf, t_watcher);
+            buf->append(", \"host\": \"").append(host).append("\"");
+            auto config = t_watcher->api_server_config();
+            if (config->use_token)
+            {
+                buf->append(", \"token\": \"").append(config->token).append("\"");
+            }
+        }
+        inline std::string json_make_state(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
+        {
+            std::string buf;
+            buf.reserve(200);
+            buf.append("{ ");
+            json_state(&buf, t_watcher);
+            buf.append(" }");
+            return buf;
+        }
+        inline std::string json_make_state_full(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher, std::string host)
+        {
+            std::string buf;
+            buf.reserve(200);
+            buf.append("{ ");
+            json_state(&buf, t_watcher, host);
+            buf.append(" }");
+            return buf;
+        }
+
         namespace beast = boost::beast;   // from <boost/beast.hpp>
         namespace http = beast::http;     // from <boost/beast/http.hpp>
         namespace net = boost::asio;      // from <boost/asio.hpp>
@@ -63,11 +97,12 @@ namespace httpgd
             class Send>
         void
         handle_request(
-            std::shared_ptr<HttpgdServerConfig> conf,
-            std::shared_ptr<HttpgdDataStore> dstore,
+            std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher,
             http::request<Body, http::basic_fields<Allocator>> &&req,
             Send &&send)
         {
+            auto conf = t_watcher->api_server_config();
+
             // Returns a bad request response
             auto const bad_request =
                 [&req, &conf](beast::string_view why) {
@@ -172,7 +207,8 @@ namespace httpgd
                 std::string html(read_txt(path));
 
                 // inject params
-                std::string sparams = dstore->api_state_json(conf, std::string(req[http::field::host]));
+                std::string host = std::string(req[http::field::host]);
+                std::string sparams = json_make_state_full(t_watcher, host); 
                 sparams.append("/*");
 
                 size_t start_pos = html.find("/*SRVRPARAMS*/");
@@ -246,7 +282,11 @@ namespace httpgd
                 }
                 res.set(http::field::content_type, "image/svg+xml");
                 res.keep_alive(req.keep_alive());
-                res.body() = dstore->api_svg(true, cli_index, cli_width, cli_height);
+
+                std::string buf = "";
+                buf.reserve(1000000);
+                t_watcher->api_svg(&buf, cli_index, cli_width, cli_height);
+                res.body() = buf;
                 res.prepare_payload();
                 return send(std::move(res));
             }
@@ -260,13 +300,13 @@ namespace httpgd
                 }
                 res.set(http::field::content_type, "application/json");
                 res.keep_alive(req.keep_alive());
-                res.body() = dstore->api_state_json();
+                res.body() = json_make_state(t_watcher);
                 res.prepare_payload();
                 return send(std::move(res));
             }
             else if (uri.path == "/clear")
             {
-                dstore->api_clear(true);
+                t_watcher->api_clear();
 
                 http::response<http::string_body> res{http::status::ok, req.version()};
                 res.set(http::field::server, HTTPGD_HTTP_VERSION);
@@ -276,7 +316,7 @@ namespace httpgd
                 }
                 res.set(http::field::content_type, "application/json");
                 res.keep_alive(req.keep_alive());
-                res.body() = dstore->api_state_json();
+                res.body() = json_make_state(t_watcher);
                 res.prepare_payload();
                 return send(std::move(res));
             }
@@ -291,7 +331,7 @@ namespace httpgd
                     trystoi(ptxt, &cli_index);
                 }
 
-                if (dstore->api_remove(true, cli_index))
+                if (t_watcher->api_remove(cli_index))
                 {
                     http::response<http::string_body> res{http::status::ok, req.version()};
                     res.set(http::field::server, HTTPGD_HTTP_VERSION);
@@ -301,7 +341,7 @@ namespace httpgd
                     }
                     res.set(http::field::content_type, "application/json");
                     res.keep_alive(req.keep_alive());
-                    res.body() = dstore->api_state_json();
+                    res.body() = json_make_state(t_watcher);
                     res.prepare_payload();
                     return send(std::move(res));
                 }
@@ -396,8 +436,7 @@ namespace httpgd
 
             beast::tcp_stream stream_;
             beast::flat_buffer buffer_;
-            std::shared_ptr<HttpgdServerConfig> conf;
-            std::shared_ptr<HttpgdDataStore> dstore;
+            std::shared_ptr<HttpgdApiAsyncWatcher> m_watcher;
             http::request<http::string_body> req_;
             std::shared_ptr<void> res_;
             send_lambda lambda_;
@@ -406,9 +445,8 @@ namespace httpgd
             // Take ownership of the stream
             session(
                 tcp::socket &&socket,
-                std::shared_ptr<HttpgdServerConfig> t_conf,
-                std::shared_ptr<HttpgdDataStore> t_dstore)
-                : stream_(std::move(socket)), conf(t_conf), dstore(t_dstore), lambda_(*this)
+                std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
+                : stream_(std::move(socket)), m_watcher(t_watcher), lambda_(*this)
             {
             }
 
@@ -458,7 +496,7 @@ namespace httpgd
                     return fail(ec, "read");
 
                 // Send the response
-                handle_request(conf, dstore, std::move(req_), lambda_);
+                handle_request(m_watcher, std::move(req_), lambda_);
             }
 
             void
@@ -500,9 +538,8 @@ namespace httpgd
         listener::listener(
             net::io_context &ioc,
             tcp::endpoint endpoint,
-            std::shared_ptr<HttpgdServerConfig> t_conf,
-            std::shared_ptr<HttpgdDataStore> t_dstore)
-            : ioc_(ioc), acceptor_(net::make_strand(ioc)), conf(t_conf), dstore(t_dstore)
+            std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
+            : ioc_(ioc), acceptor_(net::make_strand(ioc)), m_watcher(t_watcher)
         {
             beast::error_code ec;
 
@@ -575,7 +612,7 @@ namespace httpgd
                 // Create the session and run it
                 std::make_shared<session>(
                     std::move(socket),
-                    conf, dstore)
+                    m_watcher)
                     ->run();
             }
 

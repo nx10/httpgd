@@ -4,7 +4,7 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include "HttpgdHttpTask.h"
-#include "HttpgdDataStore.h"
+#include "HttpgdApiAsyncWatcher.h"
 
 namespace httpgd
 {
@@ -20,15 +20,13 @@ namespace httpgd
         {
             net::io_context &ioc_;
             tcp::acceptor acceptor_;
-            std::shared_ptr<HttpgdServerConfig> conf;
-            std::shared_ptr<HttpgdDataStore> dstore;
+            std::shared_ptr<HttpgdApiAsyncWatcher> m_watcher;
 
         public:
             listener(
                 net::io_context &ioc,
                 tcp::endpoint endpoint,
-                std::shared_ptr<HttpgdServerConfig> t_conf,
-                std::shared_ptr<HttpgdDataStore> t_dstore);
+                std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher);
 
             unsigned short get_port_after_bind();
 

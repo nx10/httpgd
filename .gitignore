@@ -7,3 +7,4 @@ src/*.so
 src/*.dll
 .vscode
 windows
+*.Rproj
