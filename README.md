@@ -1,4 +1,4 @@
-# httpgd
+# httpgd <img src="docs/httpgd_logo.svg" align="right" height = 150/>
 
 [![R build status](https://github.com/nx10/httpgd/workflows/build/badge.svg)](https://github.com/nx10/httpgd/actions)
 
