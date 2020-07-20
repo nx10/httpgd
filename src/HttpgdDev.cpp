@@ -255,20 +255,20 @@ namespace httpgd
         
         pDevDesc dd = devGeneric::get_active_pDevDesc();
 
-         Rcpp::Rcout << "[render_page] index=" << index << "\n";
+        // Rcpp::Rcout << "[render_page] index=" << index << "\n";
 
         replaying = true;
         m_data_store->resize(index, width, height); // this also clears
         if (index == m_target.get_newest_index())
         {
             m_target.set_index(index); //???
-             Rcpp::Rcout << "    -> open page. target_index=" << m_target.get_index() << "\n";
+            // Rcpp::Rcout << "    -> open page. target_index=" << m_target.get_index() << "\n";
             resize_device_to_page(dd);
             devGeneric::replay_current(dd); // replay active page
         }
         else
         {
-             Rcpp::Rcout << "    -> old page. target_newest_index="<< m_target.get_newest_index() << "\n";
+            // Rcpp::Rcout << "    -> old page. target_newest_index="<< m_target.get_newest_index() << "\n";
             m_history.set_current(m_target.get_newest_index(), dd);
 
             m_target.set_index(index);
@@ -324,13 +324,13 @@ namespace httpgd
 
     void HttpgdDev::api_svg(std::string *buf, int index, double width, double height)
     {
-        Rcpp::Rcout << "DIFF \n";
+        // Rcpp::Rcout << "DIFF \n";
         if (m_data_store->diff(index, width, height))
         {
-            Rcpp::Rcout << "RENDER \n";
+            // Rcpp::Rcout << "RENDER \n";
             api_render(index, width, height);
         }
-        Rcpp::Rcout << "SVG \n";
+        // Rcpp::Rcout << "SVG \n";
         m_data_store->svg(buf, index);
     }
 
