@@ -101,6 +101,17 @@ namespace httpgd
         dd->haveTransparency = 2;
         dd->haveTransparentBg = 2;
 
+        dd->haveRaster = 2;
+        dd->haveCapture = 1;
+        dd->haveLocator = 1;
+        
+        dd->newFrameConfirm = nullptr;
+        dd->onExit = nullptr;
+        dd->eventEnv = R_NilValue;
+        dd->eventHelper = nullptr;
+        dd->holdflush = nullptr;
+
+        // Device specific
         dd->deviceSpecific = this;
 
         return dd;
@@ -138,7 +149,10 @@ namespace httpgd
 
     void devGeneric::replay_current(pDevDesc dd)
     {
-        GEplayDisplayList(desc2GEDesc(dd));
+        pGEDevDesc gdd = desc2GEDesc(dd);
+	    if(gdd->dirty) { // avoid trying to replay list if there has been no drawing 
+            GEplayDisplayList(gdd);
+        }
     }
 
     // CALLBACKS
@@ -194,7 +208,7 @@ namespace httpgd
     }
     SEXP devGeneric::dev_cap(pDevDesc dd)
     {
-        return Rcpp::String("").get_sexp();
+        return R_NilValue;
     }
     void devGeneric::dev_raster(unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd)
     {

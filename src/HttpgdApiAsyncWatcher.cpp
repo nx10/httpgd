@@ -89,6 +89,7 @@ namespace httpgd
         if (m_data_store->diff(index, width, height))
         {
             api_render(index, width, height); // use async render call
+            // todo perform sync diff again and sync render svg
         }
         m_data_store->svg(buf, index);
     }

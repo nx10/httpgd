@@ -47,7 +47,7 @@ namespace httpgd
             GC_lineend m_lend;
             GC_linejoin m_ljoin;
             double m_lmitre;
-            Clip *m_clip;
+            int m_clip_id;
 
             explicit DrawCall(const void *gc);
             virtual ~DrawCall();
@@ -162,7 +162,8 @@ namespace httpgd
             Clip(int id, double x0, double x1, double y0, double y1);
             bool equals(double x0, double x1, double y0, double y1);
             void build_svg_def(std::string *buf) const;
-            void build_svg_attr(std::string *buf) const;
+            static void build_svg_attr(std::string *buf, int id);
+            int id() const;
 
         protected:
             int m_id;
