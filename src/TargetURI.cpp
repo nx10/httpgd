@@ -5,7 +5,7 @@
 
 namespace httpgd
 {
-    namespace http
+    namespace web
     {
         TargetURI::TargetURI(const std::string &uri)
         {

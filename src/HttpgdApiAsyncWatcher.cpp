@@ -24,14 +24,16 @@ namespace httpgd
         : m_rdevice(t_rdevice),
           m_rdevice_alive(true),
           m_svr_config(t_svr_config),
-          m_data_store(t_data_store)
+          m_data_store(t_data_store),
+          m_changelisteners()
     {
     }
 
     bool HttpgdApiAsyncWatcher::api_remove(int index)
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
-        if (!m_rdevice_alive) return false;
+        if (!m_rdevice_alive)
+            return false;
 
         auto dat = new AsyncApiCallIndexData{
             m_rdevice,
@@ -51,7 +53,8 @@ namespace httpgd
     bool HttpgdApiAsyncWatcher::api_clear()
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
-        if (!m_rdevice_alive) return false;
+        if (!m_rdevice_alive)
+            return false;
 
         rsync::later([](void *t_api) {
             auto api = static_cast<HttpgdApi *>(t_api);
@@ -66,7 +69,8 @@ namespace httpgd
     void HttpgdApiAsyncWatcher::api_render(int index, double width, double height)
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
-        if (!m_rdevice_alive) return;
+        if (!m_rdevice_alive)
+            return;
 
         auto dat = new AsyncApiCallIndexSizeData{
             m_rdevice,
@@ -112,6 +116,28 @@ namespace httpgd
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
         m_rdevice_alive = false;
+    }
+
+    void HttpgdApiAsyncWatcher::add_listener(std::weak_ptr<PlotChangedEventListener> t_listener)
+    {
+        m_changelisteners.push_back(t_listener);
+    }
+    void HttpgdApiAsyncWatcher::call_listeners(int upid)
+    {
+        auto i = m_changelisteners.begin();
+        while (i != m_changelisteners.end())
+        {
+            if (i->expired())
+            {
+                i = m_changelisteners.erase(i);
+                continue;
+            }
+            if (auto lis = i->lock())
+            { 
+                lis->plot_changed(upid);
+            }
+            ++i;
+        }
     }
 
 } // namespace httpgd

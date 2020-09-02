@@ -5,7 +5,7 @@
 
 namespace httpgd
 {
-    namespace http
+    namespace web
     {
         // This should be replaced with the URI class in boost/networking
         // https://cpp-netlib.org/0.10.1/in_depth/uri.html

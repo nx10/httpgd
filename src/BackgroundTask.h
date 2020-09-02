@@ -1,4 +1,7 @@
 
+#ifndef HTTPGD_RSYNC_BACKGROUNDTASK_H
+#define HTTPGD_RSYNC_BACKGROUNDTASK_H
+
 #include <thread>
 
 namespace httpgd
@@ -40,3 +43,5 @@ namespace httpgd
         };
     } // namespace rsync
 } // namespace httpgd
+
+#endif

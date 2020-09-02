@@ -71,7 +71,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
          aliases});
 
     httpgd::HttpgdDev::make_device("httpgd", dev);
-    dev->start_server();
+    dev->server_start();
 
     return true;
 }
@@ -111,7 +111,7 @@ Rcpp::List httpgd_state_(int devnum)
 
     return Rcpp::List::create(
         Rcpp::Named("host") = svr_config->host,
-        Rcpp::Named("port") = dev->server_await_port(),
+        Rcpp::Named("port") = dev->server_port(),
         Rcpp::Named("token") = svr_config->token,
         Rcpp::Named("hsize") = dev->api_page_count(),
         Rcpp::Named("upid") = dev->api_upid(),

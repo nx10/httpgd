@@ -44,7 +44,7 @@ namespace httpgd
         m_api_async_watcher = std::make_shared<HttpgdApiAsyncWatcher>(this, m_svr_config, m_data_store);
 
         // setup http server
-        m_svr_task = std::make_shared<http::HttpgdHttpTask>(m_api_async_watcher);
+        m_server = std::make_shared<web::WebServer>(1, m_api_async_watcher);
     }
     HttpgdDev::~HttpgdDev()
     {
@@ -68,13 +68,10 @@ namespace httpgd
 
     void HttpgdDev::dev_mode(int mode, pDevDesc dd)
     {
-        /*if (!server.replaying) {
-            if (start_draw) {
-                rsync::lock();
-            } else {
-                rsync::unlock();
-            }
-        }*/
+        if (mode == 0)
+        {
+            m_api_async_watcher->call_listeners(1234);
+        }
     }
 
     void HttpgdDev::dev_close(pDevDesc dd)
@@ -92,7 +89,7 @@ namespace httpgd
         m_target.set_newest_index(-1);
 
         // shutdown http server
-        shutdown_server();
+        server_stop();
 
         // cleanup r session data
         m_history.clear();
@@ -334,17 +331,17 @@ namespace httpgd
         m_data_store->svg(buf, index);
     }
 
-    void HttpgdDev::start_server()
+    void HttpgdDev::server_start()
     {
-        m_svr_task->begin();
+        m_server->start();
     }
-    void HttpgdDev::shutdown_server()
+    void HttpgdDev::server_stop()
     {
-        m_svr_task->stop();
+        m_server->stop();
     }
-    int HttpgdDev::server_await_port()
+    unsigned short HttpgdDev::server_port() const
     {
-        return m_svr_task->await_port();
+        return m_server->port;
     }
 
     std::shared_ptr<HttpgdServerConfig> HttpgdDev::api_server_config()

@@ -11,7 +11,7 @@
 #include "HttpgdServerConfig.h"
 #include "HttpgdDataStore.h"
 #include "HttpgdApiAsyncWatcher.h"
-#include "HttpgdHttpTask.h"
+#include "HttpgdWebTask.h"
 
 #include "PlotHistory.h"
 
@@ -56,9 +56,9 @@ namespace httpgd
         virtual ~HttpgdDev();
 
         // http server
-        void start_server();
-        void shutdown_server();
-        int server_await_port();
+        void server_start();
+        void server_stop();
+        unsigned short server_port() const;
 
         // API functions
 
@@ -102,7 +102,8 @@ namespace httpgd
         std::shared_ptr<HttpgdServerConfig> m_svr_config;
         std::shared_ptr<HttpgdDataStore> m_data_store;
         std::shared_ptr<HttpgdApiAsyncWatcher> m_api_async_watcher;
-        std::shared_ptr<http::HttpgdHttpTask> m_svr_task;
+        
+        std::shared_ptr<web::WebServer> m_server;
 
         bool replaying{false}; // Is the device replaying
         DeviceTarget m_target;

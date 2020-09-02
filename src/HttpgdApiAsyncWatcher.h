@@ -4,16 +4,26 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <functional>
+#include <vector>
 #include "HttpgdApi.h"
 #include "HttpgdServerConfig.h"
 #include "HttpgdDataStore.h"
 
 namespace httpgd
 {
+    class PlotChangedEventListener
+    {
+    public:
+        virtual void plot_changed(int upid) = 0;
+    };
+
     class HttpgdApiAsyncWatcher : public HttpgdApi
     {
 
     public:
+        std::function<void ()> broadcast_notify_change;
+
         HttpgdApiAsyncWatcher(HttpgdApi *t_rdevice, std::shared_ptr<HttpgdServerConfig> t_svr_config, std::shared_ptr<HttpgdDataStore> t_data_store);
 
         // Calls that DO synchronize with R
@@ -32,6 +42,9 @@ namespace httpgd
         // this will block when a operation is running in another thread that needs the r device to be alive
         void rdevice_destructing();
 
+        void add_listener(std::weak_ptr<PlotChangedEventListener> t_listener);
+        void call_listeners(int upid);
+
     private:
         HttpgdApi *m_rdevice;
         bool m_rdevice_alive;
@@ -39,6 +52,7 @@ namespace httpgd
         
         std::shared_ptr<HttpgdServerConfig> m_svr_config;
         std::shared_ptr<HttpgdDataStore> m_data_store;
+        std::vector<std::weak_ptr<PlotChangedEventListener>> m_changelisteners;
     };
 } // namespace httpgd
 
