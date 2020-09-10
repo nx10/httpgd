@@ -185,7 +185,7 @@ namespace httpgd
                 if (auto res = readfile(m_app.public_dir() + "/index.html"))
                 {
 
-                    ctx.res.body() = std::move(res.value());
+                    ctx.res.body() = std::move(*res);
                 }
                 else
                 {
@@ -202,7 +202,7 @@ namespace httpgd
                 ctx.res.set("content-type", "application/json");
                 ctx.res.result(OB::Belle::Status::ok);
 
-                ctx.res.body() = std::move(json_make_state(m_watcher));
+                ctx.res.body() = json_make_state(m_watcher);
             });
 
             /*m_app.on_http("/test", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
@@ -278,7 +278,7 @@ namespace httpgd
                     ctx.res.set("content-type", "application/json");
                     ctx.res.result(OB::Belle::Status::ok);
 
-                    ctx.res.body() = std::move(json_make_state(m_watcher));
+                    ctx.res.body() = json_make_state(m_watcher);
                 }
                 else
                 {
@@ -300,7 +300,7 @@ namespace httpgd
                 ctx.res.set("content-type", "application/json");
                 ctx.res.result(OB::Belle::Status::ok);
 
-                ctx.res.body() = std::move(json_make_state(m_watcher));
+                ctx.res.body() = json_make_state(m_watcher);
             });
 
             // set custom error callback
