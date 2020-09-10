@@ -13,10 +13,10 @@ httpgd(
   pointsize = 12,
   system_fonts = list(),
   user_fonts = list(),
-  recording = TRUE,
   cors = FALSE,
   token = TRUE,
-  silent = FALSE
+  silent = FALSE,
+  websockets = TRUE
 )
 }
 \arguments{
@@ -47,8 +47,6 @@ strings containing a path to a font file, or a list containing
 the font alias in the SVG output and \code{file} the path to a
 font file.}
 
-\item{recording}{Should a plot history be recorded.}
-
 \item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
 When set to TRUE, CORS header will be set to "*".}
 
@@ -61,6 +59,8 @@ when it is set to a number. FALSE deactivates the token.}
 
 \item{silent}{When set to FALSE no information will be printed to the 
 console after startup.}
+
+\item{websockets}{Use websockets.}
 }
 \description{
 Initialize httpgd graphics device and start server.

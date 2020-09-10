@@ -4,12 +4,14 @@
 \alias{httpgdURL}
 \title{Returns the url by which a httpgd device is accessible.}
 \usage{
-httpgdURL(endpoint = "live", which = dev.cur())
+httpgdURL(endpoint = "live", which = dev.cur(), websockets = TRUE)
 }
 \arguments{
 \item{endpoint}{API endpoint}
 
 \item{which}{Which device (id)}
+
+\item{websockets}{Use websockets}
 }
 \value{
 URL

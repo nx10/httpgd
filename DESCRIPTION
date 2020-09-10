@@ -26,9 +26,8 @@ LinkingTo: Rcpp,
     systemfonts
 Suggests:
     testthat
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Encoding: UTF-8
 SystemRequirements: 
     C++17,
     libpng
-
