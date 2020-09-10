@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <title>R Plot</title>
 
-  <!--LIVEJSSCIPTTAG-->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <script src="./httpgd.js"></script>
-  <!---->
   <style>
     body {
       margin: 0;
@@ -85,7 +85,7 @@
 
     #overlay {
       position: fixed;
-      display:none;
+      display: none;
       width: 100%;
       height: 100%;
       background-color: rgba(92, 92, 92, 0.685);
@@ -165,13 +165,12 @@
     <img id="drawing"></img>
   </div>
   <script>
+    const sparams = new URL(window.location.href).searchParams;
 
-    // The server injects its state when loading the page here.
-    const SERVER = /*SRVRPARAMS*/{ "host": "127.0.0.1", "port": 8288 }/**/;
-    const httpgdViewer = new HttpgdViewer(
-      SERVER.host,
-      SERVER.port ? SERVER.port : null,
-      SERVER.token ? SERVER.token : null
+    var httpgdViewer = new HttpgdViewer(
+      sparams.has("host") ? sparams.get("host") : window.location.host,
+      sparams.has("token") ? sparams.get("token") : null,
+      sparams.has("ws") ? (sparams.get("ws")!="0") : true
     );
 
     window.onload = function () {

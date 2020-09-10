@@ -44,11 +44,11 @@ namespace httpgd
         m_api_async_watcher = std::make_shared<HttpgdApiAsyncWatcher>(this, m_svr_config, m_data_store);
 
         // setup http server
-        m_server = std::make_shared<web::WebServer>(1, m_api_async_watcher);
+        m_server = std::make_shared<web::WebServer>(m_api_async_watcher);
     }
     HttpgdDev::~HttpgdDev()
     {
-        Rcpp::Rcout << "Httpgd Device destroyed! \n";
+        //Rcpp::Rcout << "Httpgd Device destructed.\n";
     }
 
     // DEVICE CALLBACKS
@@ -68,10 +68,11 @@ namespace httpgd
 
     void HttpgdDev::dev_mode(int mode, pDevDesc dd)
     {
-        if (mode == 0)
-        {
-            m_api_async_watcher->call_listeners(1234);
-        }
+        if (m_target.is_void() || mode == 0)
+            return;
+            
+        m_server->broadcast_upid(m_api_async_watcher->api_upid());
+        //m_api_async_watcher->call_listeners(1234);
     }
 
     void HttpgdDev::dev_close(pDevDesc dd)
@@ -341,7 +342,7 @@ namespace httpgd
     }
     unsigned short HttpgdDev::server_port() const
     {
-        return m_server->port;
+        return m_server->port();
     }
 
     std::shared_ptr<HttpgdServerConfig> HttpgdDev::api_server_config()

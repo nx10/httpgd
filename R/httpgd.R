@@ -21,7 +21,6 @@
 #'   \code{name} and \code{file} elements with \code{name} indicating
 #'   the font alias in the SVG output and \code{file} the path to a
 #'   font file.
-#' @param recording Should a plot history be recorded.
 #' @param cors Toggles Cross-Origin Resource Sharing (CORS) header.
 #'   When set to TRUE, CORS header will be set to "*".
 #' @param token (Optional) security token. When set, all requests
@@ -32,6 +31,7 @@
 #'   when it is set to a number. FALSE deactivates the token.
 #' @param silent When set to FALSE no information will be printed to the 
 #'   console after startup.
+#' @param websockets Use websockets.
 #'
 #' @importFrom systemfonts match_font
 #' @export
@@ -44,10 +44,10 @@ httpgd <-
            pointsize = 12,
            system_fonts = list(),
            user_fonts = list(),
-           recording = TRUE,
            cors = FALSE,
            token = TRUE,
-           silent = FALSE) {
+           silent = FALSE,
+           websockets = TRUE) {
     
     tok <- ""
     if (is.character(token)) {
@@ -59,12 +59,22 @@ httpgd <-
     }
     
     aliases <- validate_aliases(system_fonts, user_fonts)
-    httpgd_(host, port, bg, width, height, pointsize, aliases, recording, cors, tok)
+    httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok)
     if (!silent) {
-      writeLines(paste0("httpgd live server running at:\n  ", httpgdURL()))
+      cat(paste0("httpgd server running at:\n  ", hyperrefstyle(httpgdURL(websockets=websockets))))
     }
   }
 
+#' Adds ANSI escape codes to string if terminal supports it.
+#'
+#' @param str The string to style
+hyperrefstyle <- function(str) {
+  if (grepl("^screen|^xterm|^vt100|color|ansi|cygwin|linux", 
+        Sys.getenv("TERM"), ignore.case = TRUE, perl = TRUE)) {
+          return(paste0("\033[4m\033[34m", str, "\033[39m\033[24m"))
+        }
+  return(str)
+}
 
 #' Returns status information of a httpgd graphics device.
 #'
@@ -143,12 +153,13 @@ httpgdClear <- function(which = dev.cur()) {
 #'
 #' @param endpoint API endpoint
 #' @param which Which device (id)
+#' @param websockets Use websockets
 #'
 #' @return URL
 #'
 #' @importFrom grDevices dev.cur
 #' @export
-httpgdURL <- function(endpoint = "live", which = dev.cur()) {
+httpgdURL <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
   l <- httpgdState(which)
   paste0("http://",
          sub('0.0.0.0', Sys.info()[['nodename']], l$host, fixed = TRUE),
@@ -156,7 +167,8 @@ httpgdURL <- function(endpoint = "live", which = dev.cur()) {
          l$port,
          "/",
          endpoint,
-         ifelse(nchar(l$token) == 0, "", paste0("?token=", l$token)))
+         ifelse(nchar(l$token) == 0, "", paste0("?token=", l$token)),
+         ifelse(nchar(l$token) == 0, ifelse(websockets, "", "?ws=0"), ifelse(websockets, "", "&ws=0")))
 }
 
 #' Opens the url by which a httpgd device is accessible in a browser.

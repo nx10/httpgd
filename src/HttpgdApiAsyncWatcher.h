@@ -42,9 +42,6 @@ namespace httpgd
         // this will block when a operation is running in another thread that needs the r device to be alive
         void rdevice_destructing();
 
-        void add_listener(std::weak_ptr<PlotChangedEventListener> t_listener);
-        void call_listeners(int upid);
-
     private:
         HttpgdApi *m_rdevice;
         bool m_rdevice_alive;
@@ -52,7 +49,6 @@ namespace httpgd
         
         std::shared_ptr<HttpgdServerConfig> m_svr_config;
         std::shared_ptr<HttpgdDataStore> m_data_store;
-        std::vector<std::weak_ptr<PlotChangedEventListener>> m_changelisteners;
     };
 } // namespace httpgd
 

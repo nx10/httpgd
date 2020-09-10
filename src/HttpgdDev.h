@@ -11,7 +11,7 @@
 #include "HttpgdServerConfig.h"
 #include "HttpgdDataStore.h"
 #include "HttpgdApiAsyncWatcher.h"
-#include "HttpgdWebTask.h"
+#include "HttpgdWebServer.h"
 
 #include "PlotHistory.h"
 

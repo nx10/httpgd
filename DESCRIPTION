@@ -29,6 +29,6 @@ Suggests:
 RoxygenNote: 7.1.0
 Encoding: UTF-8
 SystemRequirements: 
-    C++11,
+    C++17,
     libpng
 

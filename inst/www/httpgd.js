@@ -25,7 +25,7 @@ class HttpgdState {
     }
 }
 class HttpgdViewer {
-    constructor(host, port, token) {
+    constructor(host, token, useWebsockets) {
         this.useWebsockets = false;
         this.apiHeaders = new Headers();
         this.pollIntervall = CHECK_INTERVAL;
@@ -39,7 +39,8 @@ class HttpgdViewer {
         this.plotParams = new HttpgdParams();
         this.reloading = false;
         this.image = undefined;
-        this.apiAddress = 'http://' + host + (port ? (':' + port) : '');
+        this.apiAddress = 'http://' + host;
+        this.apiWebsocket = 'ws://' + host;
         this.apiSVG = this.apiAddress + '/svg';
         this.apiState = this.apiAddress + '/state';
         this.apiClear = this.apiAddress + '/clear';
@@ -53,6 +54,7 @@ class HttpgdViewer {
             this.useToken = false;
             this.token = '';
         }
+        this.useWebsockets = (useWebsockets ? useWebsockets : false);
     }
     init(image) {
         if (image) {
@@ -61,7 +63,16 @@ class HttpgdViewer {
             this.image.addEventListener('error', () => this.imageReloaded(false));
         }
         this.resize();
-        this.pollHandle = setInterval(() => this.poll(), this.pollIntervall);
+        if (this.useWebsockets) {
+            this.socket = new WebSocket(this.apiWebsocket);
+            this.socket.onmessage = (ev) => this.onWsMessage(ev.data);
+            this.socket.onopen = () => console.log('ws open');
+            this.socket.onclose = () => console.log('ws close');
+            this.socket.onerror = () => console.log('WS error');
+        }
+        else {
+            this.startPolling();
+        }
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
                 this.reloadImage(true);
@@ -70,6 +81,20 @@ class HttpgdViewer {
         this.notifyIndex();
         this.notifyZoom();
         this.notifyDisconnected();
+    }
+    onWsMessage(message) {
+        if (message.startsWith('u')) {
+            console.log('new upid: ' + message.substring(1));
+            this.poll();
+        }
+    }
+    onWsClose() {
+    }
+    startPolling() {
+        if (this.pollHandle) {
+            clearInterval(this.pollHandle);
+        }
+        this.pollHandle = setInterval(() => this.poll(), this.pollIntervall);
     }
     notifyZoom() {
         if (this.onZoomStringChange) {
@@ -114,6 +139,7 @@ class HttpgdViewer {
             this.params.index = this.state.hsize - (this.params.index == -1 ? 2 : 1);
         }
         this.notifyIndex();
+        this.poll();
     }
     navNext() {
         if (this.params.index >= 0 && this.params.index < this.state.hsize - 1) {
@@ -123,10 +149,12 @@ class HttpgdViewer {
             this.params.index = 0;
         }
         this.notifyIndex();
+        this.poll();
     }
     navNewest() {
         this.params.index = -1;
         this.notifyIndex();
+        this.poll();
     }
     getIndexString() {
         return (this.params.index === -1 ? this.state.hsize : (this.params.index + 1)) + '/' + this.state.hsize;

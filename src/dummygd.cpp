@@ -13,7 +13,7 @@ namespace httpgd
 
         virtual ~devDummy()
         {
-            Rcpp::Rcout << "Device destroyed !!!!\n";
+            Rcpp::Rcout << "Device destructed.\n";
         }
 
     protected:

@@ -24,8 +24,7 @@ namespace httpgd
         : m_rdevice(t_rdevice),
           m_rdevice_alive(true),
           m_svr_config(t_svr_config),
-          m_data_store(t_data_store),
-          m_changelisteners()
+          m_data_store(t_data_store)
     {
     }
 
@@ -116,28 +115,6 @@ namespace httpgd
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
         m_rdevice_alive = false;
-    }
-
-    void HttpgdApiAsyncWatcher::add_listener(std::weak_ptr<PlotChangedEventListener> t_listener)
-    {
-        m_changelisteners.push_back(t_listener);
-    }
-    void HttpgdApiAsyncWatcher::call_listeners(int upid)
-    {
-        auto i = m_changelisteners.begin();
-        while (i != m_changelisteners.end())
-        {
-            if (i->expired())
-            {
-                i = m_changelisteners.erase(i);
-                continue;
-            }
-            if (auto lis = i->lock())
-            { 
-                lis->plot_changed(upid);
-            }
-            ++i;
-        }
     }
 
 } // namespace httpgd

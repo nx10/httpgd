@@ -25,7 +25,9 @@ class HttpgdState {
 
 class HttpgdViewer {
     private useWebsockets: boolean = false;
+    private socket?: WebSocket;
     private apiAddress: string;
+    private apiWebsocket: string;
     private apiSVG: string;
     private apiState: string;
     private apiRemove: string;
@@ -59,8 +61,9 @@ class HttpgdViewer {
     public onIndexStringChange?: (indexString: string) => void;
     public onZoomStringChange?: (zoomString: string) => void;
 
-    public constructor(host: string, port?: string, token?: string) {
-        this.apiAddress = 'http://' + host + (port ? (':' + port) : '');
+    public constructor(host: string, token?: string, useWebsockets?: boolean) {
+        this.apiAddress = 'http://' + host;
+        this.apiWebsocket = 'ws://' + host;
         this.apiSVG = this.apiAddress + '/svg';
         this.apiState = this.apiAddress + '/state';
         this.apiClear = this.apiAddress + '/clear';
@@ -73,9 +76,10 @@ class HttpgdViewer {
             this.useToken = false;
             this.token = '';
         }
+        this.useWebsockets = (useWebsockets ? useWebsockets : false);
     }
 
-    public init(image?: HTMLImageElement) {
+    public init(image?: HTMLImageElement): void {
         if (image) {
             this.image = image;
             this.image.addEventListener('load', () => this.imageReloaded(true));
@@ -83,7 +87,16 @@ class HttpgdViewer {
         }
 
         this.resize();
-        this.pollHandle = setInterval(() => this.poll(), this.pollIntervall);
+
+        if (this.useWebsockets) {
+            this.socket = new WebSocket(this.apiWebsocket);
+            this.socket.onmessage = (ev) => this.onWsMessage(ev.data);
+            this.socket.onopen = () => console.log('ws open');
+            this.socket.onclose = () => console.log('ws close');
+            this.socket.onerror = () => console.log('WS error');
+        } else {
+            this.startPolling();
+        }
 
         // Force reload on visibility change
         // Firefox otherwise shows a blank screen on tab change 
@@ -96,6 +109,23 @@ class HttpgdViewer {
         this.notifyIndex();
         this.notifyZoom();
         this.notifyDisconnected();
+    }
+
+    private onWsMessage(message: string): void {
+        if (message.startsWith('u')) {
+            console.log('new upid: ' + message.substring(1));
+            this.poll();
+        }
+    }
+    private onWsClose(): void {
+        
+    }
+
+    private startPolling(): void {
+        if (this.pollHandle) {
+            clearInterval(this.pollHandle);
+        }
+        this.pollHandle = setInterval(() => this.poll(), this.pollIntervall);
     }
 
     // callbacks
@@ -143,6 +173,7 @@ class HttpgdViewer {
             this.params.index = this.state.hsize - (this.params.index == -1 ? 2 : 1);
         }
         this.notifyIndex();
+        this.poll();
     }
     public navNext(): void {
         if (this.params.index >= 0 && this.params.index < this.state.hsize - 1) {
@@ -151,10 +182,12 @@ class HttpgdViewer {
             this.params.index = 0;
         }
         this.notifyIndex();
+        this.poll();
     }
     public navNewest(): void {
         this.params.index = -1;
         this.notifyIndex();
+        this.poll();
     }
     public getIndexString(): string {
         return (this.params.index === -1 ? this.state.hsize : (this.params.index + 1)) + '/' + this.state.hsize;
