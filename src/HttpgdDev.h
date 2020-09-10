@@ -79,23 +79,23 @@ namespace httpgd
     protected:
         // Device callbacks
 
-        virtual void dev_activate(pDevDesc dd);
-        virtual void dev_deactivate(pDevDesc dd);
-        virtual void dev_close(pDevDesc dd);
-        virtual void dev_clip(double x0, double x1, double y0, double y1, pDevDesc dd);
-        virtual void dev_size(double *left, double *right, double *bottom, double *top, pDevDesc dd);
-        virtual void dev_newPage(pGEcontext gc, pDevDesc dd);
-        virtual void dev_line(double x1, double y1, double x2, double y2, pGEcontext gc, pDevDesc dd);
-        virtual void dev_text(double x, double y, const char *str, double rot, double hadj, pGEcontext gc, pDevDesc dd);
-        virtual double dev_strWidth(const char *str, pGEcontext gc, pDevDesc dd);
-        virtual void dev_rect(double x0, double y0, double x1, double y1, pGEcontext gc, pDevDesc dd);
-        virtual void dev_circle(double x, double y, double r, pGEcontext gc, pDevDesc dd);
-        virtual void dev_polygon(int n, double *x, double *y, pGEcontext gc, pDevDesc dd);
-        virtual void dev_polyline(int n, double *x, double *y, pGEcontext gc, pDevDesc dd);
-        virtual void dev_path(double *x, double *y, int npoly, int *nper, Rboolean winding, pGEcontext gc, pDevDesc dd);
-        virtual void dev_mode(int mode, pDevDesc dd);
-        virtual void dev_metricInfo(int c, pGEcontext gc, double *ascent, double *descent, double *width, pDevDesc dd);
-        virtual void dev_raster(unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd);
+        virtual void dev_activate(pDevDesc dd) override;
+        virtual void dev_deactivate(pDevDesc dd) override;
+        virtual void dev_close(pDevDesc dd) override;
+        virtual void dev_clip(double x0, double x1, double y0, double y1, pDevDesc dd) override;
+        virtual void dev_size(double *left, double *right, double *bottom, double *top, pDevDesc dd) override;
+        virtual void dev_newPage(pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_line(double x1, double y1, double x2, double y2, pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_text(double x, double y, const char *str, double rot, double hadj, pGEcontext gc, pDevDesc dd) override;
+        virtual double dev_strWidth(const char *str, pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_rect(double x0, double y0, double x1, double y1, pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_circle(double x, double y, double r, pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_polygon(int n, double *x, double *y, pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_polyline(int n, double *x, double *y, pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_path(double *x, double *y, int npoly, int *nper, Rboolean winding, pGEcontext gc, pDevDesc dd) override;
+        virtual void dev_mode(int mode, pDevDesc dd) override;
+        virtual void dev_metricInfo(int c, pGEcontext gc, double *ascent, double *descent, double *width, pDevDesc dd) override;
+        virtual void dev_raster(unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd) override;
 
     private:
         PlotHistory m_history;
