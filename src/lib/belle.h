@@ -762,7 +762,7 @@ inline std::string mime_type(std::string const& path)
 {
   if (auto ext = Detail::extension(path))
   {
-    auto const str = Detail::lowercase(ext.value());
+    auto const str = Detail::lowercase(*ext);
 
     if (mime_types.find(str) != mime_types.end())
     {
@@ -1245,7 +1245,7 @@ private:
         {
           for (auto const& e : _attr->http_headers)
           {
-            res.insert(e.name_string(), e.value());
+            res.insert(e.name_string(), *e);
           }
         },
         net::bind_executor(_strand,
