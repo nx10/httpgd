@@ -1245,7 +1245,7 @@ private:
         {
           for (auto const& e : _attr->http_headers)
           {
-            res.insert(e.name_string(), *e);
+            res.insert(e.name_string(), e.value());
           }
         },
         net::bind_executor(_strand,
