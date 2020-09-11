@@ -59,9 +59,13 @@ httpgd <-
     }
     
     aliases <- validate_aliases(system_fonts, user_fonts)
-    httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok)
-    if (!silent) {
-      cat(paste0("httpgd server running at:\n  ", hyperrefstyle(httpgdURL(websockets=websockets))))
+    if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok)) {
+      if (!silent) {
+        cat(paste0("httpgd server running at:\n  ", hyperrefstyle(httpgdURL(websockets=websockets))))
+      }
+    } else {
+      httpgdCloseServer()
+      stop("Failed to start server. (Port might be in use.)")
     }
   }
 

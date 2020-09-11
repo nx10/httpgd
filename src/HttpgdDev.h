@@ -56,7 +56,7 @@ namespace httpgd
         virtual ~HttpgdDev();
 
         // http server
-        void server_start();
+        bool server_start();
         void server_stop();
         unsigned short server_port() const;
 

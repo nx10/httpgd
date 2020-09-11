@@ -72,9 +72,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
          aliases});
 
     httpgd::HttpgdDev::make_device("httpgd", dev);
-    dev->server_start();
-
-    return true;
+    return dev->server_start();
 }
 
 inline httpgd::HttpgdDev *validate_httpgddev(int devnum)

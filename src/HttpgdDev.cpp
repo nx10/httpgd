@@ -331,9 +331,9 @@ namespace httpgd
         m_data_store->svg(buf, index);
     }
 
-    void HttpgdDev::server_start()
+    bool HttpgdDev::server_start()
     {
-        m_server->start();
+        return m_server->start();
     }
     void HttpgdDev::server_stop()
     {
