@@ -152,7 +152,7 @@ class HttpgdViewer {
 
     // User interaction
     public zoomIn(): void {
-        if (this.scale - SCALE_STEP > 0) {
+        if (this.scale - SCALE_STEP > 0.05) {
             this.scale -= SCALE_STEP;
         }
         this.notifyZoom();
