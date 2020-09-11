@@ -30,14 +30,6 @@ namespace httpgd
         return std::string(res[0]);
     }
 
-    std::string read_txt(const std::string &filepath)
-    {
-        std::ifstream t(filepath);
-        std::stringstream buffer;
-        buffer << t.rdbuf();
-        return buffer.str();
-    }
-
     inline HttpgdDev *getDev(pDevDesc dd)
     {
         return static_cast<HttpgdDev *>(dd->deviceSpecific);

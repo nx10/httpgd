@@ -7,7 +7,7 @@ namespace httpgd
 {
     namespace web
     {
-        std::optional<std::string> readfile(std::string const &str)
+        /*std::optional<std::string> readfile(std::string const &str)
         {
             std::ifstream file{str};
 
@@ -23,6 +23,14 @@ namespace httpgd
             file.read(&content[0], static_cast<std::streamsize>(size));
 
             return content;
+        }*/
+        
+        std::string read_txt(const std::string &filepath)
+        {
+            std::ifstream t(filepath);
+            std::stringstream buffer;
+            buffer << t.rdbuf();
+            return buffer.str();
         }
 
         inline bool trystod(const std::string &parse, double *out)
@@ -159,7 +167,8 @@ namespace httpgd
                 ctx.res.result(OB::Belle::Status::ok);
 
                 // send the file contents
-                if (auto res = readfile(m_app.public_dir() + "/index.html"))
+                ctx.res.body() = read_txt(m_app.public_dir() + "/index.html");
+                /*if (auto res = readfile(m_app.public_dir() + "/index.html"))
                 {
 
                     ctx.res.body() = std::move(*res);
@@ -167,7 +176,7 @@ namespace httpgd
                 else
                 {
                     throw 404;
-                }
+                }*/
             });
 
             m_app.on_http("/state", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
