@@ -184,13 +184,38 @@ class HttpgdViewer {
             this.compareRemote(remoteState);
         });
     }
-    downloadPlot(filename) {
+    downloadURL(url, filename) {
         const dl = document.createElement('a');
-        dl.href = this.svgURL(this.plotParams, this.state);
-        dl.download = filename ? filename : 'plot.svg';
+        dl.href = url;
+        if (filename) {
+            dl.download = filename;
+        }
         document.body.appendChild(dl);
         dl.click();
         document.body.removeChild(dl);
+    }
+    downloadPlot(filename) {
+        this.downloadURL(this.svgURL(this.plotParams, this.state), filename ? filename : 'plot.svg');
+    }
+    downloadPlotPNG() {
+        const canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
+        canvas.width = this.plotParams.width;
+        canvas.height = this.plotParams.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx)
+            return;
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+            var imgURI = canvas
+                .toDataURL('image/png')
+                .replace('image/png', 'image/octet-stream');
+            this.downloadURL(imgURI, 'plot.png');
+        };
+        img.src = this.svgURL(this.plotParams, this.state);
+        document.body.removeChild(canvas);
     }
     resize() {
         if (this.image) {
