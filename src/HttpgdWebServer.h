@@ -21,7 +21,7 @@ namespace httpgd
             bool start();
             void stop();
             unsigned short port();
-            void broadcast_upid(int upid);
+            void broadcast_upid();
 
         private:
             std::shared_ptr<HttpgdApiAsyncWatcher> m_watcher;

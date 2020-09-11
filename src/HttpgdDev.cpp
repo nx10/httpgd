@@ -71,8 +71,7 @@ namespace httpgd
         if (m_target.is_void() || mode == 0)
             return;
             
-        m_server->broadcast_upid(m_api_async_watcher->api_upid());
-        //m_api_async_watcher->call_listeners(1234);
+        m_server->broadcast_upid();
     }
 
     void HttpgdDev::dev_close(pDevDesc dd)

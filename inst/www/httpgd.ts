@@ -91,9 +91,9 @@ class HttpgdViewer {
         if (this.useWebsockets) {
             this.socket = new WebSocket(this.apiWebsocket);
             this.socket.onmessage = (ev) => this.onWsMessage(ev.data);
-            this.socket.onopen = () => console.log('ws open');
-            this.socket.onclose = () => console.log('ws close');
-            this.socket.onerror = () => console.log('WS error');
+            this.socket.onopen = () => this.onWsOpen();
+            this.socket.onclose = () => this.onWsClose();
+            this.socket.onerror = () => console.log('Websocket error');
         } else {
             this.startPolling();
         }
@@ -112,13 +112,18 @@ class HttpgdViewer {
     }
 
     private onWsMessage(message: string): void {
-        if (message.startsWith('u')) {
-            console.log('new upid: ' + message.substring(1));
-            this.poll();
+        if (message.startsWith('{')) {
+            const remoteState = JSON.parse(message);
+            this.compareRemote(remoteState);
         }
     }
     private onWsClose(): void {
-        
+        console.log('Websocket closed');
+        this.setDisconnected(true);
+    }
+    private onWsOpen(): void {
+        console.log('Websocket opened');
+        this.setDisconnected(true);
     }
 
     private startPolling(): void {

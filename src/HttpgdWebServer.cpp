@@ -50,36 +50,13 @@ namespace httpgd
             }
         }
 
-        inline void json_state(std::string *buf, std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
-        {
-            buf->append("\"upid\": ").append(std::to_string(t_watcher->api_upid()));
-            buf->append(", \"hsize\": ").append(std::to_string(t_watcher->api_page_count()));
-        }
-        inline void json_state(std::string *buf, std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher, std::string host)
-        {
-            json_state(buf, t_watcher);
-            buf->append(", \"host\": \"").append(host).append("\"");
-            auto config = t_watcher->api_server_config();
-            if (config->use_token)
-            {
-                buf->append(", \"token\": \"").append(config->token).append("\"");
-            }
-        }
         inline std::string json_make_state(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
         {
             std::string buf;
             buf.reserve(200);
             buf.append("{ ");
-            json_state(&buf, t_watcher);
-            buf.append(" }");
-            return buf;
-        }
-        inline std::string json_make_state_full(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher, std::string host)
-        {
-            std::string buf;
-            buf.reserve(200);
-            buf.append("{ ");
-            json_state(&buf, t_watcher, host);
+            buf.append("\"upid\": ").append(std::to_string(t_watcher->api_upid()));
+            buf.append(", \"hsize\": ").append(std::to_string(t_watcher->api_page_count()));
             buf.append(" }");
             return buf;
         }
@@ -348,11 +325,12 @@ namespace httpgd
             }
         }
 
-        void WebServer::broadcast_upid(int upid)
+        void WebServer::broadcast_upid()
         {
+            int upid = m_watcher->api_upid();
             if (upid != m_last_upid)
             {
-                m_app.channels().at("/").broadcast("u" + std::to_string(upid));
+                m_app.channels().at("/").broadcast(json_make_state(m_watcher));
                 m_last_upid = upid;
             }
         }
