@@ -59,11 +59,11 @@ namespace httpgd
         class Text : public DrawCall
         {
         public:
-            Text(const void *gc, double x, double y, const std::string &str, double rot, double hadj, const TextInfo &t_text);
+            Text(const void *gc, double x, double y, const std::string &str, double rot, double /*hadj*/, const TextInfo &t_text);
             void build_svg(std::string *buf) const;
 
         private:
-            double m_x, m_y, m_rot, m_hadj;
+            double m_x, m_y, m_rot/*, m_hadj*/;
             std::string m_str;
             TextInfo m_text;
         };

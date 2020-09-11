@@ -189,9 +189,9 @@ namespace httpgd
             buf->append("\" ");
         }
 
-        Text::Text(const void *gc, double x, double y, const std::string &str, double rot, double hadj, const TextInfo &t_text)
+        Text::Text(const void *gc, double x, double y, const std::string &str, double rot, double /*hadj*/, const TextInfo &t_text)
             : DrawCall(gc),
-              m_x(x), m_y(y), m_rot(rot), m_hadj(hadj), m_str(str), m_text(t_text)
+              m_x(x), m_y(y), m_rot(rot), /*m_hadj(hadj),*/ m_str(str), m_text(t_text)
         {
         }
         void Text::build_svg(std::string *buf) const

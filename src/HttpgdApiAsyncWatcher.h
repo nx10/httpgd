@@ -25,6 +25,7 @@ namespace httpgd
         std::function<void ()> broadcast_notify_change;
 
         HttpgdApiAsyncWatcher(HttpgdApi *t_rdevice, std::shared_ptr<HttpgdServerConfig> t_svr_config, std::shared_ptr<HttpgdDataStore> t_data_store);
+        virtual ~HttpgdApiAsyncWatcher() = default; 
 
         // Calls that DO synchronize with R
         void api_render(int index, double width, double height) override;
