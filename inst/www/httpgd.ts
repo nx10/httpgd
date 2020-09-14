@@ -202,7 +202,6 @@ class HttpgdViewer {
             headers: this.apiHeaders
         }).then(res => res.json())
             .then((remoteState: HttpgdState) => {
-                // todo clear image (?)
                 if (this.reloading) return;
                 this.compareRemote(remoteState);
             });
@@ -212,8 +211,7 @@ class HttpgdViewer {
             headers: this.apiHeaders
         }).then(res => res.json())
             .then((remoteState: HttpgdState) => {
-                this.params.index = Math.min(-1, this.params.index - 1);
-                // todo: refresh image
+                this.params.index = Math.max(-1, this.params.index - 1);
                 this.compareRemote(remoteState);
             });
     }

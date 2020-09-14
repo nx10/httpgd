@@ -180,7 +180,7 @@ class HttpgdViewer {
             headers: this.apiHeaders
         }).then(res => res.json())
             .then((remoteState) => {
-            this.params.index = Math.min(-1, this.params.index - 1);
+            this.params.index = Math.max(-1, this.params.index - 1);
             this.compareRemote(remoteState);
         });
     }
