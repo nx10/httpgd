@@ -1,11 +1,12 @@
-CXX_STD = CXX11
+CXX_STD = CXX17
 
 RWINLIB = ../windows/baselibs-3.5.0
 
-PKG_CPPFLAGS = -I${RWINLIB}/include \
-	-DSTRICT_R_HEADERS
+PKG_CPPFLAGS = -Ilib -I${RWINLIB}/include \
+	-DSTRICT_R_HEADERS \
+	-DBOOST_NO_AUTO_PTR
 
-PKG_LIBS = -L${RWINLIB}/lib${R_ARCH} -lpng -lz -lWs2_32 -lMswsock -lAdvApi32
+PKG_LIBS = -L${RWINLIB}/lib${R_ARCH} -lpng -lz -lWs2_32 -lwsock32
 
 all: clean winlibs
 

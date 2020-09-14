@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include <Rcpp.h>
-#include <R_ext/GraphicsEngine.h>
+//#include <R_ext/GraphicsEngine.h>
 
 #include "lib/svglite_utils.h"
 
@@ -190,9 +190,9 @@ namespace httpgd
             buf->append("\" ");
         }
 
-        Text::Text(const void *gc, double x, double y, const std::string &str, double rot, double hadj, const TextInfo &t_text)
+        Text::Text(const void *gc, double x, double y, const std::string &str, double rot, double /*hadj*/, const TextInfo &t_text)
             : DrawCall(gc),
-              m_x(x), m_y(y), m_rot(rot), m_hadj(hadj), m_str(str), m_text(t_text)
+              m_x(x), m_y(y), m_rot(rot), /*m_hadj(hadj),*/ m_str(str), m_text(t_text)
         {
         }
         void Text::build_svg(std::string *buf) const
@@ -201,7 +201,7 @@ namespace httpgd
             // affects the clip path, so we need to specify clip path at an outer level
             // (according to svglite)
             svg_elem(buf, "g");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             buf->append(">");
 
             svg_elem(buf, "text");
@@ -244,7 +244,7 @@ namespace httpgd
         void Circle::build_svg(std::string *buf) const
         {
             svg_elem(buf, "circle");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             svg_field(buf, "cx", m_x);
             svg_field(buf, "cy", m_y);
             svg_field(buf, "r", m_r);
@@ -269,7 +269,7 @@ namespace httpgd
         void Line::build_svg(std::string *buf) const
         {
             svg_elem(buf, "line");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             svg_field(buf, "x1", m_x1);
             svg_field(buf, "y1", m_y1);
             svg_field(buf, "x2", m_x2);
@@ -289,7 +289,7 @@ namespace httpgd
         void Rect::build_svg(std::string *buf) const
         {
             svg_elem(buf, "rect");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             svg_field(buf, "x", std::min(m_x0, m_x1));
             svg_field(buf, "y", std::min(m_y0, m_y1));
             svg_field(buf, "width", std::abs(m_x0 - m_x1));
@@ -309,7 +309,7 @@ namespace httpgd
         void Polyline::build_svg(std::string *buf) const
         {
             svg_elem(buf, "polyline");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             std::string pts = "";
             for (int i = 0; i < m_n; i++)
             {
@@ -331,7 +331,7 @@ namespace httpgd
         void Polygon::build_svg(std::string *buf) const
         {
             svg_elem(buf, "polygon");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             std::string pts = "";
             for (int i = 0; i < m_n; i++)
             {
@@ -353,7 +353,7 @@ namespace httpgd
         void Path::build_svg(std::string *buf) const
         {
             svg_elem(buf, "path");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             // Create path data
             buf->append("d=\"");
             int ind = 0;
@@ -424,7 +424,7 @@ namespace httpgd
             // affects the clip path, so we need to specify clip path at an outer level
             // (according to svglite)
             svg_elem(buf, "g");
-            m_clip->build_svg_attr(buf);
+            Clip::build_svg_attr(buf, m_clip_id);
             buf->append(">");
 
             svg_elem(buf, "image");
@@ -464,6 +464,10 @@ namespace httpgd
                    std::abs(y0 - m_y0) < CLIP_EPSILON &&
                    std::abs(y1 - m_y1) < CLIP_EPSILON;
         }
+        int Clip::id() const
+        {
+            return m_id;
+        }
         void Clip::build_svg_def(std::string *buf) const
         {
             buf->append("<clipPath id=\"cp").append(std::to_string(m_id)).append("\">");
@@ -473,9 +477,9 @@ namespace httpgd
             buf->append("\" height=\"").append(std::to_string(std::abs(m_y1 - m_y0)));
             buf->append("\" /></clipPath>");
         }
-        void Clip::build_svg_attr(std::string *buf) const
+        void Clip::build_svg_attr(std::string *buf, int id)
         {
-            buf->append("clip-path=\"url(#cp").append(std::to_string(m_id)).append(")\" ");
+            buf->append("clip-path=\"url(#cp").append(std::to_string(id)).append(")\" ");
         }
 
         Page::Page(double t_width, double t_height)
@@ -486,16 +490,17 @@ namespace httpgd
 
         void Page::clip(double x0, double x1, double y0, double y1)
         {
-            if (m_cps.size() == 0 || !m_cps.back().equals(x0, x1, y0, y1))
+            auto cps_count = m_cps.size();
+            if (cps_count == 0 || !m_cps.back().equals(x0, x1, y0, y1))
             {
-                m_cps.emplace_back(Clip(m_cps.size(), x0, x1, y0, y1));
+                m_cps.emplace_back(Clip(cps_count, x0, x1, y0, y1));
             }
         }
 
         void Page::put(std::shared_ptr<DrawCall> dc)
         {
             m_dcs.emplace_back(dc);
-            dc->m_clip = &m_cps.back();
+            dc->m_clip_id = m_cps.back().id();
         }
 
         void Page::clear()

@@ -7,3 +7,5 @@
 ^.git$
 ^LICENSE$
 ^windows$
+^.*\.ts$
+^.*tsconfig.json$

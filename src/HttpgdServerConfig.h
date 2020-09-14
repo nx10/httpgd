@@ -10,7 +10,7 @@ namespace httpgd
     {
         std::string host;
         int port;
-        std::string livehtml;
+        std::string wwwpath;
         bool cors;
         bool use_token;
         std::string token;

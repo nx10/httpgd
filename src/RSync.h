@@ -5,8 +5,8 @@ namespace httpgd
 {
     namespace rsync
     {
-        void lock();
-        void unlock();
+        //void lock();
+        //void unlock();
         void later(void (*func)(void *), void *data, double secs);
         void awaitLater();
     } // namespace rsync

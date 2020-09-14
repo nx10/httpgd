@@ -1,6 +1,6 @@
 # R API
 
-[httpgd](../README.md) can be called both from R and from [HTTP](HttpApi.md).
+[httpgd](../README.md) can be accessed both from R and from [HTTP](HttpApi.md).
 
 ## Render SVG
 
@@ -41,3 +41,20 @@ $upid
 ```
 `hsize` is the number of pages in the plot history.
 `upid` is the update id. It changes when a the data store receives new information.
+
+## Security
+
+A security token can be set when starting the device:
+
+```R
+httpgd(..., token = "secret")
+```
+
+When set, each API request has to include this token inside the header `X-HTTPGD-TOKEN` or as a query param `?token=secret`.
+`token` is by default set to `TRUE` to generate a random 8 character alphanumeric token. If it is set to a number, a random token of that length will be generated. `FALSE` deactivates the security token.
+
+CORS is off by default but can be enabled on startup:
+
+```R
+httpgd(..., cors = TRUE)
+```
