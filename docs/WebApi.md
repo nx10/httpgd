@@ -1,8 +1,8 @@
-# Http API
+# Web API
 
-[httpgd](../README.md) can be called both from [R](RApi.md) and from HTTP.
+[httpgd](../README.md) can be accessed both from [R](RApi.md) and from HTTP/websockets.
 
-## API endpoints
+## HTTP API endpoints
 
 | Endpoint  | Method | Description |
 |-----------|--------|-------------|
@@ -17,19 +17,34 @@
 
 A query looks like this:
 
-`http://[host]:[port]/svg?width=400&height=300`
+```
+http://[host]:[port]/svg?width=400&height=300
+```
 
 | Key      | Value | 
 |----------|-------|
 | `width`  | With in pixels. |
 | `height` | Height in pixels. |
 | `index`  | Plot history index. If omitted, the newest plot will be returned. |
-| `token`  | If security tokens are used this should be equal to the previously secret token. |
+| `token`  | If enabled, security tokens need to be attached to every request. (The `X-HTTPGD-TOKEN` header can be set alternatively.) |
 
 ### Server state
 
+The server state will be returned as JSON.
+
+Example:
+
+```JSON
+{ "upid": 1234, "hsize": 12 }
+```
+
 | Field        | Type     | Description |
 |--------------|----------|-------------|
-| `upid`       | `int`    | Update id. It changes when a the data store receives new information. |
-| `hrecording` | `bool`   | Whether the graphics device is recording a plot history. |
+| `upid`       | `int`    | Update id. Changes when the data store receives new information. |
 | `hsize`      | `int`    | Number of plot history entries. |
+
+## Websockets
+
+httpgd accepts websocket connections on the same port as the HTTP server. [Server state](#Server-state) changes will be broadcasted immediately to all connected clients in JSON format. 
+
+If websockets are unavailable we recommend to detect state changes via polling `GET` `/state`.
