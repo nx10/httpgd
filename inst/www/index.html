@@ -114,23 +114,23 @@
     <div id="toolbar">
       <div id="tb-tools">
         <span>
-          <a title="Previous" id="tb-left"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Previous (&larr;)" id="tb-left"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" /></svg></a>
-          <a title="Newest" id="tb-pnum"></a>
-          <a title="Next" id="tb-right"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Newest (N)" id="tb-pnum"></a>
+          <a title="Next (&rarr;)" id="tb-right"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" /></svg></a>
           <!--
         --></span>
         <span>
-          <a title="Zoom out" id="tb-minus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Zoom out (-)" id="tb-minus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0V0z" fill="none" />
               <path
                 d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z" />
             </svg></a>
-          <a title="Reset zoom" id="tb-zlvl"></a>
-          <a title="Zoom in" id="tb-plus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Reset zoom (0)" id="tb-zlvl"></a>
+          <a title="Zoom in (+)" id="tb-plus"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0V0z" fill="none" />
               <path
                 d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
@@ -138,7 +138,7 @@
           <!--
         --></span>
         <span>
-          <a title="Download" id="tb-save"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Download SVG (S)" id="tb-save-svg"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path
                 d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z" />
@@ -146,13 +146,21 @@
           <!--
         --></span>
         <span>
-          <a title="Delete plot" id="tb-remove"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Download PNG (P)" id="tb-save-png"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" />
+            </svg></a>
+          <!--
+        --></span>
+        <span>
+          <a title="Delete plot (D)" id="tb-remove"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" /></svg></a>
           <!--
         --></span>
         <span>
-          <a title="Clear all plots" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Clear all plots (C)" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M0 0h24v24H0V0z" fill="none" />
               <path
@@ -170,7 +178,7 @@
     var httpgdViewer = new HttpgdViewer(
       sparams.has("host") ? sparams.get("host") : window.location.host,
       sparams.has("token") ? sparams.get("token") : null,
-      sparams.has("ws") ? (sparams.get("ws")!="0") : true
+      sparams.has("ws") ? (sparams.get("ws") != "0") : true
     );
 
     window.onload = function () {
@@ -191,7 +199,8 @@
       document.getElementById("tb-left").onclick = () => httpgdViewer.navPrevious();
       document.getElementById("tb-right").onclick = () => httpgdViewer.navNext();
       document.getElementById("tb-pnum").onclick = () => httpgdViewer.navNewest();
-      document.getElementById("tb-save").onclick = () => httpgdViewer.downloadPlot();
+      document.getElementById("tb-save-svg").onclick = () => httpgdViewer.downloadPlot();
+      document.getElementById("tb-save-png").onclick = () => httpgdViewer.downloadPlotPNG();
       document.getElementById("tb-plus").onclick = () => httpgdViewer.zoomIn();
       document.getElementById("tb-minus").onclick = () => httpgdViewer.zoomOut();
       document.getElementById("tb-zlvl").onclick = () => httpgdViewer.zoomReset();
@@ -208,6 +217,10 @@
           fun: () => httpgdViewer.navNext()
         },
         {
+          keys: [78],
+          fun: () => httpgdViewer.navNewest()
+        },
+        {
           keys: [187],
           fun: () => httpgdViewer.zoomIn()
         },
@@ -216,17 +229,19 @@
           fun: () => httpgdViewer.zoomOut()
         },
         {
-          keys: [46],
+          keys: [46, 68],
           fun: () => httpgdViewer.navRemove()
         },
         {
-          ctrl: true,
+          keys: [67],
+          fun: () => httpgdViewer.navClear()
+        },
+        {
           keys: [83],
           fun: () => httpgdViewer.downloadPlot()
         },
         {
-          ctrl: true,
-          keys: [82],
+          keys: [80],
           fun: () => httpgdViewer.downloadPlotPNG()
         },
         {
