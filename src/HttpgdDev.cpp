@@ -2,6 +2,7 @@
 #include <Rcpp.h>
 #include <string>
 #include "HttpgdDev.h"
+#include <random>
 
 #include "lib/svglite_utils.h"
 
@@ -358,9 +359,10 @@ namespace httpgd
         return m_data_store->count();
     }
 
+    // Security vulnerability: Seed can not be chosen if R's RNG is used
     // Generate random alphanumeric string with R's built in RNG
     // https://cran.rstudio.com/doc/manuals/r-devel/R-exts.html#Random-numbers
-    std::string HttpgdDev::random_token(int len)
+    /*std::string HttpgdDev::random_token(int len)
     {
         static const char alphanum[] =
             "0123456789"
@@ -374,5 +376,23 @@ namespace httpgd
         }
         PutRNGstate();
         return s;
+    }*/
+
+    std::string HttpgdDev::random_token(int len)
+    {
+        static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+        static auto seed = static_cast<long unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+        static std::mt19937 generator{seed};
+        static std::uniform_int_distribution<int> distribution{0, static_cast<int>(sizeof(alphanum) - 1)};
+
+        std::string rand_str(len, '\0');
+        for(auto& dis: rand_str)
+            dis = alphanum[distribution(generator)];
+
+        return rand_str;
     }
+
 } // namespace httpgd

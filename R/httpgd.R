@@ -209,3 +209,13 @@ httpgdCloseAllServers <- function() {
   ds <- dev.list()
   invisible(lapply(ds[names(ds) == "httpgd"], dev.off))
 }
+
+#' Generate a random alphanumeric token string.
+#'
+#' @param len Token length
+#'
+#' @return Random token string
+#' @export
+httpgd_random_token <- function(len) {
+  httpgd_random_token_(len)
+}
