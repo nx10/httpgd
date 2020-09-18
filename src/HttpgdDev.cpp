@@ -384,13 +384,15 @@ namespace httpgd
             "0123456789"
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             "abcdefghijklmnopqrstuvwxyz";
-        static auto seed = static_cast<long unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-        static std::mt19937 generator{seed};
-        static std::uniform_int_distribution<int> distribution{0, static_cast<int>(sizeof(alphanum) - 1)};
+        static auto rseed = static_cast<long unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+        static std::mt19937 generator(rseed);
+        static std::uniform_int_distribution<int> distribution{0, static_cast<int>((sizeof(alphanum) / sizeof(alphanum[0])) - 2)};
 
         std::string rand_str(len, '\0');
-        for(auto& dis: rand_str)
-            dis = alphanum[distribution(generator)];
+        for (int i = 0; i < len; ++i)
+        {
+            rand_str[i] = alphanum[distribution(generator)];
+        }
 
         return rand_str;
     }
