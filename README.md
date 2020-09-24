@@ -73,11 +73,13 @@ dev.off()
 | Keys | Result |
 |:----:|--------|
 | <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> <kbd>&#8593;</kbd> <kbd>&#8595;</kbd> | Navigate plot history. |
-| <kbd>del</kbd> | Remove current plot. |
+| <kbd>N</kbd> | Jump to the newest plot. |
+| <kbd>del</kbd> / <kbd>D</kbd> | Delete plot. |
 | <kbd>+</kbd> / <kbd>-</kbd> | Zoom in and out. |
 | <kbd>0</kbd> | Reset zoom level. |
-| <kbd>ctrl</kbd> + <kbd>S</kbd> | Download plot as SVG. |
-| <kbd>ctrl</kbd> + <kbd>R</kbd> | Download plot as PNG. |
+| <kbd>S</kbd> | Download plot as SVG. |
+| <kbd>R</kbd> | Download plot as PNG. |
+| <kbd>C</kbd> | Clear all plots. |
 
 ### API
 

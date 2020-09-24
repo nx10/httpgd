@@ -4,7 +4,7 @@
 \alias{httpgdSVG}
 \title{Returns a plot rendered as a SVG string.}
 \usage{
-httpgdSVG(page = 0, width = -1, height = -1, which = dev.cur())
+httpgdSVG(page = 0, width = -1, height = -1, which = dev.cur(), file = NA)
 }
 \arguments{
 \item{page}{Plot page to render. If this is set to 0, the last page will be selected.}
@@ -13,7 +13,9 @@ httpgdSVG(page = 0, width = -1, height = -1, which = dev.cur())
 
 \item{height}{Height of the plot. If this is set to -1, the last height will be selected.}
 
-\item{which}{Which device (id)}
+\item{which}{Which device (id).}
+
+\item{file}{Filepath to save SVG. (No file will be created if this is NA)}
 }
 \value{
 Rendered SVG string.

@@ -8,10 +8,10 @@ context("Misc tests")
 #  dev.off(which = tdev)
 #})
 
-test_that("Random token R seed", {
+test_that("Token R seed independence", {
   set.seed(1234)
-  a <- httpgd_random_token(8)
+  a <- httpgdGenerateToken(8)
   set.seed(1234)
-  b <- httpgd_random_token(8)
+  b <- httpgdGenerateToken(8)
   expect_false(isTRUE(all.equal(a, b)))
 })

@@ -29,9 +29,9 @@
 #'   This parameter can be set to TRUE to generate a random 8 character
 #'   alphanumeric token. A random token of the specified length is generated
 #'   when it is set to a number. FALSE deactivates the token.
-#' @param silent When set to FALSE no information will be printed to the 
-#'   console after startup.
+#' @param silent When set to FALSE no information will be printed to console.
 #' @param websockets Use websockets.
+#' @param webserver Can be set to FALSE for offline mode.
 #'
 #' @importFrom systemfonts match_font
 #' @export
@@ -103,18 +103,23 @@ httpgdState <- function(which = dev.cur()) {
 #' @param page Plot page to render. If this is set to 0, the last page will be selected. 
 #' @param width Width of the plot. If this is set to -1, the last width will be selected. 
 #' @param height Height of the plot. If this is set to -1, the last height will be selected. 
-#' @param which Which device (id)
+#' @param which Which device (id).
+#' @param file Filepath to save SVG. (No file will be created if this is NA)
 #'
 #' @return Rendered SVG string.
 #'
 #' @importFrom grDevices dev.cur
 #' @export
-httpgdSVG <- function(page = 0, width = -1, height = -1, which = dev.cur()) {
+httpgdSVG <- function(page = 0, width = -1, height = -1, which = dev.cur(), file = NA) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
   }
   else {
-    return(httpgd_svg_(which, page - 1, width, height))
+    svg <- httpgd_svg_(which, page - 1, width, height)
+    if (!is.na(file)) {
+      cat(svg, file=file)
+    }
+    return(svg)
   }
 }
 
@@ -217,6 +222,6 @@ httpgdCloseAllServers <- function() {
 #'
 #' @return Random token string
 #' @export
-httpgd_random_token <- function(len) {
+httpgdGenerateToken <- function(len) {
   httpgd_random_token_(len)
 }

@@ -16,7 +16,8 @@ httpgd(
   cors = FALSE,
   token = TRUE,
   silent = FALSE,
-  websockets = TRUE
+  websockets = TRUE,
+  webserver = TRUE
 )
 }
 \arguments{
@@ -57,10 +58,11 @@ This parameter can be set to TRUE to generate a random 8 character
 alphanumeric token. A random token of the specified length is generated
 when it is set to a number. FALSE deactivates the token.}
 
-\item{silent}{When set to FALSE no information will be printed to the 
-console after startup.}
+\item{silent}{When set to FALSE no information will be printed to console.}
 
 \item{websockets}{Use websockets.}
+
+\item{webserver}{Can be set to FALSE for offline mode.}
 }
 \description{
 Initialize httpgd graphics device and start server.
