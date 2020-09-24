@@ -27,7 +27,7 @@ Depends on `Rcpp`, `later` and `systemfonts`.
 
 SVG rendering (especially font rendering) based on `svglite` (<https://github.com/r-lib/svglite>).
 
-Built using [Boost Beast](https://github.com/boostorg/beast) and [Belle](https://github.com/octobanana/belle).
+Built using [Boost Beast](https://github.com/boostorg/beast), [Belle](https://github.com/octobanana/belle) and [fmt](https://github.com/fmtlib/fmt).
 
 See [system requirements](#System-requirements) for troubleshooting.
 
@@ -123,7 +123,7 @@ ben <-
   bench::mark(httpgd_test(), svglite_test(), svg_test(), iterations = 250)
 ```
 
-shows the following results:
+has the following results:
 
 |expression     |    min| median|  itr/sec| mem_alloc|    gc/sec| n_itr| n_gc| total_time|
 |:--------------|------:|------:|--------:|---------:|---------:|-----:|----:|----------:|
@@ -131,9 +131,9 @@ shows the following results:
 |svglite_test() | 20.7ms| 21.3ms| 46.02538|     593KB| 0.5590127|   247|    3|      5.37s|
 |svg_test()     | 27.2ms| 28.3ms| 34.52923|     126KB| 0.0000000|   250|    0|      7.24s|
 
-svglite (1.2.3.2), grDevices (4.0.2), httpgd (0.4.0)
+*Package versions: svglite (1.2.3.2), grDevices (4.0.2), httpgd (0.4.0)*
 
-![benchmark speed](docs/bench_speed1.png) ![benchmark filesize](docs/bench_size1.png)
+<img src="https://raw.githubusercontent.com/nx10/httpgd/master/docs/bench_speed1.png" width="640"/> <img src="https://raw.githubusercontent.com/nx10/httpgd/master/docs/bench_size1.png" width="640"/>
 
 ## Planned features
 
