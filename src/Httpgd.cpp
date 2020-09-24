@@ -41,7 +41,7 @@ namespace httpgd
 
 // [[Rcpp::export]]
 bool httpgd_(std::string host, int port, std::string bg, double width, double height,
-             double pointsize, Rcpp::List aliases, bool cors, std::string token)
+             double pointsize, Rcpp::List aliases, bool cors, std::string token, bool webserver, bool silent)
 {
     bool recording = true;
     bool use_token = token.length();
@@ -56,7 +56,9 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
          cors,
          use_token,
          token,
-         recording},
+         recording,
+         webserver,
+         silent},
         {ibg,
          width,
          height,

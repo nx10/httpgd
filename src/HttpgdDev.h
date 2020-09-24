@@ -6,6 +6,7 @@
 #include <mutex>
 #include <memory>
 #include <iostream>
+#include <boost/optional.hpp>
 
 #include "devGeneric.h"
 #include "HttpgdApi.h"

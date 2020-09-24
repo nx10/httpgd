@@ -15,6 +15,8 @@ namespace httpgd
         bool use_token;
         std::string token;
         bool record_history;
+        bool webserver;
+        bool silent;
     };
 
 }

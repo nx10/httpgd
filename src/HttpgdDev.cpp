@@ -45,7 +45,7 @@ namespace httpgd
         m_api_async_watcher = std::make_shared<HttpgdApiAsyncWatcher>(this, m_svr_config, m_data_store);
 
         // setup http server
-        m_server = std::make_shared<web::WebServer>(m_api_async_watcher);
+        m_server = m_svr_config->webserver ? std::make_shared<web::WebServer>(m_api_async_watcher) : nullptr;
     }
     HttpgdDev::~HttpgdDev()
     {
@@ -72,15 +72,14 @@ namespace httpgd
         if (m_target.is_void() || mode == 0)
             return;
             
-        m_server->broadcast_upid();
+        if (m_server)
+            m_server->broadcast_upid();
     }
 
     void HttpgdDev::dev_close(pDevDesc dd)
     {
-        Rcpp::Rcout << "Server closing... ";
-        //rsync::awaitLater();
-        //rsync::lock();
-        //rsync::unlock();
+        if (m_server && !m_svr_config->silent)
+            Rcpp::Rcout << "Server closing... ";
 
         // notify watcher
         m_api_async_watcher->rdevice_destructing();
@@ -95,7 +94,8 @@ namespace httpgd
         // cleanup r session data
         m_history.clear();
 
-        Rcpp::Rcout << "Closed.\n";
+        if (m_server && !m_svr_config->silent)
+            Rcpp::Rcout << "Closed.\n";
     }
 
     void HttpgdDev::dev_metricInfo(int c, pGEcontext gc, double *ascent, double *descent, double *width, pDevDesc dd)
@@ -334,15 +334,16 @@ namespace httpgd
 
     bool HttpgdDev::server_start()
     {
-        return m_server->start();
+        return m_server ? m_server->start() : true;
     }
     void HttpgdDev::server_stop()
     {
-        m_server->stop();
+        if (m_server)
+            m_server->stop();
     }
     unsigned short HttpgdDev::server_port() const
     {
-        return m_server->port();
+        return m_server ? m_server->port() : 0;
     }
 
     std::shared_ptr<HttpgdServerConfig> HttpgdDev::api_server_config()

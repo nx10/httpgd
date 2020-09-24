@@ -6,8 +6,8 @@
 using namespace Rcpp;
 
 // httpgd_
-bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, Rcpp::List aliases, bool cors, std::string token);
-RcppExport SEXP _httpgd_httpgd_(SEXP hostSEXP, SEXP portSEXP, SEXP bgSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP pointsizeSEXP, SEXP aliasesSEXP, SEXP corsSEXP, SEXP tokenSEXP) {
+bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, Rcpp::List aliases, bool cors, std::string token, bool webserver, bool silent);
+RcppExport SEXP _httpgd_httpgd_(SEXP hostSEXP, SEXP portSEXP, SEXP bgSEXP, SEXP widthSEXP, SEXP heightSEXP, SEXP pointsizeSEXP, SEXP aliasesSEXP, SEXP corsSEXP, SEXP tokenSEXP, SEXP webserverSEXP, SEXP silentSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,7 +20,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::List >::type aliases(aliasesSEXP);
     Rcpp::traits::input_parameter< bool >::type cors(corsSEXP);
     Rcpp::traits::input_parameter< std::string >::type token(tokenSEXP);
-    rcpp_result_gen = Rcpp::wrap(httpgd_(host, port, bg, width, height, pointsize, aliases, cors, token));
+    Rcpp::traits::input_parameter< bool >::type webserver(webserverSEXP);
+    Rcpp::traits::input_parameter< bool >::type silent(silentSEXP);
+    rcpp_result_gen = Rcpp::wrap(httpgd_(host, port, bg, width, height, pointsize, aliases, cors, token, webserver, silent));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -95,7 +97,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 9},
+    {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 11},
     {"_httpgd_httpgd_state_", (DL_FUNC) &_httpgd_httpgd_state_, 1},
     {"_httpgd_httpgd_random_token_", (DL_FUNC) &_httpgd_httpgd_random_token_, 1},
     {"_httpgd_httpgd_svg_", (DL_FUNC) &_httpgd_httpgd_svg_, 4},
