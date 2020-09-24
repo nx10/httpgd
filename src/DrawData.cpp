@@ -37,7 +37,7 @@ namespace httpgd
 
         inline void css_field(std::ostream &os, const std::string &name, double val)
         {
-            fmt::print(os, "{}=\"{:.2f}\";", name, val);
+            fmt::print(os, "{}={:.2f};", name, val);
         }
         inline void css_field(std::ostream &os, const std::string &name, const char *val)
         {
