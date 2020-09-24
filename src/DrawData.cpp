@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <boost/format.hpp>
 
 #include <Rcpp.h>
 //#include <R_ext/GraphicsEngine.h>
@@ -16,67 +17,58 @@ namespace httpgd
     namespace dc
     {
 
-        template <typename T>
-        inline void svg_field(std::string *buf, const std::string &name, T val)
+        inline void svg_field(std::ostream &os, const std::string &name, const double val)
         {
-            buf->append(name).append("=\"").append(std::to_string(val)).append("\" ");
+            os << name << "=\"" << boost::format{"%.2f"} % val << "\" ";
         }
-        template <>
-        inline void svg_field<const char *>(std::string *buf, const std::string &name, const char *val)
+        inline void svg_field(std::ostream &os, const std::string &name, const char *val)
         {
-            buf->append(name).append("=\"").append(val).append("\" ");
+            os << name << "=\"" << val << "\" ";
         }
-        template <>
-        inline void svg_field<std::string>(std::string *buf, const std::string &name, std::string val)
+        inline void svg_field(std::ostream &os, const std::string &name, const std::string &val)
         {
-            buf->append(name).append("=\"").append(val).append("\" ");
+            os << name << "=\"" << val << "\" ";
         }
 
-        inline void svg_elem(std::string *buf, const std::string &name)
+        inline void svg_elem(std::ostream &os, const std::string &name)
         {
-            buf->append("<").append(name).append(" ");
+            os << "<" << name << " ";
         }
 
-        template <typename T>
-        inline void css_field(std::string *buf, const std::string &name, T val)
+        inline void css_field(std::ostream &os, const std::string &name, double val)
         {
-            buf->append(name).append(": ").append(std::to_string(val)).append(";");
+            os << name << ": " << boost::format{"%.2f"} % val << ";";
         }
-        template <>
-        inline void css_field<const char *>(std::string *buf, const std::string &name, const char *val)
+        inline void css_field(std::ostream &os, const std::string &name, const char *val)
         {
-            buf->append(name).append(": ").append(val).append(";");
+            os << name << ": " << val << ";";
         }
 
-        inline void css_color(std::string *buf, int c)
+        inline void css_color(std::ostream &os, int c)
         {
-            char hexcol[17];
-            snprintf(hexcol, sizeof hexcol, "#%02X%02X%02X", R_RED(c), R_GREEN(c), R_BLUE(c));
-            (*buf) += hexcol;
+            os << boost::format{"#%02X%02X%02X"} % R_RED(c) % R_GREEN(c) % R_BLUE(c);
         }
-        inline void css_field_color(std::string *buf, const std::string &name, int c)
+        inline void css_field_color(std::ostream &os, const std::string &name, int c)
         {
-            buf->append(name).append(": ");
-            css_color(buf, c);
-            buf->append(";");
+            os << name << boost::format{": #%02X%02X%02X;"} % R_RED(c) % R_GREEN(c) % R_BLUE(c);
         }
 
-        inline void write_style_col(std::string *buf, const DrawCall *const dc)
+        inline void write_style_col(std::ostream &os, const DrawCall *const dc)
         {
-            buf->append("fill: ");
+            os << "fill: ";
             int col = dc->m_fill;
             int alpha = R_ALPHA(col);
             if (alpha == 0)
             {
-                buf->append(": none;");
+                os << ": none;";
             }
             else
             {
-                css_color(buf, col);
-                buf->append(";");
+                css_color(os, col);
+                os << ";";
                 if (alpha != 255)
                 {
-                    buf->append(" fill-opacity: ").append(std::to_string(alpha / 255.0)).append(";");
+                    os << boost::format{" fill-opacity: %f;"} % (alpha / 255.0);
                 }
             }
         }
@@ -87,40 +79,40 @@ namespace httpgd
             // https://github.com/wch/r-source/blob/master/src/library/grDevices/src/cairo/cairoFns.c#L134
             return ((lwd > 1) ? lwd : 1) * (lty & 15);
         }
-        inline void write_style_linetype(std::string *buf, const DrawCall *const dc)
+        inline void write_style_linetype(std::ostream &os, const DrawCall *const dc)
         {
             int lty = dc->m_lty;
 
             // 1 lwd = 1/96", but units in rest of document are 1/72"
-            css_field(buf, "stroke-width", dc->m_lwd / 96.0 * 72);
+            css_field(os, "stroke-width", dc->m_lwd / 96.0 * 72);
 
             // Default is "stroke: #000000;" as declared in <style>
             if (dc->m_col != R_RGBA(0, 0, 0, 255))
             {
-                css_field_color(buf, "stroke", dc->m_col);
+                css_field_color(os, "stroke", dc->m_col);
             }
 
             // Set line pattern type
             switch (lty)
             {
             case LTY_BLANK: // never called: blank lines never get to this point
-                buf->append("<!--BLANK-->");
+                os << "<!--BLANK-->";
             case LTY_SOLID: // default svg setting, so don't need to write out
                 break;
             default:
                 // For details
                 // https://github.com/wch/r-source/blob/trunk/src/include/R_ext/GraphicsEngine.h#L337
-                buf->append(" stroke-dasharray: ");
+                os << " stroke-dasharray: ";
                 // First number
-                buf->append(std::to_string(scale_lty(lty, dc->m_lwd)));
+                os << boost::format{"%.2f"} % (scale_lty(lty, dc->m_lwd));
                 lty = lty >> 4;
                 // Remaining numbers
                 for (int i = 1; i < 8 && lty & 15; i++)
                 {
-                    buf->append(",").append(std::to_string(scale_lty(lty, dc->m_lwd)));
+                    os << "," << boost::format{"%.2f"} % (scale_lty(lty, dc->m_lwd));
                     lty = lty >> 4;
                 }
-                buf->append(";");
+                os << ";";
                 break;
             }
 
@@ -130,10 +122,10 @@ namespace httpgd
             case GC_ROUND_CAP: // declared to be default in <style>
                 break;
             case GC_BUTT_CAP:
-                css_field(buf, "stroke-linecap", "butt");
+                css_field(os, "stroke-linecap", "butt");
                 break;
             case GC_SQUARE_CAP:
-                css_field(buf, "stroke-linecap", "square");
+                css_field(os, "stroke-linecap", "square");
                 break;
             default:
                 break;
@@ -145,13 +137,13 @@ namespace httpgd
             case GC_ROUND_JOIN: // declared to be default in <style>
                 break;
             case GC_BEVEL_JOIN:
-                css_field(buf, "stroke-linejoin", "bevel");
+                css_field(os, "stroke-linejoin", "bevel");
                 break;
             case GC_MITRE_JOIN:
-                css_field(buf, "stroke-linejoin", "miter");
+                css_field(os, "stroke-linejoin", "miter");
                 if (std::abs(dc->m_lmitre - 10.0) > 1e-3)
                 { // 10 is declared to be the default in <style>
-                    css_field(buf, "stroke-miterlimit", dc->m_lmitre);
+                    css_field(os, "stroke-miterlimit", dc->m_lmitre);
                 }
                 break;
             default:
@@ -174,20 +166,20 @@ namespace httpgd
             m_lmitre = gc->lmitre;
         }
         DrawCall::~DrawCall() = default;
-        void DrawCall::build_svg(std::string *buf) const
+        void DrawCall::build_svg(std::ostream &os) const
         {
-            buf->append("<!-- unknown draw call -->");
+            os << "<!-- unknown draw call -->";
         }
 
-        void DrawCall::build_svg_style(std::string *buf, bool include_fill) const
+        void DrawCall::build_svg_style(std::ostream &os, bool include_fill) const
         {
-            buf->append("style=\"");
-            write_style_linetype(buf, this);
+            os << "style=\"";
+            write_style_linetype(os, this);
             if (include_fill && R_ALPHA(m_fill) != 0)
             {
-                write_style_col(buf, this);
+                write_style_col(os, this);
             }
-            buf->append("\" ");
+            os << "\" ";
         }
 
         Text::Text(const void *gc, double x, double y, const std::string &str, double rot, double /*hadj*/, const TextInfo &t_text)
@@ -195,44 +187,38 @@ namespace httpgd
               m_x(x), m_y(y), m_rot(rot), /*m_hadj(hadj),*/ m_str(str), m_text(t_text)
         {
         }
-        void Text::build_svg(std::string *buf) const
+        void Text::build_svg(std::ostream &os) const
         {
             // If we specify the clip path inside <image>, the "transform" also
             // affects the clip path, so we need to specify clip path at an outer level
             // (according to svglite)
-            svg_elem(buf, "g");
-            Clip::build_svg_attr(buf, m_clip_id);
-            buf->append(">");
+            svg_elem(os, "g");
+            Clip::build_svg_attr(os, m_clip_id);
+            os << ">";
 
-            svg_elem(buf, "text");
+            svg_elem(os, "text");
             if (m_rot == 0.0)
             {
-                svg_field(buf, "x", m_x);
-                svg_field(buf, "y", m_y);
+                svg_field(os, "x", m_x);
+                svg_field(os, "y", m_y);
             }
             else
             {
-                buf->append("transform=\"translate(");
-                buf->append(std::to_string(m_x));
-                buf->append(",");
-                buf->append(std::to_string(m_y));
-                buf->append(") rotate(");
-                buf->append(std::to_string(m_rot * -1.0));
-                buf->append(")\" ");
+                os << boost::format{"transform=\"translate(%.2f,%.2f) rotate(%.2f)\" "} % m_x % m_y % (m_rot * -1.0);
             }
-            svg_field(buf, "font-family", m_text.font_family);
-            svg_field(buf, "font-size", m_text.fontsize);
+            svg_field(os, "font-family", m_text.font_family);
+            svg_field(os, "font-size", m_text.fontsize);
             if (m_text.bold)
             {
-                svg_field(buf, "font-weight", "bold");
+                svg_field(os, "font-weight", "bold");
             }
             if (m_text.italic)
             {
-                svg_field(buf, "font-style", "italic");
+                svg_field(os, "font-style", "italic");
             }
             // todo: libsvg also sets the text width in pixels here
 
-            buf->append(">").append(m_str).append("</text></g>");
+            os << ">" << m_str << "</text></g>";
         }
 
         Circle::Circle(const void *gc,
@@ -241,23 +227,23 @@ namespace httpgd
               m_x(x), m_y(y), m_r(r)
         {
         }
-        void Circle::build_svg(std::string *buf) const
+        void Circle::build_svg(std::ostream &os) const
         {
-            svg_elem(buf, "circle");
-            Clip::build_svg_attr(buf, m_clip_id);
-            svg_field(buf, "cx", m_x);
-            svg_field(buf, "cy", m_y);
-            svg_field(buf, "r", m_r);
+            svg_elem(os, "circle");
+            Clip::build_svg_attr(os, m_clip_id);
+            svg_field(os, "cx", m_x);
+            svg_field(os, "cy", m_y);
+            svg_field(os, "r", m_r);
 
-            buf->append("style=\"");
-            write_style_linetype(buf, this);
+            os << "style=\"";
+            write_style_linetype(os, this);
             if (R_ALPHA(m_fill) != 0)
             {
-                write_style_col(buf, this);
+                write_style_col(os, this);
             }
-            buf->append("\" ");
+            os << "\" ";
 
-            buf->append("/>");
+            os << "/>";
         }
 
         Line::Line(const void *gc,
@@ -266,18 +252,18 @@ namespace httpgd
               m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2)
         {
         }
-        void Line::build_svg(std::string *buf) const
+        void Line::build_svg(std::ostream &os) const
         {
-            svg_elem(buf, "line");
-            Clip::build_svg_attr(buf, m_clip_id);
-            svg_field(buf, "x1", m_x1);
-            svg_field(buf, "y1", m_y1);
-            svg_field(buf, "x2", m_x2);
-            svg_field(buf, "y2", m_y2);
+            svg_elem(os, "line");
+            Clip::build_svg_attr(os, m_clip_id);
+            svg_field(os, "x1", m_x1);
+            svg_field(os, "y1", m_y1);
+            svg_field(os, "x2", m_x2);
+            svg_field(os, "y2", m_y2);
 
-            build_svg_style(buf, false);
+            build_svg_style(os, false);
 
-            buf->append("/>");
+            os << "/>";
         }
 
         Rect::Rect(const void *gc,
@@ -286,18 +272,18 @@ namespace httpgd
               m_x0(x0), m_y0(y0), m_x1(x1), m_y1(y1)
         {
         }
-        void Rect::build_svg(std::string *buf) const
+        void Rect::build_svg(std::ostream &os) const
         {
-            svg_elem(buf, "rect");
-            Clip::build_svg_attr(buf, m_clip_id);
-            svg_field(buf, "x", std::min(m_x0, m_x1));
-            svg_field(buf, "y", std::min(m_y0, m_y1));
-            svg_field(buf, "width", std::abs(m_x0 - m_x1));
-            svg_field(buf, "height", std::abs(m_y0 - m_y1));
+            svg_elem(os, "rect");
+            Clip::build_svg_attr(os, m_clip_id);
+            svg_field(os, "x", std::min(m_x0, m_x1));
+            svg_field(os, "y", std::min(m_y0, m_y1));
+            svg_field(os, "width", std::abs(m_x0 - m_x1));
+            svg_field(os, "height", std::abs(m_y0 - m_y1));
 
-            build_svg_style(buf, true);
+            build_svg_style(os, true);
 
-            buf->append("/>");
+            os << "/>";
         }
 
         Polyline::Polyline(const void *gc,
@@ -306,21 +292,21 @@ namespace httpgd
               m_n(n), m_x(x), m_y(y)
         {
         }
-        void Polyline::build_svg(std::string *buf) const
+        void Polyline::build_svg(std::ostream &os) const
         {
-            svg_elem(buf, "polyline");
-            Clip::build_svg_attr(buf, m_clip_id);
-            std::string pts = "";
-            for (int i = 0; i < m_n; i++)
+            svg_elem(os, "polyline");
+            Clip::build_svg_attr(os, m_clip_id);
+
+            os << "points=\"";
+            for (int i = 0; i < m_n; ++i)
             {
-                pts += std::to_string(m_x[i]).append(",");
-                pts += std::to_string(m_y[i]).append(" ");
+                os << boost::format{"%.2f,%.2f "} % m_x[i] % m_y[i];
             }
-            svg_field(buf, "points", pts);
+            os << "\" ";
 
-            build_svg_style(buf, false);
+            build_svg_style(os, false);
 
-            buf->append("/>");
+            os << "/>";
         }
         Polygon::Polygon(const void *gc,
                          int n, const std::vector<double> &x, const std::vector<double> &y)
@@ -328,21 +314,21 @@ namespace httpgd
               m_n(n), m_x(x), m_y(y)
         {
         }
-        void Polygon::build_svg(std::string *buf) const
+        void Polygon::build_svg(std::ostream &os) const
         {
-            svg_elem(buf, "polygon");
-            Clip::build_svg_attr(buf, m_clip_id);
-            std::string pts = "";
-            for (int i = 0; i < m_n; i++)
+            svg_elem(os, "polygon");
+            Clip::build_svg_attr(os, m_clip_id);
+
+            os << "points=\"";
+            for (int i = 0; i < m_n; ++i)
             {
-                pts += std::to_string(m_x[i]).append(",");
-                pts += std::to_string(m_y[i]).append(" ");
+                os << boost::format{"%.2f,%.2f "} % m_x[i] % m_y[i];
             }
-            svg_field(buf, "points", pts);
+            os << "\" ";
 
-            build_svg_style(buf, true);
+            build_svg_style(os, true);
 
-            buf->append("/>");
+            os << "/>";
         }
         Path::Path(const void *gc,
                    const std::vector<double> &x, const std::vector<double> &y, int npoly, const std::vector<int> &nper, bool winding)
@@ -350,50 +336,41 @@ namespace httpgd
               m_x(x), m_y(y), m_npoly(npoly), m_nper(nper), m_winding(winding)
         {
         }
-        void Path::build_svg(std::string *buf) const
+        void Path::build_svg(std::ostream &os) const
         {
-            svg_elem(buf, "path");
-            Clip::build_svg_attr(buf, m_clip_id);
+            svg_elem(os, "path");
+            Clip::build_svg_attr(os, m_clip_id);
             // Create path data
-            buf->append("d=\"");
+            os << "d=\"";
             int ind = 0;
             for (int i = 0; i < m_npoly; i++)
             {
                 // Move to the first point of the sub-path
-                buf->append("M ");
-                buf->append(std::to_string(m_x[ind]));
-                buf->append(" ");
-                buf->append(std::to_string(m_y[ind]));
-                buf->append(" ");
+                os << boost::format{"M %.2f %.2f "} % m_x[ind] % m_y[ind];
                 ind++;
                 // Draw the sub-path
                 for (int j = 1; j < m_nper[i]; j++)
                 {
-                    buf->append("L ");
-                    buf->append(std::to_string(m_x[ind]));
-                    buf->append(" ");
-                    buf->append(std::to_string(m_y[ind]));
-                    buf->append(" ");
+                    os << boost::format{"L %.2f %.2f "} % m_x[ind] % m_y[ind];
                     ind++;
                 }
                 // Close the sub-path
-                buf->append("Z");
+                os << "Z";
             }
             // Finish path data
-            buf->append("\" ");
+            os << "\" "
 
-            buf->append("style\"");
-            write_style_linetype(buf, this);
+               << "style\"";
+            write_style_linetype(os, this);
             if (R_ALPHA(m_fill) != 0)
             {
-                write_style_col(buf, this);
+                write_style_col(os, this);
             }
-            buf->append("fill-rule: ");
-            buf->append(m_winding ? "nonzero" : "evenodd");
-            buf->append(";");
-            buf->append("\" ");
-
-            buf->append("/>");
+            os << "fill-rule: "
+               << (m_winding ? "nonzero" : "evenodd")
+               << ";"
+               << "\" "
+               << "/>";
         }
 
         Raster::Raster(const void *gc,
@@ -406,7 +383,7 @@ namespace httpgd
               m_raster(raster), m_w(w), m_h(h), m_x(x), m_y(y), m_width(width), m_height(height), m_rot(rot), m_interpolate(interpolate)
         {
         }
-        void Raster::build_svg(std::string *buf) const
+        void Raster::build_svg(std::ostream &os) const
         {
             double imageHeight = m_height;
             double imageWidth = m_width;
@@ -423,33 +400,27 @@ namespace httpgd
             // If we specify the clip path inside <image>, the "transform" also
             // affects the clip path, so we need to specify clip path at an outer level
             // (according to svglite)
-            svg_elem(buf, "g");
-            Clip::build_svg_attr(buf, m_clip_id);
-            buf->append(">");
+            svg_elem(os, "g");
+            Clip::build_svg_attr(os, m_clip_id);
+            os << ">";
 
-            svg_elem(buf, "image");
-            svg_field(buf, "width", imageWidth);
-            svg_field(buf, "height", imageHeight);
-            svg_field(buf, "x", m_x);
-            svg_field(buf, "y", m_y - imageHeight);
-            svg_field(buf, "preserveAspectRatio", "none");
+            svg_elem(os, "image");
+            svg_field(os, "width", imageWidth);
+            svg_field(os, "height", imageHeight);
+            svg_field(os, "x", m_x);
+            svg_field(os, "y", m_y - imageHeight);
+            svg_field(os, "preserveAspectRatio", "none");
             if (!m_interpolate)
             {
-                svg_field(buf, "image-rendering", "pixelated");
+                svg_field(os, "image-rendering", "pixelated");
             }
             if (m_rot != 0)
             {
-                buf->append("transform=\"rotate(");
-                buf->append(std::to_string(-1.0 * m_rot));
-                buf->append(",");
-                buf->append(std::to_string(m_x));
-                buf->append(",");
-                buf->append(std::to_string(m_y));
-                buf->append(")\" ");
+                os << boost::format{"transform=\"rotate(%.2f,%.2f,%.2f)\" "} % (-1.0 * m_rot) % m_x % m_y;
             }
-            buf->append(" xlink:href=\"data:image/png;base64,");
-            buf->append(raster_to_string(m_raster, m_w, m_h, imageWidth, imageHeight, m_interpolate));
-            buf->append("\"/></g>");
+            os << " xlink:href=\"data:image/png;base64,";
+            os << raster_to_string(m_raster, m_w, m_h, imageWidth, imageHeight, m_interpolate);
+            os << "\"/></g>";
         }
 
         Clip::Clip(int id, double x0, double x1, double y0, double y1)
@@ -468,18 +439,18 @@ namespace httpgd
         {
             return m_id;
         }
-        void Clip::build_svg_def(std::string *buf) const
+        void Clip::build_svg_def(std::ostream &os) const
         {
-            buf->append("<clipPath id=\"cp").append(std::to_string(m_id)).append("\">");
-            buf->append("<rect x=\"").append(std::to_string(std::min(m_x0, m_x1)));
-            buf->append("\" y=\"").append(std::to_string(std::min(m_y0, m_y1)));
-            buf->append("\" width=\"").append(std::to_string(std::abs(m_x1 - m_x0)));
-            buf->append("\" height=\"").append(std::to_string(std::abs(m_y1 - m_y0)));
-            buf->append("\" /></clipPath>");
+            os << "<clipPath id=\"c" << boost::format{"%d"} % m_id << "\">"
+               << "<rect x=\"" << boost::format{"%.2f"} % (std::min(m_x0, m_x1))
+               << "\" y=\"" << boost::format{"%.2f"} % (std::min(m_y0, m_y1))
+               << "\" width=\"" << boost::format{"%.2f"} % (std::abs(m_x1 - m_x0))
+               << "\" height=\"" << boost::format{"%.2f"} % (std::abs(m_y1 - m_y0))
+               << "\" /></clipPath>";
         }
-        void Clip::build_svg_attr(std::string *buf, int id)
+        void Clip::build_svg_attr(std::ostream &os, int id)
         {
-            buf->append("clip-path=\"url(#cp").append(std::to_string(id)).append(")\" ");
+            os << "clip-path=\"url(#c" << boost::format{"%d"} % (id) << ")\" ";
         }
 
         Page::Page(double t_width, double t_height)
@@ -509,49 +480,45 @@ namespace httpgd
             m_cps.clear();
             clip(0, width, 0, height);
         }
-        void Page::build_svg(std::string *buf) const
+        void Page::build_svg(std::ostream &os) const
         {
-            svg_elem(buf, "svg");
-            svg_field(buf, "xmlns", "http://www.w3.org/2000/svg");
-            svg_field(buf, "xmlns:xlink", "http://www.w3.org/1999/xlink");
-            svg_field(buf, "width", std::to_string(width));
-            svg_field(buf, "height", std::to_string(height));
-            buf->append("viewBox=\"0 0 ");
-            buf->append(std::to_string(width)).append(" ").append(std::to_string(height));
-            buf->append("\"");
+            svg_elem(os, "svg");
+            svg_field(os, "xmlns", "http://www.w3.org/2000/svg");
+            svg_field(os, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+            svg_field(os, "width", width);
+            svg_field(os, "height", height);
+            os << boost::format{"viewBox=\"0 0 %.2f %.2f\""} % width % height
 
-            (*buf) += "><defs>\n"
-                      "  <style type='text/css'><![CDATA[\n"
-                      "    line, polyline, polygon, path, rect, circle {\n"
-                      "      fill: none;\n"
-                      "      stroke: #000000;\n"
-                      "      stroke-linecap: round;\n"
-                      "      stroke-linejoin: round;\n"
-                      "      stroke-miterlimit: 10.00;\n"
-                      "    }\n"
-                      "  ]]></style>\n";
+               << "><defs>\n"
+                  "  <style type='text/css'><![CDATA[\n"
+                  "    line, polyline, polygon, path, rect, circle {\n"
+                  "      fill: none;\n"
+                  "      stroke: #000000;\n"
+                  "      stroke-linecap: round;\n"
+                  "      stroke-linejoin: round;\n"
+                  "      stroke-miterlimit: 10.00;\n"
+                  "    }\n"
+                  "  ]]></style>\n";
 
             for (const auto &cp : m_cps)
             {
-                buf->append("  ");
-                cp.build_svg_def(buf);
-                buf->append("\n");
+                cp.build_svg_def(os);
+                os << "\n";
             }
 
-            buf->append("</defs>\n");
+            os << "</defs>\n"
 
-            (*buf) += "<rect width='100%' height='100%' "
-                      "style=\"stroke: none; ";
-            css_field_color(buf, "fill", fill);
-            buf->append("\"/>\n");
+               << "<rect width='100%' height='100%' "
+                  "style=\"stroke: none; ";
+            css_field_color(os, "fill", fill);
+            os << "\"/>\n";
 
             for (const auto &dc : m_dcs)
             {
-                buf->append("  ");
-                dc->build_svg(buf);
-                buf->append("\n");
+                dc->build_svg(os);
+                os << "\n";
             }
-            buf->append("</svg>");
+            os << "</svg>";
         }
 
     } // namespace dc

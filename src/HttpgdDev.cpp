@@ -320,7 +320,7 @@ namespace httpgd
         return r;
     }
 
-    void HttpgdDev::api_svg(std::string *buf, int index, double width, double height)
+    void HttpgdDev::api_svg(std::ostream &os, int index, double width, double height)
     {
         // Rcpp::Rcout << "DIFF \n";
         if (m_data_store->diff(index, width, height))
@@ -329,7 +329,7 @@ namespace httpgd
             api_render(index, width, height);
         }
         // Rcpp::Rcout << "SVG \n";
-        m_data_store->svg(buf, index);
+        m_data_store->svg(os, index);
     }
 
     bool HttpgdDev::server_start()

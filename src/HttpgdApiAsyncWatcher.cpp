@@ -87,14 +87,14 @@ namespace httpgd
         rsync::awaitLater();
     }
 
-    void HttpgdApiAsyncWatcher::api_svg(std::string *buf, int index, double width, double height)
+    void HttpgdApiAsyncWatcher::api_svg(std::ostream &os, int index, double width, double height)
     {
         if (m_data_store->diff(index, width, height))
         {
             api_render(index, width, height); // use async render call
             // todo perform sync diff again and sync render svg
         }
-        m_data_store->svg(buf, index);
+        m_data_store->svg(os, index);
     }
 
     int HttpgdApiAsyncWatcher::api_upid()

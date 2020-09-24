@@ -2,6 +2,7 @@
 #include "HttpgdWebServer.h"
 #include <fstream>
 #include <thread>
+#include <sstream>
 
 namespace httpgd
 {
@@ -24,7 +25,7 @@ namespace httpgd
 
             return content;
         }*/
-        
+
         std::string read_txt(const std::string &filepath)
         {
             std::ifstream t(filepath);
@@ -58,15 +59,19 @@ namespace httpgd
             }
         }
 
-        inline std::string json_make_state(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
+        inline void json_make_state(std::ostream &os, const std::shared_ptr<HttpgdApiAsyncWatcher> &t_watcher)
         {
-            std::string buf;
-            buf.reserve(200);
-            buf.append("{ ");
-            buf.append("\"upid\": ").append(std::to_string(t_watcher->api_upid()));
-            buf.append(", \"hsize\": ").append(std::to_string(t_watcher->api_page_count()));
-            buf.append(" }");
-            return buf;
+            os << "{ "
+               << "\"upid\": " << std::to_string(t_watcher->api_upid())
+               << ", \"hsize\": " << std::to_string(t_watcher->api_page_count())
+               << " }";
+        }
+
+        inline std::string json_make_state(const std::shared_ptr<HttpgdApiAsyncWatcher> &t_watcher)
+        {
+            std::ostringstream buf;
+            json_make_state(buf, t_watcher);
+            return buf.str();
         }
 
         inline bool authorized(std::shared_ptr<httpgd::HttpgdServerConfig> &m_conf, OB::Belle::Server::Http_Ctx &ctx)
@@ -204,7 +209,7 @@ namespace httpgd
                 {
                     throw 401;
                 }
-                
+
                 // access the query parameters
                 auto qparams = ctx.req.params();
 
@@ -232,14 +237,13 @@ namespace httpgd
                     trystod(ptxt, &cli_height);
                 }
 
-                std::string buf = "";
-                buf.reserve(1000000);
-                m_watcher->api_svg(&buf, cli_index, cli_width, cli_height);
+                std::stringstream buf;
+                m_watcher->api_svg(buf, cli_index, cli_width, cli_height);
 
                 ctx.res.set("content-type", "image/svg+xml");
                 ctx.res.result(OB::Belle::Status::ok);
 
-                ctx.res.body() = std::move(buf);
+                ctx.res.body() = buf.str();
             });
 
             m_app.on_http("/remove", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {

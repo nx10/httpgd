@@ -124,10 +124,9 @@ std::string httpgd_svg_(int devnum, int page, double width, double height)
 {
     auto dev = validate_httpgddev(devnum);
 
-    std::string buf = "";
-    buf.reserve(1000000);
-    dev->api_svg(&buf, page, width, height);
-    return buf;
+    std::ostringstream buf;
+    dev->api_svg(buf, page, width, height);
+    return buf.str();
 }
 
 // [[Rcpp::export]]

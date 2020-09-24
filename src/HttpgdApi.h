@@ -14,7 +14,7 @@ namespace httpgd
         virtual bool api_remove(int index) = 0;
         virtual bool api_clear() = 0;
 
-        virtual void api_svg(std::string *buf, int index, double width, double height) = 0;
+        virtual void api_svg(std::ostream &os, int index, double width, double height) = 0;
 
         virtual int api_upid() = 0;
         virtual int api_page_count() = 0;

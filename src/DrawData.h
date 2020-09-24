@@ -52,15 +52,15 @@ namespace httpgd
             explicit DrawCall(const void *gc);
             virtual ~DrawCall();
 
-            virtual void build_svg(std::string *buf) const;
-            virtual void build_svg_style(std::string *buf, bool include_fill) const;
+            virtual void build_svg(std::ostream &os) const;
+            virtual void build_svg_style(std::ostream &os, bool include_fill) const;
         };
 
         class Text : public DrawCall
         {
         public:
             Text(const void *gc, double x, double y, const std::string &str, double rot, double /*hadj*/, const TextInfo &t_text);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             double m_x, m_y, m_rot/*, m_hadj*/;
@@ -72,7 +72,7 @@ namespace httpgd
         {
         public:
             Circle(const void *gc, double x, double y, double r);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             double m_x, m_y, m_r;
@@ -82,7 +82,7 @@ namespace httpgd
         {
         public:
             Line(const void *gc, double x1, double y1, double x2, double y2);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             double m_x1, m_y1, m_x2, m_y2;
@@ -92,7 +92,7 @@ namespace httpgd
         {
         public:
             Rect(const void *gc, double x0, double y0, double x1, double y1);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             double m_x0, m_y0, m_x1, m_y1;
@@ -102,7 +102,7 @@ namespace httpgd
         {
         public:
             Polyline(const void *gc, int n, const std::vector<double> &x, const std::vector<double> &y);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             int m_n;
@@ -113,7 +113,7 @@ namespace httpgd
         {
         public:
             Polygon(const void *gc, int n, const std::vector<double> &x, const std::vector<double> &y);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             int m_n;
@@ -124,7 +124,7 @@ namespace httpgd
         {
         public:
             Path(const void *gc, const std::vector<double> &x, const std::vector<double> &y, int npoly, const std::vector<int> &nper, bool winding);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             std::vector<double> m_x;
@@ -142,7 +142,7 @@ namespace httpgd
                    double width, double height,
                    double rot,
                    bool interpolate);
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const override;
 
         private:
             std::vector<unsigned int> m_raster;
@@ -161,8 +161,8 @@ namespace httpgd
         public:
             Clip(int id, double x0, double x1, double y0, double y1);
             bool equals(double x0, double x1, double y0, double y1);
-            void build_svg_def(std::string *buf) const;
-            static void build_svg_attr(std::string *buf, int id);
+            void build_svg_def(std::ostream &os) const;
+            static void build_svg_attr(std::ostream &os, int id);
             int id() const;
 
         protected:
@@ -183,7 +183,7 @@ namespace httpgd
             Page(double t_width, double t_height);
             void put(std::shared_ptr<DrawCall> dc);
             void clear();
-            void build_svg(std::string *buf) const;
+            void build_svg(std::ostream &os) const;
             void clip(double x0, double x1, double y0, double y1);
 
         private:

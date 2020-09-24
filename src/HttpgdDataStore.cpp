@@ -1,6 +1,7 @@
 
 #include "HttpgdDataStore.h"
 #include <cmath>
+#include <iostream>
 
 // Do not include any R headers here!
 
@@ -166,16 +167,16 @@ namespace httpgd
                 std::fabs(height - old_height) > 0.1);
     }
     const char *SVG_EMPTY = "<svg width=\"10\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"></svg>";
-    void HttpgdDataStore::svg(std::string *buf, int t_index)
+    void HttpgdDataStore::svg(std::ostream &os, int t_index)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
         {
-            buf->append(SVG_EMPTY);
+            os << SVG_EMPTY;
             return;
         }
         auto index = m_index_to_pos(t_index);
-        m_pages[index].build_svg(buf);
+        m_pages[index].build_svg(os);
     }
 
     void HttpgdDataStore::m_inc_upid()

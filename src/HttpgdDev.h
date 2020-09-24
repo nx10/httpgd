@@ -5,6 +5,7 @@
 
 #include <mutex>
 #include <memory>
+#include <iostream>
 
 #include "devGeneric.h"
 #include "HttpgdApi.h"
@@ -66,7 +67,7 @@ namespace httpgd
         virtual bool api_remove(int index) override;
         virtual bool api_clear() override;
         virtual int api_upid() override;
-        virtual void api_svg(std::string *buf, int index, double width, double height) override;
+        virtual void api_svg(std::ostream &os, int index, double width, double height) override;
         virtual int api_page_count() override;
         virtual std::shared_ptr<HttpgdServerConfig> api_server_config() override;
 

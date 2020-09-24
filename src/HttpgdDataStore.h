@@ -26,7 +26,7 @@ namespace httpgd
         ~HttpgdDataStore();
         
         bool diff(int index, double width, double height);
-        void svg(std::string *buf, int index);
+        void svg(std::ostream &os, int index);
 
         int count();
 
