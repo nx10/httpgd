@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include <boost/format.hpp>
+#include <fmt/ostream.h>
 
 #include <Rcpp.h>
 //#include <R_ext/GraphicsEngine.h>
@@ -19,7 +19,7 @@ namespace httpgd
 
         inline void svg_field(std::ostream &os, const std::string &name, const double val)
         {
-            os << name << "=\"" << boost::format{"%.2f"} % val << "\" ";
+            fmt::print(os, "{}=\"{:.2f}\" ", name, val);
         }
         inline void svg_field(std::ostream &os, const std::string &name, const char *val)
         {
@@ -37,7 +37,7 @@ namespace httpgd
 
         inline void css_field(std::ostream &os, const std::string &name, double val)
         {
-            os << name << ": " << boost::format{"%.2f"} % val << ";";
+            fmt::print(os, "{}=\"{:.2f}\";", name, val);
         }
         inline void css_field(std::ostream &os, const std::string &name, const char *val)
         {
@@ -46,11 +46,11 @@ namespace httpgd
 
         inline void css_color(std::ostream &os, int c)
         {
-            os << boost::format{"#%02X%02X%02X"} % R_RED(c) % R_GREEN(c) % R_BLUE(c);
+            fmt::print(os,"#{:02X}{:02X}{:02X}", R_RED(c), R_GREEN(c), R_BLUE(c));
         }
         inline void css_field_color(std::ostream &os, const std::string &name, int c)
         {
-            os << name << boost::format{": #%02X%02X%02X;"} % R_RED(c) % R_GREEN(c) % R_BLUE(c);
+            fmt::print(os,"{}: #{:02X}{:02X}{:02X};", name, R_RED(c), R_GREEN(c), R_BLUE(c));
         }
 
         inline void write_style_col(std::ostream &os, const DrawCall *const dc)
@@ -68,7 +68,7 @@ namespace httpgd
                 os << ";";
                 if (alpha != 255)
                 {
-                    os << boost::format{" fill-opacity: %f;"} % (alpha / 255.0);
+                    fmt::print(os, " fill-opacity: {:f};", alpha / 255.0);
                 }
             }
         }
@@ -104,12 +104,12 @@ namespace httpgd
                 // https://github.com/wch/r-source/blob/trunk/src/include/R_ext/GraphicsEngine.h#L337
                 os << " stroke-dasharray: ";
                 // First number
-                os << boost::format{"%.2f"} % (scale_lty(lty, dc->m_lwd));
+                fmt::print(os, "{:.2f}", scale_lty(lty, dc->m_lwd));
                 lty = lty >> 4;
                 // Remaining numbers
                 for (int i = 1; i < 8 && lty & 15; i++)
                 {
-                    os << "," << boost::format{"%.2f"} % (scale_lty(lty, dc->m_lwd));
+                    fmt::print(os, ", {:.2f}", scale_lty(lty, dc->m_lwd));
                     lty = lty >> 4;
                 }
                 os << ";";
@@ -204,7 +204,7 @@ namespace httpgd
             }
             else
             {
-                os << boost::format{"transform=\"translate(%.2f,%.2f) rotate(%.2f)\" "} % m_x % m_y % (m_rot * -1.0);
+                fmt::print(os, "transform=\"translate({:.2f},{:.2f}) rotate({:.2f})\" ", m_x, m_y, m_rot * -1.0);
             }
             svg_field(os, "font-family", m_text.font_family);
             svg_field(os, "font-size", m_text.fontsize);
@@ -300,7 +300,7 @@ namespace httpgd
             os << "points=\"";
             for (int i = 0; i < m_n; ++i)
             {
-                os << boost::format{"%.2f,%.2f "} % m_x[i] % m_y[i];
+                fmt::print(os, "{:.2f},{:.2f} ", m_x[i], m_y[i]);
             }
             os << "\" ";
 
@@ -322,7 +322,7 @@ namespace httpgd
             os << "points=\"";
             for (int i = 0; i < m_n; ++i)
             {
-                os << boost::format{"%.2f,%.2f "} % m_x[i] % m_y[i];
+                fmt::print(os, "{:.2f},{:.2f} ", m_x[i], m_y[i]);
             }
             os << "\" ";
 
@@ -346,12 +346,12 @@ namespace httpgd
             for (int i = 0; i < m_npoly; i++)
             {
                 // Move to the first point of the sub-path
-                os << boost::format{"M %.2f %.2f "} % m_x[ind] % m_y[ind];
+                fmt::print(os, "M {:.2f} {:.2f} ", m_x[ind], m_y[ind]);
                 ind++;
                 // Draw the sub-path
                 for (int j = 1; j < m_nper[i]; j++)
                 {
-                    os << boost::format{"L %.2f %.2f "} % m_x[ind] % m_y[ind];
+                    fmt::print(os, "L {:.2f} {:.2f} ", m_x[ind], m_y[ind]);
                     ind++;
                 }
                 // Close the sub-path
@@ -416,7 +416,7 @@ namespace httpgd
             }
             if (m_rot != 0)
             {
-                os << boost::format{"transform=\"rotate(%.2f,%.2f,%.2f)\" "} % (-1.0 * m_rot) % m_x % m_y;
+                fmt::print(os, "transform=\"rotate({:.2f},{:.2f},{:.2f})\" ", -1.0 * m_rot, m_x, m_y);
             }
             os << " xlink:href=\"data:image/png;base64,";
             os << raster_to_string(m_raster, m_w, m_h, imageWidth, imageHeight, m_interpolate);
@@ -441,16 +441,16 @@ namespace httpgd
         }
         void Clip::build_svg_def(std::ostream &os) const
         {
-            os << "<clipPath id=\"c" << boost::format{"%d"} % m_id << "\">"
-               << "<rect x=\"" << boost::format{"%.2f"} % (std::min(m_x0, m_x1))
-               << "\" y=\"" << boost::format{"%.2f"} % (std::min(m_y0, m_y1))
-               << "\" width=\"" << boost::format{"%.2f"} % (std::abs(m_x1 - m_x0))
-               << "\" height=\"" << boost::format{"%.2f"} % (std::abs(m_y1 - m_y0))
+            os << "<clipPath id=\"c" << fmt::format("{:d}", m_id) << "\">"
+               << "<rect x=\"" << fmt::format("{:.2f}", std::min(m_x0, m_x1))
+               << "\" y=\"" << fmt::format("{:.2f}", std::min(m_y0, m_y1))
+               << "\" width=\"" << fmt::format("{:.2f}", std::abs(m_x1 - m_x0))
+               << "\" height=\"" << fmt::format("{:.2f}", std::abs(m_y1 - m_y0))
                << "\" /></clipPath>";
         }
         void Clip::build_svg_attr(std::ostream &os, int id)
         {
-            os << "clip-path=\"url(#c" << boost::format{"%d"} % (id) << ")\" ";
+            fmt::print(os, "clip-path=\"url(#c{:d})\" ", id);
         }
 
         Page::Page(double t_width, double t_height)
@@ -487,7 +487,7 @@ namespace httpgd
             svg_field(os, "xmlns:xlink", "http://www.w3.org/1999/xlink");
             svg_field(os, "width", width);
             svg_field(os, "height", height);
-            os << boost::format{"viewBox=\"0 0 %.2f %.2f\""} % width % height
+            os << fmt::format("viewBox=\"0 0 {:.2f} {:.2f}\"", width, height)
 
                << "><defs>\n"
                   "  <style type='text/css'><![CDATA[\n"
