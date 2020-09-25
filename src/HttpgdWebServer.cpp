@@ -29,6 +29,9 @@ namespace httpgd
         std::string read_txt(const std::string &filepath)
         {
             std::ifstream t(filepath);
+            if (t.fail()) {
+                return std::string("");
+            }
             std::stringstream buffer;
             buffer << t.rdbuf();
             return buffer.str();
