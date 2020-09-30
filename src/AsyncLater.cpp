@@ -1,5 +1,6 @@
 
 
+#include <Rcpp.h>
 #include <mutex>
 #include <later_api.h>
 #include "AsyncLater.h"
@@ -25,8 +26,11 @@ namespace httpgd
             later::later([](void *data) {
                 try
                 {
-                    auto d = static_cast<AsyncLaterData *>(data);
-                    d->func(d->data);
+                    Rcpp::unwindProtect([](void *data) { 
+                        auto d = static_cast<AsyncLaterData *>(data);
+                        d->func(d->data);
+                        return R_NilValue;
+                    }, data);
                 }
                 catch (...)
                 {
