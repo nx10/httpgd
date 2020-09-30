@@ -3,13 +3,12 @@
 
 namespace httpgd
 {
-    namespace rsync
+    namespace asynclater
     {
-        //void lock();
-        //void unlock();
+        // Thread safe later
         void later(void (*func)(void *), void *data, double secs);
         void awaitLater();
-    } // namespace rsync
+    } // namespace asynclater
 } // namespace httpgd
 
 #endif

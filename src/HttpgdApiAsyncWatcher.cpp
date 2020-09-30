@@ -1,4 +1,4 @@
-#include "RSync.h"
+#include "AsyncLater.h"
 #include "HttpgdApiAsyncWatcher.h"
 
 namespace httpgd
@@ -38,14 +38,14 @@ namespace httpgd
             m_rdevice,
             index};
 
-        rsync::later([](void *t_dat) {
+        asynclater::later([](void *t_dat) {
             auto dat = static_cast<AsyncApiCallIndexData *>(t_dat);
             HttpgdApi *api = dat->api;
             api->api_remove(dat->index);
             delete dat;
         },
                      dat, 0.0);
-        rsync::awaitLater();
+        asynclater::awaitLater();
 
         return true;
     }
@@ -55,12 +55,12 @@ namespace httpgd
         if (!m_rdevice_alive)
             return false;
 
-        rsync::later([](void *t_api) {
+        asynclater::later([](void *t_api) {
             auto api = static_cast<HttpgdApi *>(t_api);
             api->api_clear();
         },
                      m_rdevice, 0.0);
-        rsync::awaitLater();
+        asynclater::awaitLater();
 
         return true;
     }
@@ -77,14 +77,14 @@ namespace httpgd
             width,
             height};
 
-        rsync::later([](void *t_dat) {
+        asynclater::later([](void *t_dat) {
             auto dat = static_cast<AsyncApiCallIndexSizeData *>(t_dat);
             HttpgdApi *api = dat->api;
             api->api_render(dat->index, dat->width, dat->height);
             delete dat;
         },
                      dat, 0.0);
-        rsync::awaitLater();
+        asynclater::awaitLater();
     }
 
     void HttpgdApiAsyncWatcher::api_svg(std::ostream &os, int index, double width, double height)

@@ -2,15 +2,16 @@
 
 #include <mutex>
 #include <later_api.h>
-#include "RSync.h"
+#include "AsyncLater.h"
 
 namespace httpgd
 {
-    namespace rsync
+    namespace asynclater
     {
+
         std::mutex later_mutex;
 
-        struct RSyncData
+        struct AsyncLaterData
         {
             void (*func)(void *);
             void *data;
@@ -22,10 +23,14 @@ namespace httpgd
             rsdat.data = data;
             rsdat.func = func;
             later::later([](void *data) {
-                try {
-                    auto d = static_cast<RSyncData *>(data);
+                try
+                {
+                    auto d = static_cast<AsyncLaterData *>(data);
                     d->func(d->data);
-                } catch (const std::exception& e) { } // make sure mutex gets unlocked; todo: log exceptions
+                }
+                catch (...)
+                {
+                } // make sure mutex gets unlocked (does not work)
                 later_mutex.unlock();
             },
                          &rsdat, secs);
@@ -36,5 +41,6 @@ namespace httpgd
             later_mutex.lock();
             later_mutex.unlock();
         }
-    } // namespace rsync
+
+    } // namespace asynclater
 } // namespace httpgd

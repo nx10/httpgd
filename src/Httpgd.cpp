@@ -6,16 +6,8 @@
 
 #include <vector>
 #include <string>
-#include <fstream>
-
-#include "lib/svglite_utils.h"
 
 #include "HttpgdDev.h"
-#include "DrawData.h"
-
-#include "RSync.h"
-
-#define LOGDRAW 0
 
 namespace httpgd
 {

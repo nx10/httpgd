@@ -122,7 +122,7 @@ namespace httpgd
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
         {
-            return {0, 0};
+            return {10, 10};
         }
         auto index = m_index_to_pos(t_index);
         return {

@@ -3,6 +3,8 @@
 #include <string>
 #include "HttpgdDev.h"
 #include <random>
+#include <cmath>
+#include "graphicsInternals.h"
 
 #include "lib/svglite_utils.h"
 
@@ -144,16 +146,36 @@ namespace httpgd
     void HttpgdDev::dev_size(double *left, double *right, double *bottom, double *top, pDevDesc dd)
     {
     }
+
+    /*inline httpgd::HttpgdDataStorePageSize find_minsize() {
+        Rcpp::Function rpar("par");
+        Rcpp::List res = rpar();
+        Rcpp::NumericVector mai = res["mai"];
+        double minw = (mai[1]+mai[3]) * 72 + 1;
+        double minh = (mai[0]+mai[2]) * 72 + 1;
+        return {minw, minh};
+    }*/
+    
+    inline httpgd::HttpgdDataStorePageSize find_minsize(const pDevDesc &dd) {
+        auto mai = getGPar(desc2GEDesc(dd)).mai;
+        double minw = (mai[1]+mai[3]) * 72 + 1;
+        double minh = (mai[0]+mai[2]) * 72 + 1;
+        return {minw, minh};
+    }
+
     void HttpgdDev::resize_device_to_page(pDevDesc dd)
     {
         int index = (m_target.is_void()) ? m_target.get_newest_index() : m_target.get_index();
 
         auto size = m_data_store->size(index);
+        auto minsize = find_minsize(dd);
 
         dd->left = 0.0;
         dd->top = 0.0;
-        dd->right = size.width;
-        dd->bottom = size.height;
+        dd->right = std::max(size.width, minsize.width);
+        dd->bottom = std::max(size.height, minsize.height);
+        //dd->right = size.width;
+        //dd->bottom = size.height;
     }
 
     void HttpgdDev::dev_newPage(pGEcontext gc, pDevDesc dd)

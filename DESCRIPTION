@@ -1,8 +1,7 @@
 Package: httpgd
 Type: Package
 Title: HTTP Server Graphics Device
-Version: 0.4.0
-Date: 2020-05-10
+Version: 1.0.0
 Authors@R: 
     c(person(given = "Florian", 
              family = "Rupprecht", 
@@ -18,7 +17,7 @@ Description: Asynchronous HTTP server graphics device.
     (<https://github.com/r-lib/svglite>).
 License: GPL-2
 Imports: Rcpp (>= 1.0.4),
-    later (>= 1.0.0),
+    later (>= 1.1.0),
     systemfonts (>= 0.2.3)
 LinkingTo: Rcpp, 
     BH,
