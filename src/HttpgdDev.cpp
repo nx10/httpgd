@@ -60,7 +60,6 @@ namespace httpgd
 
     void HttpgdDev::dev_activate(pDevDesc dd)
     {
-        Rcpp::Rcout << "ACTIVATE\n";
         if (!m_initialized) return;
         m_data_store->set_device_active(true);
         if (m_server && m_server_running)
@@ -68,7 +67,6 @@ namespace httpgd
     }
     void HttpgdDev::dev_deactivate(pDevDesc dd)
     {
-        Rcpp::Rcout << "DEACTIVATE\n";
         if (!m_initialized) return;
         m_data_store->set_device_active(false);
         if (m_server && m_server_running)
@@ -364,11 +362,11 @@ namespace httpgd
 
     bool HttpgdDev::server_start()
     {
-        if (m_server && !m_server_running && m_server->start()) {
-            m_server_running = true;
-            return true;
+        if (m_server && !m_server_running) {
+            m_server_running = m_server->start();
+            return m_server_running;
         }
-        return false;
+        return true;
     }
     void HttpgdDev::server_stop()
     {
