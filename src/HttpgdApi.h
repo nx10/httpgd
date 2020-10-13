@@ -17,6 +17,7 @@ namespace httpgd
         virtual void api_svg(std::ostream &os, int index, double width, double height) = 0;
 
         virtual int api_upid() = 0;
+        virtual bool api_active() = 0;
         virtual int api_page_count() = 0;
         
         virtual std::shared_ptr<HttpgdServerConfig> api_server_config() = 0;

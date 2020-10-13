@@ -44,10 +44,12 @@ namespace httpgd
 
         m_svr_config = std::make_shared<HttpgdServerConfig>(t_config);
         m_data_store = std::make_shared<HttpgdDataStore>();
-        m_api_async_watcher = std::make_shared<HttpgdApiAsyncWatcher>(this, m_svr_config, m_data_store);
+        m_api_async_watcher = std::make_shared<HttpgdApiAsync>(this, m_svr_config, m_data_store);
 
         // setup http server
         m_server = m_svr_config->webserver ? std::make_shared<web::WebServer>(m_api_async_watcher) : nullptr;
+
+        m_initialized = true;
     }
     HttpgdDev::~HttpgdDev()
     {
@@ -58,15 +60,19 @@ namespace httpgd
 
     void HttpgdDev::dev_activate(pDevDesc dd)
     {
-        m_device_active = true;
+        Rcpp::Rcout << "ACTIVATE\n";
+        if (!m_initialized) return;
+        m_data_store->set_device_active(true);
+        if (m_server && m_server_running)
+            m_server->broadcast_state();
     }
     void HttpgdDev::dev_deactivate(pDevDesc dd)
     {
-        m_device_active = false;
-    }
-    bool HttpgdDev::device_active()
-    {
-        return m_device_active;
+        Rcpp::Rcout << "DEACTIVATE\n";
+        if (!m_initialized) return;
+        m_data_store->set_device_active(false);
+        if (m_server && m_server_running)
+            m_server->broadcast_state();
     }
 
     void HttpgdDev::dev_mode(int mode, pDevDesc dd)
@@ -74,12 +80,14 @@ namespace httpgd
         if (m_target.is_void() || mode == 0)
             return;
             
-        if (m_server)
-            m_server->broadcast_upid();
+        if (m_server && m_server_running)
+            m_server->broadcast_state();
     }
 
     void HttpgdDev::dev_close(pDevDesc dd)
     {
+        m_initialized = false;
+
         if (m_server && !m_svr_config->silent)
             Rcpp::Rcout << "Server closing... ";
 
@@ -356,12 +364,18 @@ namespace httpgd
 
     bool HttpgdDev::server_start()
     {
-        return m_server ? m_server->start() : true;
+        if (m_server && !m_server_running && m_server->start()) {
+            m_server_running = true;
+            return true;
+        }
+        return false;
     }
     void HttpgdDev::server_stop()
     {
-        if (m_server)
+        if (m_server && m_server_running)
             m_server->stop();
+        
+        m_server_running = false;
     }
     unsigned short HttpgdDev::server_port() const
     {
@@ -376,6 +390,10 @@ namespace httpgd
     int HttpgdDev::api_upid()
     {
         return m_data_store->upid();
+    }
+    bool HttpgdDev::api_active()
+    {
+        return m_data_store->device_active();
     }
     int HttpgdDev::api_page_count()
     {

@@ -8,7 +8,7 @@
 namespace httpgd
 {
     HttpgdDataStore::HttpgdDataStore()
-        : m_pages(), m_upid(0)
+        : m_pages(), m_upid(0), m_device_active(true)
     {
     }
     HttpgdDataStore::~HttpgdDataStore() = default;
@@ -194,6 +194,16 @@ namespace httpgd
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         return m_upid;
+    }
+    bool HttpgdDataStore::device_active()
+    {
+        const std::lock_guard<std::mutex> lock(m_store_mutex);
+        return m_device_active;
+    }
+    void HttpgdDataStore::set_device_active(bool t_active)
+    {
+        const std::lock_guard<std::mutex> lock(m_store_mutex);
+        m_device_active = t_active;
     }
 
 } // namespace httpgd

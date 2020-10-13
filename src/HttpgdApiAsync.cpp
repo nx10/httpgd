@@ -1,5 +1,5 @@
 #include "AsyncLater.h"
-#include "HttpgdApiAsyncWatcher.h"
+#include "HttpgdApiAsync.h"
 
 namespace httpgd
 {
@@ -17,7 +17,7 @@ namespace httpgd
         int index;
     };
 
-    HttpgdApiAsyncWatcher::HttpgdApiAsyncWatcher(
+    HttpgdApiAsync::HttpgdApiAsync(
         HttpgdApi *t_rdevice,
         std::shared_ptr<HttpgdServerConfig> t_svr_config,
         std::shared_ptr<HttpgdDataStore> t_data_store)
@@ -28,7 +28,7 @@ namespace httpgd
     {
     }
 
-    bool HttpgdApiAsyncWatcher::api_remove(int index)
+    bool HttpgdApiAsync::api_remove(int index)
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
         if (!m_rdevice_alive)
@@ -49,7 +49,7 @@ namespace httpgd
 
         return true;
     }
-    bool HttpgdApiAsyncWatcher::api_clear()
+    bool HttpgdApiAsync::api_clear()
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
         if (!m_rdevice_alive)
@@ -65,7 +65,7 @@ namespace httpgd
         return true;
     }
 
-    void HttpgdApiAsyncWatcher::api_render(int index, double width, double height)
+    void HttpgdApiAsync::api_render(int index, double width, double height)
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
         if (!m_rdevice_alive)
@@ -87,7 +87,7 @@ namespace httpgd
         asynclater::awaitLater();
     }
 
-    void HttpgdApiAsyncWatcher::api_svg(std::ostream &os, int index, double width, double height)
+    void HttpgdApiAsync::api_svg(std::ostream &os, int index, double width, double height)
     {
         if (m_data_store->diff(index, width, height))
         {
@@ -97,21 +97,25 @@ namespace httpgd
         m_data_store->svg(os, index);
     }
 
-    int HttpgdApiAsyncWatcher::api_upid()
+    int HttpgdApiAsync::api_upid()
     {
         return m_data_store->upid();
     }
-    int HttpgdApiAsyncWatcher::api_page_count()
+    bool HttpgdApiAsync::api_active()
+    {
+        return m_data_store->device_active();
+    }
+    int HttpgdApiAsync::api_page_count()
     {
         return m_data_store->count();
     }
 
-    std::shared_ptr<HttpgdServerConfig> HttpgdApiAsyncWatcher::api_server_config()
+    std::shared_ptr<HttpgdServerConfig> HttpgdApiAsync::api_server_config()
     {
         return m_svr_config;
     }
 
-    void HttpgdApiAsyncWatcher::rdevice_destructing()
+    void HttpgdApiAsync::rdevice_destructing()
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
         m_rdevice_alive = false;

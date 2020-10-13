@@ -1,5 +1,5 @@
-#ifndef HTTPGD_HTTPGD_API_ASYNC_WATCHER_H
-#define HTTPGD_HTTPGD_API_ASYNC_WATCHER_H
+#ifndef HTTPGD_HTTPGD_API_ASYNC_H
+#define HTTPGD_HTTPGD_API_ASYNC_H
 
 #include <string>
 #include <memory>
@@ -18,14 +18,14 @@ namespace httpgd
         virtual void plot_changed(int upid) = 0;
     };
 
-    class HttpgdApiAsyncWatcher : public HttpgdApi
+    class HttpgdApiAsync : public HttpgdApi
     {
 
     public:
         std::function<void ()> broadcast_notify_change;
 
-        HttpgdApiAsyncWatcher(HttpgdApi *t_rdevice, std::shared_ptr<HttpgdServerConfig> t_svr_config, std::shared_ptr<HttpgdDataStore> t_data_store);
-        virtual ~HttpgdApiAsyncWatcher() = default; 
+        HttpgdApiAsync(HttpgdApi *t_rdevice, std::shared_ptr<HttpgdServerConfig> t_svr_config, std::shared_ptr<HttpgdDataStore> t_data_store);
+        virtual ~HttpgdApiAsync() = default; 
 
         // Calls that DO synchronize with R
         void api_render(int index, double width, double height) override;
@@ -37,6 +37,7 @@ namespace httpgd
         
         // Calls that DONT synchronize with R
         int api_upid() override;
+        bool api_active() override;
         int api_page_count() override;
         std::shared_ptr<HttpgdServerConfig> api_server_config() override;
 

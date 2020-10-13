@@ -100,7 +100,7 @@ Rcpp::List httpgd_state_(int devnum)
         Rcpp::Named("token") = svr_config->token,
         Rcpp::Named("hsize") = dev->api_page_count(),
         Rcpp::Named("upid") = dev->api_upid(),
-        Rcpp::Named("active") = dev->device_active());
+        Rcpp::Named("active") = dev->api_active());
 }
 
 // [[Rcpp::export]]

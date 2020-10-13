@@ -18,6 +18,7 @@ class HttpgdState {
     constructor() {
         this.upid = -1;
         this.hsize = 0;
+        this.active = true;
     }
     equals(other) {
         return this.upid === other.upid &&
@@ -31,6 +32,7 @@ class HttpgdViewer {
         this.pollIntervall = CHECK_INTERVAL;
         this.pollIntervallSlow = CHECK_INTERVAL * 10;
         this.scale = SCALE_DEFAULT;
+        this.deviceActive = true;
         this.disconnected = false;
         this.canResize = true;
         this.resizeCooldown = CHECK_INTERVAL;
@@ -115,6 +117,11 @@ class HttpgdViewer {
     notifyDisconnected() {
         if (this.onDisconnectedChange) {
             this.onDisconnectedChange(this.disconnected);
+        }
+    }
+    notifyDeviceActive() {
+        if (this.onDeviceActiveChange) {
+            this.onDeviceActiveChange(this.deviceActive);
         }
     }
     zoomIn() {
@@ -237,6 +244,14 @@ class HttpgdViewer {
             this.notifyDisconnected();
         }
     }
+    setDeviceActive(active) {
+        if (this.deviceActive != active) {
+            this.deviceActive = active;
+            clearInterval(this.pollHandle);
+            this.pollHandle = setInterval(() => this.poll(), this.disconnected ? this.pollIntervallSlow : this.pollIntervall);
+            this.notifyDeviceActive();
+        }
+    }
     svgURL(params, state, force = false) {
         return this.apiSVG +
             '?width=' + Math.round(params.width) +
@@ -268,6 +283,9 @@ class HttpgdViewer {
     }
     compareRemote(remoteState) {
         let needsReload = false;
+        this.setDeviceActive(!remoteState.active);
+        if (!remoteState.active)
+            return;
         if (!this.state.equals(remoteState)) {
             Object.assign(this.state, remoteState);
             this.params.index = -1;

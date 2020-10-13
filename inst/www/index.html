@@ -190,6 +190,12 @@
         document.getElementById("tb-pnum").textContent = s;
       }
       httpgdViewer.onDisconnectedChange = (d) => {
+        document.getElementById("overlay-text").innerText = "Disconnected.";
+        document.getElementById("overlay").style.display = d ? "inline" : "none";
+      }
+      httpgdViewer.onDeviceActiveChange = (d) => {
+        console.log("yoooo")
+        document.getElementById("overlay-text").innerText = "Device deactivated.";
         document.getElementById("overlay").style.display = d ? "inline" : "none";
       }
       window.addEventListener('resize', () => httpgdViewer.resize());

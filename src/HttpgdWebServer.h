@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <belle.h>
-#include "HttpgdApiAsyncWatcher.h"
+#include "HttpgdApiAsync.h"
 #include <thread>
 
 namespace httpgd
@@ -16,15 +16,15 @@ namespace httpgd
         {
         public:
 
-            WebServer(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher);
+            WebServer(std::shared_ptr<HttpgdApiAsync> t_watcher);
 
             bool start();
             void stop();
             unsigned short port();
-            void broadcast_upid();
+            void broadcast_state();
 
         private:
-            std::shared_ptr<HttpgdApiAsyncWatcher> m_watcher;
+            std::shared_ptr<HttpgdApiAsync> m_watcher;
             std::shared_ptr<HttpgdServerConfig> m_conf;
             OB::Belle::Server m_app;
             int m_last_upid = -1;

@@ -12,7 +12,7 @@
 #include "HttpgdApi.h"
 #include "HttpgdServerConfig.h"
 #include "HttpgdDataStore.h"
-#include "HttpgdApiAsyncWatcher.h"
+#include "HttpgdApiAsync.h"
 #include "HttpgdWebServer.h"
 
 #include "PlotHistory.h"
@@ -68,11 +68,10 @@ namespace httpgd
         virtual bool api_remove(int index) override;
         virtual bool api_clear() override;
         virtual int api_upid() override;
+        virtual bool api_active() override;
         virtual void api_svg(std::ostream &os, int index, double width, double height) override;
         virtual int api_page_count() override;
         virtual std::shared_ptr<HttpgdServerConfig> api_server_config() override;
-
-        bool device_active();
 
         // static 
 
@@ -103,14 +102,15 @@ namespace httpgd
         PlotHistory m_history;
         std::shared_ptr<HttpgdServerConfig> m_svr_config;
         std::shared_ptr<HttpgdDataStore> m_data_store;
-        std::shared_ptr<HttpgdApiAsyncWatcher> m_api_async_watcher;
+        std::shared_ptr<HttpgdApiAsync> m_api_async_watcher;
         
         std::shared_ptr<web::WebServer> m_server;
 
         bool replaying{false}; // Is the device replaying
         DeviceTarget m_target;
 
-        bool m_device_active{true};
+        bool m_initialized{false};
+        bool m_server_running{false};
 
         void put(std::shared_ptr<dc::DrawCall> dc);
 

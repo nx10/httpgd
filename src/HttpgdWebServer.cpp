@@ -62,15 +62,16 @@ namespace httpgd
             }
         }
 
-        inline void json_make_state(std::ostream &os, const std::shared_ptr<HttpgdApiAsyncWatcher> &t_watcher)
+        inline void json_make_state(std::ostream &os, const std::shared_ptr<HttpgdApiAsync> &t_watcher)
         {
             os << "{ "
                << "\"upid\": " << std::to_string(t_watcher->api_upid())
                << ", \"hsize\": " << std::to_string(t_watcher->api_page_count())
+               << ", \"active\": " << (t_watcher->api_active() ? "true" : "false")
                << " }";
         }
 
-        inline std::string json_make_state(const std::shared_ptr<HttpgdApiAsyncWatcher> &t_watcher)
+        inline std::string json_make_state(const std::shared_ptr<HttpgdApiAsync> &t_watcher)
         {
             std::ostringstream buf;
             json_make_state(buf, t_watcher);
@@ -99,7 +100,7 @@ namespace httpgd
             return false;
         }
 
-        WebServer::WebServer(std::shared_ptr<HttpgdApiAsyncWatcher> t_watcher)
+        WebServer::WebServer(std::shared_ptr<HttpgdApiAsync> t_watcher)
             : m_watcher(t_watcher),
               m_conf(t_watcher->api_server_config()),
               m_app()
@@ -341,7 +342,7 @@ namespace httpgd
             }
         }
 
-        void WebServer::broadcast_upid()
+        void WebServer::broadcast_state()
         {
             int upid = m_watcher->api_upid();
             if (upid != m_last_upid)

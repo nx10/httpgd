@@ -17,6 +17,7 @@ class HttpgdParams {
 class HttpgdState {
     public upid: number = -1;
     public hsize: number = 0;
+    public active: boolean = true;
     equals(other: HttpgdState): boolean {
         return this.upid === other.upid &&
             this.hsize === other.hsize;
@@ -44,6 +45,7 @@ class HttpgdViewer {
 
     private scale: number = SCALE_DEFAULT; // zoom level
 
+    private deviceActive: boolean = true;
     private disconnected: boolean = false;
     private canResize: boolean = true;
     private resizeCooldown: number = CHECK_INTERVAL;
@@ -57,6 +59,7 @@ class HttpgdViewer {
 
     private image?: HTMLImageElement = undefined;
 
+    public onDeviceActiveChange?: (deviceActive: boolean) => void;
     public onDisconnectedChange?: (disconnected: boolean) => void;
     public onIndexStringChange?: (indexString: string) => void;
     public onZoomStringChange?: (zoomString: string) => void;
@@ -147,6 +150,11 @@ class HttpgdViewer {
     private notifyDisconnected(): void {
         if (this.onDisconnectedChange) {
             this.onDisconnectedChange(this.disconnected);
+        }
+    }
+    private notifyDeviceActive(): void {
+        if (this.onDeviceActiveChange) {
+            this.onDeviceActiveChange(this.deviceActive);
         }
     }
 
@@ -270,6 +278,15 @@ class HttpgdViewer {
             this.notifyDisconnected();
         }
     }
+    
+    private setDeviceActive(active: boolean): void {
+        if (this.deviceActive != active) {
+            this.deviceActive = active;
+            clearInterval(this.pollHandle);
+            this.pollHandle = setInterval(() => this.poll(), this.disconnected ? this.pollIntervallSlow : this.pollIntervall);
+            this.notifyDeviceActive();
+        }
+    }
 
     private svgURL(params: HttpgdParams, state: HttpgdState, force: boolean = false): string {
         // Token needs to be included in query params because request headers can't be set
@@ -307,6 +324,10 @@ class HttpgdViewer {
 
     private compareRemote(remoteState: HttpgdState) {
         let needsReload: boolean = false;
+
+        this.setDeviceActive(!remoteState.active);
+        if (!remoteState.active) return;
+        
         // server side changes
         if (!this.state.equals(remoteState)) {
             Object.assign(this.state, remoteState);

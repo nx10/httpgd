@@ -42,12 +42,15 @@ namespace httpgd
         void clip(int index, double x0, double x1, double y0, double y1);
 
         int upid();
+        bool device_active();
+        void set_device_active(bool t_active);
 
     private:
         std::mutex m_store_mutex;
 
         std::vector<dc::Page> m_pages;
         int m_upid;
+        bool m_device_active;
 
         void m_inc_upid();
 
