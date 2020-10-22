@@ -62,7 +62,9 @@ httpgd <-
     aliases <- validate_aliases(system_fonts, user_fonts)
     if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok, webserver, silent)) {
       if (!silent && webserver) {
-        cat(paste0("httpgd server running at:\n  ", hyperrefstyle(httpgdURL(websockets=websockets))))
+        cat("httpgd server running at:\n  ",
+          hyperrefstyle(httpgdURL(websockets = websockets)),
+          "\n", sep = "")
       }
     } else {
       httpgdCloseServer()
