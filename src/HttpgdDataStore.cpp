@@ -23,11 +23,6 @@ namespace httpgd
         return (index == -1 ? (m_pages.size() - 1) : index);
     }
 
-    int HttpgdDataStore::count()
-    {
-        const std::lock_guard<std::mutex> lock(m_store_mutex);
-        return m_pages.size();
-    }
     int HttpgdDataStore::append(double width, double height)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
@@ -190,16 +185,25 @@ namespace httpgd
             m_upid = 0;
         }
     }
-    int HttpgdDataStore::upid()
+    HttpgdState HttpgdDataStore::state()
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
-        return m_upid;
+        return {
+            m_upid,
+            m_pages.size(),
+            m_device_active 
+            };
+    }
+    /*int HttpgdDataStore::count()
+    {
+        const std::lock_guard<std::mutex> lock(m_store_mutex);
+        return m_pages.size();
     }
     bool HttpgdDataStore::device_active()
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         return m_device_active;
-    }
+    }*/
     void HttpgdDataStore::set_device_active(bool t_active)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);

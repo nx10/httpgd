@@ -7,12 +7,13 @@
 #include <vector>
 #include <mutex>
 
-#include "HttpgdServerConfig.h"
+#include "HttpgdCommons.h"
 #include "HttpgdApi.h"
 #include "DrawData.h"
 
 namespace httpgd
 {
+
     struct HttpgdDataStorePageSize {
         double width;
         double height;
@@ -28,8 +29,6 @@ namespace httpgd
         bool diff(int index, double width, double height);
         void svg(std::ostream &os, int index);
 
-        int count();
-
         int append(double width, double height);
         void clear(int index, bool silent);
         bool remove(int index, bool silent);
@@ -41,8 +40,7 @@ namespace httpgd
         void add_dc(int index, std::shared_ptr<dc::DrawCall> dc, bool silent);
         void clip(int index, double x0, double x1, double y0, double y1);
 
-        int upid();
-        bool device_active();
+        HttpgdState state();
         void set_device_active(bool t_active);
 
     private:

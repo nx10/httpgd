@@ -109,7 +109,7 @@
 <body>
   <div id="container">
     <div id="overlay">
-      <div id="overlay-text">Disconnected</div>
+      <div id="overlay-text"></div>
     </div>
     <div id="toolbar">
       <div id="tb-tools">
@@ -160,7 +160,8 @@
           <!--
         --></span>
         <span>
-          <a title="Clear all plots (C)" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24" width="24">
+          <a title="Clear all plots (C)" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24"
+              width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M0 0h24v24H0V0z" fill="none" />
               <path
@@ -190,12 +191,11 @@
         document.getElementById("tb-pnum").textContent = s;
       }
       httpgdViewer.onDisconnectedChange = (d) => {
-        document.getElementById("overlay-text").innerText = "Disconnected.";
+        document.getElementById("overlay-text").innerText = "Connection lost.";
         document.getElementById("overlay").style.display = d ? "inline" : "none";
       }
       httpgdViewer.onDeviceActiveChange = (d) => {
-        console.log("yoooo")
-        document.getElementById("overlay-text").innerText = "Device deactivated.";
+        document.getElementById("overlay-text").innerText = "Device inactive.";
         document.getElementById("overlay").style.display = d ? "inline" : "none";
       }
       window.addEventListener('resize', () => httpgdViewer.resize());
@@ -279,7 +279,6 @@
       elem_cnt.onmouseleave = function (mouseEvent) {
         elem_tbt.style.display = "none";
       }
-
     }
   </script>
 </body>

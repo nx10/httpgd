@@ -97,7 +97,7 @@ namespace httpgd
         m_data_store->svg(os, index);
     }
 
-    int HttpgdApiAsync::api_upid()
+    /*int HttpgdApiAsync::api_upid()
     {
         return m_data_store->upid();
     }
@@ -108,6 +108,10 @@ namespace httpgd
     int HttpgdApiAsync::api_page_count()
     {
         return m_data_store->count();
+    }*/
+    HttpgdState HttpgdApiAsync::api_state()
+    {
+        return m_data_store->state();
     }
 
     std::shared_ptr<HttpgdServerConfig> HttpgdApiAsync::api_server_config()

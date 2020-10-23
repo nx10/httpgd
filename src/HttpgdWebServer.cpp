@@ -29,7 +29,8 @@ namespace httpgd
         std::string read_txt(const std::string &filepath)
         {
             std::ifstream t(filepath);
-            if (t.fail()) {
+            if (t.fail())
+            {
                 return std::string("");
             }
             std::stringstream buffer;
@@ -62,19 +63,14 @@ namespace httpgd
             }
         }
 
-        inline void json_make_state(std::ostream &os, const std::shared_ptr<HttpgdApiAsync> &t_watcher)
-        {
-            os << "{ "
-               << "\"upid\": " << std::to_string(t_watcher->api_upid())
-               << ", \"hsize\": " << std::to_string(t_watcher->api_page_count())
-               << ", \"active\": " << (t_watcher->api_active() ? "true" : "false")
-               << " }";
-        }
-
-        inline std::string json_make_state(const std::shared_ptr<HttpgdApiAsync> &t_watcher)
+        inline std::string json_make_state(const HttpgdState &state)
         {
             std::ostringstream buf;
-            json_make_state(buf, t_watcher);
+            buf << "{ "
+                << "\"upid\": " << std::to_string(state.upid)
+                << ", \"hsize\": " << std::to_string(state.hsize)
+                << ", \"active\": " << (state.active ? "true" : "false")
+                << " }";
             return buf.str();
         }
 
@@ -197,7 +193,7 @@ namespace httpgd
                 ctx.res.set("content-type", "application/json");
                 ctx.res.result(OB::Belle::Status::ok);
 
-                ctx.res.body() = json_make_state(m_watcher);
+                ctx.res.body() = json_make_state(m_watcher->api_state());
             });
 
             /*m_app.on_http("/test", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
@@ -272,7 +268,7 @@ namespace httpgd
                     ctx.res.set("content-type", "application/json");
                     ctx.res.result(OB::Belle::Status::ok);
 
-                    ctx.res.body() = json_make_state(m_watcher);
+                    ctx.res.body() = json_make_state(m_watcher->api_state());
                 }
                 else
                 {
@@ -294,7 +290,7 @@ namespace httpgd
                 ctx.res.set("content-type", "application/json");
                 ctx.res.result(OB::Belle::Status::ok);
 
-                ctx.res.body() = json_make_state(m_watcher);
+                ctx.res.body() = json_make_state(m_watcher->api_state());
             });
 
             // set custom error callback
@@ -342,15 +338,21 @@ namespace httpgd
             }
         }
 
-        void WebServer::broadcast_state()
+        void WebServer::broadcast_state(const HttpgdState &state)
         {
-            int upid = m_watcher->api_upid();
-            if (upid != m_last_upid)
+            if (state.upid != m_last_upid)
             {
-                m_app.channels().at("/").broadcast(json_make_state(m_watcher));
-                m_last_upid = upid;
+                m_app.channels().at("/").broadcast(json_make_state(state));
+                m_last_upid = state.upid;
             }
         }
+        
+        void WebServer::broadcast_state_current()
+        {
+            HttpgdState state = m_watcher->api_state();
+            broadcast_state(state);
+        }
+        
 
     } // namespace web
 } // namespace httpgd

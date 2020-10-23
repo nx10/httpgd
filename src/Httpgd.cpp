@@ -93,14 +93,15 @@ Rcpp::List httpgd_state_(int devnum)
     auto dev = validate_httpgddev(devnum);
 
     auto svr_config = dev->api_server_config();
+    httpgd::HttpgdState state = dev->api_state();
 
     return Rcpp::List::create(
         Rcpp::Named("host") = svr_config->host,
         Rcpp::Named("port") = dev->server_port(),
         Rcpp::Named("token") = svr_config->token,
-        Rcpp::Named("hsize") = dev->api_page_count(),
-        Rcpp::Named("upid") = dev->api_upid(),
-        Rcpp::Named("active") = dev->api_active());
+        Rcpp::Named("hsize") = state.hsize,
+        Rcpp::Named("upid") = state.upid,
+        Rcpp::Named("active") = state.active);
 }
 
 // [[Rcpp::export]]

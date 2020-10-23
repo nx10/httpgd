@@ -61,25 +61,34 @@ namespace httpgd
     void HttpgdDev::dev_activate(pDevDesc dd)
     {
         if (!m_initialized) return;
+        //Rcpp::Rcout << "ACTIVATE 1\n";
         m_data_store->set_device_active(true);
-        if (m_server && m_server_running)
-            m_server->broadcast_state();
+        if (m_server && m_server_running) {
+            HttpgdState state = m_data_store->state();
+            state.active = true; // in case it has changed
+            m_server->broadcast_state(state);
+        }
     }
     void HttpgdDev::dev_deactivate(pDevDesc dd)
     {
         if (!m_initialized) return;
+        //Rcpp::Rcout << "DEACTIVATE 0\n";
         m_data_store->set_device_active(false);
-        if (m_server && m_server_running)
-            m_server->broadcast_state();
+        if (m_server && m_server_running) {
+            HttpgdState state = m_data_store->state();
+            state.active = false; // in case it has changed
+            m_server->broadcast_state(state);
+        }
     }
 
     void HttpgdDev::dev_mode(int mode, pDevDesc dd)
     {
-        if (m_target.is_void() || mode == 0)
+        //Rcpp::Rcout << "MODE "<<mode<<"\n";
+        if (m_target.is_void() || mode == 1)
             return;
             
         if (m_server && m_server_running)
-            m_server->broadcast_state();
+            m_server->broadcast_state_current();
     }
 
     void HttpgdDev::dev_close(pDevDesc dd)
@@ -385,7 +394,7 @@ namespace httpgd
         return m_svr_config;
     }
 
-    int HttpgdDev::api_upid()
+    /*int HttpgdDev::api_upid()
     {
         return m_data_store->upid();
     }
@@ -396,6 +405,10 @@ namespace httpgd
     int HttpgdDev::api_page_count()
     {
         return m_data_store->count();
+    }*/
+    HttpgdState HttpgdDev::api_state()
+    {
+        return m_data_store->state();
     }
 
     // Security vulnerability: Seed can not be chosen if R's RNG is used

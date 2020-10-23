@@ -1,11 +1,17 @@
 
-#ifndef HTTPGD_SERVER_CONFIG_H
-#define HTTPGD_SERVER_CONFIG_H
+#ifndef HTTPGD_COMMONS_H
+#define HTTPGD_COMMONS_H
 
 #include <string>
 
 namespace httpgd
 {
+    struct HttpgdState {
+        int upid;
+        size_t hsize;
+        bool active;
+    };
+
     struct HttpgdServerConfig
     {
         std::string host;
