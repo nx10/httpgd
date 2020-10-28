@@ -290,11 +290,9 @@ class HttpgdViewer {
         }
     }
     diffServer(remoteState) {
-        console.log("diff server: " + !this.state.equals(remoteState));
         return !this.state.equals(remoteState);
     }
     diffClient() {
-        console.log("diff client: " + !this.params.equals(this.plotParams));
         return !this.params.equals(this.plotParams);
     }
     setDeviceActive(active) {

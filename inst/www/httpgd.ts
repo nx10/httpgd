@@ -372,13 +372,13 @@ class HttpgdViewer {
 
     // Server side changes?
     private diffServer(remoteState: HttpgdState): boolean {
-        console.log("diff server: "+ !this.state.equals(remoteState));
+        //console.log("diff server: "+ !this.state.equals(remoteState));
         return !this.state.equals(remoteState);
     }
 
     // Client side changes?
     private diffClient(): boolean {
-        console.log("diff client: "+ !this.params.equals(this.plotParams));
+        //console.log("diff client: "+ !this.params.equals(this.plotParams));
         return !this.params.equals(this.plotParams);
     }
 
