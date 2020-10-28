@@ -46,11 +46,11 @@ namespace httpgd
 
         inline void css_color(std::ostream &os, int c)
         {
-            fmt::print(os,"#{:02X}{:02X}{:02X}", R_RED(c), R_GREEN(c), R_BLUE(c));
+            fmt::print(os, "#{:02X}{:02X}{:02X}", R_RED(c), R_GREEN(c), R_BLUE(c));
         }
         inline void css_field_color(std::ostream &os, const std::string &name, int c)
         {
-            fmt::print(os,"{}: #{:02X}{:02X}{:02X};", name, R_RED(c), R_GREEN(c), R_BLUE(c));
+            fmt::print(os, "{}: #{:02X}{:02X}{:02X};", name, R_RED(c), R_GREEN(c), R_BLUE(c));
         }
 
         inline void write_style_col(std::ostream &os, const DrawCall *const dc)
@@ -89,7 +89,14 @@ namespace httpgd
             // Default is "stroke: #000000;" as declared in <style>
             if (dc->m_col != R_RGBA(0, 0, 0, 255))
             {
-                css_field_color(os, "stroke", dc->m_col);
+                if (R_TRANSPARENT(dc->m_col))
+                {
+                    os << "stroke: none;";
+                }
+                else
+                {
+                    css_field_color(os, "stroke", dc->m_col);
+                }
             }
 
             // Set line pattern type
@@ -508,7 +515,7 @@ namespace httpgd
 
             os << "</defs>\n"
 
-               << "<rect width='100%' height='100%' "
+               << "<rect width=\"100%\" height=\"100%\" "
                   "style=\"stroke: none; ";
             css_field_color(os, "fill", fill);
             os << "\"/>\n";
