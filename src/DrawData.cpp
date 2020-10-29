@@ -37,7 +37,7 @@ namespace httpgd
 
         inline void css_field(std::ostream &os, const std::string &name, double val)
         {
-            fmt::print(os, "{}={:.2f};", name, val);
+            fmt::print(os, "{}: {:.2f};", name, val);
         }
         inline void css_field(std::ostream &os, const std::string &name, const char *val)
         {
@@ -495,8 +495,7 @@ namespace httpgd
             svg_field(os, "width", width);
             svg_field(os, "height", height);
             os << fmt::format("viewBox=\"0 0 {:.2f} {:.2f}\"", width, height)
-
-               << "><defs>\n"
+               << ">\n<defs>\n"
                   "  <style type='text/css'><![CDATA[\n"
                   "    line, polyline, polygon, path, rect, circle {\n"
                   "      fill: none;\n"
@@ -518,7 +517,7 @@ namespace httpgd
                << "<rect width=\"100%\" height=\"100%\" "
                   "style=\"stroke: none; ";
             css_field_color(os, "fill", fill);
-            os << "\"/>\n";
+            os << "\" />\n";
 
             for (const auto &dc : m_dcs)
             {
