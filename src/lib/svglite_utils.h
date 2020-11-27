@@ -1,7 +1,7 @@
 //
 //  Collection of functions for font metrics and raster image encoding.
 //  Extrected from: https://github.com/r-lib/svglite/blob/master/src/devSVG.cpp (2020-06-21T15:26:43+00:00)
-// 
+//
 //
 //  (C) 2002 T Jake Luciani: SVG device, based on PicTex device
 //  (C) 2008 Tony Plate: Line type support from RSVGTipsDevice package
@@ -289,6 +289,33 @@ namespace httpgd
         png_write_png(png, info, PNG_TRANSFORM_IDENTITY, NULL);
 
         return base64_encode(buffer.data(), buffer.size());
+    }
+
+    inline void write_xml_escaped(std::ostream &os, const std::string &text)
+    {
+        for (const char &c : text)
+        {
+            switch (c)
+            {
+            case '&':
+                os << "&amp;";
+                break;
+            case '<':
+                os << "&lt;";
+                break;
+            case '>':
+                os << "&gt;";
+                break;
+            case '"':
+                os << "&quot;";
+                break;
+            case '\'':
+                os << "&apos;";
+                break;
+            default:
+                os << c;
+            }
+        }
     }
 
 } // namespace httpgd

@@ -222,7 +222,7 @@ namespace httpgd
             {
                 svg_field(os, "font-style", "italic");
             }
-            if (m_col != (int) R_RGB(0, 0, 0))
+            if (m_col != (int)R_RGB(0, 0, 0))
             {
                 os << "style=\"";
                 write_style_col(os, this->m_col);
@@ -230,7 +230,9 @@ namespace httpgd
             }
             // todo: libsvg also sets the text width in pixels here
 
-            os << ">" << m_str << "</text></g>";
+            os << ">";
+            write_xml_escaped(os, m_str);
+            os << "</text></g>";
         }
 
         Circle::Circle(const void *gc,
