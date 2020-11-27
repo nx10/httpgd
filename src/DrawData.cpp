@@ -53,10 +53,9 @@ namespace httpgd
             fmt::print(os, "{}: #{:02X}{:02X}{:02X};", name, R_RED(c), R_GREEN(c), R_BLUE(c));
         }
 
-        inline void write_style_col(std::ostream &os, const DrawCall *const dc)
+        inline void write_style_col(std::ostream &os, const int col)
         {
             os << "fill: ";
-            int col = dc->m_fill;
             int alpha = R_ALPHA(col);
             if (alpha == 0)
             {
@@ -184,7 +183,7 @@ namespace httpgd
             write_style_linetype(os, this);
             if (include_fill && R_ALPHA(m_fill) != 0)
             {
-                write_style_col(os, this);
+                write_style_col(os, this->m_fill);
             }
             os << "\" ";
         }
@@ -223,6 +222,12 @@ namespace httpgd
             {
                 svg_field(os, "font-style", "italic");
             }
+            if (m_col != (int) R_RGB(0, 0, 0))
+            {
+                os << "style=\"";
+                write_style_col(os, this->m_col);
+                os << "\" ";
+            }
             // todo: libsvg also sets the text width in pixels here
 
             os << ">" << m_str << "</text></g>";
@@ -246,7 +251,7 @@ namespace httpgd
             write_style_linetype(os, this);
             if (R_ALPHA(m_fill) != 0)
             {
-                write_style_col(os, this);
+                write_style_col(os, this->m_fill);
             }
             os << "\" ";
 
@@ -371,7 +376,7 @@ namespace httpgd
             write_style_linetype(os, this);
             if (R_ALPHA(m_fill) != 0)
             {
-                write_style_col(os, this);
+                write_style_col(os, this->m_fill);
             }
             os << "fill-rule: "
                << (m_winding ? "nonzero" : "evenodd")
