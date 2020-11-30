@@ -6,16 +6,16 @@ Authors@R:
     c(person(given = "Florian", 
              family = "Rupprecht", 
              email = "floruppr@gmail.com", 
-             role = c("aut", "cre")),
+             role = c("aut", "cre"),
+             comment = c(ORCID = "0000-0002-1795-8624")),
       person(given = "Kun",
              family = "Ren",
              role = "ctb",
              email = "mail@renkun.me"))
 Description: Asynchronous HTTP server graphics device.
-    Some of the SVG rendering (especially the font handling and
-    raster image encoding) is based on svglite
+    Much of the SVG rendering (especially font handling) is based on svglite
     (<https://github.com/r-lib/svglite>).
-License: GPL-2
+License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.4),
     later (>= 1.1.0),
     systemfonts (>= 0.2.3)
@@ -30,3 +30,5 @@ Encoding: UTF-8
 SystemRequirements: 
     C++17,
     libpng
+URL: https://github.com/nx10/httpgd
+BugReports: https://github.com/nx10/httpgd/issues

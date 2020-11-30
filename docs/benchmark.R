@@ -45,8 +45,8 @@ library(ggplot2)
 ggplot2::autoplot(ben) +
   labs(title = "Plot speed (smaller is better)",
        subtitle = pvers) +
-  scale_x_discrete(labels = packages, limits = c("httpgd_test()", "svglite_test()", "svg_test()")) +
-  ylim(0, NA) +
+  scale_x_discrete(name  = "Package", labels = packages, limits = c("httpgd_test()", "svglite_test()", "svg_test()")) +
+  scale_y_continuous(name="Time", limits = c(0, NA)) +
   theme_bw()
 
 ggsave("docs/bench_speed1.png")
@@ -62,7 +62,7 @@ ggplot(data = df, aes(x = reorder(name, kb), y = kb)) +
     y = "Size (kB)",
     title = "SVG file size (smaller is better)",
     subtitle = pvers
-  )
+  ) + theme_bw()
 ggsave("docs/bench_size1.png")
 
 cat(paste0(paste0(knitr::kable(ben[, c(

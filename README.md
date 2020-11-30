@@ -175,4 +175,6 @@ Other areas in need of improvement are: Testing, documentation, net security and
 
 This project is licensed GPL v2.0.
 
+It includes parts of [svglite](<https://github.com/r-lib/svglite>), [Boost Beast](https://github.com/boostorg/beast), [Belle](https://github.com/octobanana/belle) and [fmt](https://github.com/fmtlib/fmt), which are licensed as specified on their respective websites.
+
 The HTML client includes [Material Design icons by Google](https://github.com/google/material-design-icons) which are licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt).
