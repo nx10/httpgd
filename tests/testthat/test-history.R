@@ -1,31 +1,31 @@
 test_that("Create pages", {
-  httpgd(webserver=F)
+  hgd(webserver=F)
   pnum <- 10
   for (i in 1:pnum) {
     plot.new()
   }
-  hs <- httpgdState()
+  hs <- hgd_state()
   dev.off()
   expect_equal(hs$hsize, pnum)
 })
 
 test_that("Delete pages", {
-  httpgd(webserver=F)
+  hgd(webserver=F)
   pnum <- 10
   dnum <- 3
   for (i in 1:pnum) {
     plot.new()
   }
   for (i in 1:dnum) {
-    httpgdRemove()
+    hgd_remove()
   }
-  hs <- httpgdState()
+  hs <- hgd_state()
   dev.off()
   expect_equal(hs$hsize, pnum-dnum)
 })
 
 test_that("Get page by index", {
-  httpgd(webserver=F)
+  hgd(webserver=F)
   pnum <- 10
   dnum <- 3
   for (i in 1:pnum) {
@@ -33,13 +33,13 @@ test_that("Get page by index", {
     teststr <- paste0("123abc_plot_", i)
     text(0, 0, teststr)
   }
-  svg <- httpgdSVG(page = 4)
+  svg <- hgd_svg(page = 4)
   dev.off()
   expect_true(grepl("123abc_plot_4", svg, fixed = TRUE))
 })
 
 test_that("Delete page by index", {
-  httpgd(webserver=F)
+  hgd(webserver=F)
   pnum <- 10
   dnum <- 3
   for (i in 1:pnum) {
@@ -47,11 +47,11 @@ test_that("Delete page by index", {
     teststr <- paste0("123abc_plot_", i)
     text(0, 0, teststr)
   }
-  httpgdRemove(page = 4)
-  hs <- httpgdState()
+  hgd_remove(page = 4)
+  hs <- hgd_state()
   svgs <- rep(NA, hs$hsize)
   for (i in 1:hs$hsize) {
-    svgs[i] <- httpgdSVG(page = i)
+    svgs[i] <- hgd_svg(page = i)
   }
   dev.off()
   expect_true(grepl("123abc_plot_3", svgs[3], fixed = TRUE))
@@ -59,13 +59,13 @@ test_that("Delete page by index", {
 })
 
 test_that("Clear pages", {
-  httpgd(webserver=F)
+  hgd(webserver=F)
   pnum <- 10
   for (i in 1:pnum) {
     plot.new()
   }
-  httpgdClear()
-  hs <- httpgdState()
+  hgd_clear()
+  hs <- hgd_state()
   dev.off()
   expect_equal(hs$hsize, 0)
 })

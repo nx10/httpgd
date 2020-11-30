@@ -85,16 +85,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// dummygd_
-bool dummygd_();
-RcppExport SEXP _httpgd_dummygd_() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(dummygd_());
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_", (DL_FUNC) &_httpgd_httpgd_, 11},
@@ -103,7 +93,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_svg_", (DL_FUNC) &_httpgd_httpgd_svg_, 4},
     {"_httpgd_httpgd_remove_", (DL_FUNC) &_httpgd_httpgd_remove_, 2},
     {"_httpgd_httpgd_clear_", (DL_FUNC) &_httpgd_httpgd_clear_, 1},
-    {"_httpgd_dummygd_", (DL_FUNC) &_httpgd_dummygd_, 0},
     {NULL, NULL, 0}
 };
 

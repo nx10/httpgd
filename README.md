@@ -36,13 +36,13 @@ See [system requirements](#System-requirements) for troubleshooting.
 Initialize graphics device and start server with:
 
 ```R
-httpgd()
+hgd()
 ```
 
 Copy the displayed link in the browser or call
 
 ```R
-httpgdBrowse()
+hgd_browse()
 ```
 
 to open a browser window automatically.
@@ -114,9 +114,9 @@ svg_test <- function() {
   dev.off()
 }
 httpgd_test <- function() {
-  httpgd(webserver = FALSE)
+  hgd(webserver = FALSE)
   plot(x, y)
-  httpgdSVG(file = tmp3)
+  hgd_svg(file = tmp3)
   dev.off()
 }
 ben <-

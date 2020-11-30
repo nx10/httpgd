@@ -20,9 +20,9 @@ svg_test <- function() {
   dev.off()
 }
 httpgd_test <- function() {
-  httpgd(webserver = FALSE)
+  hgd(webserver = FALSE)
   plot(x, y)
-  httpgdSVG(file = tmp3)
+  hgd_svg(file = tmp3)
   dev.off()
 }
 

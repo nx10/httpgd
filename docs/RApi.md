@@ -5,20 +5,20 @@
 ## Render SVG
 
 ```R
-httpgdSVG(page, width, height, ...)
+hgd_svg(page, width, height, ...)
 ```
 
 ## Remove pages
 
 ```R
-httpgdRemove(page, ...) # Remove a single page
-httpgdClear(...) # Clear all pages
+hgd_remove(page, ...) # Remove a single page
+hgd_clear(...) # Clear all pages
 ```
 
 ## Server state
 
 ```R
-httpgdState()
+hgd_state()
 ```
 
 This will return the current server state as a R list:
@@ -47,7 +47,7 @@ $upid
 A security token can be set when starting the device:
 
 ```R
-httpgd(..., token = "secret")
+hgd(..., token = "secret")
 ```
 
 When set, each API request has to include this token inside the header `X-HTTPGD-TOKEN` or as a query param `?token=secret`.
@@ -56,5 +56,5 @@ When set, each API request has to include this token inside the header `X-HTTPGD
 CORS is off by default but can be enabled on startup:
 
 ```R
-httpgd(..., cors = TRUE)
+hgd(..., cors = TRUE)
 ```

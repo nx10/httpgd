@@ -2,7 +2,7 @@
 
 #' Initialize httpgd graphics device and start server.
 #'
-#' @param host Server hostname.
+#' @param host Server hostname. Set to "0.0.0.0" to enable remote access.
 #' @param port Server port. If this is set to 0, an open port 
 #'   will be assigned.
 #' @param width Graphics device width (pixels).
@@ -35,7 +35,7 @@
 #'
 #' @importFrom systemfonts match_font
 #' @export
-httpgd <-
+hgd <-
   function(host = "127.0.0.1",
            port = 0,
            width = 720,
@@ -63,11 +63,11 @@ httpgd <-
     if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok, webserver, silent)) {
       if (!silent && webserver) {
         cat("httpgd server running at:\n  ",
-          hyperrefstyle(httpgdURL(websockets = websockets)),
+          hyperrefstyle(hgd_url(websockets = websockets)),
           "\n", sep = "")
       }
     } else {
-      httpgdCloseServer()
+      hgd_close()
       stop("Failed to start server. (Port might be in use.)")
     }
   }
@@ -91,7 +91,7 @@ hyperrefstyle <- function(str) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
-httpgdState <- function(which = dev.cur()) {
+hgd_state <- function(which = dev.cur()) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
   }
@@ -112,7 +112,7 @@ httpgdState <- function(which = dev.cur()) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
-httpgdSVG <- function(page = 0, width = -1, height = -1, which = dev.cur(), file = NA) {
+hgd_svg <- function(page = 0, width = -1, height = -1, which = dev.cur(), file = NA) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
   }
@@ -134,7 +134,7 @@ httpgdSVG <- function(page = 0, width = -1, height = -1, which = dev.cur(), file
 #'
 #' @importFrom grDevices dev.cur
 #' @export
-httpgdRemove <- function(page = 0, which = dev.cur()) {
+hgd_remove <- function(page = 0, which = dev.cur()) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
   }
@@ -151,7 +151,7 @@ httpgdRemove <- function(page = 0, which = dev.cur()) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
-httpgdClear <- function(which = dev.cur()) {
+hgd_clear <- function(which = dev.cur()) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
   }
@@ -171,8 +171,8 @@ httpgdClear <- function(which = dev.cur()) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
-httpgdURL <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
-  l <- httpgdState(which)
+hgd_url <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
+  l <- hgd_state(which)
   paste0("http://",
          sub('0.0.0.0', Sys.info()[['nodename']], l$host, fixed = TRUE),
          ":",
@@ -183,7 +183,7 @@ httpgdURL <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
          ifelse(nchar(l$token) == 0, ifelse(websockets, "", "?ws=0"), ifelse(websockets, "", "&ws=0")))
 }
 
-#' Opens the url by which a httpgd device is accessible in a browser.
+#' Opens the URL by which a httpgd device is accessible in a browser.
 #'
 #' @param endpoint API endpoint
 #' @param which Which device (id)
@@ -193,37 +193,36 @@ httpgdURL <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
 #' @importFrom grDevices dev.cur
 #' @importFrom utils browseURL
 #' @export
-httpgdBrowse <- function(endpoint = "live", which = dev.cur()) {
-  browseURL(httpgdURL(endpoint, which))
+hgd_browse <- function(endpoint = "live", which = dev.cur()) {
+  browseURL(hgd_url(endpoint, which))
 }
 
 #' Closes a graphics device if it is a httpgd server.
 #' This achieves the same effect as dev.off().
 #'
 #' @param which Which device (id)
+#' @param all If set to true, all running httpgd devices will be closed
 #' 
 #' @importFrom grDevices dev.cur dev.list dev.off
 #' @export
-httpgdCloseServer <- function(which = dev.cur()) {
-  if (names(which(dev.list() == which)) == "httpgd") {
-    dev.off(which)
+hgd_close <- function(which = dev.cur(), all = FALSE) {
+  if (all) {
+    ds <- dev.list()
+    invisible(lapply(ds[names(ds) == "httpgd"], dev.off))
+  } else {
+    if (names(which(dev.list() == which)) == "httpgd") {
+      dev.off(which)
+    }
   }
 }
 
-#' Search for all active servers and close them.
-#'
-#' @export
-httpgdCloseAllServers <- function() {
-  ds <- dev.list()
-  invisible(lapply(ds[names(ds) == "httpgd"], dev.off))
-}
-
-#' Generate a random alphanumeric token string.
+#' Generate a random alphanumeric token string. 
+#' This is mainly used internally by httpgd.
 #'
 #' @param len Token length
 #'
 #' @return Random token string
 #' @export
-httpgdGenerateToken <- function(len) {
+hgd_generate_token <- function(len) {
   httpgd_random_token_(len)
 }

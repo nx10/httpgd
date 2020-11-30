@@ -25,10 +25,3 @@ httpgd_clear_ <- function(devnum) {
     .Call(`_httpgd_httpgd_clear_`, devnum)
 }
 
-#' Dummy graphics device for debug purposes.
-#'
-#' @export
-dummygd_ <- function() {
-    .Call(`_httpgd_dummygd_`)
-}
-
