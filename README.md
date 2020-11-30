@@ -92,7 +92,13 @@ httpgd can be accessed both from R and from HTTP:
 
 ## Benchmark
 
-The following benchmark (expanded from [svglite](https://github.com/r-lib/svglite/blob/master/README.md))
+There are currently no other network graphics devices for comparison, httpgd can be used in offline mode (with `hgd(webserver = FALSE)`) to compare it with conventional SVG graphics devices.
+
+The [benchmark from svglite](https://github.com/r-lib/svglite/blob/master/README.md) has the following results:
+
+<details>
+
+<summary>Code</summary>
 
 ```R
 library(svglite)
@@ -123,21 +129,20 @@ ben <-
   bench::mark(httpgd_test(), svglite_test(), svg_test(), iterations = 250)
 ```
 
-has the following results:
+[See full code](docs/benchmark.R)
+
+</details>
 
 |expression     |    min| median|  itr/sec| mem_alloc|    gc/sec| n_itr| n_gc| total_time|
 |:--------------|------:|------:|--------:|---------:|---------:|-----:|----:|----------:|
-|httpgd_test()  | 10.3ms|   11ms| 90.03988|     363KB| 0.3616059|   249|    1|      2.77s|
-|svglite_test() | 20.7ms| 21.3ms| 46.02538|     593KB| 0.5590127|   247|    3|      5.37s|
-|svg_test()     | 27.2ms| 28.3ms| 34.52923|     126KB| 0.0000000|   250|    0|      7.24s|
+|httpgd_test()  | 10.2ms| 10.8ms| 91.43165|     361KB| 0.7373520|   248|    2|      2.71s|
+|svglite_test() | 20.3ms| 21.4ms| 46.29561|     593KB| 0.5622948|   247|    3|      5.33s|
+|svg_test()     | 27.2ms| 28.3ms| 35.15964|     126KB| 0.1412034|   249|    1|      7.08s|
 
-*Package versions: svglite (1.2.3.2), grDevices (4.0.2), httpgd (0.4.0)*
+*Package versions: httpgd (1.0.0), svglite (1.2.3.2), grDevices (4.0.3)*
 
-<img src="https://raw.githubusercontent.com/nx10/httpgd/master/docs/bench_speed1.png" width="640"/> <img src="https://raw.githubusercontent.com/nx10/httpgd/master/docs/bench_size1.png" width="640"/>
+<img src="docs/bench_speed1.png" width="640"/> <img src="docs/bench_size1.png" width="640"/>
 
-## Planned features
-
-* TLS encryption (HTTPS/WSS)
 
 ## System requirements
 
@@ -162,7 +167,9 @@ Install [XQuartz](https://www.xquartz.org/).
 
 ## Help welcome
 
-Any advice and suggestions are welcome. Especially with C++ optimization and security.
+The various components of httpgd are written in C++, R and TypeScript. We welcome contributions of any kind.
+
+Other areas in need of improvement are: Testing, documentation, net security and continuous integration.
 
 ## License
 
