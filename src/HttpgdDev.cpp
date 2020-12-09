@@ -35,7 +35,7 @@ namespace httpgd
     }
 
     HttpgdDev::HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params)
-        : devGeneric(t_params.width, t_params.height, t_params.pointsize),
+        : devGeneric(t_params.width, t_params.height, t_params.pointsize, t_params.bg),
           system_aliases(Rcpp::wrap(t_params.aliases["system"])),
           user_aliases(Rcpp::wrap(t_params.aliases["user"])),
           m_history(std::string(".httpgdPlots_").append(random_token(4)))

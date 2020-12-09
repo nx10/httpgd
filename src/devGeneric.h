@@ -9,7 +9,7 @@ namespace httpgd
     {
     public:
 
-        devGeneric(double t_width, double t_height, double t_pointsize);
+        devGeneric(double t_width, double t_height, double t_pointsize, int t_fill);
         virtual ~devGeneric() = default;
         
         static void make_device(const char *t_device_name, devGeneric *t_dev);

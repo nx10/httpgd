@@ -67,7 +67,7 @@ namespace httpgd
                 os << ";";
                 if (alpha != 255)
                 {
-                    fmt::print(os, " fill-opacity: {:f};", alpha / 255.0);
+                    fmt::print(os, " fill-opacity: {:.2f};", alpha / 255.0);
                 }
             }
         }

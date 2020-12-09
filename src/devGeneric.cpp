@@ -6,10 +6,11 @@
 
 namespace httpgd
 {
-    devGeneric::devGeneric(double t_width, double t_height, double t_pointsize)
+    devGeneric::devGeneric(double t_width, double t_height, double t_pointsize, int t_fill)
         : m_initial_width(t_width),
           m_initial_height(t_height),
-          m_initial_pointsize(t_pointsize)
+          m_initial_pointsize(t_pointsize),
+          m_initial_fill(t_fill)
     {
     }
 
