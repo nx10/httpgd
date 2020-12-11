@@ -8,30 +8,12 @@ namespace httpgd
 {
     namespace web
     {
-        /*std::optional<std::string> readfile(std::string const &str)
-        {
-            std::ifstream file{str};
-
-            if (!file.is_open())
-            {
-                return {};
-            }
-
-            file.seekg(0, std::ios::end);
-            size_t size(static_cast<size_t>(file.tellg()));
-            std::string content(size, ' ');
-            file.seekg(0);
-            file.read(&content[0], static_cast<std::streamsize>(size));
-
-            return content;
-        }*/
-
-        std::string read_txt(const std::string &filepath)
+        std::string read_txt(const std::string &filepath, const std::string &fail_default)
         {
             std::ifstream t(filepath);
             if (t.fail())
             {
-                return std::string("");
+                return fail_default;
             }
             std::stringstream buffer;
             buffer << t.rdbuf();
@@ -172,7 +154,7 @@ namespace httpgd
                 ctx.res.result(OB::Belle::Status::ok);
 
                 // send the file contents
-                ctx.res.body() = read_txt(m_app.public_dir() + "/index.html");
+                ctx.res.body() = read_txt(m_app.public_dir() + "/index.html", std::string("<html><body><b>ERROR:</b> File not found (") + m_app.public_dir() + "/index.html).<br>Please reload package.</body></html>");
                 /*if (auto res = readfile(m_app.public_dir() + "/index.html"))
                 {
 
@@ -195,14 +177,6 @@ namespace httpgd
 
                 ctx.res.body() = json_make_state(m_watcher->api_state());
             });
-
-            /*m_app.on_http("/test", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-
-                ctx.res.set("content-type", "application/json");
-                ctx.res.result(OB::Belle::Status::ok);
-
-                ctx.res.body() = std::string(m_watcher->api_server_config()->token);
-            });*/
 
             m_app.on_http("/svg", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
