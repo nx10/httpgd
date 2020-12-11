@@ -24,7 +24,9 @@ LinkingTo: Rcpp,
     later,
     systemfonts
 Suggests:
-    testthat
+    testthat,
+    xml2 (>= 1.0.0),
+    fontquiver (>= 0.2.0)
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 SystemRequirements: 
