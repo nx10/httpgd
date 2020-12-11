@@ -88,13 +88,18 @@ namespace httpgd
             // Default is "stroke: #000000;" as declared in <style>
             if (dc->m_col != R_RGBA(0, 0, 0, 255))
             {
-                if (R_TRANSPARENT(dc->m_col))
+                int alpha = R_ALPHA(dc->m_col);
+                if (alpha == 0)
                 {
                     os << "stroke: none;";
                 }
                 else
                 {
                     css_field_color(os, "stroke", dc->m_col);
+                    if (alpha != 255)
+                    {
+                        fmt::print(os, " stroke-opacity: {:.2f};", alpha / 255.0);
+                    }
                 }
             }
 
@@ -373,8 +378,7 @@ namespace httpgd
             }
             // Finish path data
             os << "\" "
-
-               << "style\"";
+               << "style=\"";
             write_style_linetype(os, this);
             if (R_ALPHA(m_fill) != 0)
             {

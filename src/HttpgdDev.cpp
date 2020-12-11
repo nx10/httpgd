@@ -197,7 +197,7 @@ namespace httpgd
     {
         const double width = dd->right;
         const double height = dd->bottom;
-        const int fill = dd->startfill;
+        const int fill = (R_ALPHA(gc->fill) == 0) ? dd->startfill : gc->fill;
 
         // Rcpp::Rcout << "[new_page] replaying="<<replaying<<"\n";
         if (!replaying)
