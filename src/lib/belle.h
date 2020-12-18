@@ -1239,15 +1239,21 @@ private:
           this->on_control_callback(type, data);
         }
       );
-
-      derived().socket().async_accept_ex(_ctx.req,
+      
+      // beast 1.75 
+      derived().socket().set_option(
+          websocket::stream_base::decorator(
         [&](auto& res)
         {
           for (auto const& e : _attr->http_headers)
           {
             res.insert(e.name_string(), e.value());
           }
-        },
+        }
+      )
+      );
+
+      derived().socket().async_accept(_ctx.req,
         net::bind_executor(_strand,
           [self = derived().shared_from_this()](error_code ec)
           {
