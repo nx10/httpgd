@@ -22,6 +22,7 @@ jobs:
     - name: Install httpgd
       run: |
         Rscript -e "install.packages(c('remotes', 'rcmdcheck'), repos = 'https://cloud.r-project.org')"
+        Rscript -e "install.packages('BH', repos='https://ghrr.github.io/drat')"
         Rscript -e "remotes::install_deps(dependencies = TRUE)"
     - name: Running Tests
       run: |
@@ -48,6 +49,7 @@ jobs:
       run: |
         Rscript -e "install.packages(c('remotes', 'rcmdcheck'), repos = 'https://cloud.r-project.org', type = 'mac.binary')"
         Rscript -e "install.packages(c('Rcpp'), repos = 'https://cloud.r-project.org', type = 'source')"
+        Rscript -e "install.packages('BH', repos='https://ghrr.github.io/drat')"
         Rscript -e "remotes::install_deps(dependencies = TRUE, type = 'mac.binary')"
     - name: Running Tests
       run: Rscript -e "rcmdcheck::rcmdcheck(args = c('--as-cran', '--no-manual', '--timings'), error_on = 'error')"
@@ -68,6 +70,7 @@ jobs:
     - name: Install dependencies
       run: |
         Rscript -e "install.packages(c('remotes', 'devtools'), repos = 'https://cloud.r-project.org', type = 'win.binary')"
+        Rscript -e "install.packages('BH', repos='https://ghrr.github.io/drat')"
         Rscript -e "remotes::install_deps(dependencies = TRUE, type = 'win.binary')"
     - name: Running Tests
       run: Rscript -e "rcmdcheck::rcmdcheck(args = c('--as-cran', '--no-manual', '--timings'), error_on = 'error')"
