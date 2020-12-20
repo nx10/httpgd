@@ -5,7 +5,7 @@
 #include <cmath>
 #include <fmt/ostream.h>
 
-#include <Rcpp.h>
+//#include <Rcpp.h>
 //#include <R_ext/GraphicsEngine.h>
 
 #include "lib/svglite_utils.h"

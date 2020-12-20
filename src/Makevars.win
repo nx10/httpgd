@@ -3,6 +3,7 @@ CXX_STD = CXX17
 RWINLIB = ../windows/baselibs-3.5.0
 
 PKG_CPPFLAGS = -Ilib -I${RWINLIB}/include \
+	-DR_NO_REMAP \
 	-DSTRICT_R_HEADERS \
 	-DBOOST_NO_AUTO_PTR \
 	-DFMT_HEADER_ONLY \

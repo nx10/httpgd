@@ -19,12 +19,10 @@ License: GPL (>= 2)
 Depends:
     R (>= 4.0.0)
 Imports: 
-    Rcpp,
     cpp11,
     later (>= 1.1.0),
     systemfonts (>= 0.2.3)
 LinkingTo: 
-    Rcpp,
     cpp11,
     BH,
     later,

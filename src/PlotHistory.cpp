@@ -1,6 +1,7 @@
-// [[Rcpp::plugins("cpp11")]]
 
-#include <Rcpp.h>
+#include <cpp11/environment.hpp>
+#include <cpp11/function.hpp>
+#include <cpp11/list.hpp>
 #include <R_ext/GraphicsEngine.h>
 #include <R_ext/GraphicsDevice.h>
 
@@ -14,53 +15,51 @@ namespace httpgd
 
     void PlotHistory::m_write_data() const
     {
-        Rcpp::Environment::global_env()[m_rvname] = m_vdl;
+        m_env[m_rvname] = m_vdl;
     }
     bool PlotHistory::m_read_data()
     {
-        const Rcpp::Environment &e = Rcpp::Environment::global_env();
-        if (!e.exists(m_rvname))
+        if (!m_env.exists(m_rvname.c_str()))
         {
             return false;
         }
         else
         {
-            m_vdl = e[m_rvname];
+            m_vdl = cpp11::writable::list(m_env[m_rvname]);
             return true;
         }
     }
     void PlotHistory::m_remove_data() const
     {
-        Rcpp::Environment e = Rcpp::Environment::global_env();
-        if (e.exists(m_rvname))
+        if (m_env.exists(m_rvname.c_str()))
         {
-            e.remove(m_rvname);
+            //TODO m_env.remove(m_rvname.c_str());
         }
     }
-    void PlotHistory::m_empty(int size)
+    void PlotHistory::m_empty(R_xlen_t size)
     {
-        m_vdl = Rcpp::List(size, R_NilValue);
+        m_vdl = cpp11::writable::list(size);
     }
 
-    void PlotHistory::m_grow(int new_size)
+    void PlotHistory::m_grow(R_xlen_t new_size)
     {
-        Rcpp::List new_vdl = Rcpp::List(new_size, R_NilValue);
+        auto new_vdl = cpp11::writable::list(new_size);
         for (int i = 0; i < m_vdl.size(); i++)
         {
-            new_vdl[i] = m_vdl[i];
+            new_vdl.insert(i, m_vdl[i]);
         }
         m_vdl = new_vdl;
     }
 
-    PlotHistory::PlotHistory(const std::string &t_rvname)
-        : m_rvname(t_rvname)
+    PlotHistory::PlotHistory(const std::string &t_rvname, const cpp11::environment &t_env)
+        : m_rvname(t_rvname), m_env(t_env)
     {
     }
     PlotHistory::~PlotHistory()
     {
         m_remove_data();
     }
-    void PlotHistory::set(int index, SEXP snap)
+    void PlotHistory::set(R_xlen_t index, SEXP snap)
     {
         if (!m_read_data())
         {
@@ -73,7 +72,7 @@ namespace httpgd
         m_vdl[index] = snap;
         m_write_data();
     }
-    bool PlotHistory::set_current(int index, pDevDesc dd)
+    bool PlotHistory::set_current(R_xlen_t index, pDevDesc dd)
     {
         pGEDevDesc gdd = desc2GEDesc(dd);
         if (gdd->displayList != R_NilValue)
@@ -83,7 +82,7 @@ namespace httpgd
         }
         return false;
     }
-    void PlotHistory::set_last(int index, pDevDesc dd)
+    void PlotHistory::set_last(R_xlen_t index, pDevDesc dd)
     {
         set(index, desc2GEDesc(dd)->savedSnapshot);
     }
@@ -91,7 +90,7 @@ namespace httpgd
     {
         m_remove_data();
     }
-    bool PlotHistory::play(int index, pDevDesc dd)
+    bool PlotHistory::play(R_xlen_t index, pDevDesc dd)
     {
         SEXP snap = nullptr;
         if (get(index, &snap))
@@ -101,7 +100,7 @@ namespace httpgd
         }
         return false;
     }
-    bool PlotHistory::get(int index, SEXP *snapshot)
+    bool PlotHistory::get(R_xlen_t index, SEXP *snapshot)
     {
         if (!m_read_data())
         {
@@ -115,7 +114,7 @@ namespace httpgd
         return true;
     }
 
-    bool PlotHistory::remove(int index)
+    bool PlotHistory::remove(R_xlen_t index)
     {
         if (!m_read_data())
         {
@@ -128,7 +127,7 @@ namespace httpgd
         m_vdl[index] = R_NilValue;
         for (int i = index; i < m_vdl.size() - 1; i++)
         {
-            m_vdl[i] = m_vdl[i + 1];
+            m_vdl.insert(i, m_vdl[i + 1]);
         }
         m_vdl[m_vdl.size() - 1] = R_NilValue;
         m_write_data();

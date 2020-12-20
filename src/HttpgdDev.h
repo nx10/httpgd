@@ -1,7 +1,7 @@
 #ifndef HTTPGD_DEV_H
 #define HTTPGD_DEV_H
 
-#include <Rcpp.h>
+#include <cpp11/list.hpp>
 
 #include <mutex>
 #include <memory>
@@ -26,7 +26,7 @@ namespace httpgd
         double width;
         double height;
         double pointsize;
-        Rcpp::List &aliases;
+        cpp11::list &aliases;
     };
 
     class DeviceTarget
@@ -51,10 +51,10 @@ namespace httpgd
     public:
 
         // Font handling
-        Rcpp::List system_aliases;
-        Rcpp::List user_aliases;
+        cpp11::list system_aliases;
+        cpp11::list user_aliases;
 
-        HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params);
+        HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params, const cpp11::environment &t_env);
         virtual ~HttpgdDev();
 
         // http server

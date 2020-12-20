@@ -1,6 +1,7 @@
 #ifndef HTTPGD_RGRAPHICSENGINECPP_H
 #define HTTPGD_RGRAPHICSENGINECPP_H
 
+#include <cpp11/R.hpp>
 #include <R_ext/GraphicsEngine.h>
 
 namespace httpgd

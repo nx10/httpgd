@@ -1,6 +1,6 @@
-// [[Rcpp::plugins("cpp11")]]
 
-#include <Rcpp.h>
+
+#include <cpp11/protect.hpp> // for cpp11::stop
 
 #include "devGeneric.h"
 
@@ -128,7 +128,7 @@ namespace httpgd
         {
             pDevDesc dd = t_dev->create();
             if (dd == nullptr)
-                Rcpp::stop("Failed to start device");
+                cpp11::stop("Failed to start device");
 
             pGEDevDesc gdd = GEcreateDevDesc(dd);
             GEaddDevice2(gdd, t_device_name);
@@ -141,10 +141,10 @@ namespace httpgd
     {
         pGEDevDesc gdd = GEcurrentDevice();
         if (gdd == nullptr)
-            Rcpp::stop("Current device not found");
+            cpp11::stop("Current device not found");
         pDevDesc dd = gdd->dev;
         if (dd == nullptr)
-            Rcpp::stop("Current device not found");
+            cpp11::stop("Current device not found");
         return dd;
     }
 

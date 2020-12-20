@@ -1,5 +1,4 @@
 
-#include <Rcpp.h>
 #include <string>
 #include "HttpgdDev.h"
 #include <random>
@@ -34,11 +33,11 @@ namespace httpgd
         m_index = -1;
     }
 
-    HttpgdDev::HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params)
+    HttpgdDev::HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params, const cpp11::environment &t_env)
         : devGeneric(t_params.width, t_params.height, t_params.pointsize, t_params.bg),
-          system_aliases(Rcpp::wrap(t_params.aliases["system"])),
-          user_aliases(Rcpp::wrap(t_params.aliases["user"])),
-          m_history(std::string(".httpgdPlots_").append(random_token(4)))
+          system_aliases(t_params.aliases["system"]),
+          user_aliases(t_params.aliases["user"]),
+          m_history(std::string(".httpgdPlots_").append(random_token(4)), t_env)
     {
         m_df_displaylist = true;
 
@@ -96,7 +95,7 @@ namespace httpgd
         m_initialized = false;
 
         if (m_server && !m_svr_config->silent)
-            Rcpp::Rcout << "Server closing... ";
+            Rprintf("Server closing... ");
 
         // notify watcher
         m_api_async_watcher->rdevice_destructing();
@@ -112,7 +111,7 @@ namespace httpgd
         m_history.clear();
 
         if (m_server && !m_svr_config->silent)
-            Rcpp::Rcout << "Closed.\n";
+            Rprintf("Closed.\n");
     }
 
     void HttpgdDev::dev_metricInfo(int c, pGEcontext gc, double *ascent, double *descent, double *width, pDevDesc dd)
