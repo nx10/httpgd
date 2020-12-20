@@ -16,10 +16,16 @@ Description: Asynchronous HTTP server graphics device.
     Much of the SVG rendering (especially font handling) is based on svglite
     (<https://github.com/r-lib/svglite>).
 License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.4),
+Depends:
+    R (>= 4.0.0)
+Imports: 
+    Rcpp,
+    cpp11,
     later (>= 1.1.0),
     systemfonts (>= 0.2.3)
-LinkingTo: Rcpp, 
+LinkingTo: 
+    Rcpp,
+    cpp11,
     BH,
     later,
     systemfonts

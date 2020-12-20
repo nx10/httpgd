@@ -2,6 +2,10 @@
 
 #include <Rcpp.h>
 
+#include <cpp11/environment.hpp>
+#include <cpp11/function.hpp>
+#include <cpp11/r_string.hpp>
+
 //#include <R_ext/GraphicsEngine.h>
 
 #include <vector>
@@ -15,11 +19,13 @@ namespace httpgd
     // returns system path to {package}/inst/www/{filename}
     std::string get_wwwpath(const std::string &filename)
     {
-        Rcpp::Environment base("package:base");
-        Rcpp::Function sys_file = base["system.file"];
-        Rcpp::StringVector res = sys_file("www", filename,
-                                          Rcpp::_["package"] = "httpgd");
-        return std::string(res[0]);
+        using namespace cpp11::literals;
+
+        auto sys_file = cpp11::package("base")["system.file"];
+
+        cpp11::r_string res(sys_file("www", filename,
+                                          "package"_nm = "httpgd"));
+        return res;
     }
 
     inline HttpgdDev *getDev(pDevDesc dd)
@@ -31,7 +37,7 @@ namespace httpgd
 
 } // namespace httpgd
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 bool httpgd_(std::string host, int port, std::string bg, double width, double height,
              double pointsize, Rcpp::List aliases, bool cors, std::string token, bool webserver, bool silent)
 {
@@ -65,29 +71,29 @@ inline httpgd::HttpgdDev *validate_httpgddev(int devnum)
 {
     if (devnum < 1 || devnum > 64) // R_MaxDevices
     {
-        Rcpp::stop("invalid graphical device number");
+        cpp11::stop("invalid graphical device number");
     }
 
     pGEDevDesc gdd = GEgetDevice(devnum - 1);
     if (!gdd)
     {
-        Rcpp::stop("invalid device");
+        cpp11::stop("invalid device");
     }
     pDevDesc dd = gdd->dev;
     if (!dd)
     {
-        Rcpp::stop("invalid device");
+        cpp11::stop("invalid device");
     }
     auto dev = static_cast<httpgd::HttpgdDev *>(dd->deviceSpecific);
     if (!dev)
     {
-        Rcpp::stop("invalid device");
+        cpp11::stop("invalid device");
     }
 
     return dev;
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 Rcpp::List httpgd_state_(int devnum)
 {
     auto dev = validate_httpgddev(devnum);
@@ -104,7 +110,7 @@ Rcpp::List httpgd_state_(int devnum)
         Rcpp::Named("active") = state.active);
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 std::string httpgd_random_token_(int len)
 {
     if (len < 0)
@@ -114,7 +120,7 @@ std::string httpgd_random_token_(int len)
     return httpgd::HttpgdDev::random_token(len);
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 std::string httpgd_svg_(int devnum, int page, double width, double height)
 {
     auto dev = validate_httpgddev(devnum);
@@ -124,14 +130,14 @@ std::string httpgd_svg_(int devnum, int page, double width, double height)
     return buf.str();
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 bool httpgd_remove_(int devnum, int page)
 {
     auto dev = validate_httpgddev(devnum);
     return dev->api_remove(page);
 }
 
-// [[Rcpp::export]]
+[[cpp11::register]]
 bool httpgd_clear_(int devnum)
 {
     auto dev = validate_httpgddev(devnum);
