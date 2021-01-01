@@ -26,7 +26,7 @@ namespace httpgd
         double width;
         double height;
         double pointsize;
-        cpp11::list &aliases;
+        cpp11::list aliases;
     };
 
     class DeviceTarget
@@ -54,7 +54,7 @@ namespace httpgd
         cpp11::list system_aliases;
         cpp11::list user_aliases;
 
-        HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params, const cpp11::environment &t_env);
+        HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params);
         virtual ~HttpgdDev();
 
         // http server

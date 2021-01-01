@@ -1,12 +1,9 @@
-// [[Rcpp::plugins("cpp11")]]
 
-#include <Rcpp.h>
-
-#include <cpp11/environment.hpp>
 #include <cpp11/function.hpp>
 #include <cpp11/strings.hpp>
 #include <cpp11/list.hpp>
 #include <cpp11/integers.hpp>
+#include <cpp11/as.hpp>
 
 //#include <R_ext/GraphicsEngine.h>
 
@@ -41,8 +38,7 @@ namespace httpgd
 
 [[cpp11::register]]
 bool httpgd_(std::string host, int port, std::string bg, double width, double height,
-             double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent,
-             cpp11::environment env)
+             double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent)
 {
     bool recording = true;
     bool use_token = token.length();
@@ -64,7 +60,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
          width,
          height,
          pointsize,
-         aliases}, env);
+         aliases});
 
     httpgd::HttpgdDev::make_device("httpgd", dev);
     return dev->server_start();

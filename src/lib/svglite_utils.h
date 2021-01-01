@@ -26,10 +26,10 @@
 #define HTTPGD_SVGLITE_UTILS_H
 
 #include <cpp11/list.hpp>
-#include <cpp11/r_string.hpp>
+#include <cpp11/as.hpp>
 #include <systemfonts.h>
+#define R_NO_REMAP
 #include <R_ext/GraphicsEngine.h>
-#include <R_ext/GraphicsDevice.h>
 
 extern "C"
 {
@@ -59,26 +59,26 @@ namespace httpgd
         return face == 5;
     }
 
-    inline std::string find_alias_field(std::string &family, cpp11::list &alias,
+    inline std::string find_alias_field(std::string family, cpp11::list &alias,
                                         const char *face, const char *field)
     {
-        if (alias.names().contains(face))
+        if (alias[face] != R_NilValue)
         {
-            cpp11::list font = alias[face];
-            if (font.names().contains(field))
-                return cpp11::r_string(font[field]);
+            cpp11::list font(alias[face]);
+            if (font[field] != R_NilValue)
+                return cpp11::as_cpp<std::string>(font[field]);
         }
         return std::string();
     }
 
-    inline std::string find_user_alias(std::string &family,
+    inline std::string find_user_alias(std::string family,
                                        cpp11::list const &aliases,
                                        int face, const char *field)
     {
         std::string out;
-        if (aliases.names().contains(family.c_str()))
+        if (aliases[family.c_str()] != R_NilValue)
         {
-            cpp11::list alias = aliases[family];
+            cpp11::list alias(aliases[family.c_str()]);
             if (is_bolditalic(face))
                 out = find_alias_field(family, alias, "bolditalic", field);
             else if (is_bold(face))
@@ -131,15 +131,15 @@ namespace httpgd
         return res;
     }
 
-    inline std::string find_system_alias(std::string &family,
+    inline std::string find_system_alias(std::string family,
                                          cpp11::list const &aliases)
     {
         std::string out;
-        if (aliases.names().contains(family.c_str()))
+        if (aliases[family.c_str()] != R_NilValue)
         {
-            SEXP alias = aliases[family];
+            cpp11::sexp alias = aliases[family.c_str()];
             if (TYPEOF(alias) == STRSXP && Rf_length(alias) == 1)
-                out = cpp11::r_string(alias);
+                out = cpp11::as_cpp<std::string>(alias);
         }
         return out;
     }

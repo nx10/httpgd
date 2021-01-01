@@ -1,8 +1,7 @@
 
-
+#include "devGeneric.h"
 #include <cpp11/protect.hpp> // for cpp11::stop
 
-#include "devGeneric.h"
 
 namespace httpgd
 {
@@ -152,7 +151,7 @@ namespace httpgd
     {
         pGEDevDesc gdd = desc2GEDesc(dd);
 	    if(gdd->dirty) { // avoid trying to replay list if there has been no drawing 
-            GEplayDisplayList(gdd);
+            cpp11::safe[GEplayDisplayList](gdd);
         }
     }
 

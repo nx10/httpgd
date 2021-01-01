@@ -1,9 +1,14 @@
 
+
+#include <cpp11/strings.hpp>
+#include <cpp11/list.hpp>
+#include <cpp11/as.hpp>
 #include <string>
-#include "HttpgdDev.h"
 #include <random>
 #include <cmath>
-#include "graphicsInternals.h"
+//#include "graphicsInternals.h"
+
+#include "HttpgdDev.h"
 
 #include "lib/svglite_utils.h"
 
@@ -33,11 +38,11 @@ namespace httpgd
         m_index = -1;
     }
 
-    HttpgdDev::HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params, const cpp11::environment &t_env)
+    HttpgdDev::HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params)
         : devGeneric(t_params.width, t_params.height, t_params.pointsize, t_params.bg),
-          system_aliases(t_params.aliases["system"]),
-          user_aliases(t_params.aliases["user"]),
-          m_history(std::string(".httpgdPlots_").append(random_token(4)), t_env)
+          system_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["system"])),
+          user_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["user"])),
+          m_history()
     {
         m_df_displaylist = true;
 
@@ -170,26 +175,26 @@ namespace httpgd
         return {minw, minh};
     }*/
     
-    inline httpgd::HttpgdDataStorePageSize find_minsize(const pDevDesc &dd) {
+    /*inline httpgd::HttpgdDataStorePageSize find_minsize(const pDevDesc &dd) {
         auto mai = getGPar(desc2GEDesc(dd)).mai;
         double minw = (mai[1]+mai[3]) * 72 + 1;
         double minh = (mai[0]+mai[2]) * 72 + 1;
         return {minw, minh};
-    }
+    }*/
 
     void HttpgdDev::resize_device_to_page(pDevDesc dd)
     {
         int index = (m_target.is_void()) ? m_target.get_newest_index() : m_target.get_index();
 
         auto size = m_data_store->size(index);
-        auto minsize = find_minsize(dd);
+        //auto minsize = find_minsize(dd);
 
         dd->left = 0.0;
         dd->top = 0.0;
-        dd->right = std::max(size.width, minsize.width);
-        dd->bottom = std::max(size.height, minsize.height);
-        //dd->right = size.width;
-        //dd->bottom = size.height;
+        //dd->right = std::max(size.width, minsize.width);
+        //dd->bottom = std::max(size.height, minsize.height);
+        dd->right = size.width;
+        dd->bottom = size.height;
     }
 
     void HttpgdDev::dev_newPage(pGEcontext gc, pDevDesc dd)
@@ -204,7 +209,7 @@ namespace httpgd
             if (m_target.get_newest_index() >= 0) // no previous pages
             {
                 // Rcpp::Rcout << "    -> record open page in history\n";
-                m_history.set_last(m_target.get_newest_index(), dd);
+                m_history.put_last(m_target.get_newest_index(), dd);
             }
             // Rcpp::Rcout << "    -> add new page to server\n";
             m_target.set_index(m_data_store->append(width, height));
@@ -303,7 +308,7 @@ namespace httpgd
         else
         {
             // Rcpp::Rcout << "    -> old page. target_newest_index="<< m_target.get_newest_index() << "\n";
-            m_history.set_current(m_target.get_newest_index(), dd);
+            m_history.put_current(m_target.get_newest_index(), dd);
 
             m_target.set_index(index);
             resize_device_to_page(dd);

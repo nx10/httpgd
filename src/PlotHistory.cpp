@@ -1,136 +1,74 @@
 
-#include <cpp11/environment.hpp>
-#include <cpp11/function.hpp>
-#include <cpp11/list.hpp>
+
+#include <cpp11/R.hpp>
+#include <cpp11/protect.hpp>
+#define R_NO_REMAP
 #include <R_ext/GraphicsEngine.h>
 #include <R_ext/GraphicsDevice.h>
-
 #include <string>
 
 #include "PlotHistory.h"
 
 namespace httpgd
 {
-    const int GROW_STEP = 4;
-
-    void PlotHistory::m_write_data() const
+    PlotHistory::PlotHistory()
+        : m_items()
     {
-        m_env[m_rvname] = m_vdl;
     }
-    bool PlotHistory::m_read_data()
+    void PlotHistory::put(R_xlen_t t_index, SEXP t_snapshot)
     {
-        if (!m_env.exists(m_rvname.c_str()))
+        if (m_items.size() <= t_index)
         {
-            return false;
+            m_items.resize(t_index + 1);
         }
-        else
-        {
-            m_vdl = cpp11::writable::list(m_env[m_rvname]);
-            return true;
-        }
+        m_items[t_index] = t_snapshot;
     }
-    void PlotHistory::m_remove_data() const
-    {
-        if (m_env.exists(m_rvname.c_str()))
-        {
-            //TODO m_env.remove(m_rvname.c_str());
-        }
-    }
-    void PlotHistory::m_empty(R_xlen_t size)
-    {
-        m_vdl = cpp11::writable::list(size);
-    }
-
-    void PlotHistory::m_grow(R_xlen_t new_size)
-    {
-        auto new_vdl = cpp11::writable::list(new_size);
-        for (int i = 0; i < m_vdl.size(); i++)
-        {
-            new_vdl.insert(i, m_vdl[i]);
-        }
-        m_vdl = new_vdl;
-    }
-
-    PlotHistory::PlotHistory(const std::string &t_rvname, const cpp11::environment &t_env)
-        : m_rvname(t_rvname), m_env(t_env)
-    {
-    }
-    PlotHistory::~PlotHistory()
-    {
-        m_remove_data();
-    }
-    void PlotHistory::set(R_xlen_t index, SEXP snap)
-    {
-        if (!m_read_data())
-        {
-            m_empty(index + GROW_STEP - (index % GROW_STEP));
-        }
-        else if (index >= m_vdl.size())
-        {
-            m_grow(index + GROW_STEP - (index % GROW_STEP));
-        }
-        m_vdl[index] = snap;
-        m_write_data();
-    }
-    bool PlotHistory::set_current(R_xlen_t index, pDevDesc dd)
+    bool PlotHistory::put_current(R_xlen_t t_index, pDevDesc dd)
     {
         pGEDevDesc gdd = desc2GEDesc(dd);
         if (gdd->displayList != R_NilValue)
         {
-            set(index, GEcreateSnapshot(gdd));
+            put(t_index, cpp11::safe[GEcreateSnapshot](gdd));
             return true;
         }
         return false;
     }
-    void PlotHistory::set_last(R_xlen_t index, pDevDesc dd)
+    void PlotHistory::put_last(R_xlen_t t_index, pDevDesc dd)
     {
-        set(index, desc2GEDesc(dd)->savedSnapshot);
+        put(t_index, desc2GEDesc(dd)->savedSnapshot);
     }
     void PlotHistory::clear()
     {
-        m_remove_data();
+        m_items.clear();
     }
-    bool PlotHistory::play(R_xlen_t index, pDevDesc dd)
+    bool PlotHistory::play(R_xlen_t t_index, pDevDesc dd)
     {
-        SEXP snap = nullptr;
-        if (get(index, &snap))
+        SEXP snap = R_NilValue;
+        if (get(t_index, &snap))
         {
-            GEplaySnapshot(snap, desc2GEDesc(dd));
+            cpp11::safe[GEplaySnapshot](snap, desc2GEDesc(dd));
             return true;
         }
         return false;
     }
-    bool PlotHistory::get(R_xlen_t index, SEXP *snapshot)
+    bool PlotHistory::get(R_xlen_t t_index, SEXP *t_snapshot)
     {
-        if (!m_read_data())
+        if (m_items.size() <= t_index)
         {
+            *t_snapshot = R_NilValue;
             return false;
         }
-        else if (index >= m_vdl.size())
-        {
-            return false;
-        }
-        *snapshot = m_vdl[index];
+        *t_snapshot = m_items[t_index];
         return true;
     }
 
-    bool PlotHistory::remove(R_xlen_t index)
+    bool PlotHistory::remove(R_xlen_t t_index)
     {
-        if (!m_read_data())
+        if (m_items.size() <= t_index)
         {
             return false;
         }
-        else if (index >= m_vdl.size())
-        {
-            return false;
-        }
-        m_vdl[index] = R_NilValue;
-        for (int i = index; i < m_vdl.size() - 1; i++)
-        {
-            m_vdl.insert(i, m_vdl[i + 1]);
-        }
-        m_vdl[m_vdl.size() - 1] = R_NilValue;
-        m_write_data();
+        m_items.erase(t_index);
         return true;
     }
 
