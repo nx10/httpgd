@@ -381,15 +381,15 @@ class HttpgdViewer {
     downloadPlotPNG() {
         const canvas = document.createElement('canvas');
         document.body.appendChild(canvas);
-        canvas.width = this.plotParams.width;
-        canvas.height = this.plotParams.height;
+        canvas.width = this.plotParams.width / this.scale;
+        canvas.height = this.plotParams.height / this.scale;
         const ctx = canvas.getContext('2d');
         if (!ctx)
             return;
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => {
-            ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             var imgURI = canvas
                 .toDataURL('image/png')
                 .replace('image/png', 'image/octet-stream');
