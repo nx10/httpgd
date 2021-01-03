@@ -11,6 +11,9 @@ namespace httpgd
     class PlotHistory
     {
     public:
+        // Replay the current graphics device state
+        static bool replay_current(pDevDesc dd);
+
         PlotHistory();
 
         void put(R_xlen_t index, SEXP snapshot);

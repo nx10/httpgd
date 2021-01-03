@@ -147,14 +147,6 @@ namespace httpgd
         return dd;
     }
 
-    void devGeneric::replay_current(pDevDesc dd)
-    {
-        pGEDevDesc gdd = desc2GEDesc(dd);
-	    if(gdd->dirty) { // avoid trying to replay list if there has been no drawing 
-            cpp11::safe[GEplayDisplayList](gdd);
-        }
-    }
-
     // CALLBACKS
 
     void devGeneric::dev_activate(pDevDesc dd)

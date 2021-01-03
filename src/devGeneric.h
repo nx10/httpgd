@@ -17,8 +17,6 @@ namespace httpgd
         static void make_device(const char *t_device_name, devGeneric *t_dev);
         // avoid when possible
         static pDevDesc get_active_pDevDesc();
-        // Replay the current graphics device state
-        static void replay_current(pDevDesc dd);
 
     protected:
         // DEVICE CALLBACKS

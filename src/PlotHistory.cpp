@@ -9,8 +9,28 @@
 
 #include "PlotHistory.h"
 
+#include "DebugPrint.h"
+
 namespace httpgd
 {
+    bool PlotHistory::replay_current(pDevDesc dd)
+    {
+        pGEDevDesc gdd = desc2GEDesc(dd);
+        if (gdd->dirty)
+        { // avoid trying to replay list if there has been no drawing
+            try
+            {
+                cpp11::safe[GEplayDisplayList](gdd);
+            }
+            catch (...)
+            {
+                debug_print("GEplayDisplayList error\n");
+                return false;
+            }
+        }
+        return true;
+    }
+
     PlotHistory::PlotHistory()
         : m_items()
     {
@@ -28,7 +48,15 @@ namespace httpgd
         pGEDevDesc gdd = desc2GEDesc(dd);
         if (gdd->displayList != R_NilValue)
         {
-            put(t_index, cpp11::safe[GEcreateSnapshot](gdd));
+            try
+            {
+                put(t_index, cpp11::safe[GEcreateSnapshot](gdd));
+            }
+            catch (...)
+            {
+                debug_print("GEcreateSnapshot error\n");
+                return false;
+            }
             return true;
         }
         return false;
@@ -46,7 +74,15 @@ namespace httpgd
         SEXP snap = R_NilValue;
         if (get(t_index, &snap))
         {
-            cpp11::safe[GEplaySnapshot](snap, desc2GEDesc(dd));
+            try
+            {
+                cpp11::safe[GEplaySnapshot](snap, desc2GEDesc(dd));
+            }
+            catch (...)
+            {
+                debug_print("GEplaySnapshot error\n");
+                return false;
+            }
             return true;
         }
         return false;
@@ -59,7 +95,7 @@ namespace httpgd
             return false;
         }
         *t_snapshot = m_items[t_index];
-        return true;
+        return *t_snapshot != R_NilValue;
     }
 
     bool PlotHistory::remove(R_xlen_t t_index)
