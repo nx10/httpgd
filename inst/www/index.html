@@ -239,7 +239,7 @@
           fun: () => httpgdViewer.navRemove()
         },
         {
-          keys: [67],
+          keys: [84],
           fun: () => httpgdViewer.navClear()
         },
         {
@@ -253,6 +253,11 @@
         {
           keys: [48],
           fun: () => httpgdViewer.zoomReset()
+        },
+        {
+          keys: [67],
+          ctrl: true,
+          fun: () => httpgdViewer.copyPlotPNG()
         }
       ];
 

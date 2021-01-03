@@ -474,10 +474,28 @@ class HttpgdViewer {
         img.crossOrigin = "anonymous";
         img.onload = () => {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            var imgURI = canvas
+            const imgURI = canvas
                 .toDataURL('image/png')
                 .replace('image/png', 'image/octet-stream');
             HttpgdViewer.downloadURL(imgURI, 'plot.png');
+        };
+        img.src = this.svgURL();
+        document.body.removeChild(canvas);
+    }
+
+    public copyPlotPNG() {
+        if (!navigator.clipboard) return;
+        const canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
+        canvas.width = this.plotParams.width / this.scale;
+        canvas.height = this.plotParams.height / this.scale;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => { if (blob) navigator.clipboard.write?.([new ClipboardItem({ 'image/png': blob })]) });
         };
         img.src = this.svgURL();
         document.body.removeChild(canvas);
