@@ -107,7 +107,6 @@ namespace httpgd
             switch (lty)
             {
             case LTY_BLANK: // never called: blank lines never get to this point
-                os << "<!--BLANK-->";
             case LTY_SOLID: // default svg setting, so don't need to write out
                 break;
             default:
