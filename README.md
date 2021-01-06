@@ -1,6 +1,8 @@
 # httpgd <img src="docs/httpgd_logo.svg" align="right" height = 250/>
 
-[![R build status](https://github.com/nx10/httpgd/workflows/build/badge.svg)](https://github.com/nx10/httpgd/actions)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
+<!-- badges: end -->
 
 Asynchronous http server graphics device for R.
 
