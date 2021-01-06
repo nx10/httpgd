@@ -48,7 +48,8 @@ hgd <-
            token = TRUE,
            silent = FALSE,
            websockets = TRUE,
-           webserver = TRUE) {
+           webserver = TRUE, 
+           fix_text_width = TRUE) {
     
     tok <- ""
     if (is.character(token)) {
@@ -60,7 +61,7 @@ hgd <-
     }
     
     aliases <- validate_aliases(system_fonts, user_fonts)
-    if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok, webserver, silent)) {
+    if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok, webserver, silent, fix_text_width)) {
       if (!silent && webserver) {
         cat("httpgd server running at:\n  ",
           hyperrefstyle(hgd_url(websockets = websockets)),
@@ -225,4 +226,42 @@ hgd_close <- function(which = dev.cur(), all = FALSE) {
 #' @export
 hgd_generate_token <- function(len) {
   httpgd_random_token_(len)
+}
+
+
+#' Returns a plot rendered as a SVG string.
+#' This is similar to hgd_svg(...) but the plotting code is specified inline.
+#' This function manages (creates and destroys) the httpgd graphics device by itself.
+#'
+#' @param code Plotting code.
+#' @param page Plot page to render. If this is set to 0, the last page will be selected. 
+#' @param width Width of the plot. If this is set to -1, the last width will be selected. 
+#' @param height Height of the plot. If this is set to -1, the last height will be selected.
+#' @param file Filepath to save SVG. (No file will be created if this is NA)
+#' @param ... Additional parameters passed to hgd(webserver=FALSE, ...)
+#'
+#' @return Rendered SVG string.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' 
+#' hgd_inline({
+#'   hist(rnorm(100))
+#' })
+#' 
+#' hgd_inline({
+#'   plot.new()
+#'   lines(c(0.5, 1, 0.5), c(0.5, 1, 1))
+#' })
+#' }
+hgd_inline <- function(code, page = 0, width = -1, height = -1, file = NA, ...) {
+  hgd(webserver=FALSE, ...)
+  tryCatch(code,
+    finally = {
+      s <- hgd_svg(page=page, width=width, height=height)
+      dev.off()
+    }
+  )
+  s
 }

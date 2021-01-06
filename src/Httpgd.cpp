@@ -38,7 +38,7 @@ namespace httpgd
 
 [[cpp11::register]]
 bool httpgd_(std::string host, int port, std::string bg, double width, double height,
-             double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent)
+             double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent, bool fix_text_width)
 {
     bool recording = true;
     bool use_token = token.length();
@@ -60,7 +60,8 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
          width,
          height,
          pointsize,
-         aliases});
+         aliases,
+         fix_text_width});
 
     httpgd::HttpgdDev::make_device("httpgd", dev);
     return dev->server_start();

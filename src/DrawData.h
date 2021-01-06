@@ -63,7 +63,7 @@ namespace httpgd
             void build_svg(std::ostream &os) const override;
 
         private:
-            double m_x, m_y, m_rot/*, m_hadj*/;
+            double m_x, m_y, m_rot, m_hadj;
             std::string m_str;
             TextInfo m_text;
         };

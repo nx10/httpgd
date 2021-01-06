@@ -27,6 +27,7 @@ namespace httpgd
         double height;
         double pointsize;
         cpp11::list aliases;
+        bool fix_strwidth;
     };
 
     class DeviceTarget
@@ -117,6 +118,8 @@ namespace httpgd
 
         // set device size
         void resize_device_to_page(pDevDesc dd);
+
+        bool m_fix_strwidth  = true;
     };
 
 } // namespace httpgd

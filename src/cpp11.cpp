@@ -5,10 +5,10 @@
 #include "cpp11/declarations.hpp"
 
 // Httpgd.cpp
-bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent);
-extern "C" SEXP _httpgd_httpgd_(SEXP host, SEXP port, SEXP bg, SEXP width, SEXP height, SEXP pointsize, SEXP aliases, SEXP cors, SEXP token, SEXP webserver, SEXP silent) {
+bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent, bool fix_text_width);
+extern "C" SEXP _httpgd_httpgd_(SEXP host, SEXP port, SEXP bg, SEXP width, SEXP height, SEXP pointsize, SEXP aliases, SEXP cors, SEXP token, SEXP webserver, SEXP silent, SEXP fix_text_width) {
   BEGIN_CPP11
-    return cpp11::as_sexp(httpgd_(cpp11::as_cpp<cpp11::decay_t<std::string>>(host), cpp11::as_cpp<cpp11::decay_t<int>>(port), cpp11::as_cpp<cpp11::decay_t<std::string>>(bg), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(pointsize), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(aliases), cpp11::as_cpp<cpp11::decay_t<bool>>(cors), cpp11::as_cpp<cpp11::decay_t<std::string>>(token), cpp11::as_cpp<cpp11::decay_t<bool>>(webserver), cpp11::as_cpp<cpp11::decay_t<bool>>(silent)));
+    return cpp11::as_sexp(httpgd_(cpp11::as_cpp<cpp11::decay_t<std::string>>(host), cpp11::as_cpp<cpp11::decay_t<int>>(port), cpp11::as_cpp<cpp11::decay_t<std::string>>(bg), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(pointsize), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(aliases), cpp11::as_cpp<cpp11::decay_t<bool>>(cors), cpp11::as_cpp<cpp11::decay_t<std::string>>(token), cpp11::as_cpp<cpp11::decay_t<bool>>(webserver), cpp11::as_cpp<cpp11::decay_t<bool>>(silent), cpp11::as_cpp<cpp11::decay_t<bool>>(fix_text_width)));
   END_CPP11
 }
 // Httpgd.cpp
@@ -49,7 +49,7 @@ extern "C" SEXP _httpgd_httpgd_clear_(SEXP devnum) {
 
 extern "C" {
 /* .Call calls */
-extern SEXP _httpgd_httpgd_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _httpgd_httpgd_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _httpgd_httpgd_clear_(SEXP);
 extern SEXP _httpgd_httpgd_random_token_(SEXP);
 extern SEXP _httpgd_httpgd_remove_(SEXP, SEXP);
@@ -57,7 +57,7 @@ extern SEXP _httpgd_httpgd_state_(SEXP);
 extern SEXP _httpgd_httpgd_svg_(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_httpgd_httpgd_",              (DL_FUNC) &_httpgd_httpgd_,              11},
+    {"_httpgd_httpgd_",              (DL_FUNC) &_httpgd_httpgd_,              12},
     {"_httpgd_httpgd_clear_",        (DL_FUNC) &_httpgd_httpgd_clear_,         1},
     {"_httpgd_httpgd_random_token_", (DL_FUNC) &_httpgd_httpgd_random_token_,  1},
     {"_httpgd_httpgd_remove_",       (DL_FUNC) &_httpgd_httpgd_remove_,        2},

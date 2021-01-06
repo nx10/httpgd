@@ -17,7 +17,8 @@ hgd(
   token = TRUE,
   silent = FALSE,
   websockets = TRUE,
-  webserver = TRUE
+  webserver = TRUE,
+  fix_text_width = TRUE
 )
 }
 \arguments{

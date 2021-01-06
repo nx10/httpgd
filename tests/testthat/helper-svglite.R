@@ -1,17 +1,6 @@
-# httpgd equivalent to svglite::inlineSVG
-inlineSVG <- function(code, ...) {
-  hgd(webserver=F, ...)
-  tryCatch(code,
-    finally = {
-      s <- hgd_svg()
-      dev.off()
-    }
-  )
-  s
-}
 # httpgd equivalent to svglite::xmlSVG
 xmlSVG <- function(code, ...) {
-  xml2::read_xml(inlineSVG(code, ...))
+  xml2::read_xml(hgd_inline(code, ...))
 }
 
 # Helper

@@ -47,7 +47,8 @@ namespace httpgd
         : devGeneric(t_params.width, t_params.height, t_params.pointsize, t_params.bg),
           system_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["system"])),
           user_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["user"])),
-          m_history()
+          m_history(),
+          m_fix_strwidth(t_params.fix_strwidth)
     {
         m_df_displaylist = true;
 
@@ -241,7 +242,7 @@ namespace httpgd
                                            gc->cex * gc->ps,
                                            is_bold(gc->fontface),
                                            is_italic(gc->fontface),
-                                           dev_strWidth(str, gc, dd)}));
+                                           m_fix_strwidth ? dev_strWidth(str, gc, dd) : -1.0}));
     }
     void HttpgdDev::dev_rect(double x0, double y0, double x1, double y1, pGEcontext gc, pDevDesc dd)
     {

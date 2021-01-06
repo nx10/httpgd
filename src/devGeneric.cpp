@@ -95,11 +95,11 @@ namespace httpgd
 
         // Capabilities
         dd->canClip = static_cast<Rboolean>(1);
-        dd->canHAdj = 0;
+        dd->canHAdj = 1;
         dd->canChangeGamma = static_cast<Rboolean>(0);
         dd->displayListOn = static_cast<Rboolean>(m_df_displaylist);
         dd->haveTransparency = 2;
-        dd->haveTransparentBg = 2;
+        dd->haveTransparentBg = 3;
 
         dd->haveRaster = 2;
         dd->haveCapture = 1;

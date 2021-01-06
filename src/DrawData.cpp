@@ -192,9 +192,9 @@ namespace httpgd
             os << "\" ";
         }
 
-        Text::Text(const void *gc, double x, double y, const std::string &str, double rot, double /*hadj*/, const TextInfo &t_text)
+        Text::Text(const void *gc, double x, double y, const std::string &str, double rot, double hadj, const TextInfo &t_text)
             : DrawCall(gc),
-              m_x(x), m_y(y), m_rot(rot), /*m_hadj(hadj),*/ m_str(str), m_text(t_text)
+              m_x(x), m_y(y), m_rot(rot), m_hadj(hadj), m_str(str), m_text(t_text)
         {
         }
         void Text::build_svg(std::ostream &os) const
@@ -216,24 +216,35 @@ namespace httpgd
             {
                 fmt::print(os, "transform=\"translate({:.2f},{:.2f}) rotate({:.2f})\" ", m_x, m_y, m_rot * -1.0);
             }
-            svg_field(os, "font-family", m_text.font_family);
-            svg_field(os, "font-size", m_text.fontsize);
+
+            if (m_hadj == 0.5)
+            {
+                svg_field(os, "text-anchor", "middle");
+            }
+            else if (m_hadj == 1)
+            {
+                svg_field(os, "text-anchor", "end");
+            }
+
+            os << "style=\"";
+            fmt::print(os, "font-family: {}; font-size: {:.2f}px; ", m_text.font_family, m_text.fontsize);
             if (m_text.bold)
             {
-                svg_field(os, "font-weight", "bold");
+                css_field(os, "font-weight", "bold");
             }
             if (m_text.italic)
             {
-                svg_field(os, "font-style", "italic");
+                css_field(os, "font-style", "italic");
             }
             if (m_col != (int)R_RGB(0, 0, 0))
             {
-                os << "style=\"";
                 write_style_col(os, this->m_col);
-                os << "\" ";
             }
-            // todo: libsvg also sets the text width in pixels here
-
+            os << "\"";
+            if (m_text.txtwidth_px > 0)
+            {
+                fmt::print(os, " textLength='{}px' lengthAdjust='spacingAndGlyphs'", m_text.txtwidth_px);
+            }
             os << ">";
             write_xml_escaped(os, m_str);
             os << "</text></g>";
