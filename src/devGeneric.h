@@ -1,6 +1,8 @@
 #ifndef HTTPGD_RGRAPHICSENGINECPP_H
 #define HTTPGD_RGRAPHICSENGINECPP_H
 
+#define R_NO_REMAP
+#include <cpp11/R.hpp>
 #include <R_ext/GraphicsEngine.h>
 
 namespace httpgd
@@ -15,8 +17,6 @@ namespace httpgd
         static void make_device(const char *t_device_name, devGeneric *t_dev);
         // avoid when possible
         static pDevDesc get_active_pDevDesc();
-        // Replay the current graphics device state
-        static void replay_current(pDevDesc dd);
 
     protected:
         // DEVICE CALLBACKS

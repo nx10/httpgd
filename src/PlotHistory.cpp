@@ -1,137 +1,110 @@
-// [[Rcpp::plugins("cpp11")]]
 
-#include <Rcpp.h>
+
+#include <cpp11/R.hpp>
+#include <cpp11/protect.hpp>
+#define R_NO_REMAP
 #include <R_ext/GraphicsEngine.h>
 #include <R_ext/GraphicsDevice.h>
-
 #include <string>
 
 #include "PlotHistory.h"
 
+#include "DebugPrint.h"
+
 namespace httpgd
 {
-    const int GROW_STEP = 4;
-
-    void PlotHistory::m_write_data() const
+    bool PlotHistory::replay_current(pDevDesc dd)
     {
-        Rcpp::Environment::global_env()[m_rvname] = m_vdl;
-    }
-    bool PlotHistory::m_read_data()
-    {
-        const Rcpp::Environment &e = Rcpp::Environment::global_env();
-        if (!e.exists(m_rvname))
-        {
-            return false;
+        pGEDevDesc gdd = desc2GEDesc(dd);
+        if (gdd->dirty)
+        { // avoid trying to replay list if there has been no drawing
+            try
+            {
+                cpp11::safe[GEplayDisplayList](gdd);
+            }
+            catch (...)
+            {
+                debug_print("GEplayDisplayList error\n");
+                return false;
+            }
         }
-        else
-        {
-            m_vdl = e[m_rvname];
-            return true;
-        }
-    }
-    void PlotHistory::m_remove_data() const
-    {
-        Rcpp::Environment e = Rcpp::Environment::global_env();
-        if (e.exists(m_rvname))
-        {
-            e.remove(m_rvname);
-        }
-    }
-    void PlotHistory::m_empty(int size)
-    {
-        m_vdl = Rcpp::List(size, R_NilValue);
+        return true;
     }
 
-    void PlotHistory::m_grow(int new_size)
+    PlotHistory::PlotHistory()
+        : m_items()
     {
-        Rcpp::List new_vdl = Rcpp::List(new_size, R_NilValue);
-        for (int i = 0; i < m_vdl.size(); i++)
+    }
+    void PlotHistory::put(R_xlen_t t_index, SEXP t_snapshot)
+    {
+        if (m_items.size() <= t_index)
         {
-            new_vdl[i] = m_vdl[i];
+            m_items.resize(t_index + 1);
         }
-        m_vdl = new_vdl;
+        m_items[t_index] = t_snapshot;
     }
-
-    PlotHistory::PlotHistory(const std::string &t_rvname)
-        : m_rvname(t_rvname)
-    {
-    }
-    PlotHistory::~PlotHistory()
-    {
-        m_remove_data();
-    }
-    void PlotHistory::set(int index, SEXP snap)
-    {
-        if (!m_read_data())
-        {
-            m_empty(index + GROW_STEP - (index % GROW_STEP));
-        }
-        else if (index >= m_vdl.size())
-        {
-            m_grow(index + GROW_STEP - (index % GROW_STEP));
-        }
-        m_vdl[index] = snap;
-        m_write_data();
-    }
-    bool PlotHistory::set_current(int index, pDevDesc dd)
+    bool PlotHistory::put_current(R_xlen_t t_index, pDevDesc dd)
     {
         pGEDevDesc gdd = desc2GEDesc(dd);
         if (gdd->displayList != R_NilValue)
         {
-            set(index, GEcreateSnapshot(gdd));
+            try
+            {
+                put(t_index, cpp11::safe[GEcreateSnapshot](gdd));
+            }
+            catch (...)
+            {
+                debug_print("GEcreateSnapshot error\n");
+                return false;
+            }
             return true;
         }
         return false;
     }
-    void PlotHistory::set_last(int index, pDevDesc dd)
+    void PlotHistory::put_last(R_xlen_t t_index, pDevDesc dd)
     {
-        set(index, desc2GEDesc(dd)->savedSnapshot);
+        put(t_index, desc2GEDesc(dd)->savedSnapshot);
     }
     void PlotHistory::clear()
     {
-        m_remove_data();
+        m_items.clear();
     }
-    bool PlotHistory::play(int index, pDevDesc dd)
+    bool PlotHistory::play(R_xlen_t t_index, pDevDesc dd)
     {
-        SEXP snap = nullptr;
-        if (get(index, &snap))
+        SEXP snap = R_NilValue;
+        if (get(t_index, &snap))
         {
-            GEplaySnapshot(snap, desc2GEDesc(dd));
+            try
+            {
+                cpp11::safe[GEplaySnapshot](snap, desc2GEDesc(dd));
+            }
+            catch (...)
+            {
+                debug_print("GEplaySnapshot error\n");
+                return false;
+            }
             return true;
         }
         return false;
     }
-    bool PlotHistory::get(int index, SEXP *snapshot)
+    bool PlotHistory::get(R_xlen_t t_index, SEXP *t_snapshot)
     {
-        if (!m_read_data())
+        if (m_items.size() <= t_index)
         {
+            *t_snapshot = R_NilValue;
             return false;
         }
-        else if (index >= m_vdl.size())
-        {
-            return false;
-        }
-        *snapshot = m_vdl[index];
-        return true;
+        *t_snapshot = m_items[t_index];
+        return *t_snapshot != R_NilValue;
     }
 
-    bool PlotHistory::remove(int index)
+    bool PlotHistory::remove(R_xlen_t t_index)
     {
-        if (!m_read_data())
+        if (m_items.size() <= t_index)
         {
             return false;
         }
-        else if (index >= m_vdl.size())
-        {
-            return false;
-        }
-        m_vdl[index] = R_NilValue;
-        for (int i = index; i < m_vdl.size() - 1; i++)
-        {
-            m_vdl[i] = m_vdl[i + 1];
-        }
-        m_vdl[m_vdl.size() - 1] = R_NilValue;
-        m_write_data();
+        m_items.erase(t_index);
         return true;
     }
 

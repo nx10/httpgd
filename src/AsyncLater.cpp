@@ -1,6 +1,6 @@
 
 
-#include <Rcpp.h>
+//#include <cpp11/protect.hpp>
 #include <mutex>
 #include <later_api.h>
 #include "AsyncLater.h"
@@ -26,14 +26,15 @@ namespace httpgd
             later::later([](void *data) {
                 try
                 {
-                    Rcpp::unwindProtect([](void *data) { 
+                    //cpp11::unwind_protect([&data]() { 
                         auto d = static_cast<AsyncLaterData *>(data);
                         d->func(d->data);
-                        return R_NilValue;
-                    }, data);
+                        //return R_NilValue;
+                    //});
                 }
                 catch (...)
                 {
+                    REprintf("AsyncLater error");
                 } // make sure mutex gets unlocked (does not work)
                 later_mutex.unlock();
             },

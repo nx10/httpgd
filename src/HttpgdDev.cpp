@@ -1,16 +1,25 @@
 
-#include <Rcpp.h>
+
+#include <cpp11/strings.hpp>
+#include <cpp11/list.hpp>
+#include <cpp11/as.hpp>
+#include <cpp11/function.hpp>
+#include <cpp11/doubles.hpp>
 #include <string>
-#include "HttpgdDev.h"
 #include <random>
 #include <cmath>
-#include "graphicsInternals.h"
+
+#include "HttpgdDev.h"
 
 #include "lib/svglite_utils.h"
+#include "DebugPrint.h"
 
 namespace httpgd
 {
-    int DeviceTarget::get_index() const { return m_index; }
+    int DeviceTarget::get_index() const
+    {
+        return m_index;
+    }
     void DeviceTarget::set_index(int t_index)
     {
         m_void = false;
@@ -36,9 +45,9 @@ namespace httpgd
 
     HttpgdDev::HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params)
         : devGeneric(t_params.width, t_params.height, t_params.pointsize, t_params.bg),
-          system_aliases(Rcpp::wrap(t_params.aliases["system"])),
-          user_aliases(Rcpp::wrap(t_params.aliases["user"])),
-          m_history(std::string(".httpgdPlots_").append(random_token(4)))
+          system_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["system"])),
+          user_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["user"])),
+          m_history()
     {
         m_df_displaylist = true;
 
@@ -60,10 +69,12 @@ namespace httpgd
 
     void HttpgdDev::dev_activate(pDevDesc dd)
     {
-        if (!m_initialized) return;
+        if (!m_initialized)
+            return;
         //Rcpp::Rcout << "ACTIVATE 1\n";
         m_data_store->set_device_active(true);
-        if (m_server && m_server_running) {
+        if (m_server && m_server_running)
+        {
             HttpgdState state = m_data_store->state();
             state.active = true; // in case it has changed
             m_server->broadcast_state(state);
@@ -71,10 +82,12 @@ namespace httpgd
     }
     void HttpgdDev::dev_deactivate(pDevDesc dd)
     {
-        if (!m_initialized) return;
+        if (!m_initialized)
+            return;
         //Rcpp::Rcout << "DEACTIVATE 0\n";
         m_data_store->set_device_active(false);
-        if (m_server && m_server_running) {
+        if (m_server && m_server_running)
+        {
             HttpgdState state = m_data_store->state();
             state.active = false; // in case it has changed
             m_server->broadcast_state(state);
@@ -86,7 +99,7 @@ namespace httpgd
         //Rcpp::Rcout << "MODE "<<mode<<"\n";
         if (m_target.is_void() || mode == 1)
             return;
-            
+
         if (m_server && m_server_running)
             m_server->broadcast_state_current();
     }
@@ -96,7 +109,7 @@ namespace httpgd
         m_initialized = false;
 
         if (m_server && !m_svr_config->silent)
-            Rcpp::Rcout << "Server closing... ";
+            Rprintf("Server closing... ");
 
         // notify watcher
         m_api_async_watcher->rdevice_destructing();
@@ -112,7 +125,7 @@ namespace httpgd
         m_history.clear();
 
         if (m_server && !m_svr_config->silent)
-            Rcpp::Rcout << "Closed.\n";
+            Rprintf("Closed.\n");
     }
 
     void HttpgdDev::dev_metricInfo(int c, pGEcontext gc, double *ascent, double *descent, double *width, pDevDesc dd)
@@ -162,17 +175,14 @@ namespace httpgd
     {
     }
 
-    /*inline httpgd::HttpgdDataStorePageSize find_minsize() {
-        Rcpp::Function rpar("par");
-        Rcpp::List res = rpar();
-        Rcpp::NumericVector mai = res["mai"];
-        double minw = (mai[1]+mai[3]) * 72 + 1;
-        double minh = (mai[0]+mai[2]) * 72 + 1;
-        return {minw, minh};
-    }*/
-    
+    /**
+     * "Figure margins too large" protection.
+     * Including the graphics headers and reading the values directly
+     * is about 40 times faster, but is probably not allowed by CRAN.
+     */
     inline httpgd::HttpgdDataStorePageSize find_minsize(const pDevDesc &dd) {
-        auto mai = getGPar(desc2GEDesc(dd)).mai;
+        auto par = cpp11::package("graphics")["par"];
+        auto mai = cpp11::as_cpp<cpp11::doubles>(cpp11::as_cpp<cpp11::list>(par())["mai"]);
         double minw = (mai[1]+mai[3]) * 72 + 1;
         double minh = (mai[0]+mai[2]) * 72 + 1;
         return {minw, minh};
@@ -189,8 +199,6 @@ namespace httpgd
         dd->top = 0.0;
         dd->right = std::max(size.width, minsize.width);
         dd->bottom = std::max(size.height, minsize.height);
-        //dd->right = size.width;
-        //dd->bottom = size.height;
     }
 
     void HttpgdDev::dev_newPage(pGEcontext gc, pDevDesc dd)
@@ -199,22 +207,22 @@ namespace httpgd
         const double height = dd->bottom;
         const int fill = (R_ALPHA(gc->fill) == 0) ? dd->startfill : gc->fill;
 
-        // Rcpp::Rcout << "[new_page] replaying="<<replaying<<"\n";
+        debug_print("[new_page] replaying=%i\n", replaying);
         if (!replaying)
         {
             if (m_target.get_newest_index() >= 0) // no previous pages
             {
-                // Rcpp::Rcout << "    -> record open page in history\n";
-                m_history.set_last(m_target.get_newest_index(), dd);
+                debug_print("    -> record open page in history\n");
+                m_history.put_last(m_target.get_newest_index(), dd);
             }
-            // Rcpp::Rcout << "    -> add new page to server\n";
+            debug_print("    -> add new page to server\n");
             m_target.set_index(m_data_store->append(width, height));
             m_target.set_newest_index(m_target.get_index());
         }
         else
         {
-            // Rcpp::Rcout << "    -> rewrite target: " << m_target << "\n";
-            // Rcpp::Rcout << "    -> clear page\n";
+            debug_print("    -> rewrite target: %i\n", m_target.get_index());
+            debug_print("    -> clear page\n");
             if (!m_target.is_void())
                 m_data_store->clear(m_target.get_index(), true);
         }
@@ -286,25 +294,26 @@ namespace httpgd
 
     void HttpgdDev::api_render(int index, double width, double height)
     {
-        if (index == -1) index = m_target.get_newest_index();
-        
+        if (index == -1)
+            index = m_target.get_newest_index();
+
         pDevDesc dd = devGeneric::get_active_pDevDesc();
 
-        // Rcpp::Rcout << "[render_page] index=" << index << "\n";
+        debug_print("[render_page] index=%i\n", index);
 
         replaying = true;
         m_data_store->resize(index, width, height); // this also clears
         if (index == m_target.get_newest_index())
         {
-            m_target.set_index(index); //???
-            // Rcpp::Rcout << "    -> open page. target_index=" << m_target.get_index() << "\n";
+            m_target.set_index(index); 
+            debug_print("    -> open page. target_index=%i\n", m_target.get_index());
             resize_device_to_page(dd);
-            devGeneric::replay_current(dd); // replay active page
+            PlotHistory::replay_current(dd); // replay active page
         }
         else
         {
-            // Rcpp::Rcout << "    -> old page. target_newest_index="<< m_target.get_newest_index() << "\n";
-            m_history.set_current(m_target.get_newest_index(), dd);
+            debug_print("    -> old page. target_newest_index=%i\n", m_target.get_newest_index());
+            m_history.put_current(m_target.get_newest_index(), dd);
 
             m_target.set_index(index);
             resize_device_to_page(dd);
@@ -312,7 +321,7 @@ namespace httpgd
             m_target.set_void();
             resize_device_to_page(dd);
             m_history.play(m_target.get_newest_index(), dd); // recreate previous state
-            m_target.set_index(m_target.get_newest_index());    // set target to open page for new draw calls
+            m_target.set_index(m_target.get_newest_index()); // set target to open page for new draw calls
         }
         replaying = false;
     }
@@ -332,7 +341,8 @@ namespace httpgd
 
     bool HttpgdDev::api_remove(int index)
     {
-        if (index == -1) index = m_target.get_newest_index();
+        if (index == -1)
+            index = m_target.get_newest_index();
 
         // remove from store
         bool r = m_data_store->remove(index, false);
@@ -341,37 +351,38 @@ namespace httpgd
 
         pDevDesc dd = devGeneric::get_active_pDevDesc();
 
-        // Rcpp::Rcout << "[hist_remove] target = " << target << "\n";
+        debug_print("[hist_remove] index = %i\n", index);
         replaying = true;
         m_history.remove(index);
         if (index == m_target.get_newest_index() && index > 0)
         {
-            //Rcpp::Rcout << "   -> last removed replay new last\n";
+            debug_print("   -> last removed replay new last\n");
             m_target.set_index(m_target.get_newest_index() - 1);
             resize_device_to_page(dd);
             m_history.play(m_target.get_newest_index() - 1, dd); // recreate state of the element before last element
         }
         m_target.set_newest_index(m_target.get_newest_index() - 1);
         replaying = false;
-        
+
         return r;
     }
 
     void HttpgdDev::api_svg(std::ostream &os, int index, double width, double height)
     {
-        // Rcpp::Rcout << "DIFF \n";
+        debug_print("DIFF \n");
         if (m_data_store->diff(index, width, height))
         {
-            // Rcpp::Rcout << "RENDER \n";
+            debug_print("RENDER \n");
             api_render(index, width, height);
         }
-        // Rcpp::Rcout << "SVG \n";
+        debug_print("SVG \n");
         m_data_store->svg(os, index);
     }
 
     bool HttpgdDev::server_start()
     {
-        if (m_server && !m_server_running) {
+        if (m_server && !m_server_running)
+        {
             m_server_running = m_server->start();
             return m_server_running;
         }
@@ -381,7 +392,7 @@ namespace httpgd
     {
         if (m_server && m_server_running)
             m_server->stop();
-        
+
         m_server_running = false;
     }
     unsigned short HttpgdDev::server_port() const

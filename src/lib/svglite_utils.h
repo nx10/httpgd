@@ -25,10 +25,11 @@
 #ifndef HTTPGD_SVGLITE_UTILS_H
 #define HTTPGD_SVGLITE_UTILS_H
 
-#include <Rcpp.h>
+#include <cpp11/list.hpp>
+#include <cpp11/as.hpp>
 #include <systemfonts.h>
+#define R_NO_REMAP
 #include <R_ext/GraphicsEngine.h>
-#include <R_ext/GraphicsDevice.h>
 
 extern "C"
 {
@@ -58,26 +59,26 @@ namespace httpgd
         return face == 5;
     }
 
-    inline std::string find_alias_field(std::string &family, Rcpp::List &alias,
+    inline std::string find_alias_field(std::string family, cpp11::list &alias,
                                         const char *face, const char *field)
     {
-        if (alias.containsElementNamed(face))
+        if (alias[face] != R_NilValue)
         {
-            Rcpp::List font = alias[face];
-            if (font.containsElementNamed(field))
-                return font[field];
+            cpp11::list font(alias[face]);
+            if (font[field] != R_NilValue)
+                return cpp11::as_cpp<std::string>(font[field]);
         }
         return std::string();
     }
 
-    inline std::string find_user_alias(std::string &family,
-                                       Rcpp::List const &aliases,
+    inline std::string find_user_alias(std::string family,
+                                       cpp11::list const &aliases,
                                        int face, const char *field)
     {
         std::string out;
-        if (aliases.containsElementNamed(family.c_str()))
+        if (aliases[family.c_str()] != R_NilValue)
         {
-            Rcpp::List alias = aliases[family];
+            cpp11::list alias(aliases[family.c_str()]);
             if (is_bolditalic(face))
                 out = find_alias_field(family, alias, "bolditalic", field);
             else if (is_bold(face))
@@ -93,7 +94,7 @@ namespace httpgd
     }
 
     inline std::string fontfile(const char *family_, int face,
-                                Rcpp::List user_aliases)
+                                cpp11::list user_aliases)
     {
         std::string family(family_);
         if (face == 5)
@@ -104,7 +105,7 @@ namespace httpgd
         return find_user_alias(family, user_aliases, face, "file");
     }
 
-    inline std::pair<std::string, int> get_font_file(const char *family, int face, Rcpp::List user_aliases)
+    inline std::pair<std::string, int> get_font_file(const char *family, int face, cpp11::list user_aliases)
     {
         const char *fontfamily = family;
         if (is_symbol(face))
@@ -130,22 +131,22 @@ namespace httpgd
         return res;
     }
 
-    inline std::string find_system_alias(std::string &family,
-                                         Rcpp::List const &aliases)
+    inline std::string find_system_alias(std::string family,
+                                         cpp11::list const &aliases)
     {
         std::string out;
-        if (aliases.containsElementNamed(family.c_str()))
+        if (aliases[family.c_str()] != R_NilValue)
         {
-            SEXP alias = aliases[family];
+            cpp11::sexp alias = aliases[family.c_str()];
             if (TYPEOF(alias) == STRSXP && Rf_length(alias) == 1)
-                out = Rcpp::as<std::string>(alias);
+                out = cpp11::as_cpp<std::string>(alias);
         }
         return out;
     }
 
     inline std::string fontname(const char *family_, int face,
-                                Rcpp::List const &system_aliases,
-                                Rcpp::List const &user_aliases)
+                                cpp11::list const &system_aliases,
+                                cpp11::list const &user_aliases)
     {
         std::string family(family_);
         if (face == 5)
