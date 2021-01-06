@@ -80,6 +80,16 @@ SOFTWARE.
 
 // Config End
 
+// Fixes false positive array-bounds warning in GCC Win64 at O2
+#if defined(_WIN64) && defined(__GNUC__)
+#pragma GCC push_options
+#pragma GCC optimize ("O1")
+#endif
+#include <boost/beast/core/detail/char_buffer.hpp>
+#if defined(_WIN64) && defined(__GNUC__)
+#pragma GCC pop_options
+#endif
+
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/websocket.hpp>
