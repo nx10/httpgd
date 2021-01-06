@@ -6,16 +6,16 @@
 This is similar to hgd_svg(...) but the plotting code is specified inline.
 This function manages (creates and destroys) the httpgd graphics device by itself.}
 \usage{
-hgd_inline(code, page = 0, width = -1, height = -1, file = NA, ...)
+hgd_inline(code, page = 0, page_width = -1, page_height = -1, file = NA, ...)
 }
 \arguments{
 \item{code}{Plotting code.}
 
 \item{page}{Plot page to render. If this is set to 0, the last page will be selected.}
 
-\item{width}{Width of the plot. If this is set to -1, the last width will be selected.}
+\item{page_width}{Width of the plot. If this is set to -1, the last width will be selected.}
 
-\item{height}{Height of the plot. If this is set to -1, the last height will be selected.}
+\item{page_height}{Height of the plot. If this is set to -1, the last height will be selected.}
 
 \item{file}{Filepath to save SVG. (No file will be created if this is NA)}
 

@@ -64,6 +64,16 @@ when it is set to a number. FALSE deactivates the token.}
 \item{websockets}{Use websockets.}
 
 \item{webserver}{Can be set to FALSE for offline mode.}
+
+\item{fix_text_width}{Should the width of strings be fixed so that it doesn't
+change between svg renderers depending on their font rendering? Defaults to
+`TRUE`. If `TRUE` each string will have the `textLength` CSS property set
+to the width calculated by systemfonts and
+`lengthAdjust='spacingAndGlyphs'`. Setting this to `FALSE` can be
+beneficial for heavy post-processing that may change content or style of
+strings, but may lead to inconsistencies between strings and graphic
+elements that depend on the dimensions of the string (e.g. label borders
+and background).}
 }
 \description{
 Initialize httpgd graphics device and start server.

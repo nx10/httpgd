@@ -32,6 +32,15 @@
 #' @param silent When set to FALSE no information will be printed to console.
 #' @param websockets Use websockets.
 #' @param webserver Can be set to FALSE for offline mode.
+#' @param fix_text_width Should the width of strings be fixed so that it doesn't
+#'   change between svg renderers depending on their font rendering? Defaults to
+#'   `TRUE`. If `TRUE` each string will have the `textLength` CSS property set
+#'   to the width calculated by systemfonts and
+#'   `lengthAdjust='spacingAndGlyphs'`. Setting this to `FALSE` can be
+#'   beneficial for heavy post-processing that may change content or style of
+#'   strings, but may lead to inconsistencies between strings and graphic
+#'   elements that depend on the dimensions of the string (e.g. label borders
+#'   and background).
 #'
 #' @importFrom systemfonts match_font
 #' @export
@@ -332,8 +341,8 @@ hgd_generate_token <- function(len) {
 #'
 #' @param code Plotting code.
 #' @param page Plot page to render. If this is set to 0, the last page will be selected. 
-#' @param width Width of the plot. If this is set to -1, the last width will be selected. 
-#' @param height Height of the plot. If this is set to -1, the last height will be selected.
+#' @param page_width Width of the plot. If this is set to -1, the last width will be selected. 
+#' @param page_height Height of the plot. If this is set to -1, the last height will be selected.
 #' @param file Filepath to save SVG. (No file will be created if this is NA)
 #' @param ... Additional parameters passed to hgd(webserver=FALSE, ...)
 #'
@@ -353,11 +362,11 @@ hgd_generate_token <- function(len) {
 #' })
 #' cat(s)
 #' }
-hgd_inline <- function(code, page = 0, width = -1, height = -1, file = NA, ...) {
+hgd_inline <- function(code, page = 0, page_width = -1, page_height = -1, file = NA, ...) {
   hgd(webserver=FALSE, ...)
   tryCatch(code,
     finally = {
-      s <- hgd_svg(page=page, width=width, height=height)
+      s <- hgd_svg(page=page, width=page_width, height=page_height)
       dev.off()
     }
   )

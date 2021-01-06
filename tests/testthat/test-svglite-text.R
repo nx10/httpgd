@@ -9,7 +9,7 @@ test_that("par(cex) affects strwidth", {
 })
 
 test_that("cex affects strwidth", {
-  inlineSVG(height = 7 * 72, width = 7 * 72, {
+  hgd_inline(height = 7 * 72, width = 7 * 72, {
     plot.new()
     w1 <- strwidth("X")
     w4 <- strwidth("X", cex = 4)
