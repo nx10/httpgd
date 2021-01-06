@@ -17,3 +17,9 @@ Random token string
 Generate a random alphanumeric token string. 
 This is mainly used internally by httpgd.
 }
+\examples{
+\dontrun{
+
+hgd_generate_token(6)
+}
+}

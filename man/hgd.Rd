@@ -68,3 +68,16 @@ when it is set to a number. FALSE deactivates the token.}
 \description{
 Initialize httpgd graphics device and start server.
 }
+\examples{
+\dontrun{
+
+hgd() # Initialize graphics device and start server
+# hgd_browse() # Copy the displayed link in the browser or call
+
+# Plot something
+x = seq(0, 3 * pi, by = 0.1)
+plot(x, sin(x), type = "l")
+
+dev.off() # alternatively: hgd_close()
+}
+}

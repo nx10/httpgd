@@ -15,3 +15,14 @@ Whether there were any pages to remove.
 \description{
 Clears all plot pages.
 }
+\examples{
+\dontrun{
+
+hgd()
+plot(1,1)
+hist(rnorm(100))
+hgd_clear()
+hist(rnorm(100))
+dev.off()
+}
+}

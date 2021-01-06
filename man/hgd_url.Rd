@@ -19,3 +19,11 @@ URL
 \description{
 Returns the url by which a httpgd device is accessible.
 }
+\examples{
+\dontrun{
+
+hgd()
+my_url <- hgd_url()
+#dev.off()
+}
+}

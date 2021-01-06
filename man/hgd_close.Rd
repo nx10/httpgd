@@ -16,3 +16,18 @@ hgd_close(which = dev.cur(), all = FALSE)
 Closes a graphics device if it is a httpgd server.
 This achieves the same effect as dev.off().
 }
+\examples{
+\dontrun{
+
+hgd()
+hgd_browse() # open browser
+hist(rnorm(100))
+# ...
+hgd_close() # Equvalent to dev.off()
+
+hgd()
+hgd()
+hgd()
+hgd_close(all=TRUE)
+}
+}

@@ -15,3 +15,17 @@ List of status variables
 \description{
 Returns status information of a httpgd graphics device.
 }
+\examples{
+\dontrun{
+
+hgd()
+
+hgd_state()
+
+plot(1,1)
+
+hgd_state() 
+
+dev.off() 
+}
+}

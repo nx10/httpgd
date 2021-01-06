@@ -23,3 +23,14 @@ Rendered SVG string.
 \description{
 Returns a plot rendered as a SVG string.
 }
+\examples{
+\dontrun{
+
+hgd()
+plot(1,1)
+s <- hgd_svg(width=600, height=400)
+hist(rnorm(100))
+hgd_svg(file="my_plot.svg", width=600, height=400) 
+dev.off()
+}
+}

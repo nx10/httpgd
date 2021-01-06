@@ -17,3 +17,13 @@ Whether the page existed (and thereby was successfully removed).
 \description{
 Removes a plot page.
 }
+\examples{
+\dontrun{
+
+hgd()
+plot(1,1) # page 1
+hist(rnorm(100)) # page 2
+hgd_remove(page=1) # remove page 1
+dev.off()
+}
+}

@@ -36,9 +36,10 @@ hgd_inline({
   hist(rnorm(100))
 })
 
-hgd_inline({
+s <- hgd_inline({
   plot.new()
   lines(c(0.5, 1, 0.5), c(0.5, 1, 1))
 })
+cat(s)
 }
 }

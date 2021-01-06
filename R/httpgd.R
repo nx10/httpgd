@@ -35,6 +35,19 @@
 #'
 #' @importFrom systemfonts match_font
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd() # Initialize graphics device and start server
+#' # hgd_browse() # Copy the displayed link in the browser or call
+#' 
+#' # Plot something
+#' x = seq(0, 3 * pi, by = 0.1)
+#' plot(x, sin(x), type = "l")
+#' 
+#' dev.off() # alternatively: hgd_close()
+#' }
 hgd <-
   function(host = "127.0.0.1",
            port = 0,
@@ -92,6 +105,20 @@ hyperrefstyle <- function(str) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd()
+#' 
+#' hgd_state()
+#' 
+#' plot(1,1)
+#' 
+#' hgd_state() 
+#' 
+#' dev.off() 
+#' }
 hgd_state <- function(which = dev.cur()) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
@@ -113,6 +140,17 @@ hgd_state <- function(which = dev.cur()) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd()
+#' plot(1,1)
+#' s <- hgd_svg(width=600, height=400)
+#' hist(rnorm(100))
+#' hgd_svg(file="my_plot.svg", width=600, height=400) 
+#' dev.off()
+#' }
 hgd_svg <- function(page = 0, width = -1, height = -1, which = dev.cur(), file = NA) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
@@ -135,6 +173,16 @@ hgd_svg <- function(page = 0, width = -1, height = -1, which = dev.cur(), file =
 #'
 #' @importFrom grDevices dev.cur
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd()
+#' plot(1,1) # page 1
+#' hist(rnorm(100)) # page 2
+#' hgd_remove(page=1) # remove page 1
+#' dev.off()
+#' }
 hgd_remove <- function(page = 0, which = dev.cur()) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
@@ -152,6 +200,17 @@ hgd_remove <- function(page = 0, which = dev.cur()) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd()
+#' plot(1,1)
+#' hist(rnorm(100))
+#' hgd_clear()
+#' hist(rnorm(100))
+#' dev.off()
+#' }
 hgd_clear <- function(which = dev.cur()) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
@@ -172,6 +231,14 @@ hgd_clear <- function(which = dev.cur()) {
 #'
 #' @importFrom grDevices dev.cur
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd()
+#' my_url <- hgd_url()
+#' #dev.off()
+#' }
 hgd_url <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
   l <- hgd_state(which)
   paste0("http://",
@@ -194,6 +261,15 @@ hgd_url <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
 #' @importFrom grDevices dev.cur
 #' @importFrom utils browseURL
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd()
+#' hgd_browse() # open browser
+#' hist(rnorm(100))
+#' #dev.off()
+#' }
 hgd_browse <- function(endpoint = "live", which = dev.cur()) {
   browseURL(hgd_url(endpoint, which))
 }
@@ -206,6 +282,21 @@ hgd_browse <- function(endpoint = "live", which = dev.cur()) {
 #' 
 #' @importFrom grDevices dev.cur dev.list dev.off
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd()
+#' hgd_browse() # open browser
+#' hist(rnorm(100))
+#' # ...
+#' hgd_close() # Equvalent to dev.off()
+#' 
+#' hgd()
+#' hgd()
+#' hgd()
+#' hgd_close(all=TRUE)
+#' }
 hgd_close <- function(which = dev.cur(), all = FALSE) {
   if (all) {
     ds <- dev.list()
@@ -224,6 +315,12 @@ hgd_close <- function(which = dev.cur(), all = FALSE) {
 #'
 #' @return Random token string
 #' @export
+#' 
+#' @examples
+#' \dontrun{
+#' 
+#' hgd_generate_token(6)
+#' }
 hgd_generate_token <- function(len) {
   httpgd_random_token_(len)
 }
@@ -250,10 +347,11 @@ hgd_generate_token <- function(len) {
 #'   hist(rnorm(100))
 #' })
 #' 
-#' hgd_inline({
+#' s <- hgd_inline({
 #'   plot.new()
 #'   lines(c(0.5, 1, 0.5), c(0.5, 1, 1))
 #' })
+#' cat(s)
 #' }
 hgd_inline <- function(code, page = 0, width = -1, height = -1, file = NA, ...) {
   hgd(webserver=FALSE, ...)

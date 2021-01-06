@@ -17,3 +17,12 @@ URL
 \description{
 Opens the URL by which a httpgd device is accessible in a browser.
 }
+\examples{
+\dontrun{
+
+hgd()
+hgd_browse() # open browser
+hist(rnorm(100))
+#dev.off()
+}
+}
