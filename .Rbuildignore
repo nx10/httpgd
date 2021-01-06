@@ -9,3 +9,4 @@
 ^windows$
 ^.*\.ts$
 ^.*tsconfig.json$
+^\.github$
