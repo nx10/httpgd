@@ -112,7 +112,7 @@ namespace httpgd
 
 #if R_GE_version >= 13
         dd->deviceVersion = R_GE_definitions;
-        dd->canClip = static_cast<Rboolean>(0);
+        dd->deviceClip = static_cast<Rboolean>(0);
 #endif
 
         // Device specific
