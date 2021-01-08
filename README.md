@@ -84,14 +84,15 @@ dev.off()
 | <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
 | <kbd>T</kbd> | Clear all plots. |
 
-### API
+### API &amp; documentation
 
-![structure](docs/httpgd_structure.svg)
 
 httpgd can be accessed both from R and from HTTP:
 
 * [R API](docs/RApi.md)
 * [Web API](docs/WebApi.md)
+
+Technical documentation for developers wanting to contribute can be found [here](docs/tecdoc.md).
 
 ## Benchmark
 
@@ -173,6 +174,8 @@ Install [XQuartz](https://www.xquartz.org/).
 The various components of httpgd are written in C++, R and TypeScript. We welcome contributions of any kind.
 
 Other areas in need of improvement are: Testing, documentation, net security and continuous integration.
+
+If you feel lost, the [technical documentation](docs/tecdoc.md) might help.
 
 ## License
 
