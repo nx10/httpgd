@@ -80,8 +80,8 @@ dev.off()
 | <kbd>+</kbd> / <kbd>-</kbd> | Zoom in and out. |
 | <kbd>0</kbd> | Reset zoom level. |
 | <kbd>S</kbd> | Download plot as SVG. |
-| <kbd>R</kbd> | Download plot as PNG. |
-| <kbd>Ctrl</kbd> + <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
+| <kbd>P</kbd> | Download plot as PNG. |
+| <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
 | <kbd>T</kbd> | Clear all plots. |
 
 ### API

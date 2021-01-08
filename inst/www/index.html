@@ -146,6 +146,13 @@
           <!--
         --></span>
         <span>
+          <a title="Copy PNG (C)" id="tb-copy-png"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+            </svg></a>
+          <!--
+        --></span>
+        <span>
           <a title="Download PNG (P)" id="tb-save-png"><svg class="icon" height="24" viewBox="0 0 24 24" width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path
@@ -160,7 +167,7 @@
           <!--
         --></span>
         <span>
-          <a title="Clear all plots (C)" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24"
+          <a title="Clear all plots (T)" id="tb-clear"><svg class="icon-warn" height="24" viewBox="0 0 24 24"
               width="24">
               <path d="M0 0h24v24H0z" fill="none" />
               <path d="M0 0h24v24H0V0z" fill="none" />
@@ -207,6 +214,7 @@
       document.getElementById("tb-pnum").onclick = () => httpgdViewer.navNewest();
       document.getElementById("tb-save-svg").onclick = () => httpgdViewer.downloadPlot();
       document.getElementById("tb-save-png").onclick = () => httpgdViewer.downloadPlotPNG();
+      document.getElementById("tb-copy-png").onclick = () => httpgdViewer.copyPlotPNG();
       document.getElementById("tb-plus").onclick = () => httpgdViewer.zoomIn();
       document.getElementById("tb-minus").onclick = () => httpgdViewer.zoomOut();
       document.getElementById("tb-zlvl").onclick = () => httpgdViewer.zoomReset();
@@ -256,7 +264,6 @@
         },
         {
           keys: [67],
-          ctrl: true,
           fun: () => httpgdViewer.copyPlotPNG()
         }
       ];
