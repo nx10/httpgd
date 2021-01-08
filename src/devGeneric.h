@@ -10,10 +10,9 @@ namespace httpgd
     class devGeneric
     {
     public:
-
         devGeneric(double t_width, double t_height, double t_pointsize, int t_fill);
         virtual ~devGeneric() = default;
-        
+
         static void make_device(const char *t_device_name, devGeneric *t_dev);
         // avoid when possible
         static pDevDesc get_active_pDevDesc();
@@ -57,6 +56,15 @@ namespace httpgd
         virtual SEXP dev_cap(pDevDesc dd);
         // Draw raster image
         virtual void dev_raster(unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd);
+
+#if R_GE_version >= 13
+        virtual SEXP dev_setPattern(SEXP pattern, pDevDesc dd);
+        virtual void dev_releasePattern(SEXP ref, pDevDesc dd);
+        virtual SEXP dev_setClipPath(SEXP path, SEXP ref, pDevDesc dd);
+        virtual void dev_releaseClipPath(SEXP ref, pDevDesc dd);
+        virtual SEXP dev_setMask(SEXP path, SEXP ref, pDevDesc dd);
+        virtual void dev_releaseMask(SEXP ref, pDevDesc dd);
+#endif
 
         // GRAPHICS DEVICE FEATURE FLAGS
 

@@ -2,7 +2,6 @@
 #include "devGeneric.h"
 #include <cpp11/protect.hpp> // for cpp11::stop
 
-
 namespace httpgd
 {
     devGeneric::devGeneric(double t_width, double t_height, double t_pointsize, int t_fill)
@@ -104,12 +103,17 @@ namespace httpgd
         dd->haveRaster = 2;
         dd->haveCapture = 1;
         dd->haveLocator = 1;
-        
+
         dd->newFrameConfirm = nullptr;
         dd->onExit = nullptr;
         dd->eventEnv = R_NilValue;
         dd->eventHelper = nullptr;
         dd->holdflush = nullptr;
+
+#if R_GE_version >= 13
+        dd->deviceVersion = R_GE_definitions;
+        dd->canClip = static_cast<Rboolean>(0);
+#endif
 
         // Device specific
         dd->deviceSpecific = this;
@@ -205,5 +209,28 @@ namespace httpgd
     void devGeneric::dev_raster(unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd)
     {
     }
+#if R_GE_version >= 13
+    SEXP devGeneric::dev_setPattern(SEXP pattern, pDevDesc dd)
+    {
+        return R_NilValue;
+    }
+    void devGeneric::dev_releasePattern(SEXP ref, pDevDesc dd)
+    {
+    }
+    SEXP devGeneric::dev_setClipPath(SEXP path, SEXP ref, pDevDesc dd)
+    {
+        return R_NilValue;
+    }
+    void devGeneric::dev_releaseClipPath(SEXP ref, pDevDesc dd)
+    {
+    }
+    SEXP devGeneric::dev_setMask(SEXP path, SEXP ref, pDevDesc dd)
+    {
+        return R_NilValue;
+    }
+    void devGeneric::dev_releaseMask(SEXP ref, pDevDesc dd)
+    {
+    }
+#endif
 
 } // namespace httpgd
