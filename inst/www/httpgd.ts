@@ -285,7 +285,7 @@ class HttpgdConnectionManager {
 }
 
 class HttpgdViewer {
-    static readonly COOLDOWN_RESIZE: number = 500;
+    static readonly COOLDOWN_RESIZE: number = 200;
     static readonly SCALE_DEFAULT: number = 0.8;
     static readonly SCALE_STEP: number = HttpgdViewer.SCALE_DEFAULT / 12.0;
 

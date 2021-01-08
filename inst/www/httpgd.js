@@ -436,6 +436,6 @@ class HttpgdViewer {
         }, HttpgdViewer.COOLDOWN_RESIZE);
     }
 }
-HttpgdViewer.COOLDOWN_RESIZE = 500;
+HttpgdViewer.COOLDOWN_RESIZE = 200;
 HttpgdViewer.SCALE_DEFAULT = 0.8;
 HttpgdViewer.SCALE_STEP = HttpgdViewer.SCALE_DEFAULT / 12.0;
