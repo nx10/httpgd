@@ -2,20 +2,20 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_remove}
 \alias{hgd_remove}
-\title{Removes a plot page.}
+\title{Remove a httpgd plot page.}
 \usage{
 hgd_remove(page = 0, which = dev.cur())
 }
 \arguments{
-\item{page}{Plot page to remove. If this is set to 0, the last page will be selected.}
+\item{page}{Plot page to remove. If this is set to \code{0}, the last page will be selected.}
 
-\item{which}{Which device (id)}
+\item{which}{Which device (ID).}
 }
 \value{
 Whether the page existed (and thereby was successfully removed).
 }
 \description{
-Removes a plot page.
+This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
 \dontrun{

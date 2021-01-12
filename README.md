@@ -1,15 +1,19 @@
-# httpgd <img src="docs/httpgd_logo.svg" align="right" height = 250/>
+# `httpgd` <img src="docs/httpgd_logo.svg" align="right" height = 250/>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
 <!-- badges: end -->
 
-Asynchronous http server graphics device for R.
+A graphics device for R that is accessible via network protocols.
+This package was created to make it easier to embed live R graphics in 
+integrated development environments and other applications.
+The included HTML/JavaScript client (plot viewer) aims to provide a better overall user experience when dealing with R graphics.
+The device asynchronously serves SVG graphics via HTTP and WebSockets.
 
 ## Features
 
-* Fast high quality plots
-* Stateless HTTP/Websocket SVG API
+* Fast high quality SVG plots
+* Stateless asynchronous HTTP/WebSocket API
 * Plot resizing
 * Plot history
 * HTML/JavaScript client (TypeScript module)
@@ -24,12 +28,6 @@ Asynchronous http server graphics device for R.
 ```R
 devtools::install_github("nx10/httpgd")
 ```
-
-Depends on `Rcpp`, `later` and `systemfonts`.
-
-SVG rendering (especially font rendering) based on `svglite` (<https://github.com/r-lib/svglite>).
-
-Built using [Boost Beast](https://github.com/boostorg/beast), [Belle](https://github.com/octobanana/belle) and [fmt](https://github.com/fmtlib/fmt).
 
 See [system requirements](#System-requirements) for troubleshooting.
 
@@ -84,19 +82,18 @@ dev.off()
 | <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
 | <kbd>T</kbd> | Clear all plots. |
 
-### API &amp; documentation
+### API &amp; Documentation
 
+`httpgd` can be accessed both from R and from HTTP:
 
-httpgd can be accessed both from R and from HTTP:
+* [R API](https://github.com/nx10/httpgd/blob/master/docs/RApi.md)
+* [Web API](https://github.com/nx10/httpgd/blob/master/docs/WebApi.md)
 
-* [R API](docs/RApi.md)
-* [Web API](docs/WebApi.md)
-
-Technical documentation for developers wanting to contribute can be found [here](docs/tecdoc.md).
+Technical documentation for developers wanting to contribute can be found [here](https://github.com/nx10/httpgd/blob/master/docs/tecdoc.md).
 
 ## Benchmark
 
-There are currently no other network graphics devices for comparison, httpgd can be used in offline mode (with `hgd(webserver = FALSE)`) to compare it with conventional SVG graphics devices.
+There are currently no other network graphics devices for comparison, `httpgd` can be used in offline mode (with `hgd(webserver = FALSE)`) to compare it with conventional SVG graphics devices.
 
 The [benchmark from svglite](https://github.com/r-lib/svglite/blob/master/README.md) has the following results:
 
@@ -133,7 +130,7 @@ ben <-
   bench::mark(httpgd_test(), svglite_test(), svg_test(), iterations = 250)
 ```
 
-[See full code](docs/benchmark.R)
+[See full code](https://github.com/nx10/httpgd/blob/master/docs/benchmark.R)
 
 </details>
 
@@ -143,12 +140,14 @@ ben <-
 |svglite_test() | 20.3ms| 21.4ms| 46.29561|     593KB| 0.5622948|   247|    3|      5.33s|
 |svg_test()     | 27.2ms| 28.3ms| 35.15964|     126KB| 0.1412034|   249|    1|      7.08s|
 
-*Package versions: httpgd (1.0.0), svglite (1.2.3.2), grDevices (4.0.3)*
+*Package versions: `httpgd` (1.0.0 dev), `svglite` (1.2.3.2), `grDevices` (4.0.3)*
 
-<img src="docs/bench_speed1.png" width="640"/> <img src="docs/bench_size1.png" width="640"/>
+<img src="https://raw.githubusercontent.com/nx10/httpgd/master/docs/bench_speed1.png" width="640"/> <img src="https://raw.githubusercontent.com/nx10/httpgd/master/docs/bench_size1.png" width="640"/>
 
 
 ## System requirements
+
+Depends on `R` version &geq; 4.0.
 
 `libpng` and X11 are required on unix like systems (e.g. Linux, macOS).
 
@@ -160,27 +159,37 @@ If `libpng` is missing install it via:
 brew install libpng
 ```
 
-If X11 is missing the error message will include the text:
+If `X11` is missing the error message will include the text:
 
 ```sh
 unable to load shared object [...] systemfonts/libs/systemfonts.so [...]
 ```
 
-Install [XQuartz](https://www.xquartz.org/).
+Install [`XQuartz`](https://www.xquartz.org/).
 (see: <https://github.com/r-lib/systemfonts/issues/17>)
 
-## Help welcome
+## Help welcome!
 
-The various components of httpgd are written in C++, R and TypeScript. We welcome contributions of any kind.
+The various components of `httpgd` are written in C++, R and TypeScript. We welcome contributions of any kind.
 
 Other areas in need of improvement are: Testing, documentation, net security and continuous integration.
 
-If you feel lost, the [technical documentation](docs/tecdoc.md) might help.
+If you feel lost, the [technical documentation](https://github.com/nx10/httpgd/blob/master/docs/tecdoc.md) might help.
 
-## License
+## Links &amp; Articles
+
+- [Using httpgd in VSCode: A web-based SVG graphics device](https://renkun.me/2020/06/16/using-httpgd-in-vscode-a-web-based-svg-graphics-device/)
+
+## About &amp; License
+
+Depends on `cpp11`, `later` and `systemfonts`.
+
+Webserver based on [`Boost/Beast`](<https://github.com/boostorg/beast>) included in the `BH` package.
+    
+Much of the font handling and SVG rendering code is modified code from the excellent [`svglite`](<https://github.com/r-lib/svglite>) package.
 
 This project is licensed GPL v2.0.
 
-It includes parts of [svglite](<https://github.com/r-lib/svglite>), [Boost Beast](https://github.com/boostorg/beast), [Belle](https://github.com/octobanana/belle) and [fmt](https://github.com/fmtlib/fmt), which are licensed as specified on their respective websites.
+It includes parts of [`svglite`](<https://github.com/r-lib/svglite>) (GPL &geq; 2), [`Belle`](https://github.com/octobanana/belle) (MIT) and [`fmt`](https://github.com/fmtlib/fmt) (MIT). The HTML client includes [Material Design icons by Google](https://github.com/google/material-design-icons) which are licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt).
 
-The HTML client includes [Material Design icons by Google](https://github.com/google/material-design-icons) which are licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt).
+Full copies of the license agreements used by these components are included in [`./inst/licenses`](https://github.com/nx10/httpgd/tree/master/inst/licenses).

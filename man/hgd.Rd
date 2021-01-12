@@ -2,7 +2,7 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd}
 \alias{hgd}
-\title{Initialize httpgd graphics device and start server.}
+\title{Asynchronous HTTP server graphics device.}
 \usage{
 hgd(
   host = "127.0.0.1",
@@ -22,9 +22,11 @@ hgd(
 )
 }
 \arguments{
-\item{host}{Server hostname. Set to "0.0.0.0" to enable remote access.}
+\item{host}{Server hostname. Set to \code{"0.0.0.0"} to enable remote access.
+We recommend to \strong{only enable remote access in trusted networks}.
+The network security of httpgd has not yet been properly tested.}
 
-\item{port}{Server port. If this is set to 0, an open port 
+\item{port}{Server port. If this is set to \code{0}, an open port
 will be assigned.}
 
 \item{width}{Graphics device width (pixels).}
@@ -39,7 +41,7 @@ will be assigned.}
 fonts installed on your system. If unspecified, the R default
 families \code{sans}, \code{serif}, \code{mono} and \code{symbol}
 are aliased to the family returned by
-\code{\link[systemfonts]{font_info}()}.}
+\code{\link[systemfonts:font_info]{systemfonts::font_info()}}.}
 
 \item{user_fonts}{Named list of fonts to be aliased with font files
 provided by the user rather than fonts properly installed on the
@@ -50,33 +52,41 @@ the font alias in the SVG output and \code{file} the path to a
 font file.}
 
 \item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
-When set to TRUE, CORS header will be set to "*".}
+When set to \code{TRUE}, CORS header will be set to \code{"*"}.}
 
 \item{token}{(Optional) security token. When set, all requests
-need to include a token to be allowed. (Either in a request header 
-(X-HTTPGD-TOKEN) field or as a query parameter.)
-This parameter can be set to TRUE to generate a random 8 character
+need to include a token to be allowed. (Either in a request header
+(\code{X-HTTPGD-TOKEN}) field or as a query parameter.)
+This parameter can be set to \code{TRUE} to generate a random 8 character
 alphanumeric token. A random token of the specified length is generated
-when it is set to a number. FALSE deactivates the token.}
+when it is set to a number. \code{FALSE} deactivates the token.}
 
-\item{silent}{When set to FALSE no information will be printed to console.}
+\item{silent}{When set to \code{FALSE} no information will be printed to console.}
 
 \item{websockets}{Use websockets.}
 
-\item{webserver}{Can be set to FALSE for offline mode.}
+\item{webserver}{Can be set to \code{FALSE} for offline mode.
+In offline mode the device is only accessible via R.}
 
 \item{fix_text_width}{Should the width of strings be fixed so that it doesn't
-change between svg renderers depending on their font rendering? Defaults to
-`TRUE`. If `TRUE` each string will have the `textLength` CSS property set
+change between SVG renderers depending on their font rendering? Defaults to
+\code{TRUE}. If \code{TRUE} each string will have the \code{textLength} CSS property set
 to the width calculated by systemfonts and
-`lengthAdjust='spacingAndGlyphs'`. Setting this to `FALSE` can be
+\code{lengthAdjust='spacingAndGlyphs'}. Setting this to \code{FALSE} can be
 beneficial for heavy post-processing that may change content or style of
 strings, but may lead to inconsistencies between strings and graphic
 elements that depend on the dimensions of the string (e.g. label borders
 and background).}
 }
 \description{
-Initialize httpgd graphics device and start server.
+This function initializes a httpgd graphics device and
+starts a local webserver, that allows for access via HTTP and WebSockets.
+A link will be printed by which the web client can be accessed using
+a browser.
+}
+\details{
+All font settings and descriptions are adopted from the excellent
+'svglite' package.
 }
 \examples{
 \dontrun{

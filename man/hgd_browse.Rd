@@ -2,20 +2,20 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_browse}
 \alias{hgd_browse}
-\title{Opens the URL by which a httpgd device is accessible in a browser.}
+\title{Open httpgd device URL in the browser.}
 \usage{
 hgd_browse(endpoint = "live", which = dev.cur())
 }
 \arguments{
-\item{endpoint}{API endpoint}
+\item{endpoint}{API endpoint.}
 
-\item{which}{Which device (id)}
+\item{which}{Which device (ID).}
 }
 \value{
-URL
+URL.
 }
 \description{
-Opens the URL by which a httpgd device is accessible in a browser.
+This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
 \dontrun{

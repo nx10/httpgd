@@ -1,0 +1,8 @@
+The httpgd package as a whole is distributed under GPL-2. The httpgd package includes other open source software components. The following is a list of these components:
+
+* fmt: MIT
+* belle: MIT
+* svglite: GPL-2 | GPL-3
+* material-design-icons: Apache 2.0
+
+Full copies of the license agreements used by these components are included in `inst/licenses`.

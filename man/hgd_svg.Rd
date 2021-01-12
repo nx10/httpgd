@@ -2,18 +2,18 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_svg}
 \alias{hgd_svg}
-\title{Returns a plot rendered as a SVG string.}
+\title{Render httpgd plot to SVG.}
 \usage{
 hgd_svg(page = 0, width = -1, height = -1, which = dev.cur(), file = NA)
 }
 \arguments{
-\item{page}{Plot page to render. If this is set to 0, the last page will be selected.}
+\item{page}{Plot page to render. If this is set to \code{0}, the last page will be selected.}
 
-\item{width}{Width of the plot. If this is set to -1, the last width will be selected.}
+\item{width}{Width of the plot. If this is set to \code{-1}, the last width will be selected.}
 
-\item{height}{Height of the plot. If this is set to -1, the last height will be selected.}
+\item{height}{Height of the plot. If this is set to \code{-1}, the last height will be selected.}
 
-\item{which}{Which device (id).}
+\item{which}{Which device (ID).}
 
 \item{file}{Filepath to save SVG. (No file will be created if this is NA)}
 }
@@ -21,7 +21,7 @@ hgd_svg(page = 0, width = -1, height = -1, which = dev.cur(), file = NA)
 Rendered SVG string.
 }
 \description{
-Returns a plot rendered as a SVG string.
+This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
 \dontrun{

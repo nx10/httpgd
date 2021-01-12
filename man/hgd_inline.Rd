@@ -2,32 +2,31 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_inline}
 \alias{hgd_inline}
-\title{Returns a plot rendered as a SVG string.
-This is similar to hgd_svg(...) but the plotting code is specified inline.
-This function manages (creates and destroys) the httpgd graphics device by itself.}
+\title{Inline SVG rendering.}
 \usage{
 hgd_inline(code, page = 0, page_width = -1, page_height = -1, file = NA, ...)
 }
 \arguments{
-\item{code}{Plotting code.}
+\item{code}{Plotting code. See examples for more information.}
 
-\item{page}{Plot page to render. If this is set to 0, the last page will be selected.}
+\item{page}{Plot page to render. If this is set to \code{0}, the last page will be selected.}
 
-\item{page_width}{Width of the plot. If this is set to -1, the last width will be selected.}
+\item{page_width}{Width of the plot. If this is set to \code{-1}, the last width will be selected.}
 
-\item{page_height}{Height of the plot. If this is set to -1, the last height will be selected.}
+\item{page_height}{Height of the plot. If this is set to \code{-1}, the last height will be selected.}
 
-\item{file}{Filepath to save SVG. (No file will be created if this is NA)}
+\item{file}{Filepath to save SVG. (No file will be created if this is \code{NA})}
 
-\item{...}{Additional parameters passed to hgd(webserver=FALSE, ...)}
+\item{...}{Additional parameters passed to \code{hgd(webserver=FALSE, ...)}}
 }
 \value{
 Rendered SVG string.
 }
 \description{
-Returns a plot rendered as a SVG string.
-This is similar to hgd_svg(...) but the plotting code is specified inline.
-This function manages (creates and destroys) the httpgd graphics device by itself.
+Convenience function for quick inline SVG rendering.
+This is similar to \code{\link[=hgd_svg]{hgd_svg()}} but the plotting code is specified inline
+and an offline httpgd graphics device is managed (created and closed)
+automatically. Starting a device with \code{\link[=hgd]{hgd()}} is therefore not necessary.
 }
 \examples{
 \dontrun{

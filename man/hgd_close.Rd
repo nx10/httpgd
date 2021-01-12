@@ -2,19 +2,18 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_close}
 \alias{hgd_close}
-\title{Closes a graphics device if it is a httpgd server.
-This achieves the same effect as dev.off().}
+\title{Close httpgd device.}
 \usage{
 hgd_close(which = dev.cur(), all = FALSE)
 }
 \arguments{
-\item{which}{Which device (id)}
+\item{which}{Which device (ID).}
 
-\item{all}{If set to true, all running httpgd devices will be closed}
+\item{all}{Should all running httpgd devices be closed.}
 }
 \description{
-Closes a graphics device if it is a httpgd server.
-This achieves the same effect as dev.off().
+This achieves the same effect as \code{\link[grDevices:dev]{grDevices::dev.off()}},
+but will only close the device if it has the httpgd type.
 }
 \examples{
 \dontrun{

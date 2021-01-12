@@ -2,18 +2,18 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_clear}
 \alias{hgd_clear}
-\title{Clears all plot pages.}
+\title{Clear all httpgd plot pages.}
 \usage{
 hgd_clear(which = dev.cur())
 }
 \arguments{
-\item{which}{Which device (id)}
+\item{which}{Which device (ID).}
 }
 \value{
 Whether there were any pages to remove.
 }
 \description{
-Clears all plot pages.
+This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
 \dontrun{

@@ -2,22 +2,22 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_url}
 \alias{hgd_url}
-\title{Returns the url by which a httpgd device is accessible.}
+\title{httpgd server URL.}
 \usage{
 hgd_url(endpoint = "live", which = dev.cur(), websockets = TRUE)
 }
 \arguments{
-\item{endpoint}{API endpoint}
+\item{endpoint}{API endpoint.}
 
-\item{which}{Which device (id)}
+\item{which}{Which device (ID).}
 
-\item{websockets}{Use websockets}
+\item{websockets}{Use websockets.}
 }
 \value{
-URL
+URL.
 }
 \description{
-Returns the url by which a httpgd device is accessible.
+This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
 \dontrun{

@@ -1,6 +1,6 @@
 # R API
 
-[httpgd](../README.md) can be accessed both from R and from [HTTP](HttpApi.md).
+[httpgd](https://github.com/nx10/httpgd/blob/master/README.md) can be accessed both from R and from [HTTP](https://github.com/nx10/httpgd/blob/master/docs/HttpApi.md).
 
 ## Render SVG
 

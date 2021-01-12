@@ -2,18 +2,25 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_state}
 \alias{hgd_state}
-\title{Returns status information of a httpgd graphics device.}
+\title{httpgd device status.}
 \usage{
 hgd_state(which = dev.cur())
 }
 \arguments{
-\item{which}{Which device (id)}
+\item{which}{Which device (ID).}
 }
 \value{
-List of status variables
+List of status variables with the following named items:
+\verb{$host}: Server hostname,
+\verb{$port}: Server port,
+\verb{$token}: Security token,
+\verb{$hsize}: Plot history size (how many plots are accessible),
+\verb{$upid}: Update ID (changes when the device has received new information),
+\verb{$active}: Is the device the currently activated device.
 }
 \description{
-Returns status information of a httpgd graphics device.
+Access status information of a httpgd graphics device.
+This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
 \dontrun{

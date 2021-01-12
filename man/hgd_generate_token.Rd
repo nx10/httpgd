@@ -2,20 +2,19 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_generate_token}
 \alias{hgd_generate_token}
-\title{Generate a random alphanumeric token string. 
-This is mainly used internally by httpgd.}
+\title{Generate random alphanumeric token.}
 \usage{
 hgd_generate_token(len)
 }
 \arguments{
-\item{len}{Token length}
+\item{len}{Token length (number of characters).}
 }
 \value{
-Random token string
+Random token string.
 }
 \description{
-Generate a random alphanumeric token string. 
-This is mainly used internally by httpgd.
+This is mainly used internally by httpgd, but exposed for
+testing purposes.
 }
 \examples{
 \dontrun{

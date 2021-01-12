@@ -1,6 +1,6 @@
-#' httpgd: Http server graphics device
+#' httpgd: HTTP server graphics device
 #' 
-#' Asynchronous http server graphics device.
+#' Asynchronous HTTP server graphics device.
 #'
 #' @docType package
 #' @name httpgd-package

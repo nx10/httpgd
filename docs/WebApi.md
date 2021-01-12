@@ -1,6 +1,6 @@
 # Web API
 
-[httpgd](../README.md) can be accessed both from [R](RApi.md) and from HTTP/websockets.
+[httpgd](https://github.com/nx10/httpgd/blob/master/README.md) can be accessed both from [R](https://github.com/nx10/httpgd/blob/master/docs/RApi.md) and from HTTP/websockets.
 
 ## HTTP API endpoints
 
