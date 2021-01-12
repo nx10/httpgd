@@ -10,3 +10,4 @@
 ^.*\.ts$
 ^.*tsconfig.json$
 ^\.github$
+^cran-comments\.md$
