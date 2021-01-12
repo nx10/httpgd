@@ -32,7 +32,7 @@ Imports:
     systemfonts (>= 0.2.3)
 LinkingTo: 
     cpp11,
-    BH,
+    BH (>= 1.75.0),
     later,
     systemfonts
 Suggests:
