@@ -26,12 +26,9 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 \dontrun{
 
 hgd()
-
 hgd_state()
-
 plot(1,1)
-
-hgd_state() 
+hgd_state()
 
 dev.off() 
 }

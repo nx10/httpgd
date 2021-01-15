@@ -23,6 +23,7 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 hgd()
 hgd_browse() # open browser
 hist(rnorm(100))
-#dev.off()
+
+dev.off()
 }
 }

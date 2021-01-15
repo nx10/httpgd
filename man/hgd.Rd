@@ -78,6 +78,9 @@ strings, but may lead to inconsistencies between strings and graphic
 elements that depend on the dimensions of the string (e.g. label borders
 and background).}
 }
+\value{
+No return value, called to initialize graphics device.
+}
 \description{
 This function initializes a httpgd graphics device and
 starts a local webserver, that allows for access via HTTP and WebSockets.
@@ -92,7 +95,7 @@ All font settings and descriptions are adopted from the excellent
 \dontrun{
 
 hgd() # Initialize graphics device and start server
-# hgd_browse() # Copy the displayed link in the browser or call
+hgd_browse() # Or copy the displayed link in the browser
 
 # Plot something
 x = seq(0, 3 * pi, by = 0.1)

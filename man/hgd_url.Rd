@@ -24,6 +24,7 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 
 hgd()
 my_url <- hgd_url()
-#dev.off()
+
+dev.off()
 }
 }

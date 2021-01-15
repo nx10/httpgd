@@ -23,6 +23,7 @@ plot(1,1)
 hist(rnorm(100))
 hgd_clear()
 hist(rnorm(100))
+
 dev.off()
 }
 }

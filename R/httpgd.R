@@ -52,6 +52,8 @@
 #'   strings, but may lead to inconsistencies between strings and graphic
 #'   elements that depend on the dimensions of the string (e.g. label borders
 #'   and background).
+#' 
+#' @return No return value, called to initialize graphics device.
 #'
 #' @importFrom systemfonts match_font
 #' @export
@@ -60,7 +62,7 @@
 #' \dontrun{
 #' 
 #' hgd() # Initialize graphics device and start server
-#' # hgd_browse() # Copy the displayed link in the browser or call
+#' hgd_browse() # Or copy the displayed link in the browser
 #' 
 #' # Plot something
 #' x = seq(0, 3 * pi, by = 0.1)
@@ -97,7 +99,7 @@ hgd <-
     if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok, webserver, silent, fix_text_width)) {
       if (!silent && webserver) {
         cat("httpgd server running at:\n  ",
-          hyperrefstyle(hgd_url(websockets = websockets)),
+          hgd_url(websockets = websockets),
           "\n", sep = "")
       }
     } else {
@@ -105,14 +107,6 @@ hgd <-
       stop("Failed to start server. (Port might be in use.)")
     }
   }
-
-hyperrefstyle <- function(str) {
-  if (grepl("^screen|^xterm|^vt100|color|ansi|cygwin|linux", 
-        Sys.getenv("TERM"), ignore.case = TRUE, perl = TRUE)) {
-          return(paste0("\033[4m\033[34m", str, "\033[39m\033[24m"))
-        }
-  return(str)
-}
 
 #' httpgd device status.
 #' 
@@ -136,12 +130,9 @@ hyperrefstyle <- function(str) {
 #' \dontrun{
 #' 
 #' hgd()
-#' 
 #' hgd_state()
-#' 
 #' plot(1,1)
-#' 
-#' hgd_state() 
+#' hgd_state()
 #' 
 #' dev.off() 
 #' }
@@ -176,7 +167,8 @@ hgd_state <- function(which = dev.cur()) {
 #' plot(1,1)
 #' s <- hgd_svg(width=600, height=400)
 #' hist(rnorm(100))
-#' hgd_svg(file="my_plot.svg", width=600, height=400) 
+#' hgd_svg(file=tempfile(), width=600, height=400) 
+#' 
 #' dev.off()
 #' }
 hgd_svg <- function(page = 0, width = -1, height = -1, which = dev.cur(), file = NA) {
@@ -211,6 +203,7 @@ hgd_svg <- function(page = 0, width = -1, height = -1, which = dev.cur(), file =
 #' plot(1,1) # page 1
 #' hist(rnorm(100)) # page 2
 #' hgd_remove(page=1) # remove page 1
+#' 
 #' dev.off()
 #' }
 hgd_remove <- function(page = 0, which = dev.cur()) {
@@ -241,6 +234,7 @@ hgd_remove <- function(page = 0, which = dev.cur()) {
 #' hist(rnorm(100))
 #' hgd_clear()
 #' hist(rnorm(100))
+#' 
 #' dev.off()
 #' }
 hgd_clear <- function(which = dev.cur()) {
@@ -271,7 +265,8 @@ hgd_clear <- function(which = dev.cur()) {
 #' 
 #' hgd()
 #' my_url <- hgd_url()
-#' #dev.off()
+#' 
+#' dev.off()
 #' }
 hgd_url <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
   l <- hgd_state(which)
@@ -304,7 +299,8 @@ hgd_url <- function(endpoint = "live", which = dev.cur(), websockets = TRUE) {
 #' hgd()
 #' hgd_browse() # open browser
 #' hist(rnorm(100))
-#' #dev.off()
+#' 
+#' dev.off()
 #' }
 hgd_browse <- function(endpoint = "live", which = dev.cur()) {
   browseURL(hgd_url(endpoint, which))
@@ -318,6 +314,8 @@ hgd_browse <- function(endpoint = "live", which = dev.cur()) {
 #' @param which Which device (ID).
 #' @param all Should all running httpgd devices be closed.
 #' 
+#' @return Number and name of the new active device (after the specified device has been shut down).
+#' 
 #' @importFrom grDevices dev.cur dev.list dev.off
 #' @export
 #' 
@@ -327,7 +325,6 @@ hgd_browse <- function(endpoint = "live", which = dev.cur()) {
 #' hgd()
 #' hgd_browse() # open browser
 #' hist(rnorm(100))
-#' # ...
 #' hgd_close() # Equvalent to dev.off()
 #' 
 #' hgd()
@@ -340,7 +337,7 @@ hgd_close <- function(which = dev.cur(), all = FALSE) {
     ds <- dev.list()
     invisible(lapply(ds[names(ds) == "httpgd"], dev.off))
   } else {
-    if (names(which(dev.list() == which)) == "httpgd") {
+    if (which != 1 && names(which(dev.list() == which)) == "httpgd") {
       dev.off(which)
     }
   }
@@ -357,10 +354,7 @@ hgd_close <- function(which = dev.cur(), all = FALSE) {
 #' @export
 #' 
 #' @examples
-#' \dontrun{
-#' 
 #' hgd_generate_token(6)
-#' }
 hgd_generate_token <- function(len) {
   httpgd_random_token_(len)
 }
@@ -384,8 +378,6 @@ hgd_generate_token <- function(len) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' 
 #' hgd_inline({
 #'   hist(rnorm(100))
 #' })
@@ -395,7 +387,6 @@ hgd_generate_token <- function(len) {
 #'   lines(c(0.5, 1, 0.5), c(0.5, 1, 1))
 #' })
 #' cat(s)
-#' }
 hgd_inline <- function(code, page = 0, page_width = -1, page_height = -1, file = NA, ...) {
   hgd(webserver=FALSE, ...)
   tryCatch(code,

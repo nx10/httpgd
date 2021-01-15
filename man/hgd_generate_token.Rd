@@ -17,8 +17,5 @@ This is mainly used internally by httpgd, but exposed for
 testing purposes.
 }
 \examples{
-\dontrun{
-
 hgd_generate_token(6)
-}
 }

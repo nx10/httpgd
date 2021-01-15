@@ -29,8 +29,6 @@ and an offline httpgd graphics device is managed (created and closed)
 automatically. Starting a device with \code{\link[=hgd]{hgd()}} is therefore not necessary.
 }
 \examples{
-\dontrun{
-
 hgd_inline({
   hist(rnorm(100))
 })
@@ -40,5 +38,4 @@ s <- hgd_inline({
   lines(c(0.5, 1, 0.5), c(0.5, 1, 1))
 })
 cat(s)
-}
 }
