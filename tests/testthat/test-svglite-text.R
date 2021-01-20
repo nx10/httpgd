@@ -2,11 +2,10 @@ test_that("par(cex) affects strwidth", {
   xmlSVG({
     plot.new()
     w1 <- strwidth("X")
-    oldpar <- par(cex = 4)
+    par(cex = 4)
     w4 <- strwidth("X")
   })
   expect_equal(w4 / w1, 4, tol = 1e-3)
-  par(oldpar)
 })
 
 test_that("cex affects strwidth", {
