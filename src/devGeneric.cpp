@@ -19,7 +19,7 @@ namespace httpgd
 
     pDevDesc devGeneric::create()
     {
-        pDevDesc dd = new DevDesc();
+        pDevDesc dd = (DevDesc*) calloc(1, sizeof(DevDesc));
         if (dd == nullptr)
             return dd;
 
