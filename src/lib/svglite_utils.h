@@ -289,6 +289,8 @@ namespace httpgd
         png_set_write_fn(png, &buffer, png_memory_write, NULL);
         png_write_png(png, info, PNG_TRANSFORM_IDENTITY, NULL);
 
+        png_destroy_write_struct(&png, &info);
+
         return base64_encode(buffer.data(), buffer.size());
     }
 
