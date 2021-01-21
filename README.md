@@ -2,6 +2,8 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
+[![CRAN](https://www.r-pkg.org/badges/version/httpgd)](https://CRAN.R-project.org/package=httpgd)
+![downloads](https://cranlogs.r-pkg.org/badges/grand-total/httpgd)
 <!-- badges: end -->
 
 A graphics device for R that is accessible via network protocols.
@@ -24,6 +26,14 @@ The device asynchronously serves SVG graphics via HTTP and WebSockets.
 ![demo](https://user-images.githubusercontent.com/33600480/83944385-6587fa80-a803-11ea-8f4a-7808d144309d.gif)
 
 ## Installation
+
+Install `httpgd` from CRAN:
+
+```R
+install.packages("httpgd")
+```
+
+Or get the latest development version from GitHub:
 
 ```R
 devtools::install_github("nx10/httpgd")
