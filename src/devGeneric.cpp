@@ -58,6 +58,14 @@ namespace httpgd
         dd->mode = [](int mode, pDevDesc dd) { getDev(dd)->dev_mode(mode, dd); };
         dd->metricInfo = [](int c, pGEcontext gc, double *ascent, double *descent, double *width, pDevDesc dd) { getDev(dd)->dev_metricInfo(c, gc, ascent, descent, width, dd); };
         dd->raster = [](unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd) { getDev(dd)->dev_raster(raster, w, h, x, y, width, height, rot, interpolate, gc, dd); };
+#if R_GE_version >= 13
+        dd->setPattern = [](SEXP pattern, pDevDesc dd) { return getDev(dd)->dev_setPattern(pattern, dd); };
+        dd->releasePattern = [](SEXP ref, pDevDesc dd) { getDev(dd)->dev_releasePattern(ref, dd); };
+        dd->setClipPath = [](SEXP path, SEXP ref, pDevDesc dd) { return getDev(dd)->dev_setClipPath(path, ref, dd); };
+        dd->releaseClipPath = [](SEXP ref, pDevDesc dd) { getDev(dd)->dev_releaseClipPath(ref, dd); };
+        dd->setMask = [](SEXP path, SEXP ref, pDevDesc dd) { return getDev(dd)->dev_setMask(path, ref, dd); };
+        dd->releaseMask = [](SEXP ref, pDevDesc dd) { getDev(dd)->dev_releaseMask(ref, dd); };
+#endif
 
         if (m_df_cap)
         {
