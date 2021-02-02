@@ -228,9 +228,13 @@ namespace httpgd
 
             os << "style=\"";
             fmt::print(os, "font-family: {}; font-size: {:.2f}px; ", m_text.font_family, m_text.fontsize);
-            if (m_text.bold)
-            {
-                css_field(os, "font-weight", "bold");
+            
+            if (m_text.weight != 400) {
+                if (m_text.weight == 700) {
+                    css_field(os, "font-weight", "bold");
+                } else {
+                    css_field(os, "font-weight", m_text.weight);
+                }
             }
             if (m_text.italic)
             {
@@ -239,6 +243,9 @@ namespace httpgd
             if (m_col != (int)R_RGB(0, 0, 0))
             {
                 write_style_col(os, this->m_col);
+            }
+            if (m_text.features.length() > 0) {
+                fmt::print(os, " font-feature-settings: {} ", m_text.features);
             }
             os << "\"";
             if (m_text.txtwidth_px > 0)
@@ -481,8 +488,8 @@ namespace httpgd
             fmt::print(os, "clip-path=\"url(#c{:d})\" ", id);
         }
 
-        Page::Page(double t_width, double t_height)
-            : width(t_width), height(t_height), m_dcs(), m_cps()
+        Page::Page(double t_width, double t_height, const std::string &t_extra_css)
+            : width(t_width), height(t_height), extra_css(t_extra_css), m_dcs(), m_cps()
         {
             clip(0, width, 0, height);
         }
@@ -518,7 +525,8 @@ namespace httpgd
             os << fmt::format("viewBox=\"0 0 {:.2f} {:.2f}\"", width, height)
                << ">\n<defs>\n"
                   "  <style type='text/css'><![CDATA[\n"
-                  "    line, polyline, polygon, path, rect, circle {\n"
+               << extra_css << "\n"
+               << "    line, polyline, polygon, path, rect, circle {\n"
                   "      fill: none;\n"
                   "      stroke: #000000;\n"
                   "      stroke-linecap: round;\n"

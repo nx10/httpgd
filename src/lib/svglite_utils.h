@@ -105,7 +105,7 @@ namespace httpgd
         return find_user_alias(family, user_aliases, face, "file");
     }
 
-    inline std::pair<std::string, int> get_font_file(const char *family, int face, cpp11::list user_aliases)
+    inline FontSettings get_font_file(const char *family, int face, cpp11::list user_aliases)
     {
         const char *fontfamily = family;
         if (is_symbol(face))
@@ -119,16 +119,14 @@ namespace httpgd
         std::string alias = fontfile(family, face, user_aliases);
         if (alias.size() > 0)
         {
-            return {alias, 0};
+            FontSettings result = {};
+            std::strncpy(result.file, alias.c_str(), PATH_MAX);
+            result.index = 0;
+            result.n_features = 0;
+            return result;
         }
 
-        char *path = new char[PATH_MAX + 1];
-        path[PATH_MAX] = '\0';
-        int index = locate_font(fontfamily, is_italic(face), is_bold(face), path, PATH_MAX);
-        std::pair<std::string, int> res{path, index};
-        delete[] path;
-
-        return res;
+        return locate_font_with_features(fontfamily, is_italic(face), is_bold(face));
     }
 
     inline std::string find_system_alias(std::string family,
@@ -146,7 +144,8 @@ namespace httpgd
 
     inline std::string fontname(const char *family_, int face,
                                 cpp11::list const &system_aliases,
-                                cpp11::list const &user_aliases)
+                                cpp11::list const &user_aliases, 
+                                FontSettings &font)
     {
         std::string family(family_);
         if (face == 5)
@@ -156,12 +155,22 @@ namespace httpgd
 
         std::string alias = find_system_alias(family, system_aliases);
         if (!alias.size())
+        {
             alias = find_user_alias(family, user_aliases, face, "name");
+        }
 
         if (alias.size())
+        {
             return alias;
-        else
-            return family;
+        }
+
+        const size_t MAX_FONT_FAMILY_LEN = 100;
+        char family_name[MAX_FONT_FAMILY_LEN];
+        if (get_font_family(font.file, font.index, family_name, MAX_FONT_FAMILY_LEN))
+        {
+            return std::string(family_name, strnlen(family_name, MAX_FONT_FAMILY_LEN));
+        }
+        return family;
     }
 
     // Raster image encoding

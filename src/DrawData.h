@@ -27,9 +27,10 @@ namespace httpgd
 
         struct TextInfo 
         {
+            int weight;
+            std::string features;
             std::string font_family;
             double fontsize;
-            bool bold;
             bool italic;
             double txtwidth_px;
         };
@@ -179,8 +180,9 @@ namespace httpgd
             double width;
             double height;
             int fill;
+            std::string extra_css;
 
-            Page(double t_width, double t_height);
+            Page(double t_width, double t_height, const std::string &t_extra_css);
             void put(std::shared_ptr<DrawCall> dc);
             void clear();
             void build_svg(std::ostream &os) const;

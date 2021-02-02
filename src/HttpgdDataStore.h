@@ -29,7 +29,7 @@ namespace httpgd
         bool diff(int index, double width, double height);
         void svg(std::ostream &os, int index);
 
-        int append(double width, double height);
+        int append(double width, double height, const std::string &extra_css);
         void clear(int index, bool silent);
         bool remove(int index, bool silent);
         bool remove_all();

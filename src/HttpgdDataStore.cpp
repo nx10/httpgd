@@ -23,10 +23,10 @@ namespace httpgd
         return (index == -1 ? (m_pages.size() - 1) : index);
     }
 
-    int HttpgdDataStore::append(double width, double height)
+    int HttpgdDataStore::append(double width, double height, const std::string &extra_css)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
-        m_pages.push_back(dc::Page(width, height));
+        m_pages.push_back(dc::Page(width, height, extra_css));
         return m_pages.size() - 1;
     }
     void HttpgdDataStore::add_dc(int t_index, std::shared_ptr<dc::DrawCall> dc, bool silent)

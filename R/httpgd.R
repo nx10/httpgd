@@ -52,6 +52,8 @@
 #'   strings, but may lead to inconsistencies between strings and graphic
 #'   elements that depend on the dimensions of the string (e.g. label borders
 #'   and background).
+#' @param extra_css Extra CSS to be added to the SVG. This can be used
+#'   to embed webfonts.
 #' 
 #' @return No return value, called to initialize graphics device.
 #'
@@ -84,7 +86,8 @@ hgd <-
            silent = FALSE,
            websockets = TRUE,
            webserver = TRUE, 
-           fix_text_width = TRUE) {
+           fix_text_width = TRUE,
+           extra_css = "") {
     
     tok <- ""
     if (is.character(token)) {
@@ -96,7 +99,7 @@ hgd <-
     }
     
     aliases <- validate_aliases(system_fonts, user_fonts)
-    if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok, webserver, silent, fix_text_width)) {
+    if (httpgd_(host, port, bg, width, height, pointsize, aliases, cors, tok, webserver, silent, fix_text_width, extra_css)) {
       if (!silent && webserver) {
         cat("httpgd server running at:\n  ",
           hgd_url(websockets = websockets),

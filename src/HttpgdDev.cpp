@@ -47,6 +47,7 @@ namespace httpgd
         : devGeneric(t_params.width, t_params.height, t_params.pointsize, t_params.bg),
           system_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["system"])),
           user_aliases(cpp11::as_cpp<cpp11::list>(t_params.aliases["user"])),
+          extra_css(t_params.extra_css),
           m_history(),
           m_fix_strwidth(t_params.fix_strwidth)
     {
@@ -136,9 +137,9 @@ namespace httpgd
             c = -c;
         }
 
-        std::pair<std::string, int> font = get_font_file(gc->fontfamily, gc->fontface, user_aliases);
+        FontSettings font = get_font_file(gc->fontfamily, gc->fontface, user_aliases);
 
-        int error = glyph_metrics(c, font.first.c_str(), font.second, gc->ps * gc->cex, 1e4, ascent, descent, width);
+        int error = glyph_metrics(c, font.file, font.index, gc->ps * gc->cex, 1e4, ascent, descent, width);
         if (error != 0)
         {
             *ascent = 0;
@@ -152,11 +153,11 @@ namespace httpgd
     }
     double HttpgdDev::dev_strWidth(const char *str, pGEcontext gc, pDevDesc dd)
     {
-        std::pair<std::string, int> font = get_font_file(gc->fontfamily, gc->fontface, user_aliases);
+        FontSettings font = get_font_file(gc->fontfamily, gc->fontface, user_aliases);
 
         double width = 0.0;
 
-        int error = string_width(str, font.first.c_str(), font.second, gc->ps * gc->cex, 1e4, 1, &width);
+        int error = string_width(str, font.file, font.index, gc->ps * gc->cex, 1e4, 1, &width);
 
         if (error != 0)
         {
@@ -217,7 +218,7 @@ namespace httpgd
                 m_history.put_last(m_target.get_newest_index(), dd);
             }
             debug_print("    -> add new page to server\n");
-            m_target.set_index(m_data_store->append(width, height));
+            m_target.set_index(m_data_store->append(width, height, extra_css));
             m_target.set_newest_index(m_target.get_index());
         }
         else
@@ -236,11 +237,28 @@ namespace httpgd
     }
     void HttpgdDev::dev_text(double x, double y, const char *str, double rot, double hadj, pGEcontext gc, pDevDesc dd)
     {
+        FontSettings font_info = get_font_file(gc->fontfamily, gc->fontface, user_aliases);
+
+        int weight = get_font_weight(font_info.file, font_info.index);
+
+        std::string feature = "";
+        for (int i = 0; i < font_info.n_features; ++i) {
+            feature += "'";
+            feature += font_info.features[i].feature[0];
+            feature += font_info.features[i].feature[1];
+            feature += font_info.features[i].feature[2];
+            feature += font_info.features[i].feature[3];
+            feature += "' ";
+            feature += font_info.features[i].setting;
+            feature += (i == font_info.n_features - 1 ? ";" : ",");
+        }
+
         put(std::make_shared<dc::Text>(gc, x, y, str, rot, hadj,
                                        dc::TextInfo{
-                                           fontname(gc->fontfamily, gc->fontface, system_aliases, user_aliases),
+                                           weight,
+                                           feature,
+                                           fontname(gc->fontfamily, gc->fontface, system_aliases, user_aliases, font_info),
                                            gc->cex * gc->ps,
-                                           is_bold(gc->fontface),
                                            is_italic(gc->fontface),
                                            m_fix_strwidth ? dev_strWidth(str, gc, dd) : -1.0}));
     }

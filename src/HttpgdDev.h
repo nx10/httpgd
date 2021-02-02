@@ -28,6 +28,7 @@ namespace httpgd
         double pointsize;
         cpp11::list aliases;
         bool fix_strwidth;
+        std::string extra_css;
     };
 
     class DeviceTarget
@@ -54,6 +55,7 @@ namespace httpgd
         // Font handling
         cpp11::list system_aliases;
         cpp11::list user_aliases;
+        std::string extra_css;
 
         HttpgdDev(const HttpgdServerConfig &t_config, const HttpgdDevStartParams &t_params);
         virtual ~HttpgdDev();

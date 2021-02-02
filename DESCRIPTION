@@ -32,7 +32,7 @@ Depends:
     R (>= 4.0.0)
 Imports: 
     later (>= 1.1.0),
-    systemfonts (>= 0.2.3)
+    systemfonts (>= 1.0.0)
 LinkingTo: 
     cpp11 (>= 0.2.4),
     BH (>= 1.75.0),
