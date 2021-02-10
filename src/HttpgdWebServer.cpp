@@ -4,45 +4,82 @@
 #include <thread>
 #include <sstream>
 #include <fmt/ostream.h>
+#include <boost/optional.hpp>
 
 namespace httpgd
 {
     namespace web
     {
-        std::string read_txt(const std::string &filepath, const std::string &fail_default)
+        boost::optional<std::string> read_txt(const std::string &filepath)
         {
             std::ifstream t(filepath);
             if (t.fail())
             {
-                return fail_default;
+                return boost::none;
             }
             std::stringstream buffer;
             buffer << t.rdbuf();
             return buffer.str();
         }
 
-        inline bool trystod(const std::string &parse, double *out)
+        inline boost::optional<std::string> param_str(OB::Belle::Request::Params params, std::string name)
         {
+            auto it = params.find(name);
+            if (it == params.end())
+            {
+                return boost::none;
+            }
+            return it->second;
+        }
+        inline boost::optional<double> param_double(OB::Belle::Request::Params params, std::string name)
+        {
+            auto it = params.find(name);
+            if (it == params.end())
+            {
+                return boost::none;
+            }
             try
             {
-                *out = std::stod(parse);
-                return true;
+                double val = std::stod(it->second);
+                return val;
             }
             catch (const std::exception &e)
             {
-                return false;
+                return boost::none;
             }
         }
-        inline bool trystoi(const std::string &parse, int *out)
+        inline boost::optional<int> param_int(OB::Belle::Request::Params params, std::string name)
         {
+            auto it = params.find(name);
+            if (it == params.end())
+            {
+                return boost::none;
+            }
             try
             {
-                *out = std::stoi(parse);
-                return true;
+                int val = std::stoi(it->second);
+                return val;
             }
             catch (const std::exception &e)
             {
-                return false;
+                return boost::none;
+            }
+        }
+        inline boost::optional<long> param_long(OB::Belle::Request::Params params, std::string name)
+        {
+            auto it = params.find(name);
+            if (it == params.end())
+            {
+                return boost::none;
+            }
+            try
+            {
+                long val = std::stol(it->second);
+                return val;
+            }
+            catch (const std::exception &e)
+            {
+                return boost::none;
             }
         }
 
@@ -155,14 +192,15 @@ namespace httpgd
                 ctx.res.set("content-type", "text/html");
                 ctx.res.result(OB::Belle::Status::ok);
 
-                // send the file contents
-                ctx.res.body() = read_txt(m_app.public_dir() + "/index.html", std::string("<html><body><b>ERROR:</b> File not found (") + m_app.public_dir() + "/index.html).<br>Please reload package.</body></html>");
+                std::string filepath = m_app.public_dir() + "/index.html";
+                ctx.res.body() = read_txt(filepath).get_value_or(
+                    fmt::format("<html><body><b>ERROR:</b> File not found ({}).<br>Please reload package.</body></html>", filepath));
             });
 
             m_app.on_http("/state", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
-                    throw 401;
+                    throw OB::Belle::Status::unauthorized;
                 }
 
                 ctx.res.set("content-type", "application/json");
@@ -174,38 +212,22 @@ namespace httpgd
             m_app.on_http("/plots", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
-                    throw 401;
+                    throw OB::Belle::Status::unauthorized;
                 }
 
                 HttpgdQueryResults qr;
-                
+
                 auto qparams = ctx.req.params();
+                auto p_index = param_int(qparams, "index");
+                auto p_limit = param_int(qparams, "limit");
 
-                auto find_index = qparams.find("index");
-                auto find_limit = qparams.find("limit");
-                bool has_index = (find_index != qparams.end());
-                bool has_limit = (find_limit != qparams.end());
-
-                if (has_index || has_limit)
+                if (p_limit)
                 {
-                    int cli_index = 0;
-                    if (has_index)
-                    {
-                        std::string ptxt = find_index->second;
-                        trystoi(ptxt, &cli_index);
-                    }
-
-                    if (has_limit)
-                    {
-                        std::string ptxt = find_limit->second;
-                        int cli_limit = -1;
-                        trystoi(ptxt, &cli_limit);
-                        qr = m_watcher->api_query_range(cli_index, cli_limit);
-                    }
-                    else
-                    {
-                        qr = m_watcher->api_query_index(cli_index);
-                    }
+                    qr = m_watcher->api_query_range(p_index.get_value_or(0), *p_limit);
+                }
+                else if (p_index)
+                {
+                    qr = m_watcher->api_query_index(*p_index);
                 }
                 else
                 {
@@ -235,63 +257,58 @@ namespace httpgd
             m_app.on_http("/svg", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
-                    throw 401;
+                    throw OB::Belle::Status::unauthorized;
                 }
 
-                // access the query parameters
                 auto qparams = ctx.req.params();
+                auto p_width = param_double(qparams, "width");
+                auto p_height = param_double(qparams, "height");
+                auto p_id = param_long(qparams, "id");
 
-                int cli_index = -1;
-                double cli_width = -1;
-                double cli_height = -1;
-
-                auto find_index = qparams.find("index");
-                auto find_width = qparams.find("width");
-                auto find_height = qparams.find("height");
-
-                if (find_index != qparams.end())
+                boost::optional<int> index;
+                if (p_id)
                 {
-                    std::string ptxt = find_index->second;
-                    trystoi(ptxt, &cli_index);
+                    index = m_watcher->api_index(*p_id);
                 }
-                if (find_width != qparams.end())
+                else
                 {
-                    std::string ptxt = find_width->second;
-                    trystod(ptxt, &cli_width);
-                }
-                if (find_height != qparams.end())
-                {
-                    std::string ptxt = find_height->second;
-                    trystod(ptxt, &cli_height);
+                    index = param_int(qparams, "index").get_value_or(-1);
                 }
 
-                std::stringstream buf;
-                m_watcher->api_svg(buf, cli_index, cli_width, cli_height);
-
-                ctx.res.set("content-type", "image/svg+xml");
-                ctx.res.result(OB::Belle::Status::ok);
-
-                ctx.res.body() = buf.str();
+                if (index)
+                {
+                    std::stringstream buf;
+                    m_watcher->api_svg(buf, *index, p_width.get_value_or(-1), p_height.get_value_or(-1));
+                    ctx.res.set("content-type", "image/svg+xml");
+                    ctx.res.result(OB::Belle::Status::ok);
+                    ctx.res.body() = buf.str();
+                }
+                else
+                {
+                    throw OB::Belle::Status::not_found;
+                }
             });
 
             m_app.on_http("/remove", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
-                    throw 401;
+                    throw OB::Belle::Status::unauthorized;
                 }
 
                 auto qparams = ctx.req.params();
+                auto p_id = param_long(qparams, "id");
 
-                int cli_index = -1;
-
-                auto find_index = qparams.find("index");
-                if (find_index != qparams.end())
+                boost::optional<int> index;
+                if (p_id)
                 {
-                    std::string ptxt = find_index->second;
-                    trystoi(ptxt, &cli_index);
+                    index = m_watcher->api_index(*p_id);
+                }
+                else
+                {
+                    index = param_int(qparams, "index").get_value_or(-1);
                 }
 
-                if (m_watcher->api_remove(cli_index))
+                if (index && m_watcher->api_remove(*index))
                 {
                     ctx.res.set("content-type", "application/json");
                     ctx.res.result(OB::Belle::Status::ok);
@@ -300,17 +317,14 @@ namespace httpgd
                 }
                 else
                 {
-                    ctx.res.set("content-type", "application/json");
-                    ctx.res.result(OB::Belle::Status::not_found);
-
-                    ctx.res.body() = std::string("plot not found");
+                    throw OB::Belle::Status::not_found;
                 }
             });
 
             m_app.on_http("/clear", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
-                    throw 401;
+                    throw OB::Belle::Status::unauthorized;
                 }
 
                 m_watcher->api_clear();

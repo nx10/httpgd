@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <boost/optional.hpp>
 #include "HttpgdCommons.h"
 
 namespace httpgd
@@ -16,6 +17,7 @@ namespace httpgd
         virtual bool api_clear() = 0;
 
         virtual void api_svg(std::ostream &os, int index, double width, double height) = 0;
+        virtual boost::optional<int> api_index(long id) = 0;
 
         virtual HttpgdState api_state() = 0;
 

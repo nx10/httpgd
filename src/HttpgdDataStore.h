@@ -26,6 +26,8 @@ namespace httpgd
         HttpgdDataStore();
         ~HttpgdDataStore();
         
+        boost::optional<int> find_index(long id);
+
         bool diff(int index, double width, double height);
         void svg(std::ostream &os, int index);
 

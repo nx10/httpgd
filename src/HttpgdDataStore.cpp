@@ -192,6 +192,19 @@ namespace httpgd
         m_pages[index].build_svg(os);
     }
 
+    boost::optional<int> HttpgdDataStore::find_index(long t_id)
+    {
+        const std::lock_guard<std::mutex> lock(m_store_mutex);
+        for (std::size_t i = 0; i != m_pages.size(); i++)
+        {
+            if (m_pages[i].id == t_id)
+            {
+                return static_cast<int>(i);
+            }
+        }
+        return boost::none;
+    }
+
     void HttpgdDataStore::m_inc_upid()
     {
         m_upid = incwrap(m_upid);

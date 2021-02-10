@@ -398,6 +398,11 @@ namespace httpgd
         m_data_store->svg(os, index);
     }
 
+    boost::optional<int> HttpgdDev::api_index(long id)
+    {
+        return m_data_store->find_index(id);
+    }
+
     bool HttpgdDev::server_start()
     {
         if (m_server && !m_server_running)
