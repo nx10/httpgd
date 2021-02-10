@@ -70,10 +70,10 @@ namespace httpgd
         virtual void api_render(int index, double width, double height) override;
         virtual bool api_remove(int index) override;
         virtual bool api_clear() override;
-        //virtual int api_upid() override;
-        //virtual bool api_active() override;
-        //virtual int api_page_count() override;
         virtual HttpgdState api_state() override;
+        HttpgdQueryResults api_query_all() override;
+        HttpgdQueryResults api_query_index(int index) override;
+        HttpgdQueryResults api_query_range(int offset, int limit) override;
         virtual void api_svg(std::ostream &os, int index, double width, double height) override;
         virtual std::shared_ptr<HttpgdServerConfig> api_server_config() override;
 

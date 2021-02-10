@@ -488,8 +488,8 @@ namespace httpgd
             fmt::print(os, "clip-path=\"url(#c{:d})\" ", id);
         }
 
-        Page::Page(double t_width, double t_height, const std::string &t_extra_css)
-            : width(t_width), height(t_height), extra_css(t_extra_css), m_dcs(), m_cps()
+        Page::Page(long t_id, double t_width, double t_height, const std::string &t_extra_css)
+            : id(t_id), width(t_width), height(t_height), extra_css(t_extra_css), m_dcs(), m_cps()
         {
             clip(0, width, 0, height);
         }

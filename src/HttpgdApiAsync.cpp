@@ -97,21 +97,22 @@ namespace httpgd
         m_data_store->svg(os, index);
     }
 
-    /*int HttpgdApiAsync::api_upid()
-    {
-        return m_data_store->upid();
-    }
-    bool HttpgdApiAsync::api_active()
-    {
-        return m_data_store->device_active();
-    }
-    int HttpgdApiAsync::api_page_count()
-    {
-        return m_data_store->count();
-    }*/
     HttpgdState HttpgdApiAsync::api_state()
     {
         return m_data_store->state();
+    }
+    
+    HttpgdQueryResults HttpgdApiAsync::api_query_all()
+    {
+        return m_data_store->query_all();
+    }
+    HttpgdQueryResults HttpgdApiAsync::api_query_index(int index)
+    {
+        return m_data_store->query_index(index);
+    }
+    HttpgdQueryResults HttpgdApiAsync::api_query_range(int offset, int limit)
+    {
+        return m_data_store->query_range(offset, limit);
     }
 
     std::shared_ptr<HttpgdServerConfig> HttpgdApiAsync::api_server_config()

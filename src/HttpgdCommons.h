@@ -3,6 +3,7 @@
 #define HTTPGD_COMMONS_H
 
 #include <string>
+#include <vector>
 
 namespace httpgd
 {
@@ -10,6 +11,11 @@ namespace httpgd
         int upid;
         size_t hsize;
         bool active;
+    };
+
+    struct HttpgdQueryResults {
+        HttpgdState state;
+        std::vector<long> ids;
     };
 
     struct HttpgdServerConfig

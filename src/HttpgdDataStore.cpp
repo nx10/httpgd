@@ -7,8 +7,23 @@
 
 namespace httpgd
 {
+    // safely increases numbers (wraps to 0)
+    template <typename T>
+    T incwrap(T t_value)
+    {
+        T v = t_value;
+        if (v == std::numeric_limits<T>::max())
+        {
+            return static_cast<T>(0);
+        }
+        return v + 1;
+    }
+
     HttpgdDataStore::HttpgdDataStore()
-        : m_pages(), m_upid(0), m_device_active(true)
+        : m_id_counter(0),
+          m_pages(),
+          m_upid(0),
+          m_device_active(true)
     {
     }
     HttpgdDataStore::~HttpgdDataStore() = default;
@@ -18,7 +33,7 @@ namespace httpgd
         auto psize = m_pages.size();
         return (psize > 0 && (index >= -1 && index < static_cast<int>(psize)));
     }
-    inline size_t HttpgdDataStore::m_index_to_pos(int index)
+    inline std::size_t HttpgdDataStore::m_index_to_pos(int index)
     {
         return (index == -1 ? (m_pages.size() - 1) : index);
     }
@@ -26,7 +41,10 @@ namespace httpgd
     int HttpgdDataStore::append(double width, double height, const std::string &extra_css)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
-        m_pages.push_back(dc::Page(width, height, extra_css));
+        m_pages.push_back(dc::Page(m_id_counter, width, height, extra_css));
+
+        m_id_counter = incwrap(m_id_counter);
+
         return m_pages.size() - 1;
     }
     void HttpgdDataStore::add_dc(int t_index, std::shared_ptr<dc::DrawCall> dc, bool silent)
@@ -176,14 +194,7 @@ namespace httpgd
 
     void HttpgdDataStore::m_inc_upid()
     {
-        if (m_upid < 1000000)
-        {
-            m_upid += 1;
-        }
-        else
-        {
-            m_upid = 0;
-        }
+        m_upid = incwrap(m_upid);
     }
     HttpgdState HttpgdDataStore::state()
     {
@@ -191,23 +202,73 @@ namespace httpgd
         return {
             m_upid,
             m_pages.size(),
-            m_device_active 
-            };
+            m_device_active};
     }
-    /*int HttpgdDataStore::count()
-    {
-        const std::lock_guard<std::mutex> lock(m_store_mutex);
-        return m_pages.size();
-    }
-    bool HttpgdDataStore::device_active()
-    {
-        const std::lock_guard<std::mutex> lock(m_store_mutex);
-        return m_device_active;
-    }*/
+
     void HttpgdDataStore::set_device_active(bool t_active)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         m_device_active = t_active;
+    }
+
+    HttpgdQueryResults HttpgdDataStore::query_all()
+    {
+        const std::lock_guard<std::mutex> lock(m_store_mutex);
+
+        std::vector<long> res(m_pages.size());
+        for (std::size_t i = 0; i != m_pages.size(); i++)
+        {
+            res[i] = m_pages[i].id;
+        }
+        return {{m_upid,
+                 m_pages.size(),
+                 m_device_active},
+                res};
+    }
+    HttpgdQueryResults HttpgdDataStore::query_index(int t_index)
+    {
+        const std::lock_guard<std::mutex> lock(m_store_mutex);
+
+        if (!m_valid_index(t_index))
+        {
+            return {{m_upid,
+                     m_pages.size(),
+                     m_device_active},
+                    {}};
+        }
+        auto index = m_index_to_pos(t_index);
+        return {{m_upid,
+                 m_pages.size(),
+                 m_device_active},
+                {m_pages[index].id}};
+    }
+    HttpgdQueryResults HttpgdDataStore::query_range(int t_offset, int t_limit)
+    {
+        const std::lock_guard<std::mutex> lock(m_store_mutex);
+
+        if (!m_valid_index(t_offset))
+        {
+            return {{m_upid,
+                     m_pages.size(),
+                     m_device_active},
+                    {}};
+        }
+        auto index = m_index_to_pos(t_offset);
+        if (t_limit < 0)
+        {
+            t_limit = m_pages.size();
+        }
+        auto end = std::min(m_pages.size(), index + static_cast<std::size_t>(t_limit));
+
+        std::vector<long> res(end - index);
+        for (std::size_t i = index; i != end; i++)
+        {
+            res[i - index] = m_pages[i].id;
+        }
+        return {{m_upid,
+                 m_pages.size(),
+                 m_device_active},
+                res};
     }
 
 } // namespace httpgd

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <thread>
 #include <sstream>
+#include <fmt/ostream.h>
 
 namespace httpgd
 {
@@ -45,14 +46,15 @@ namespace httpgd
             }
         }
 
+        inline void json_write_state(std::ostream &buf, const HttpgdState &state)
+        {
+            fmt::print(buf, "{{ \"upid\": {}, \"hsize\": {}, \"active\": {} }}", state.upid, state.hsize, state.active);
+        }
+
         inline std::string json_make_state(const HttpgdState &state)
         {
-            std::ostringstream buf;
-            buf << "{ "
-                << "\"upid\": " << std::to_string(state.upid)
-                << ", \"hsize\": " << std::to_string(state.hsize)
-                << ", \"active\": " << (state.active ? "true" : "false")
-                << " }";
+            std::stringstream buf;
+            json_write_state(buf, state);
             return buf.str();
         }
 
@@ -155,15 +157,6 @@ namespace httpgd
 
                 // send the file contents
                 ctx.res.body() = read_txt(m_app.public_dir() + "/index.html", std::string("<html><body><b>ERROR:</b> File not found (") + m_app.public_dir() + "/index.html).<br>Please reload package.</body></html>");
-                /*if (auto res = readfile(m_app.public_dir() + "/index.html"))
-                {
-
-                    ctx.res.body() = std::move(*res);
-                }
-                else
-                {
-                    throw 404;
-                }*/
             });
 
             m_app.on_http("/state", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
@@ -176,6 +169,67 @@ namespace httpgd
                 ctx.res.result(OB::Belle::Status::ok);
 
                 ctx.res.body() = json_make_state(m_watcher->api_state());
+            });
+
+            m_app.on_http("/plots", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
+                if (!authorized(m_conf, ctx))
+                {
+                    throw 401;
+                }
+
+                HttpgdQueryResults qr;
+                
+                auto qparams = ctx.req.params();
+
+                auto find_index = qparams.find("index");
+                auto find_limit = qparams.find("limit");
+                bool has_index = (find_index != qparams.end());
+                bool has_limit = (find_limit != qparams.end());
+
+                if (has_index || has_limit)
+                {
+                    int cli_index = 0;
+                    if (has_index)
+                    {
+                        std::string ptxt = find_index->second;
+                        trystoi(ptxt, &cli_index);
+                    }
+
+                    if (has_limit)
+                    {
+                        std::string ptxt = find_limit->second;
+                        int cli_limit = -1;
+                        trystoi(ptxt, &cli_limit);
+                        qr = m_watcher->api_query_range(cli_index, cli_limit);
+                    }
+                    else
+                    {
+                        qr = m_watcher->api_query_index(cli_index);
+                    }
+                }
+                else
+                {
+                    qr = m_watcher->api_query_all();
+                }
+
+                std::stringstream buf;
+                buf << "{ \"state\": ";
+                json_write_state(buf, qr.state);
+                buf << ", \"plots\": [";
+
+                for (const auto &id : qr.ids)
+                {
+                    if (&id != &qr.ids[0])
+                    {
+                        buf << ", ";
+                    }
+                    fmt::print(buf, "{{ \"id\": \"{}\" }}", id);
+                }
+                buf << "] }";
+
+                ctx.res.set("content-type", "application/json");
+                ctx.res.result(OB::Belle::Status::ok);
+                ctx.res.body() = buf.str();
             });
 
             m_app.on_http("/svg", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
@@ -320,13 +374,12 @@ namespace httpgd
                 m_last_upid = state.upid;
             }
         }
-        
+
         void WebServer::broadcast_state_current()
         {
             HttpgdState state = m_watcher->api_state();
             broadcast_state(state);
         }
-        
 
     } // namespace web
 } // namespace httpgd

@@ -36,10 +36,10 @@ namespace httpgd
         void api_svg(std::ostream &os, int index, double width, double height) override;
         
         // Calls that DONT synchronize with R
-        //int api_upid() override;
-        //bool api_active() override;
-        //int api_page_count() override;
         HttpgdState api_state() override;
+        HttpgdQueryResults api_query_all() override;
+        HttpgdQueryResults api_query_index(int index) override;
+        HttpgdQueryResults api_query_range(int offset, int limit) override;
         std::shared_ptr<HttpgdServerConfig> api_server_config() override;
 
         // this will block when a operation is running in another thread that needs the r device to be alive

@@ -177,12 +177,13 @@ namespace httpgd
         class Page
         {
         public:
+            long id;
             double width;
             double height;
             int fill;
             std::string extra_css;
 
-            Page(double t_width, double t_height, const std::string &t_extra_css);
+            Page(long t_id, double t_width, double t_height, const std::string &t_extra_css);
             void put(std::shared_ptr<DrawCall> dc);
             void clear();
             void build_svg(std::ostream &os) const;

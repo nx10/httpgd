@@ -43,9 +43,14 @@ namespace httpgd
         HttpgdState state();
         void set_device_active(bool t_active);
 
+        HttpgdQueryResults query_all();
+        HttpgdQueryResults query_index(int index);
+        HttpgdQueryResults query_range(int offset, int limit);
+
     private:
         std::mutex m_store_mutex;
 
+        long m_id_counter;
         std::vector<dc::Page> m_pages;
         int m_upid;
         bool m_device_active;

@@ -424,42 +424,26 @@ namespace httpgd
         return m_svr_config;
     }
 
-    /*int HttpgdDev::api_upid()
-    {
-        return m_data_store->upid();
-    }
-    bool HttpgdDev::api_active()
-    {
-        return m_data_store->device_active();
-    }
-    int HttpgdDev::api_page_count()
-    {
-        return m_data_store->count();
-    }*/
     HttpgdState HttpgdDev::api_state()
     {
         return m_data_store->state();
     }
 
-    // Security vulnerability: Seed can not be chosen if R's RNG is used
-    // Generate random alphanumeric string with R's built in RNG
-    // https://cran.rstudio.com/doc/manuals/r-devel/R-exts.html#Random-numbers
-    /*std::string HttpgdDev::random_token(int len)
+    HttpgdQueryResults HttpgdDev::api_query_all()
     {
-        static const char alphanum[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        std::string s(len, 'a');
-        GetRNGstate();
-        for (int i = 0; i < len; i++)
-        {
-            s[i] = alphanum[(int)(unif_rand() * (sizeof(alphanum) / sizeof(*alphanum) - 1))];
-        }
-        PutRNGstate();
-        return s;
-    }*/
+        return m_data_store->query_all();
+    }
+    HttpgdQueryResults HttpgdDev::api_query_index(int index)
+    {
+        return m_data_store->query_index(index);
+    }
+    HttpgdQueryResults HttpgdDev::api_query_range(int offset, int limit)
+    {
+        return m_data_store->query_range(offset, limit);
+    }
 
+    // Can not use R's RNG for this for security reasons.
+    // (Seed could be predicted)
     std::string HttpgdDev::random_token(int len)
     {
         static const char alphanum[] =
