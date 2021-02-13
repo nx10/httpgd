@@ -8,7 +8,7 @@ PKG_CPPFLAGS = -Ilib -I${RWINLIB}/include \
 
 PKG_LIBS = -L${RWINLIB}/lib${R_ARCH} -lpng -lz -lWs2_32 -lwsock32
 
-all: clean winlibs
+all: winlibs
 
 winlibs:
 	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R" ${VERSION}
