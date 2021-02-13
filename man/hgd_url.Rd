@@ -2,21 +2,36 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_url}
 \alias{hgd_url}
-\title{httpgd server URL.}
+\title{httpgd URL.}
 \usage{
-hgd_url(endpoint = "live", which = dev.cur(), websockets = TRUE)
+hgd_url(
+  endpoint = "live",
+  which = dev.cur(),
+  websockets = TRUE,
+  width = -1,
+  height = -1
+)
 }
 \arguments{
-\item{endpoint}{API endpoint.}
+\item{endpoint}{API endpoint. The default, \code{"live"} is the HTML/JS
+plot viewer. Can be set to a numeric plot index or plot ID
+(see \code{\link[=hgd_id]{hgd_id()}}) to obtain the direct URL to the SVG.}
 
 \item{which}{Which device (ID).}
 
 \item{websockets}{Use websockets.}
+
+\item{width}{Width of the plot. (Only used when \code{endpoint} is \code{"svg"},
+or a plot index or ID.)}
+
+\item{height}{Height of the plot. (Only used when \code{endpoint} is \code{"svg"},
+or a plot index or ID.)}
 }
 \value{
 URL.
 }
 \description{
+Generate URLs to the plot viewer or to plot SVGs.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
@@ -24,6 +39,8 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 
 hgd()
 my_url <- hgd_url()
+hgd_url(0)
+hgd_url(plot_id(), width = 800, height = 600)
 
 dev.off()
 }

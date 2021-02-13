@@ -7,7 +7,9 @@
 hgd_remove(page = 0, which = dev.cur())
 }
 \arguments{
-\item{page}{Plot page to remove. If this is set to \code{0}, the last page will be selected.}
+\item{page}{Plot page to remove. If this is set to \code{0}, the last page will
+be selected. Can be set to a numeric plot index or plot ID
+(see \code{\link[=hgd_id]{hgd_id()}}).}
 
 \item{which}{Which device (ID).}
 }
@@ -21,9 +23,9 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 \dontrun{
 
 hgd()
-plot(1,1) # page 1
+plot(1, 1) # page 1
 hist(rnorm(100)) # page 2
-hgd_remove(page=1) # remove page 1
+hgd_remove(page = 1) # remove page 1
 
 dev.off()
 }

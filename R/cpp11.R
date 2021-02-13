@@ -16,8 +16,20 @@ httpgd_svg_ <- function(devnum, page, width, height) {
   .Call(`_httpgd_httpgd_svg_`, devnum, page, width, height)
 }
 
+httpgd_svg_id_ <- function(devnum, id, width, height) {
+  .Call(`_httpgd_httpgd_svg_id_`, devnum, id, width, height)
+}
+
 httpgd_remove_ <- function(devnum, page) {
   .Call(`_httpgd_httpgd_remove_`, devnum, page)
+}
+
+httpgd_remove_id_ <- function(devnum, id) {
+  .Call(`_httpgd_httpgd_remove_id_`, devnum, id)
+}
+
+httpgd_id_ <- function(devnum, page, limit) {
+  .Call(`_httpgd_httpgd_id_`, devnum, page, limit)
 }
 
 httpgd_clear_ <- function(devnum) {

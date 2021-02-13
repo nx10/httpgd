@@ -7,11 +7,15 @@
 hgd_svg(page = 0, width = -1, height = -1, which = dev.cur(), file = NA)
 }
 \arguments{
-\item{page}{Plot page to render. If this is set to \code{0}, the last page will be selected.}
+\item{page}{Plot page to render. If this is set to \code{0}, the last page will
+be selected. Can be set to a numeric plot index or plot ID
+(see \code{\link[=hgd_id]{hgd_id()}}).}
 
-\item{width}{Width of the plot. If this is set to \code{-1}, the last width will be selected.}
+\item{width}{Width of the plot. If this is set to \code{-1}, the last width will
+be selected.}
 
-\item{height}{Height of the plot. If this is set to \code{-1}, the last height will be selected.}
+\item{height}{Height of the plot. If this is set to \code{-1}, the last height
+will be selected.}
 
 \item{which}{Which device (ID).}
 
@@ -27,10 +31,10 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 \dontrun{
 
 hgd()
-plot(1,1)
-s <- hgd_svg(width=600, height=400)
+plot(1, 1)
+s <- hgd_svg(width = 600, height = 400)
 hist(rnorm(100))
-hgd_svg(file=tempfile(), width=600, height=400) 
+hgd_svg(file = tempfile(), width = 600, height = 400)
 
 dev.off()
 }

@@ -27,9 +27,9 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 
 hgd()
 hgd_state()
-plot(1,1)
+plot(1, 1)
 hgd_state()
 
-dev.off() 
+dev.off()
 }
 }

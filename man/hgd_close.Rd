@@ -12,7 +12,8 @@ hgd_close(which = dev.cur(), all = FALSE)
 \item{all}{Should all running httpgd devices be closed.}
 }
 \value{
-Number and name of the new active device (after the specified device has been shut down).
+Number and name of the new active device (after the specified device
+has been shut down).
 }
 \description{
 This achieves the same effect as \code{\link[grDevices:dev]{grDevices::dev.off()}},
@@ -29,6 +30,6 @@ hgd_close() # Equvalent to dev.off()
 hgd()
 hgd()
 hgd()
-hgd_close(all=TRUE)
+hgd_close(all = TRUE)
 }
 }

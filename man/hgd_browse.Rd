@@ -2,12 +2,12 @@
 % Please edit documentation in R/httpgd.R
 \name{hgd_browse}
 \alias{hgd_browse}
-\title{Open httpgd device URL in the browser.}
+\title{Open httpgd URL in the browser.}
 \usage{
-hgd_browse(endpoint = "live", which = dev.cur())
+hgd_browse(..., which = dev.cur())
 }
 \arguments{
-\item{endpoint}{API endpoint.}
+\item{...}{Parameters passed to \code{\link[=hgd_url]{hgd_url()}}.}
 
 \item{which}{Which device (ID).}
 }

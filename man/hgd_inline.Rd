@@ -9,11 +9,15 @@ hgd_inline(code, page = 0, page_width = -1, page_height = -1, file = NA, ...)
 \arguments{
 \item{code}{Plotting code. See examples for more information.}
 
-\item{page}{Plot page to render. If this is set to \code{0}, the last page will be selected.}
+\item{page}{Plot page to render. If this is set to \code{0}, the last page will
+be selected. Can be set to a numeric plot index or plot ID
+(see \code{\link[=hgd_id]{hgd_id()}}).}
 
-\item{page_width}{Width of the plot. If this is set to \code{-1}, the last width will be selected.}
+\item{page_width}{Width of the plot. If this is set to \code{-1}, the last width
+will be selected.}
 
-\item{page_height}{Height of the plot. If this is set to \code{-1}, the last height will be selected.}
+\item{page_height}{Height of the plot. If this is set to \code{-1}, the last
+height will be selected.}
 
 \item{file}{Filepath to save SVG. (No file will be created if this is \code{NA})}
 

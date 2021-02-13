@@ -19,7 +19,7 @@ This function will only work after starting a device with \code{\link[=hgd]{hgd(
 \dontrun{
 
 hgd()
-plot(1,1)
+plot(1, 1)
 hist(rnorm(100))
 hgd_clear()
 hist(rnorm(100))

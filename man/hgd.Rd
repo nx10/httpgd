@@ -102,7 +102,7 @@ hgd() # Initialize graphics device and start server
 hgd_browse() # Or copy the displayed link in the browser
 
 # Plot something
-x = seq(0, 3 * pi, by = 0.1)
+x <- seq(0, 3 * pi, by = 0.1)
 plot(x, sin(x), type = "l")
 
 dev.off() # alternatively: hgd_close()

@@ -94,6 +94,17 @@ inline httpgd::HttpgdDev *validate_httpgddev(int devnum)
     return dev;
 }
 
+inline long validate_plotid(const std::string &id)
+{
+    try {
+        return std::stol(id);
+    }
+    catch (const std::exception &e){
+        cpp11::stop("Not a valid plot ID.");
+    }
+    return -1;
+}
+
 [[cpp11::register]]
 cpp11::list httpgd_state_(int devnum)
 {
@@ -133,10 +144,77 @@ std::string httpgd_svg_(int devnum, int page, double width, double height)
 }
 
 [[cpp11::register]]
+std::string httpgd_svg_id_(int devnum, std::string id, double width, double height)
+{
+    long pid = validate_plotid(id);
+
+    auto dev = validate_httpgddev(devnum);
+    auto page = dev->api_index(pid);
+    if (!page)
+    {
+        cpp11::stop("Not a valid plot ID.");
+    }
+
+    std::ostringstream buf;
+    dev->api_svg(buf, *page, width, height);
+    return buf.str();
+}
+
+[[cpp11::register]]
 bool httpgd_remove_(int devnum, int page)
 {
     auto dev = validate_httpgddev(devnum);
     return dev->api_remove(page);
+}
+
+[[cpp11::register]]
+bool httpgd_remove_id_(int devnum, std::string id)
+{
+    long pid = validate_plotid(id);
+    auto dev = validate_httpgddev(devnum);
+    auto page = dev->api_index(pid);
+    if (!page)
+    {
+        cpp11::stop("Not a valid plot ID.");
+    }
+
+    return dev->api_remove(*page);
+}
+
+[[cpp11::register]]
+cpp11::writable::list httpgd_id_(int devnum, int page, int limit)
+{
+    auto dev = validate_httpgddev(devnum);
+    httpgd::HttpgdQueryResults res;
+    
+    if (page == -1)
+    {
+        res = dev->api_query_index(page);
+    }
+    else
+    {
+        res = dev->api_query_range(page, limit);
+    }
+
+    using namespace cpp11::literals;
+    cpp11::writable::list state{
+        "hsize"_nm = res.state.hsize,
+        "upid"_nm = res.state.upid,
+        "active"_nm = res.state.active};
+
+    cpp11::writable::list plots{static_cast<R_xlen_t>(res.ids.size())};
+
+    for (std::size_t i = 0; i < res.ids.size(); ++i)
+    {
+        cpp11::writable::list p{"id"_nm = std::to_string(res.ids[i])};
+        p.attr("class") = "httpgd_pid";
+        plots[i] = p;
+    }
+
+    return {
+        "state"_nm = state,
+        "plots"_nm = plots
+    };
 }
 
 [[cpp11::register]]
