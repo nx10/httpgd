@@ -46,8 +46,14 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
 
     std::string wwwpath(httpgd::get_wwwpath(""));
 
+    boost::optional<const std::string &> css;
+    if (!extra_css.empty()) 
+    {
+        css = extra_css;
+    }
+
     auto dev = new httpgd::HttpgdDev(
-        {host,
+        {std::move(host),
          port,
          wwwpath,
          cors,
@@ -62,7 +68,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
          pointsize,
          aliases,
          fix_text_width,
-         extra_css});
+         css});
 
     httpgd::HttpgdDev::make_device("httpgd", dev);
     return dev->server_start();

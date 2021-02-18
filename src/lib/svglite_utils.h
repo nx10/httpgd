@@ -25,9 +25,11 @@
 #ifndef HTTPGD_SVGLITE_UTILS_H
 #define HTTPGD_SVGLITE_UTILS_H
 
-#include <cpp11/list.hpp>
 #include <cpp11/as.hpp>
+#include <cpp11/list.hpp>
+#include <cstring>
 #include <systemfonts.h>
+
 #define R_NO_REMAP
 #include <R_ext/GraphicsEngine.h>
 

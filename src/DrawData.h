@@ -1,15 +1,24 @@
 #ifndef HTTPGD_DRAWDATA_H
 #define HTTPGD_DRAWDATA_H
 
+#include "HttpgdGeom.h"
+
+#include <algorithm>
+#include <boost/optional.hpp>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 // Do not include any R headers here !
 
-namespace httpgd
+namespace httpgd::dc
 {
-    namespace dc
+    using clip_id_t = int;
+    using page_id_t = int32_t;
+
+    // Data
+
+    struct LineInfo
     {
         enum GC_lineend
         {
@@ -25,176 +34,176 @@ namespace httpgd
             GC_BEVEL_JOIN = 3
         };
 
-        struct TextInfo 
-        {
-            int weight;
-            std::string features;
-            std::string font_family;
-            double fontsize;
-            bool italic;
-            double txtwidth_px;
-        };
+        color_t col;
+        double lwd;
+        int lty;
+        GC_lineend lend;
+        GC_linejoin ljoin;
+        double lmitre;
+    };
 
-        class Clip;
+    struct TextInfo
+    {
+        int weight;
+        std::string features;
+        std::string font_family;
+        double fontsize;
+        bool italic;
+        double txtwidth_px;
+    };
 
-        class DrawCall
-        {
-        public:
-            int m_col;
-            int m_fill;
-            double m_gamma;
-            double m_lwd;
-            int m_lty;
-            GC_lineend m_lend;
-            GC_linejoin m_ljoin;
-            double m_lmitre;
-            int m_clip_id;
+    // Draw calls
 
-            explicit DrawCall(const void *gc);
-            virtual ~DrawCall();
+    class Clip;
 
-            virtual void build_svg(std::ostream &os) const;
-            virtual void build_svg_style(std::ostream &os, bool include_fill) const;
-        };
+    class DrawCall
+    {
+    public:
+        virtual void svg(std::ostream &os) const;
+        [[nodiscard]] clip_id_t clip_id() const;
+        void clip_id(clip_id_t t_clip_id);
 
-        class Text : public DrawCall
-        {
-        public:
-            Text(const void *gc, double x, double y, const std::string &str, double rot, double /*hadj*/, const TextInfo &t_text);
-            void build_svg(std::ostream &os) const override;
+    private:
+        clip_id_t m_clip_id = 0;
+    };
 
-        private:
-            double m_x, m_y, m_rot, m_hadj;
-            std::string m_str;
-            TextInfo m_text;
-        };
+    class Text : public DrawCall
+    {
+    public:
+        Text(color_t t_col, vertex<double> t_pos, std::string &&t_str, double t_rot, double t_hadj, TextInfo &&t_text);
+        void svg(std::ostream &os) const override;
 
-        class Circle : public DrawCall
-        {
-        public:
-            Circle(const void *gc, double x, double y, double r);
-            void build_svg(std::ostream &os) const override;
+    private:
+        color_t m_col;
+        vertex<double> m_pos;
+        double m_rot, m_hadj;
+        std::string m_str;
+        TextInfo m_text;
+    };
 
-        private:
-            double m_x, m_y, m_r;
-        };
+    class Circle : public DrawCall
+    {
+    public:
+        Circle(LineInfo &&t_line, color_t t_fill, vertex<double> t_pos, double t_radius);
+        void svg(std::ostream &os) const override;
 
-        class Line : public DrawCall
-        {
-        public:
-            Line(const void *gc, double x1, double y1, double x2, double y2);
-            void build_svg(std::ostream &os) const override;
+    private:
+        LineInfo m_line;
+        color_t m_fill;
+        vertex<double> m_pos;
+        double m_radius;
+    };
 
-        private:
-            double m_x1, m_y1, m_x2, m_y2;
-        };
+    class Line : public DrawCall
+    {
+    public:
+        Line(LineInfo &&t_line, vertex<double> t_orig, vertex<double> t_dest);
+        void svg(std::ostream &os) const override;
 
-        class Rect : public DrawCall
-        {
-        public:
-            Rect(const void *gc, double x0, double y0, double x1, double y1);
-            void build_svg(std::ostream &os) const override;
+    private:
+        LineInfo m_line;
+        vertex<double> m_orig, m_dest;
+    };
 
-        private:
-            double m_x0, m_y0, m_x1, m_y1;
-        };
+    class Rect : public DrawCall
+    {
+    public:
+        Rect(LineInfo &&t_line, color_t t_fill, rect<double> t_rect);
+        void svg(std::ostream &os) const override;
 
-        class Polyline : public DrawCall
-        {
-        public:
-            Polyline(const void *gc, int n, const std::vector<double> &x, const std::vector<double> &y);
-            void build_svg(std::ostream &os) const override;
+    private:
+        LineInfo m_line;
+        color_t m_fill;
+        rect<double> m_rect;
+    };
 
-        private:
-            int m_n;
-            std::vector<double> m_x;
-            std::vector<double> m_y;
-        };
-        class Polygon : public DrawCall
-        {
-        public:
-            Polygon(const void *gc, int n, const std::vector<double> &x, const std::vector<double> &y);
-            void build_svg(std::ostream &os) const override;
+    class Polyline : public DrawCall
+    {
+    public:
+        Polyline(LineInfo &&t_line, std::vector<vertex<double>> &&t_points);
+        void svg(std::ostream &os) const override;
 
-        private:
-            int m_n;
-            std::vector<double> m_x;
-            std::vector<double> m_y;
-        };
-        class Path : public DrawCall
-        {
-        public:
-            Path(const void *gc, const std::vector<double> &x, const std::vector<double> &y, int npoly, const std::vector<int> &nper, bool winding);
-            void build_svg(std::ostream &os) const override;
+    private:
+        LineInfo m_line;
+        std::vector<vertex<double>> m_points;
+    };
+    class Polygon : public DrawCall
+    {
+    public:
+        Polygon(LineInfo &&t_line, color_t t_fill, std::vector<vertex<double>> &&t_points);
+        void svg(std::ostream &os) const override;
 
-        private:
-            std::vector<double> m_x;
-            std::vector<double> m_y;
-            int m_npoly;
-            std::vector<int> m_nper;
-            bool m_winding;
-        };
+    private:
+        LineInfo m_line;
+        color_t m_fill;
+        std::vector<vertex<double>> m_points;
+    };
+    class Path : public DrawCall
+    {
+    public:
+        Path(LineInfo &&t_line, color_t t_fill, std::vector<vertex<double>> &&t_points, std::vector<int> &&t_nper, bool t_winding);
+        void svg(std::ostream &os) const override;
 
-        class Raster : public DrawCall
-        {
-        public:
-            Raster(const void *gc, const std::vector<unsigned int> &raster, int w, int h,
-                   double x, double y,
-                   double width, double height,
-                   double rot,
-                   bool interpolate);
-            void build_svg(std::ostream &os) const override;
+    private:
+        LineInfo m_line;
+        color_t m_fill;
+        std::vector<vertex<double>> m_points;
+        std::vector<int> m_nper;
+        bool m_winding;
+    };
 
-        private:
-            std::vector<unsigned int> m_raster;
-            int m_w;
-            int m_h;
-            double m_x;
-            double m_y;
-            double m_width;
-            double m_height;
-            double m_rot;
-            bool m_interpolate;
-        };
+    class Raster : public DrawCall
+    {
+    public:
+        Raster(std::vector<unsigned int> &&t_raster, vertex<int> t_wh,
+               rect<double> t_rect,
+               double t_rot,
+               bool t_interpolate);
+        void svg(std::ostream &os) const override;
 
-        class Clip
-        {
-        public:
-            Clip(int id, double x0, double x1, double y0, double y1);
-            bool equals(double x0, double x1, double y0, double y1);
-            void build_svg_def(std::ostream &os) const;
-            static void build_svg_attr(std::ostream &os, int id);
-            int id() const;
+    private:
+        std::vector<unsigned int> m_raster;
+        vertex<int> m_wh;
+        rect<double> m_rect;
+        double m_rot;
+        bool m_interpolate;
+    };
 
-        protected:
-            int m_id;
-            double m_x0;
-            double m_x1;
-            double m_y0;
-            double m_y1;
-        };
+    class Clip
+    {
+    public:
+        Clip(clip_id_t t_id, rect<double> t_rect);
+        [[nodiscard]] bool equals(rect<double> t_rect) const;
+        void svg_def(std::ostream &os) const;
+        [[nodiscard]] clip_id_t id() const;
 
-        class Page
-        {
-        public:
-            long id;
-            double width;
-            double height;
-            int fill;
-            std::string extra_css;
+    private:
+        clip_id_t m_id;
+        rect<double> m_rect;
+    };
 
-            Page(long t_id, double t_width, double t_height, const std::string &t_extra_css);
-            void put(std::shared_ptr<DrawCall> dc);
-            void clear();
-            void build_svg(std::ostream &os) const;
-            void clip(double x0, double x1, double y0, double y1);
+    class Page
+    {
+    public:
+        Page(page_id_t t_id, vertex<double> t_size);
+        void put(std::shared_ptr<DrawCall> t_dc);
+        void clear();
+        void svg(std::ostream &os, boost::optional<const std::string &> t_extra_css) const;
+        void clip(rect<double> t_rect);
+        [[nodiscard]] vertex<double> size() const;
+        void size(vertex<double> t_size);
+        void fill(color_t t_fill);
+        [[nodiscard]] page_id_t id() const;
 
-        private:
-            std::vector<std::shared_ptr<DrawCall>> m_dcs;
-            std::vector<Clip> m_cps;
-        };
+    private:
+        page_id_t m_id;
+        vertex<double> m_size;
+        color_t m_fill;
 
-    } // namespace dc
-} // namespace httpgd
+        std::vector<std::shared_ptr<DrawCall>> m_dcs;
+        std::vector<Clip> m_cps;
+    };
+
+} // namespace httpgd::dc
 
 #endif /* HTTPGD_DRAWDATA_H */

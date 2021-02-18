@@ -89,7 +89,7 @@ namespace httpgd
 
     void HttpgdApiAsync::api_svg(std::ostream &os, int index, double width, double height)
     {
-        if (m_data_store->diff(index, width, height))
+        if (m_data_store->diff(index, {width, height}))
         {
             api_render(index, width, height); // use async render call
             // todo perform sync diff again and sync render svg
@@ -97,7 +97,7 @@ namespace httpgd
         m_data_store->svg(os, index);
     }
 
-    boost::optional<int> HttpgdApiAsync::api_index(long id)
+    boost::optional<int> HttpgdApiAsync::api_index(int32_t id)
     {
         return m_data_store->find_index(id);
     }

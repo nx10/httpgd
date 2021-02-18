@@ -1,66 +1,64 @@
 #ifndef HTTPGD_SERVER_STORE_H
 #define HTTPGD_SERVER_STORE_H
 
-#include <functional>
+#include "DrawData.h"
+#include "HttpgdApi.h"
+#include "HttpgdCommons.h"
+#include "HttpgdGeom.h"
+
 #include <atomic>
+#include <functional>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
-
-#include "HttpgdCommons.h"
-#include "HttpgdApi.h"
-#include "DrawData.h"
 
 namespace httpgd
 {
-
-    struct HttpgdDataStorePageSize {
-        double width;
-        double height;
-    };
+    using page_id_t = int32_t;
+    using page_index_t = int;
 
     class HttpgdDataStore
     {
     public:
-        
-        HttpgdDataStore();
-        ~HttpgdDataStore();
-        
-        boost::optional<int> find_index(long id);
+        boost::optional<page_index_t> find_index(page_id_t t_id);
 
-        bool diff(int index, double width, double height);
-        void svg(std::ostream &os, int index);
+        bool diff(page_index_t t_index, vertex<double> t_size);
+        void svg(std::ostream &os, page_index_t t_index);
 
-        int append(double width, double height, const std::string &extra_css);
-        void clear(int index, bool silent);
-        bool remove(int index, bool silent);
+        page_index_t append(vertex<double> t_size);
+        void clear(page_index_t t_index, bool t_silent);
+        bool remove(page_index_t t_index, bool t_silent);
         bool remove_all();
-        void resize(int index, double width, double height);
-        HttpgdDataStorePageSize size(int index);
+        void resize(page_index_t t_index, vertex<double> t_size);
+        vertex<double> size(page_index_t t_index);
 
-        void fill(int index, int fill);
-        void add_dc(int index, std::shared_ptr<dc::DrawCall> dc, bool silent);
-        void clip(int index, double x0, double x1, double y0, double y1);
+        void fill(page_index_t t_index, color_t t_fill);
+        void add_dc(page_index_t t_index, std::shared_ptr<dc::DrawCall> t_dc, bool t_silent);
+        void clip(page_index_t t_index, rect<double> t_rect);
 
         HttpgdState state();
         void set_device_active(bool t_active);
 
         HttpgdQueryResults query_all();
-        HttpgdQueryResults query_index(int index);
-        HttpgdQueryResults query_range(int offset, int limit);
+        HttpgdQueryResults query_index(page_index_t t_index);
+        HttpgdQueryResults query_range(page_index_t t_offset, page_index_t t_limit);
+
+        void extra_css(boost::optional<const std::string &> t_extra_css);
 
     private:
         std::mutex m_store_mutex;
 
-        long m_id_counter;
+        page_id_t m_id_counter = 0;
         std::vector<dc::Page> m_pages;
-        int m_upid;
-        bool m_device_active;
+        int m_upid = 0;
+        bool m_device_active = true;
+
+        boost::optional<const std::string &> m_extra_css;
 
         void m_inc_upid();
 
-        inline bool m_valid_index(int index);
-        inline size_t m_index_to_pos(int index);
+        inline bool m_valid_index(page_index_t t_index);
+        inline size_t m_index_to_pos(page_index_t t_index);
         
     };
 
