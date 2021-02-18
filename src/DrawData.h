@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <boost/optional.hpp>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <vector>
 
