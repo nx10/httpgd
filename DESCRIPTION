@@ -41,7 +41,9 @@ LinkingTo:
 Suggests:
     testthat,
     xml2 (>= 1.0.0),
-    fontquiver (>= 0.2.0)
+    fontquiver (>= 0.2.0),
+    knitr,
+    rmarkdown
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Encoding: UTF-8
@@ -50,3 +52,4 @@ SystemRequirements:
     libpng
 URL: https://github.com/nx10/httpgd
 BugReports: https://github.com/nx10/httpgd/issues
+VignetteBuilder: knitr

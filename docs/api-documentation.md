@@ -1,0 +1,171 @@
+# `httpgd` API documentation
+
+<!-- copy to: vignette/api-documentation.Rmd -->
+
+[httpgd](https://github.com/nx10/httpgd/blob/master/README.md) can be accessed both from R and from HTTP/Websockets.
+
+## Overview
+
+| R                          | HTTP                  | Description                         |
+| -------------------------- | --------------------- | ----------------------------------- |
+| `hgd()`                    |                       | Initialize device and start server. |
+| `hgd_close()`              |                       | Helper: Close device.               |
+| `hgd_url()`                |                       | Helper: URL generation.             |
+| `hgd_browse()`             |                       | Helper: Open browser.               |
+| `hgd_state()`              | `/state`              | Get current server state.           |
+| [`hgd_svg()`](#render-svg) | [`/svg`](#render-svg) | Get rendered SVG.                   |
+| `hgd_clear()`              | `/clear`              | Remove all plots.                   |
+| `hgd_remove()`             | `/remove`             | Remove a single plot.               |
+| `hgd_id()`                 | `/plot`               | Get static plot IDs.                |
+|                            | `/`                   | Welcome message.                    |
+|                            | `/live`               | Live server page.                   |
+
+## Get state
+
+While all the APIs can be accessed stateless, the graphics device does have a state defined by.
+
+| Field    | Type   | Description                                                                                                                                                                             |
+| -------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `upid`   | `int`  | Update id. Changes when plots are removed or when something is drawn.                                                                                                                   |
+| `hsize`  | `int`  | Number of plots in the history.                                                                                                                                                         |
+| `active` | `bool` | Whether the graphics device is active. When another graphics device is activated, the device will become inactive and not be able to render any plots that are not cached (no resizes). |
+
+To receive state changes as they happen WebSockets can be used (see below). Alternatively `/state` may be polled repeatedly.
+
+### From R
+
+```R
+hgd_state()
+```
+
+Will respond with a list object including fields containig `host`, `port` and security `token` of the server.
+
+### From HTTP
+
+```
+/state
+```
+
+| Key     | Value                        | Default                                                 |
+| ------- | ---------------------------- | ------------------------------------------------------- |
+| `token` | [Security token](#security). | (The `X-HTTPGD-TOKEN` header can be set alternatively.) |
+
+Will respond with a JSON object.
+
+### From WebSockets
+
+httpgd accepts websocket connections on the same port as the HTTP server. [Server state](#Server-state) changes will be broadcasted immediately to all connected clients in JSON format. 
+
+## Render SVG
+
+SVGs can be rendered from both R and HTTP. The actual plot construction in R is relatively slow so httpgd caches the plot in the last requested size. Subsequent calls with the same width and height or without a size specified will allways be fast. (This way "flipping" through plot pages is very fast.)
+
+### From R
+
+Example:
+```R
+hgd_svg(page = 3, width = 800, height = 600) # Get plot at index 3 with 800*600
+hgd_svg() # Get last plot with cached size
+```
+
+`page` can eather be a number to indicate a plot index or a static plot ID (see: hgd_id()).
+
+This function returns the plot as a string. The `file` attribute can be used to save the SVG directly to disk.
+
+### From HTTP
+
+Example:
+```
+/svg?index=2&width=800&height=600
+```
+
+Parameters:
+
+| Key      | Value                        | Default                                                 |
+| -------- | ---------------------------- | ------------------------------------------------------- |
+| `width`  | With in pixels.              | Last rendered width. (Initially device width.)          |
+| `height` | Height in pixels.            | Last rendered height. (Initially device height.)        |
+| `index`  | Plot history index.          | Newest plot.                                            |
+| `id`     | Static plot ID.              | `index` will be used.                                   |
+| `token`  | [Security token](#security). | (The `X-HTTPGD-TOKEN` header can be set alternatively.) |
+
+> Note that the HTTP API uses 0-based indexing and the R API 1-based indexing. This is done to conform to R and JavaScript on both ends. (This means the the first plot is accessed with `/svg?index=0` and `hgd_svg(page = 1)`.)
+
+## Remove pages
+
+### From R
+
+Examples:
+```R
+hgd_remove(page = 2) # Remove the second page
+hgd_clear() # Clear all pages
+```
+
+### From HTTP
+
+Examples:
+```
+/remove?index=2
+/clear
+```
+
+| Key     | Value                        | Default                                                 |
+| ------- | ---------------------------- | ------------------------------------------------------- |
+| `index` | Plot history index.          | Newest plot.                                            |
+| `id`    | Static plot ID.              | `index` will be used.                                   |
+| `token` | [Security token](#security). | (The `X-HTTPGD-TOKEN` header can be set alternatively.) |
+
+
+## Get static IDs
+
+The problem with requesting individual plots by index is, that a plots index will change when earlier plots are removed from the plot history.
+To circumvent this, each plot also is assigned a static ID. 
+
+All APIs that access individual plots can also be called with static IDs instead of indices.
+
+### From R
+
+Examples:
+```R
+hgd_id(index = 2) # Static ID of the second plot
+hgd_id() # Static ID of the last plot
+```
+
+Note: The `limit` parameter can be adjusted to obtain multiple or all plot IDs.
+
+### From HTTP
+
+Examples:
+```
+/plot?index=2
+/plot
+```
+
+| Key     | Value                          | Default                                                 |
+| ------- | ------------------------------ | ------------------------------------------------------- |
+| `index` | Plot history index.            | Newest plot.                                            |
+| `limit` | Number of subsequent plot IDs. | 1                                                       |
+| `token` | [Security token](#security).   | (The `X-HTTPGD-TOKEN` header can be set alternatively.) |
+
+
+Notes: 
+
+- The `limit` parameter can be specified to support pagenation.
+- The JSON response will contain the [state](#get-state) to allow checking for desyncs.
+
+## Security
+
+A security token can be set when starting the device:
+
+```R
+hgd(..., token = "secret")
+```
+
+When set, each API request has to include this token inside the header `X-HTTPGD-TOKEN` or as a query param `?token=secret`.
+`token` is by default set to `TRUE` to generate a random 8 character alphanumeric token. If it is set to a number, a random token of that length will be generated. `FALSE` deactivates the security token.
+
+CORS is off by default but can be enabled on startup:
+
+```R
+hgd(..., cors = TRUE)
+```

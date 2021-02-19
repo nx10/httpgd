@@ -94,12 +94,9 @@ dev.off()
 
 ### API &amp; Documentation
 
-`httpgd` can be accessed both from R and from HTTP:
+The API documentation can be found [here](https://github.com/nx10/httpgd/blob/master/docs/api-documentation.md), and is also available as a package vignette.
 
-* [R API](https://github.com/nx10/httpgd/blob/master/docs/RApi.md)
-* [Web API](https://github.com/nx10/httpgd/blob/master/docs/WebApi.md)
-
-Technical documentation for developers wanting to contribute can be found [here](https://github.com/nx10/httpgd/blob/master/docs/tecdoc.md).
+Technical documentation for developers wanting to contribute to `httpgd` can be found [here](https://github.com/nx10/httpgd/blob/master/docs/tecdoc.md).
 
 ## Benchmark
 
@@ -186,7 +183,7 @@ The various components of `httpgd` are written in C++, R and TypeScript. We welc
 
 Other areas in need of improvement are: Testing, documentation, net security and continuous integration.
 
-If you feel lost, the [technical documentation](https://github.com/nx10/httpgd/blob/master/docs/tecdoc.md) might help.
+If you feel lost, the [documentation](#api--documentation) might help.
 
 ## Links &amp; Articles
 

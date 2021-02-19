@@ -8,3 +8,4 @@ src/*.dll
 .vscode
 windows
 *.Rproj
+inst/doc
