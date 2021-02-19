@@ -6,19 +6,19 @@
 
 ## Overview
 
-| R                          | HTTP                  | Description                         |
-| -------------------------- | --------------------- | ----------------------------------- |
-| `hgd()`                    |                       | Initialize device and start server. |
-| `hgd_close()`              |                       | Helper: Close device.               |
-| `hgd_url()`                |                       | Helper: URL generation.             |
-| `hgd_browse()`             |                       | Helper: Open browser.               |
-| `hgd_state()`              | `/state`              | Get current server state.           |
-| [`hgd_svg()`](#render-svg) | [`/svg`](#render-svg) | Get rendered SVG.                   |
-| `hgd_clear()`              | `/clear`              | Remove all plots.                   |
-| `hgd_remove()`             | `/remove`             | Remove a single plot.               |
-| `hgd_id()`                 | `/plot`               | Get static plot IDs.                |
-|                            | `/`                   | Welcome message.                    |
-|                            | `/live`               | Live server page.                   |
+| R                               | HTTP                       | Description                         |
+| ------------------------------- | -------------------------- | ----------------------------------- |
+| `hgd()`                         |                            | Initialize device and start server. |
+| `hgd_close()`                   |                            | Helper: Close device.               |
+| `hgd_url()`                     |                            | Helper: URL generation.             |
+| `hgd_browse()`                  |                            | Helper: Open browser.               |
+| [`hgd_state()`](#get-state)     | [`/state`](#get-state)     | Get current server state.           |
+| [`hgd_svg()`](#render-svg)      | [`/svg`](#render-svg)      | Get rendered SVG.                   |
+| [`hgd_clear()`](#remove-plots)  | [`/clear`](#remove-plots)  | Remove all plots.                   |
+| [`hgd_remove()`](#remove-plots) | [`/remove`](#remove-plots) | Remove a single plot.               |
+| [`hgd_id()`](#get-static-ids)   | [`/plot`](#get-static-ids) | Get static plot IDs.                |
+|                                 | `/`                        | Welcome message.                    |
+|                                 | `/live`                    | Live server page.                   |
 
 ## Get state
 
@@ -30,7 +30,7 @@ While all the APIs can be accessed stateless, the graphics device does have a st
 | `hsize`  | `int`  | Number of plots in the history.                                                                                                                                                         |
 | `active` | `bool` | Whether the graphics device is active. When another graphics device is activated, the device will become inactive and not be able to render any plots that are not cached (no resizes). |
 
-To receive state changes as they happen WebSockets can be used (see below). Alternatively `/state` may be polled repeatedly.
+To receive state changes as they happen [WebSockets can be used](#from-websockets). Alternatively `/state` may be polled repeatedly.
 
 ### From R
 
@@ -91,7 +91,7 @@ Parameters:
 
 > Note that the HTTP API uses 0-based indexing and the R API 1-based indexing. This is done to conform to R and JavaScript on both ends. (This means the the first plot is accessed with `/svg?index=0` and `hgd_svg(page = 1)`.)
 
-## Remove pages
+## Remove plots
 
 ### From R
 
