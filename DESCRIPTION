@@ -29,7 +29,7 @@ Description: A graphics device for R that is accessible via network protocols.
     The device asynchronously serves 'SVG' graphics via 'HTTP' and 'WebSockets'.
 License: GPL (>= 2)
 Depends:
-    R (>= 4.0.0)
+    R (>= 3.2.0)
 Imports: 
     later (>= 1.1.0),
     systemfonts (>= 1.0.0)
