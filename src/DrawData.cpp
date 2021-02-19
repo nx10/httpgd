@@ -129,11 +129,6 @@ namespace httpgd::dc
         }
     }
 
-    void svg_clip_attr(std::ostream &os, clip_id_t id)
-    {
-        fmt::print(os, R""(clip-path="url(#c{:d})")"", id);
-    }
-
     // DRAW CALL OBJECTS
 
     clip_id_t DrawCall::clip_id() const
@@ -160,9 +155,7 @@ namespace httpgd::dc
         // If we specify the clip path inside <image>, the "transform" also
         // affects the clip path, so we need to specify clip path at an outer level
         // (according to svglite)
-        os << "<g ";
-        svg_clip_attr(os, clip_id());
-        os << "><text ";
+        os << "<g><text ";
 
         if (m_rot == 0.0)
         {
@@ -225,8 +218,7 @@ namespace httpgd::dc
     void Circle::svg(std::ostream &os) const
     {
         os << "<circle ";
-        svg_clip_attr(os, clip_id());
-        fmt::print(os, R""( cx="{:.2f}" cy="{:.2f}" r="{:.2f}" )"", m_pos.x, m_pos.y, m_radius);
+        fmt::print(os, R""(cx="{:.2f}" cy="{:.2f}" r="{:.2f}" )"", m_pos.x, m_pos.y, m_radius);
 
         os << "style=\"";
         css_lineinfo(os, m_line);
@@ -241,8 +233,7 @@ namespace httpgd::dc
     void Line::svg(std::ostream &os) const
     {
         os << "<line ";
-        svg_clip_attr(os, clip_id());
-        fmt::print(os, R""( x1="{:.2f}" y1="{:.2f}" x2="{:.2f}" y2="{:.2f}" )"", m_orig.x, m_orig.y, m_dest.x, m_dest.y);
+        fmt::print(os, R""(x1="{:.2f}" y1="{:.2f}" x2="{:.2f}" y2="{:.2f}" )"", m_orig.x, m_orig.y, m_dest.x, m_dest.y);
 
         os << "style=\"";
         css_lineinfo(os, m_line);
@@ -256,8 +247,7 @@ namespace httpgd::dc
     void Rect::svg(std::ostream &os) const
     {
         os << "<rect ";
-        svg_clip_attr(os, clip_id());
-        fmt::print(os, R""( x="{:.2f}" y="{:.2f}" width="{:.2f}" height="{:.2f}" )"",
+        fmt::print(os, R""(x="{:.2f}" y="{:.2f}" width="{:.2f}" height="{:.2f}" )"",
                    m_rect.x,
                    m_rect.y,
                    m_rect.width,
@@ -275,9 +265,7 @@ namespace httpgd::dc
     }
     void Polyline::svg(std::ostream &os) const
     {
-        os << "<polyline ";
-        svg_clip_attr(os, clip_id());
-        os << " points=\"";
+        os << "<polyline points=\"";
         for (auto it = m_points.begin(); it != m_points.end(); ++it)
         {
             if (it != m_points.begin())
@@ -296,10 +284,7 @@ namespace httpgd::dc
     }
     void Polygon::svg(std::ostream &os) const
     {
-        os << "<polygon ";
-        svg_clip_attr(os, clip_id());
-
-        os << " points=\"";
+        os << "<polygon points=\"";
         for (auto it = m_points.begin(); it != m_points.end(); ++it)
         {
             if (it != m_points.begin())
@@ -323,9 +308,7 @@ namespace httpgd::dc
     }
     void Path::svg(std::ostream &os) const
     {
-        os << "<path ";
-        svg_clip_attr(os, clip_id());
-        os << " d=\"";
+        os << "<path d=\"";
 
         auto it_poly = m_nper.begin();
         std::size_t left = 0;
@@ -371,9 +354,7 @@ namespace httpgd::dc
         // If we specify the clip path inside <image>, the "transform" also
         // affects the clip path, so we need to specify clip path at an outer level
         // (according to svglite)
-        os << "<g ";
-        svg_clip_attr(os, clip_id());
-        os << "><image ";
+        os << "<g><image ";
         fmt::print(os, R""( x="{:.2f}" y="{:.2f}" width="{:.2f}" height="{:.2f}" )"",
                    m_rect.x,
                    m_rect.y,
@@ -492,14 +473,22 @@ namespace httpgd::dc
             os << "\n";
         }
         os << "</defs>\n";
-        fmt::print(os, R""(<rect width="100%" height="100%" style="stroke: none; fill: #{:02X}{:02X}{:02X};"/>)"" "\n",
+        fmt::print(os, R""(<rect width="100%" height="100%" style="stroke: none;fill: #{:02X}{:02X}{:02X};"/>)"" "\n",
                    R_RED(m_fill), R_GREEN(m_fill), R_BLUE(m_fill));
+
+        clip_id_t last_id = m_cps.front().id();
+        fmt::print(os, R""(<g clip-path='url(#c{:d})'>)"" "\n", last_id);
         for (const auto &dc : m_dcs)
         {
+            if (dc->clip_id() != last_id)
+            {
+                fmt::print(os, R""(</g><g clip-path='url(#c{:d})'>)"" "\n", dc->clip_id());
+                last_id = dc->clip_id();
+            }
             dc->svg(os);
             os << "\n";
         }
-        os << "</svg>";
+        os << "</g>\n</svg>";
     }
 
 } // namespace httpgd::dc
