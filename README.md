@@ -157,7 +157,9 @@ ben <-
 
 ## System requirements
 
-Depends on `R` version &geq; 4.0.
+Depends on `R` version &geq; 4.0 on windows, and R &geq; 3.2 on linux and macOS (a C++ compiler with basic C++17 support [is required](https://github.com/nx10/httpgd/issues/56)).
+
+Note that there is a rare bug in R versions < 4.1, that leads to [some plots dissappearing when ggplot2 plots are resized and deleted in a specific way](https://github.com/nx10/httpgd/issues/50).
 
 `libpng` and X11 are required on unix like systems (e.g. Linux, macOS).
 
