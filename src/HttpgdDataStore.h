@@ -23,7 +23,7 @@ namespace httpgd
         boost::optional<page_index_t> find_index(page_id_t t_id);
 
         bool diff(page_index_t t_index, vertex<double> t_size);
-        void svg(std::ostream &os, page_index_t t_index);
+        std::string svg(page_index_t t_index);
 
         page_index_t append(vertex<double> t_size);
         void clear(page_index_t t_index, bool t_silent);

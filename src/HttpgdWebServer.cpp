@@ -277,11 +277,9 @@ namespace httpgd
 
                 if (index)
                 {
-                    std::stringstream buf;
-                    m_watcher->api_svg(buf, *index, p_width.get_value_or(-1), p_height.get_value_or(-1));
                     ctx.res.set("content-type", "image/svg+xml");
                     ctx.res.result(OB::Belle::Status::ok);
-                    ctx.res.body() = buf.str();
+                    ctx.res.body() = m_watcher->api_svg(*index, p_width.get_value_or(-1), p_height.get_value_or(-1));
                 }
                 else
                 {

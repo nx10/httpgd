@@ -9,6 +9,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <fmt/format.h>
 
 // Do not include any R headers here !
 
@@ -60,7 +61,7 @@ namespace httpgd::dc
     class DrawCall
     {
     public:
-        virtual void svg(std::ostream &os) const;
+        virtual void svg(fmt::memory_buffer &os) const;
         [[nodiscard]] clip_id_t clip_id() const;
         void clip_id(clip_id_t t_clip_id);
 
@@ -72,7 +73,7 @@ namespace httpgd::dc
     {
     public:
         Text(color_t t_col, vertex<double> t_pos, std::string &&t_str, double t_rot, double t_hadj, TextInfo &&t_text);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         color_t m_col;
@@ -86,7 +87,7 @@ namespace httpgd::dc
     {
     public:
         Circle(LineInfo &&t_line, color_t t_fill, vertex<double> t_pos, double t_radius);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         LineInfo m_line;
@@ -99,7 +100,7 @@ namespace httpgd::dc
     {
     public:
         Line(LineInfo &&t_line, vertex<double> t_orig, vertex<double> t_dest);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         LineInfo m_line;
@@ -110,7 +111,7 @@ namespace httpgd::dc
     {
     public:
         Rect(LineInfo &&t_line, color_t t_fill, rect<double> t_rect);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         LineInfo m_line;
@@ -122,7 +123,7 @@ namespace httpgd::dc
     {
     public:
         Polyline(LineInfo &&t_line, std::vector<vertex<double>> &&t_points);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         LineInfo m_line;
@@ -132,7 +133,7 @@ namespace httpgd::dc
     {
     public:
         Polygon(LineInfo &&t_line, color_t t_fill, std::vector<vertex<double>> &&t_points);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         LineInfo m_line;
@@ -143,7 +144,7 @@ namespace httpgd::dc
     {
     public:
         Path(LineInfo &&t_line, color_t t_fill, std::vector<vertex<double>> &&t_points, std::vector<int> &&t_nper, bool t_winding);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         LineInfo m_line;
@@ -160,7 +161,7 @@ namespace httpgd::dc
                rect<double> t_rect,
                double t_rot,
                bool t_interpolate);
-        void svg(std::ostream &os) const override;
+        void svg(fmt::memory_buffer &os) const override;
 
     private:
         std::vector<unsigned int> m_raster;
@@ -175,7 +176,7 @@ namespace httpgd::dc
     public:
         Clip(clip_id_t t_id, rect<double> t_rect);
         [[nodiscard]] bool equals(rect<double> t_rect) const;
-        void svg_def(std::ostream &os) const;
+        void svg_def(fmt::memory_buffer &os) const;
         [[nodiscard]] clip_id_t id() const;
 
     private:
@@ -189,7 +190,7 @@ namespace httpgd::dc
         Page(page_id_t t_id, vertex<double> t_size);
         void put(std::shared_ptr<DrawCall> t_dc);
         void clear();
-        void svg(std::ostream &os, boost::optional<const std::string &> t_extra_css) const;
+        std::string svg(boost::optional<const std::string &> t_extra_css) const;
         void clip(rect<double> t_rect);
         [[nodiscard]] vertex<double> size() const;
         void size(vertex<double> t_size);

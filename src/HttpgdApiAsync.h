@@ -33,7 +33,7 @@ namespace httpgd
         bool api_clear() override;
 
         // Calls that MAYBE synchronize with R
-        void api_svg(std::ostream &os, int index, double width, double height) override;
+        std::string api_svg(int index, double width, double height) override;
         boost::optional<int> api_index(int32_t id) override;
         
         // Calls that DONT synchronize with R

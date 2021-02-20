@@ -156,16 +156,15 @@ namespace httpgd
                 std::fabs(new_size.y - old_size.y) > 0.1);
     }
     const char *SVG_EMPTY = "<svg width=\"10\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"></svg>";
-    void HttpgdDataStore::svg(std::ostream &os, page_index_t t_index)
+    std::string HttpgdDataStore::svg(page_index_t t_index)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
         {
-            os << SVG_EMPTY;
-            return;
+            return std::string(SVG_EMPTY);
         }
         auto index = m_index_to_pos(t_index);
-        m_pages[index].svg(os, m_extra_css);
+        return m_pages[index].svg(m_extra_css);
     }
 
     boost::optional<int> HttpgdDataStore::find_index(page_id_t t_id)

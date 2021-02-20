@@ -416,7 +416,7 @@ namespace httpgd
         return r;
     }
 
-    void HttpgdDev::api_svg(std::ostream &os, int index, double width, double height)
+    std::string HttpgdDev::api_svg(int index, double width, double height)
     {
         debug_print("DIFF \n");
         if (m_data_store->diff(index, {width, height}))
@@ -425,7 +425,7 @@ namespace httpgd
             api_render(index, width, height);
         }
         debug_print("SVG \n");
-        m_data_store->svg(os, index);
+        return m_data_store->svg(index);
     }
 
     boost::optional<int> HttpgdDev::api_index(int32_t id)

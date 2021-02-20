@@ -306,29 +306,29 @@ namespace httpgd
         return base64_encode(buffer.data(), buffer.size());
     }
 
-    inline void write_xml_escaped(std::ostream &os, const std::string &text)
+    inline void write_xml_escaped(fmt::memory_buffer &os, const std::string &text)
     {
         for (const char &c : text)
         {
             switch (c)
             {
             case '&':
-                os << "&amp;";
+                fmt::format_to(os, "&amp;");
                 break;
             case '<':
-                os << "&lt;";
+                fmt::format_to(os, "&lt;");
                 break;
             case '>':
-                os << "&gt;";
+                fmt::format_to(os, "&gt;");
                 break;
             case '"':
-                os << "&quot;";
+                fmt::format_to(os, "&quot;");
                 break;
             case '\'':
-                os << "&apos;";
+                fmt::format_to(os, "&apos;");
                 break;
             default:
-                os << c;
+                fmt::format_to(os, "{}", c);
             }
         }
     }

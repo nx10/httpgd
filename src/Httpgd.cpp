@@ -144,9 +144,7 @@ std::string httpgd_svg_(int devnum, int page, double width, double height)
 {
     auto dev = validate_httpgddev(devnum);
 
-    std::ostringstream buf;
-    dev->api_svg(buf, page, width, height);
-    return buf.str();
+    return dev->api_svg(page, width, height);
 }
 
 [[cpp11::register]]
@@ -161,9 +159,7 @@ std::string httpgd_svg_id_(int devnum, std::string id, double width, double heig
         cpp11::stop("Not a valid plot ID.");
     }
 
-    std::ostringstream buf;
-    dev->api_svg(buf, *page, width, height);
-    return buf.str();
+    return dev->api_svg(*page, width, height);
 }
 
 [[cpp11::register]]
