@@ -1,48 +1,13 @@
 "use strict";
-class ImageRequestHelper {
-    constructor(image, onSuccess, onError) {
-        this._image = image;
-        const _this = this;
-        this._success = function success(ev) {
-            onSuccess === null || onSuccess === void 0 ? void 0 : onSuccess(image);
-            _this.cleanup();
-        };
-        this._error = function error(ev) {
-            onError === null || onError === void 0 ? void 0 : onError(image);
-            _this.cleanup();
-        };
-        image.addEventListener('load', this._success);
-        image.addEventListener('error', this._error);
-    }
-    cleanup() {
-        this._image.removeEventListener('load', this._success);
-        this._image.removeEventListener('error', this._error);
-    }
-}
-class HttpgdParams {
-    constructor() {
-        this.index = -1;
-        this.width = 0;
-        this.height = 0;
-    }
-    equals(other) {
-        return this.index === other.index &&
-            Math.abs(this.width - other.width) < 0.1 &&
-            Math.abs(this.height - other.height) < 0.1;
-    }
-}
-class HttpgdState {
-    constructor() {
-        this.upid = -1;
-        this.hsize = 0;
-        this.active = true;
-    }
-    equals(other) {
-        return this.upid === other.upid &&
-            this.hsize === other.hsize &&
-            this.active === other.active;
-    }
-}
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 class HttpgdApi {
     constructor(host, token) {
         this.httpHeaders = new Headers();
@@ -52,6 +17,7 @@ class HttpgdApi {
         this.httpState = this.http + '/state';
         this.httpClear = this.http + '/clear';
         this.httpRemove = this.http + '/remove';
+        this.httpPlots = this.http + '/plots';
         if (token) {
             this.useToken = true;
             this.token = token;
@@ -62,22 +28,86 @@ class HttpgdApi {
             this.token = '';
         }
     }
-    svgURL(width, height, index, upid, force = false) {
-        return this.httpSVG +
-            '?width=' + Math.round(width) +
-            '&height=' + Math.round(height) +
-            '&index=' + index +
-            (this.useToken ? ('&token=' + this.token) : '') +
-            '&upid=' + upid + (force ? 'f' : '');
+    svg_index(index, width, height, c) {
+        const url = this.svg_ext(width, height, c);
+        url.searchParams.append('index', index.toString());
+        return url;
     }
-    removeURL(index) {
-        return this.httpRemove + '?index=' + index;
+    svg_id(id, width, height, c) {
+        const url = this.svg_ext(width, height, c);
+        url.searchParams.append('id', id);
+        return url;
+    }
+    svg_ext(width, height, c) {
+        const url = new URL(this.httpSVG);
+        if (width)
+            url.searchParams.append('width', Math.round(width).toString());
+        if (height)
+            url.searchParams.append('height', Math.round(height).toString());
+        if (this.useToken)
+            url.searchParams.append('token', this.token);
+        if (c)
+            url.searchParams.append('c', c);
+        return url;
+    }
+    remove_index(index) {
+        const url = new URL(this.httpRemove);
+        url.searchParams.append('index', index.toString());
+        return url;
+    }
+    get_remove_index(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield fetch(this.remove_index(index).href, {
+                headers: this.httpHeaders
+            });
+            return res;
+        });
+    }
+    remove_id(id) {
+        const url = new URL(this.httpRemove);
+        url.searchParams.append('id', id);
+        return url;
+    }
+    get_remove_id(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield fetch(this.remove_id(id).href, {
+                headers: this.httpHeaders
+            });
+            return res;
+        });
+    }
+    get_plots() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield fetch(this.httpPlots, {
+                headers: this.httpHeaders
+            });
+            return yield res.json();
+        });
+    }
+    get_clear() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield fetch(this.httpClear, {
+                headers: this.httpHeaders
+            });
+            return res;
+        });
+    }
+    get_state() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield fetch(this.httpState, {
+                headers: this.httpHeaders
+            });
+            return yield res.json();
+        });
+    }
+    new_websocket() {
+        return new WebSocket(this.ws);
     }
 }
-class HttpgdConnectionManager {
+class HttpgdConnection {
     constructor(host, token, allowWebsockets) {
         this.mode = 0;
-        this.imageReloading = false;
+        this.pausePoll = false;
         this.disconnected = true;
         this.api = new HttpgdApi(host, token);
         this.allowWebsockets = allowWebsockets ? allowWebsockets : false;
@@ -100,14 +130,14 @@ class HttpgdConnectionManager {
                 console.log("Start POLL");
                 this.clearWebsocket();
                 this.clearPoll();
-                this.pollHandle = setInterval(() => this.poll(), HttpgdConnectionManager.INTERVAL_POLL);
+                this.pollHandle = setInterval(() => this.poll(), HttpgdConnection.INTERVAL_POLL);
                 this.mode = targetMode;
                 break;
             case 2:
                 console.log("Start SLOWPOLL");
                 this.clearWebsocket();
                 this.clearPoll();
-                this.pollHandle = setInterval(() => this.poll(), HttpgdConnectionManager.INTERVAL_POLL_SLOW);
+                this.pollHandle = setInterval(() => this.poll(), HttpgdConnection.INTERVAL_POLL_SLOW);
                 this.mode = targetMode;
                 break;
             case 3:
@@ -118,7 +148,7 @@ class HttpgdConnectionManager {
                 console.log("Start WEBSOCKET");
                 this.clearPoll();
                 this.clearWebsocket();
-                this.socket = new WebSocket(this.api.ws);
+                this.socket = this.api.new_websocket();
                 this.socket.onmessage = (ev) => this.onWsMessage(ev.data);
                 this.socket.onopen = () => this.onWsOpen();
                 this.socket.onclose = () => this.onWsClose();
@@ -147,28 +177,24 @@ class HttpgdConnectionManager {
         }
     }
     poll() {
-        if (this.imageReloading)
+        if (this.pausePoll)
             return;
-        fetch(this.api.httpState, {
-            headers: this.api.httpHeaders
-        })
-            .then(res => res.json())
-            .then((remoteState) => {
-            var _a;
+        this.api.get_state().then((remoteState) => {
             this.setDisconnected(false);
-            if (this.imageReloading)
+            if (this.mode === 2)
+                this.start(3);
+            if (this.pausePoll)
                 return;
-            (_a = this.stateCallback) === null || _a === void 0 ? void 0 : _a.call(this, remoteState);
+            this.checkState(remoteState);
         }).catch((e) => {
             console.warn(e);
             this.setDisconnected(true);
         });
     }
     onWsMessage(message) {
-        var _a;
         if (message.startsWith('{')) {
             const remoteState = JSON.parse(message);
-            (_a = this.stateCallback) === null || _a === void 0 ? void 0 : _a.call(this, remoteState);
+            this.checkState(remoteState);
         }
         else {
             console.log("Unknown WS message: " + message);
@@ -192,108 +218,157 @@ class HttpgdConnectionManager {
             else {
                 this.start(3);
             }
-            (_a = this.connectionCallback) === null || _a === void 0 ? void 0 : _a.call(this, disconnected);
+            (_a = this.connectionChanged) === null || _a === void 0 ? void 0 : _a.call(this, disconnected);
         }
     }
-    loadImage(width, height, index, upid, force, image) {
-        if (!image)
-            return;
-        new ImageRequestHelper(image, (image) => {
-            this.imageReloading = false;
-        }, (image) => {
-            console.warn("SVG load failed!");
-            this.imageReloading = false;
-        });
-        image.src = this.api.svgURL(width, height, index, upid, force);
-    }
-    clearPlots() {
-        fetch(this.api.httpClear, {
-            headers: this.api.httpHeaders
-        }).then(res => res.json())
-            .then((remoteState) => {
-            var _a;
-            (_a = this.stateCallback) === null || _a === void 0 ? void 0 : _a.call(this, remoteState);
-        });
-    }
-    removePlot(index) {
-        fetch(this.api.removeURL(index), {
-            headers: this.api.httpHeaders
-        }).then(res => res.json())
-            .then((remoteState) => {
-            var _a;
-            (_a = this.stateCallbackRemove) === null || _a === void 0 ? void 0 : _a.call(this, remoteState);
-        });
-    }
-    svgURL(width, height, index, upid) {
-        return this.api.svgURL(width, height, index, upid);
+    checkState(remoteState) {
+        var _a;
+        if ((!this.lastState) ||
+            (this.lastState.active !== remoteState.active) ||
+            (this.lastState.hsize !== remoteState.hsize) ||
+            (this.lastState.upid !== remoteState.upid)) {
+            this.lastState = remoteState;
+            (_a = this.remoteStateChanged) === null || _a === void 0 ? void 0 : _a.call(this, remoteState);
+        }
     }
 }
-HttpgdConnectionManager.INTERVAL_POLL = 500;
-HttpgdConnectionManager.INTERVAL_POLL_SLOW = 5000;
+HttpgdConnection.INTERVAL_POLL = 500;
+HttpgdConnection.INTERVAL_POLL_SLOW = 5000;
+class HttpgdNavigator {
+    constructor() {
+        this.index = -1;
+        this.width = 0;
+        this.height = 0;
+        this.last_id = "";
+        this.last_width = 0;
+        this.last_height = 0;
+    }
+    navigate(offset) {
+        if (!this.data)
+            return;
+        this.index = (this.data.plots.length + this.index + offset) % this.data.plots.length;
+    }
+    jump(index) {
+        if (!this.data)
+            return;
+        this.index = (this.data.plots.length + index) % this.data.plots.length;
+    }
+    jump_id(id) {
+        if (!this.data)
+            return;
+        for (let i = 0; i < this.data.plots.length; i++) {
+            if (id === this.data.plots[i].id) {
+                this.index = i;
+                break;
+            }
+        }
+    }
+    resize(width, height) {
+        this.width = width;
+        this.height = height;
+    }
+    next(api, c) {
+        if (!this.data || this.data.plots.length == 0)
+            return undefined;
+        if ((this.last_id !== this.data.plots[this.index].id) ||
+            (Math.abs(this.last_width - this.width) > 0.1) ||
+            (Math.abs(this.last_height - this.height) > 0.1))
+            return api.svg_id(this.data.plots[this.index].id, this.width, this.height, c);
+        return undefined;
+    }
+    update(data) {
+        this.data = data;
+        this.index = data.plots.length - 1;
+    }
+    id() {
+        var _a;
+        return (_a = this.data) === null || _a === void 0 ? void 0 : _a.plots[this.index].id;
+    }
+    indexStr() {
+        if (!this.data)
+            return '0/0';
+        return Math.max(0, this.index + 1) + '/' + this.data.plots.length;
+    }
+}
 class HttpgdViewer {
     constructor(host, token, allowWebsockets) {
-        this.state = new HttpgdState();
-        this.params = new HttpgdParams();
-        this.plotParams = new HttpgdParams();
+        this.navi = new HttpgdNavigator();
+        this.plotUpid = -1;
         this.scale = HttpgdViewer.SCALE_DEFAULT;
         this.deviceActive = true;
         this.image = undefined;
+        this.sidebar = undefined;
         this.resizeBlocked = false;
-        this.connection = new HttpgdConnectionManager(host, token, allowWebsockets);
-        this.connection.stateCallback = (remoteState) => this.serverChanges(remoteState);
-        this.connection.stateCallbackRemove = (remoteState) => {
-            this.params.index = Math.max(-1, this.params.index - 1);
-            this.serverChanges(remoteState);
-        };
-        this.connection.connectionCallback = (disconnected) => { var _a; return (_a = this.onDisconnectedChange) === null || _a === void 0 ? void 0 : _a.call(this, disconnected); };
+        this.connection = new HttpgdConnection(host, token, allowWebsockets);
+        this.connection.remoteStateChanged = (remoteState) => this.serverChanges(remoteState);
+        this.connection.connectionChanged = (disconnected) => { var _a; return (_a = this.onDisconnectedChange) === null || _a === void 0 ? void 0 : _a.call(this, disconnected); };
     }
-    init(image) {
+    init(image, sidebar) {
         var _a, _b;
         this.image = image;
+        this.sidebar = sidebar;
         this.connection.open();
         this.checkResize();
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) {
-                this.loadImage(true);
+                this.updateImage('v');
             }
         }, false);
-        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.getIndexString());
+        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
         (_b = this.onZoomStringChange) === null || _b === void 0 ? void 0 : _b.call(this, this.getZoomString());
+        this.connection.api.get_plots().then(plots => {
+            var _a;
+            console.log('initial update plots');
+            this.navi.update(plots);
+            (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
+            this.updateSidebar(plots);
+            this.updateImage();
+        });
     }
-    loadImage(force) {
-        this.connection.loadImage(this.params.width, this.params.height, this.params.index, this.state.upid, force, this.image);
+    updateImage(c) {
+        if (!this.image)
+            return;
+        const n = this.navi.next(this.connection.api, this.plotUpid + (c ? c : ''));
+        if (n) {
+            console.log('update image');
+            this.image.src = n.href;
+        }
+    }
+    updateSidebar(plots) {
+        if (!this.sidebar)
+            return;
+        this.sidebar.innerHTML = '';
+        for (const p of plots.plots) {
+            const elem_card = document.createElement("div");
+            const elem_x = document.createElement("a");
+            elem_x.href = "google.de";
+            elem_x.innerHTML = "&#10006;";
+            const elem_img = document.createElement("img");
+            elem_card.classList.add("history-item");
+            elem_img.setAttribute('src', this.connection.api.svg_id(p.id).href);
+            elem_card.onclick = () => {
+                var _a;
+                this.navi.jump_id(p.id);
+                (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
+                this.updateImage();
+            };
+            elem_card.appendChild(elem_img);
+            elem_card.appendChild(elem_x);
+            this.sidebar.appendChild(elem_card);
+        }
+        this.sidebar.scrollTop = this.sidebar.scrollHeight;
     }
     serverChanges(remoteState) {
-        var _a;
         this.setDeviceActive(!remoteState.active);
-        let needsReload = false;
-        if (this.diffServer(remoteState)) {
-            Object.assign(this.state, remoteState);
-            this.params.index = -1;
-            needsReload = true;
-        }
-        if (this.diffClient()) {
-            Object.assign(this.plotParams, this.params);
-            needsReload = true;
-        }
-        if (needsReload) {
-            (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.getIndexString());
-            this.loadImage();
-        }
-    }
-    clientChanges() {
-        var _a;
-        if (this.diffClient()) {
-            Object.assign(this.plotParams, this.params);
-            (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.getIndexString());
-            this.loadImage();
-        }
-    }
-    diffServer(remoteState) {
-        return !this.state.equals(remoteState);
-    }
-    diffClient() {
-        return !this.params.equals(this.plotParams);
+        this.plotUpid = remoteState.upid;
+        this.connection.api.get_plots().then(plots => {
+            var _a;
+            console.log('update plots');
+            this.navi.update(plots);
+            (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
+            this.updateSidebar(plots);
+            this.updateImage();
+        });
     }
     setDeviceActive(active) {
         var _a;
@@ -327,104 +402,36 @@ class HttpgdViewer {
     }
     navPrevious() {
         var _a;
-        if (this.params.index > 0) {
-            this.params.index -= 1;
-        }
-        else if (this.state.hsize >= 2) {
-            this.params.index = this.state.hsize - (this.params.index == -1 ? 2 : 1);
-        }
-        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.getIndexString());
-        this.clientChanges();
+        this.navi.navigate(-1);
+        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
+        this.updateImage();
     }
     navNext() {
         var _a;
-        if (this.params.index >= 0 && this.params.index < this.state.hsize - 1) {
-            this.params.index += 1;
-        }
-        else {
-            this.params.index = 0;
-        }
-        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.getIndexString());
-        this.clientChanges();
+        this.navi.navigate(1);
+        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
+        this.updateImage();
     }
     navNewest() {
         var _a;
-        this.params.index = -1;
-        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.getIndexString());
-        this.clientChanges();
-    }
-    getIndexString() {
-        return (this.params.index === -1 ? this.state.hsize : (this.params.index + 1)) + '/' + this.state.hsize;
+        this.navi.jump(-1);
+        (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
+        this.updateImage();
     }
     navClear() {
-        this.connection.clearPlots();
+        this.connection.api.get_clear();
     }
     navRemove() {
-        this.connection.removePlot(this.params.index);
-    }
-    svgURL() {
-        return this.connection.svgURL(this.plotParams.width, this.plotParams.height, this.plotParams.index, this.state.upid);
-    }
-    static downloadURL(url, filename) {
-        const dl = document.createElement('a');
-        dl.href = url;
-        if (filename) {
-            dl.download = filename;
-        }
-        document.body.appendChild(dl);
-        dl.click();
-        document.body.removeChild(dl);
-    }
-    downloadPlot(filename) {
-        HttpgdViewer.downloadURL(this.svgURL(), filename ? filename : 'plot.svg');
-    }
-    downloadPlotPNG() {
-        const canvas = document.createElement('canvas');
-        document.body.appendChild(canvas);
-        canvas.width = this.plotParams.width / this.scale;
-        canvas.height = this.plotParams.height / this.scale;
-        const ctx = canvas.getContext('2d');
-        if (!ctx)
-            return;
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const imgURI = canvas
-                .toDataURL('image/png')
-                .replace('image/png', 'image/octet-stream');
-            HttpgdViewer.downloadURL(imgURI, 'plot.png');
-        };
-        img.src = this.svgURL();
-        document.body.removeChild(canvas);
-    }
-    copyPlotPNG() {
-        if (!navigator.clipboard)
-            return;
-        const canvas = document.createElement('canvas');
-        document.body.appendChild(canvas);
-        canvas.width = this.plotParams.width / this.scale;
-        canvas.height = this.plotParams.height / this.scale;
-        const ctx = canvas.getContext('2d');
-        if (!ctx)
-            return;
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(blob => { var _a, _b; if (blob)
-                (_b = (_a = navigator.clipboard).write) === null || _b === void 0 ? void 0 : _b.call(_a, [new ClipboardItem({ 'image/png': blob })]); });
-        };
-        img.src = this.svgURL();
-        document.body.removeChild(canvas);
+        const id = this.navi.id();
+        if (id)
+            this.connection.api.get_remove_id(id);
     }
     checkResize() {
         if (!this.image)
             return;
         const rect = this.image.getBoundingClientRect();
-        this.params.width = rect.width * this.scale;
-        this.params.height = rect.height * this.scale;
-        this.clientChanges();
+        this.navi.resize(rect.width * this.scale, rect.height * this.scale);
+        this.updateImage();
     }
     resize() {
         if (this.resizeBlocked)
