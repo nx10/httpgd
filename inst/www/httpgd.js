@@ -269,11 +269,11 @@ class HttpgdNavigator {
     }
     next(api, c) {
         if (!this.data || this.data.plots.length == 0)
-            return undefined;
+            return './plot-none.svg';
         if ((this.last_id !== this.data.plots[this.index].id) ||
             (Math.abs(this.last_width - this.width) > 0.1) ||
             (Math.abs(this.last_height - this.height) > 0.1))
-            return api.svg_id(this.data.plots[this.index].id, this.width, this.height, c);
+            return api.svg_id(this.data.plots[this.index].id, this.width, this.height, c).href;
         return undefined;
     }
     update(data) {
@@ -281,8 +281,9 @@ class HttpgdNavigator {
         this.index = data.plots.length - 1;
     }
     id() {
-        var _a;
-        return (_a = this.data) === null || _a === void 0 ? void 0 : _a.plots[this.index].id;
+        if (!this.data || this.data.plots.length == 0)
+            return undefined;
+        return this.data.plots[this.index].id;
     }
     indexStr() {
         if (!this.data)
@@ -316,12 +317,15 @@ class HttpgdViewer {
         }, false);
         (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
         (_b = this.onZoomStringChange) === null || _b === void 0 ? void 0 : _b.call(this, this.getZoomString());
+        console.log('initial update plots');
+        this.updatePlots(true);
+    }
+    updatePlots(scroll = false) {
         this.connection.api.get_plots().then(plots => {
             var _a;
-            console.log('initial update plots');
             this.navi.update(plots);
             (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
-            this.updateSidebar(plots);
+            this.updateSidebar(plots, scroll);
             this.updateImage();
         });
     }
@@ -331,18 +335,31 @@ class HttpgdViewer {
         const n = this.navi.next(this.connection.api, this.plotUpid + (c ? c : ''));
         if (n) {
             console.log('update image');
-            this.image.src = n.href;
+            this.image.src = n;
         }
     }
-    updateSidebar(plots) {
+    updateSidebar(plots, scroll = false) {
         if (!this.sidebar)
             return;
-        this.sidebar.innerHTML = '';
-        for (const p of plots.plots) {
+        let idx = 0;
+        while (idx < this.sidebar.children.length) {
+            if (idx >= plots.plots.length || this.sidebar.children[idx].getAttribute('data-pid') !== plots.plots[idx].id) {
+                this.sidebar.removeChild(this.sidebar.children[idx]);
+            }
+            else {
+                idx++;
+            }
+        }
+        for (; idx < plots.plots.length; ++idx) {
+            const p = plots.plots[idx];
             const elem_card = document.createElement("div");
+            elem_card.setAttribute('data-pid', p.id);
             const elem_x = document.createElement("a");
-            elem_x.href = "google.de";
             elem_x.innerHTML = "&#10006;";
+            elem_x.onclick = () => {
+                this.connection.api.get_remove_id(p.id);
+                this.updatePlots();
+            };
             const elem_img = document.createElement("img");
             elem_card.classList.add("history-item");
             elem_img.setAttribute('src', this.connection.api.svg_id(p.id).href);
@@ -356,19 +373,14 @@ class HttpgdViewer {
             elem_card.appendChild(elem_x);
             this.sidebar.appendChild(elem_card);
         }
-        this.sidebar.scrollTop = this.sidebar.scrollHeight;
+        if (scroll) {
+            this.sidebar.scrollTop = this.sidebar.scrollHeight;
+        }
     }
     serverChanges(remoteState) {
         this.setDeviceActive(!remoteState.active);
         this.plotUpid = remoteState.upid;
-        this.connection.api.get_plots().then(plots => {
-            var _a;
-            console.log('update plots');
-            this.navi.update(plots);
-            (_a = this.onIndexStringChange) === null || _a === void 0 ? void 0 : _a.call(this, this.navi.indexStr());
-            this.updateSidebar(plots);
-            this.updateImage();
-        });
+        this.updatePlots(true);
     }
     setDeviceActive(active) {
         var _a;
@@ -420,11 +432,69 @@ class HttpgdViewer {
     }
     navClear() {
         this.connection.api.get_clear();
+        this.updatePlots();
     }
     navRemove() {
         const id = this.navi.id();
-        if (id)
+        if (id) {
             this.connection.api.get_remove_id(id);
+            this.updatePlots();
+        }
+    }
+    static downloadURL(url, filename) {
+        const dl = document.createElement('a');
+        dl.href = url;
+        if (filename) {
+            dl.download = filename;
+        }
+        document.body.appendChild(dl);
+        dl.click();
+        document.body.removeChild(dl);
+    }
+    downloadPlotSVG(image) {
+        if (!this.navi.id())
+            return;
+        fetch(image.src).then((response) => {
+            return response.blob();
+        }).then(blob => {
+            HttpgdViewer.downloadURL(URL.createObjectURL(blob), 'plot_' + this.navi.id() + '.svg');
+        });
+    }
+    static imageTempCanvas(image, fn) {
+        const canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
+        const rect = image.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx)
+            return;
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        fn(canvas);
+        document.body.removeChild(canvas);
+    }
+    downloadPlotPNG(image) {
+        if (!this.navi.id())
+            return;
+        HttpgdViewer.imageTempCanvas(image, canvas => {
+            const imgURI = canvas
+                .toDataURL('image/png')
+                .replace('image/png', 'image/octet-stream');
+            HttpgdViewer.downloadURL(imgURI, 'plot_' + this.navi.id() + '.png');
+        });
+    }
+    copyPlotPNG(image) {
+        if (!this.navi.id())
+            return;
+        if (!navigator.clipboard)
+            return;
+        HttpgdViewer.imageTempCanvas(image, canvas => {
+            canvas.toBlob(blob => {
+                var _a, _b;
+                if (blob)
+                    (_b = (_a = navigator.clipboard).write) === null || _b === void 0 ? void 0 : _b.call(_a, [new ClipboardItem({ 'image/png': blob })]);
+            });
+        });
     }
     checkResize() {
         if (!this.image)

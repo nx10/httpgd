@@ -4,29 +4,40 @@ body {
 
 #container {
     height: 100%;
+    display: relative;
 }
 
+.plotview {
+    height: 100%;
+    width: 80%;
+    /* margin-right: -8px; */
+    position: relative;
+    transition: width 0.3s;
+}
+.plotview.nohist {
+    width: 100%;
+    transition: width 0.3s;
+}
 #drawing {
     width: 100%;
     height: 100%;
 }
 
-.plotview {
-    background-color: aqua;
-    width: 80%;
-    height: 100%;
-    float: left;
-    /* margin-right: -8px; */
-}
-
 .history {
-    background-color: #ffffff;
     width: 20%;
     height: 100%;
-    float: right;
     overflow-y: scroll;
     overflow-x: hidden;
     /* padding-left: 8px; */
+    position: fixed;
+    top: 0;
+    right: 0;
+    transition: right 0.3s;
+}
+.history.nohist {
+    right: -20%;
+    visibility: hidden;
+    transition: right 0.3s, visibility 0.3s;
 }
 
 .history-item {
@@ -38,6 +49,7 @@ body {
 
 .history-item img {
     width: 100%;
+    height: 12vw;
 }
 
 .history-item a {
@@ -65,10 +77,6 @@ body {
     box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
 }
 
-.plotview {
-    position: relative;
-}
-
 #toolbar {
     float: left;
     position: absolute;
@@ -82,8 +90,6 @@ body {
     user-select: none;
     background-color: rgba(253, 253, 254, 0.8);
     border-color: rgba(253, 253, 254, 0.8);
-    margin: 2px 2px 0px 0px;
-    padding: 0px 0px 6px 0px;
     border-radius: 2px;
 }
 
@@ -191,12 +197,14 @@ body {
 
 .drop {
     position: relative;
+    display: inline-block;
+    height: 34px;
 }
 
 .drop ul {
     position: absolute;
     right: -2px;
-    top: 14px;
+    top: 20px;
     transition: all 0.3s ease;
     transform: scale(0);
     transform-origin: top right;
