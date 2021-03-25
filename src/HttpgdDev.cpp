@@ -75,9 +75,7 @@ namespace httpgd
         m_data_store->set_device_active(true);
         if (m_server && m_server_running)
         {
-            HttpgdState state = m_data_store->state();
-            state.active = true; // in case it has changed
-            m_server->broadcast_state(state);
+            m_server->broadcast_state_current();
         }
     }
     void HttpgdDev::dev_deactivate(pDevDesc dd)
@@ -88,15 +86,12 @@ namespace httpgd
         m_data_store->set_device_active(false);
         if (m_server && m_server_running)
         {
-            HttpgdState state = m_data_store->state();
-            state.active = false; // in case it has changed
-            m_server->broadcast_state(state);
+            m_server->broadcast_state_current();
         }
     }
 
     void HttpgdDev::dev_mode(int mode, pDevDesc dd)
     {
-        //Rcpp::Rcout << "MODE "<<mode<<"\n";
         if (m_target.is_void() || mode == 1)
             return;
 

@@ -380,10 +380,11 @@ namespace httpgd
 
         void WebServer::broadcast_state(const HttpgdState &state)
         {
-            if (state.upid != m_last_upid)
+            if (state.upid != m_last_upid || state.active != m_last_active)
             {
                 m_app.channels().at("/").broadcast(json_make_state(state));
                 m_last_upid = state.upid;
+                m_last_active = state.active;
             }
         }
 

@@ -451,12 +451,14 @@ class HttpgdViewer {
     // checks if there were server side changes
     private serverChanges(remoteState: HttpgdState): void {
         this.setDeviceActive(!remoteState.active);
+        const lastUpid = this.plotUpid;
         this.plotUpid = remoteState.upid;
-        this.updatePlots(true);
+        if (lastUpid !== remoteState.upid)
+            this.updatePlots(true);
     }
 
     private setDeviceActive(active: boolean): void {
-        if (this.deviceActive != active) {
+        if (this.deviceActive !== active) {
             this.deviceActive = active;
             this.onDeviceActiveChange?.(active);
         }

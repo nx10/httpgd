@@ -29,6 +29,7 @@ namespace httpgd
             std::shared_ptr<HttpgdServerConfig> m_conf;
             OB::Belle::Server m_app;
             int m_last_upid = -1;
+            bool m_last_active = true;
             std::thread m_server_thread;
 
             void run();

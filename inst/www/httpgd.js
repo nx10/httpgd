@@ -379,12 +379,14 @@ class HttpgdViewer {
     }
     serverChanges(remoteState) {
         this.setDeviceActive(!remoteState.active);
+        const lastUpid = this.plotUpid;
         this.plotUpid = remoteState.upid;
-        this.updatePlots(true);
+        if (lastUpid !== remoteState.upid)
+            this.updatePlots(true);
     }
     setDeviceActive(active) {
         var _a;
-        if (this.deviceActive != active) {
+        if (this.deviceActive !== active) {
             this.deviceActive = active;
             (_a = this.onDeviceActiveChange) === null || _a === void 0 ? void 0 : _a.call(this, active);
         }

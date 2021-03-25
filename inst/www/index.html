@@ -126,9 +126,18 @@
         document.getElementById("overlay-text").innerText = "Connection lost.";
         document.getElementById("overlay").style.display = d ? "inline" : "none";
       }
+      var httpgd_inactive_delayed;
       httpgdViewer.onDeviceActiveChange = (d) => {
-        document.getElementById("overlay-text").innerText = "Device inactive.";
-        document.getElementById("overlay").style.display = d ? "inline" : "none";
+        if (!d) {
+          clearTimeout(httpgd_inactive_delayed);
+          document.getElementById("overlay").style.display = "none";
+        }
+        else {
+          httpgd_inactive_delayed = setTimeout(() => {
+            document.getElementById("overlay-text").innerText = "Device inactive.";
+            document.getElementById("overlay").style.display = "inline";
+          }, 50);
+        }
       }
       window.addEventListener('resize', () => httpgdViewer.resize());
 
@@ -226,7 +235,7 @@
       const elem_cnt = document.getElementById("container");
       const TB_FADE_TIMEOUT = 4000;
 
-      var httpgd_tb_fade = setTimeout(() => elem_tbt.classList.add("fade-out"), TB_FADE_TIMEOUT);;
+      var httpgd_tb_fade = setTimeout(() => elem_tbt.classList.add("fade-out"), TB_FADE_TIMEOUT);
       elem_cnt.onmousemove = function () {
         elem_tbt.classList.remove("fade-out");
         clearTimeout(httpgd_tb_fade);
