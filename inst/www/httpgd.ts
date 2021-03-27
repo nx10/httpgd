@@ -543,6 +543,7 @@ class HttpgdViewer {
     }
 
     public downloadPlotPNG(image: HTMLImageElement) {
+        if (!image) return;
         if (!this.navi.id()) return;
         HttpgdViewer.imageTempCanvas(image, canvas => {
             const imgURI = canvas
@@ -553,6 +554,7 @@ class HttpgdViewer {
     }
 
     public copyPlotPNG(image: HTMLImageElement) {
+        if (!image) return;
         if (!this.navi.id()) return;
         if (!navigator.clipboard) return;
         HttpgdViewer.imageTempCanvas(image, canvas => {

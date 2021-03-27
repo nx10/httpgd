@@ -196,11 +196,11 @@
         },
         {
           keys: [83],
-          fun: () => httpgdViewer.downloadPlot()
+          fun: () => httpgdViewer.downloadPlotSVG(document.getElementById("drawing"))
         },
         {
           keys: [80],
-          fun: () => httpgdViewer.downloadPlotPNG()
+          fun: () => httpgdViewer.downloadPlotPNG(document.getElementById("drawing"))
         },
         {
           keys: [48],
@@ -208,7 +208,7 @@
         },
         {
           keys: [67],
-          fun: () => httpgdViewer.copyPlotPNG()
+          fun: () => httpgdViewer.copyPlotPNG(document.getElementById("drawing"))
         },
         {
           keys: [72],

@@ -476,6 +476,8 @@ class HttpgdViewer {
         document.body.removeChild(canvas);
     }
     downloadPlotPNG(image) {
+        if (!image)
+            return;
         if (!this.navi.id())
             return;
         HttpgdViewer.imageTempCanvas(image, canvas => {
@@ -486,6 +488,8 @@ class HttpgdViewer {
         });
     }
     copyPlotPNG(image) {
+        if (!image)
+            return;
         if (!this.navi.id())
             return;
         if (!navigator.clipboard)
