@@ -91,7 +91,7 @@
                     <path d="M0 0h24v24H0V0z" fill="none" />
                     <path
                       d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z" />
-                  </svg><span>Clear all plots</span><span class="drop-kbd">T</span></a></li>
+                  </svg><span>Clear all plots</span><span class="drop-kbd">Alt+D</span></a></li>
               <li><a id="tb-history"><svg height="24" viewBox="0 0 24 24">
                     <path d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z" />
                   </svg><span>Show history</span><span class="drop-kbd">H</span></a></li>
@@ -115,6 +115,17 @@
     );
 
     window.onload = function () {
+
+      const dropElem = document.getElementById("tb-more").parentElement;
+      dropElem.onmouseenter = () => {
+        dropElem.classList.add('drop-open');
+      };
+      dropElem.onmouseleave = () => {
+        dropElem.classList.remove('drop-open');
+      };
+      function closeDropdown() {
+        dropElem.classList.remove('drop-open');
+      }
 
       httpgdViewer.onZoomStringChange = (s) => {
         document.getElementById("tb-zlvl").childNodes[0].nodeValue = s;
@@ -146,13 +157,25 @@
       document.getElementById("tb-left").onclick = () => httpgdViewer.navPrevious();
       document.getElementById("tb-right").onclick = () => httpgdViewer.navNext();
       document.getElementById("tb-pnum").onclick = () => httpgdViewer.navNewest();
-      document.getElementById("tb-save-svg").onclick = () => httpgdViewer.downloadPlotSVG(document.getElementById("drawing"));
-      document.getElementById("tb-save-png").onclick = () => httpgdViewer.downloadPlotPNG(document.getElementById("drawing"));
-      document.getElementById("tb-copy-png").onclick = () => httpgdViewer.copyPlotPNG(document.getElementById("drawing"));
+      document.getElementById("tb-save-svg").onclick = () => {
+        httpgdViewer.downloadPlotSVG(document.getElementById("drawing"));
+        closeDropdown();
+      }
+      document.getElementById("tb-save-png").onclick = () => {
+        httpgdViewer.downloadPlotPNG(document.getElementById("drawing"));
+        closeDropdown();
+      };
+      document.getElementById("tb-copy-png").onclick = () => {
+        httpgdViewer.copyPlotPNG(document.getElementById("drawing"));
+        closeDropdown();
+      };
       document.getElementById("tb-plus").onclick = () => httpgdViewer.zoomIn();
       document.getElementById("tb-minus").onclick = () => httpgdViewer.zoomOut();
       document.getElementById("tb-zlvl").onclick = () => httpgdViewer.zoomReset();
-      document.getElementById("tb-clear").onclick = () => httpgdViewer.navClear();
+      document.getElementById("tb-clear").onclick = () => {
+        httpgdViewer.navClear();
+        closeDropdown();
+      };
       document.getElementById("tb-remove").onclick = () => httpgdViewer.navRemove();
 
 
@@ -160,6 +183,7 @@
         document.getElementById("sidebar").classList.toggle('nohist')
         document.getElementById("plotview").classList.toggle('nohist')
         setTimeout(() => httpgdViewer.checkResize(), 300);
+        closeDropdown();
       }
 
       const elem_his = document.getElementById("tb-history");
@@ -187,12 +211,13 @@
           fun: () => httpgdViewer.zoomOut()
         },
         {
-          keys: [46, 68],
-          fun: () => httpgdViewer.navRemove()
+          altKey: true,
+          keys: [68],
+          fun: () => httpgdViewer.navClear()
         },
         {
-          keys: [84],
-          fun: () => httpgdViewer.navClear()
+          keys: [46, 68],
+          fun: () => httpgdViewer.navRemove()
         },
         {
           keys: [83],
@@ -220,7 +245,7 @@
         for (let action of shortcuts) {
           for (let keyCode of action.keys) {
             if (keyCode == e.keyCode) {
-              if (!action.ctrl || e.ctrlKey) {
+              if (!action.altKey || e.altKey) {
                 action.fun();
                 e.preventDefault();
                 return;

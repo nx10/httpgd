@@ -255,6 +255,6 @@ body {
     fill: #DA4567;
 }
 
-.drop:hover ul {
+.drop-open ul {
     transform: scale(1);
 }
