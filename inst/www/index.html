@@ -147,7 +147,7 @@
           httpgd_inactive_delayed = setTimeout(() => {
             document.getElementById("overlay-text").innerText = "Device inactive.";
             document.getElementById("overlay").style.display = "inline";
-          }, 50);
+          }, 1000);
         }
       }
       window.addEventListener('resize', () => httpgdViewer.resize());
