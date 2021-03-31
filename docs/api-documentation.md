@@ -2,7 +2,7 @@
 
 <!-- copy to: vignette/api-documentation.Rmd -->
 
-[httpgd](https://github.com/nx10/httpgd/blob/master/README.md) can be accessed both from R and from HTTP/Websockets.
+[httpgd](https://github.com/nx10/httpgd/blob/master/README.md) can be accessed both from R and from HTTP/WebSockets.
 
 ## Overview
 
@@ -38,7 +38,7 @@ To receive state changes as they happen [WebSockets can be used](#from-websocket
 hgd_state()
 ```
 
-Will respond with a list object including fields containig `host`, `port` and security `token` of the server.
+Will respond with a list object including fields containing `host`, `port` and security `token` of the server.
 
 ### From HTTP
 
@@ -54,11 +54,11 @@ Will respond with a JSON object.
 
 ### From WebSockets
 
-httpgd accepts websocket connections on the same port as the HTTP server. [Server state](#Server-state) changes will be broadcasted immediately to all connected clients in JSON format. 
+httpgd accepts WebSocket connections on the same port as the HTTP server. [Server state](#Server-state) changes will be broadcasted immediately to all connected clients in JSON format. 
 
 ## Render SVG
 
-SVGs can be rendered from both R and HTTP. The actual plot construction in R is relatively slow so httpgd caches the plot in the last requested size. Subsequent calls with the same width and height or without a size specified will allways be fast. (This way "flipping" through plot pages is very fast.)
+SVGs can be rendered from both R and HTTP. The actual plot construction in R is relatively slow so httpgd caches the plot in the last requested size. Subsequent calls with the same width and height or without a size specified will always be fast. (This way "flipping" through plot pages is very fast.)
 
 ### From R
 
@@ -68,7 +68,7 @@ hgd_svg(page = 3, width = 800, height = 600) # Get plot at index 3 with 800*600
 hgd_svg() # Get last plot with cached size
 ```
 
-`page` can eather be a number to indicate a plot index or a static plot ID (see: hgd_id()).
+`page` can either be a number to indicate a plot index or a static plot ID (see: hgd_id()).
 
 This function returns the plot as a string. The `file` attribute can be used to save the SVG directly to disk.
 
@@ -150,8 +150,8 @@ Examples:
 
 Notes: 
 
-- The `limit` parameter can be specified to support pagenation.
-- The JSON response will contain the [state](#get-state) to allow checking for desyncs.
+- The `limit` parameter can be specified to support pagination.
+- The JSON response will contain the [state](#get-state) to allow checking for desynchronisation.
 
 ## Security
 
