@@ -1,3 +1,15 @@
+# httpgd 1.1.0
+
+- Added plot history sidebar.
+- Improved SVG rendering performance.
+- Added static plot ID API.
+- Font handling improvements.
+- Various client improvements.
+- Added API documentation vignette.
+- Fixed client device inactive desynchronisation.
+- Fixes for R devel.
+- Library updates.
+
 # httpgd 1.0.1
 
 - Fix memory allocation issues with graphics device creation and libpng.

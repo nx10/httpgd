@@ -1,9 +1,9 @@
 ## Test environments
 GitHub rlib/actions:
-* Windows Server 2019 10.0.17763, R 4.0.3
-* Mac OS X 10.15.7, R 4.0.3
-* Ubuntu 20.04.1, R 4.0.3
-* Ubuntu 20.04.1, R devel
+* Windows Server 2019 10.0.17763, R4.0.4
+* Mac OS X 10.15.7, R 4.0.4
+* Ubuntu 20.04.2, R 4.0.4
+* Ubuntu 20.04.2, R devel
 
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
@@ -19,7 +19,3 @@ There was 1 NOTE:
 
 ## Downstream dependencies
 There are no downstream dependencies.
-
-## Additional issues (valgrind/ASAN)
-I was able to replicate the valgrind/ASAN errors.
-These should be fixed now.
