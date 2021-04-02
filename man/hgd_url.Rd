@@ -9,7 +9,8 @@ hgd_url(
   which = dev.cur(),
   websockets = TRUE,
   width = -1,
-  height = -1
+  height = -1,
+  history = TRUE
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ or a plot index or ID.)}
 
 \item{height}{Height of the plot. (Only used when \code{endpoint} is \code{"svg"},
 or a plot index or ID.)}
+
+\item{history}{Should the plot history sidebar be visible.}
 }
 \value{
 URL.

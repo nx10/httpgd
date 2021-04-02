@@ -258,3 +258,7 @@ body {
 .drop-open ul {
     transform: scale(1);
 }
+
+.notransition {
+    transition: none !important;
+  }

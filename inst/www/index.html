@@ -108,6 +108,17 @@
   <script>
     const sparams = new URL(window.location.href).searchParams;
 
+    if (sparams.has("sidebar") && sparams.get("sidebar")) {
+        document.getElementById("sidebar").classList.add('notransition');
+        document.getElementById("plotview").classList.add('notransition');
+        document.getElementById("sidebar").classList.add('nohist');
+        document.getElementById("plotview").classList.add('nohist');
+        setTimeout(() => {
+          document.getElementById("sidebar").classList.remove('notransition');
+          document.getElementById("plotview").classList.remove('notransition');
+        },300);
+      }
+
     var httpgdViewer = new HttpgdViewer(
       sparams.has("host") ? sparams.get("host") : window.location.host,
       sparams.has("token") ? sparams.get("token") : null,

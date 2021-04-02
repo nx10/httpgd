@@ -343,6 +343,7 @@ build_http_query <- function(x) {
 #'   or a plot index or ID.)
 #' @param height Height of the plot. (Only used when `endpoint` is `"svg"`,
 #'   or a plot index or ID.)
+#' @param history Should the plot history sidebar be visible.
 #'
 #' @return URL.
 #'
@@ -364,7 +365,8 @@ hgd_url <- function(
                     which = dev.cur(),
                     websockets = TRUE,
                     width = -1,
-                    height = -1) {
+                    height = -1,
+                    history = TRUE) {
   l <- hgd_state(which)
   q <- list()
   if (is.numeric(endpoint) || (class(endpoint) == "httpgd_pid")) {
@@ -390,6 +392,9 @@ hgd_url <- function(
   }
   if (!websockets) {
     q["ws"] <- "0"
+  }
+  if (!history) {
+    q["sidebar"] <- "0"
   }
   paste0(
     "http://",
