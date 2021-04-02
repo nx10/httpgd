@@ -186,7 +186,7 @@ namespace httpgd::dc
             }
             else
             {
-                fmt::format_to(os, "font-weight: {:.2f};", m_text.weight);
+                fmt::format_to(os, "font-weight: {};", m_text.weight);
             }
         }
         if (m_text.italic)
