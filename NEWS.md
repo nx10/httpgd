@@ -1,3 +1,8 @@
+# httpgd 1.1.1
+
+- Fixed font weight related rendering crash.
+- Small client adjustments.
+
 # httpgd 1.1.0
 
 - Added plot history sidebar.

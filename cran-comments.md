@@ -19,3 +19,32 @@ There was 1 NOTE:
 
 ## Downstream dependencies
 There are no downstream dependencies.
+
+
+## CRAN Package Check Issues
+
+### Unit test error on r-devel-linux-x86_64-fedora-*
+
+I was able to reproduce the error and fixed it in this update.
+
+### Warning -Wdeprecated-declarations
+
+The warning
+
+`warning: 'allocator<void>' is deprecated [-Wdeprecated-declarations]`
+
+on `r-devel-linux-x86_64-fedora-clang` originates from the boost.asio
+library:
+
+https://github.com/chriskohlhoff/asio/issues/785
+
+It is possibly a false positive:
+
+https://github.com/chriskohlhoff/asio/issues/290
+
+The warning is also only shown with LLVM/clang version 11, 
+GCC does not show the warning.
+
+Would you be able to make an exception in this case and allow the warning?
+I will monitor the boost.asio issue tracker closely from now on, 
+in case a workaround will be released.
