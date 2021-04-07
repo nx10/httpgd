@@ -13,3 +13,12 @@ test_that("boxplot returns valid SVG", {
     boxplot(rnorm(10))
   }), regexp = NA)
 })
+
+test_that("Append CSS with extra_css", {
+  testcss <- ".httpgd polyline { stroke: green; }"
+  hgd(webserver=F, extra_css = testcss)
+  plot(1)
+  svg <- hgd_svg()
+  dev.off()
+  expect_true(grepl(testcss, svg, fixed = TRUE))
+})

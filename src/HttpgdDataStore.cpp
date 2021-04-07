@@ -259,7 +259,7 @@ namespace httpgd
                 res};
     }
 
-    void HttpgdDataStore::extra_css(boost::optional<const std::string &> t_extra_css)
+    void HttpgdDataStore::extra_css(boost::optional<std::string> t_extra_css)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         m_extra_css = t_extra_css;

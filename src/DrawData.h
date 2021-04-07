@@ -190,7 +190,7 @@ namespace httpgd::dc
         Page(page_id_t t_id, vertex<double> t_size);
         void put(std::shared_ptr<DrawCall> t_dc);
         void clear();
-        std::string svg(boost::optional<const std::string &> t_extra_css) const;
+        std::string svg(boost::optional<std::string> t_extra_css) const;
         void clip(rect<double> t_rect);
         [[nodiscard]] vertex<double> size() const;
         void size(vertex<double> t_size);

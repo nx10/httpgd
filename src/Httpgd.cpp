@@ -46,7 +46,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
 
     std::string wwwpath(httpgd::get_wwwpath(""));
 
-    boost::optional<const std::string &> css;
+    boost::optional<std::string> css;
     if (!extra_css.empty()) 
     {
         css = extra_css;

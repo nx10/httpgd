@@ -446,7 +446,7 @@ namespace httpgd::dc
         m_cps.clear();
         clip({0, 0, m_size.x, m_size.y});
     }
-    std::string Page::svg(boost::optional<const std::string &> t_extra_css) const
+    std::string Page::svg(boost::optional<std::string> t_extra_css) const
     {
         fmt::memory_buffer os;
         os.reserve((m_dcs.size() + m_cps.size()) * 128 + 512);
@@ -455,19 +455,19 @@ namespace httpgd::dc
                    R""(width="{:.2f}" height="{:.2f}" viewBox="0 0 {:.2f} {:.2f}")"",
                    m_size.x, m_size.y, m_size.x, m_size.y);
         fmt::format_to(os, ">\n<defs>\n"
-              "  <style type='text/css'><![CDATA[\n");
-        if (t_extra_css)
-        {
-            fmt::format_to(os, *t_extra_css);
-            fmt::format_to(os, "\n");
-        }
-        fmt::format_to(os, "    .httpgd line, .httpgd polyline, .httpgd polygon, .httpgd path, .httpgd rect, .httpgd circle {{\n"
+              "  <style type='text/css'><![CDATA[\n"
+              "    .httpgd line, .httpgd polyline, .httpgd polygon, .httpgd path, .httpgd rect, .httpgd circle {{\n"
               "      fill: none;\n"
               "      stroke: #000000;\n"
               "      stroke-linecap: round;\n"
               "      stroke-linejoin: round;\n"
               "      stroke-miterlimit: 10.00;\n"
-              "    }}\n"
+              "    }}\n");
+        if (t_extra_css)
+        {
+            fmt::format_to(os, "{}\n", *t_extra_css);
+        }
+        fmt::format_to(os, 
               "  ]]></style>\n");
 
         for (const auto &cp : m_cps)

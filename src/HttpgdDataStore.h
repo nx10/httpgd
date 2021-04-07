@@ -43,7 +43,7 @@ namespace httpgd
         HttpgdQueryResults query_index(page_index_t t_index);
         HttpgdQueryResults query_range(page_index_t t_offset, page_index_t t_limit);
 
-        void extra_css(boost::optional<const std::string &> t_extra_css);
+        void extra_css(boost::optional<std::string> t_extra_css);
 
     private:
         std::mutex m_store_mutex;
@@ -53,7 +53,7 @@ namespace httpgd
         int m_upid = 0;
         bool m_device_active = true;
 
-        boost::optional<const std::string &> m_extra_css;
+        boost::optional<std::string> m_extra_css;
 
         void m_inc_upid();
 

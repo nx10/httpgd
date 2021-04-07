@@ -28,7 +28,7 @@ namespace httpgd
         double pointsize;
         cpp11::list aliases;
         bool fix_strwidth;
-        boost::optional<const std::string &> extra_css;
+        boost::optional<std::string> extra_css;
     };
 
     class DeviceTarget
