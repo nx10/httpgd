@@ -413,6 +413,7 @@ hgd_url <- function(
 #'
 #' @param ... Parameters passed to [hgd_url()].
 #' @param which Which device (ID).
+#' @param browser Program to be used as HTML browser.
 #'
 #' @return URL.
 #'
@@ -429,8 +430,11 @@ hgd_url <- function(
 #'
 #' dev.off()
 #' }
-hgd_browse <- function(..., which = dev.cur()) {
-  browseURL(hgd_url(..., which = which))
+hgd_browse <- function(..., which = dev.cur(), browser = NULL) {
+  if (is.null(browser)) {
+    browser <- getOption("browser")
+  }
+  browseURL(hgd_url(..., which = which), browser)
 }
 
 #' Close httpgd device.
