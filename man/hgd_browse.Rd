@@ -4,12 +4,14 @@
 \alias{hgd_browse}
 \title{Open httpgd URL in the browser.}
 \usage{
-hgd_browse(..., which = dev.cur())
+hgd_browse(..., which = dev.cur(), browser = NULL)
 }
 \arguments{
 \item{...}{Parameters passed to \code{\link[=hgd_url]{hgd_url()}}.}
 
 \item{which}{Which device (ID).}
+
+\item{browser}{Program to be used as HTML browser.}
 }
 \value{
 URL.
