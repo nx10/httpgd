@@ -9,3 +9,4 @@ src/*.dll
 windows
 *.Rproj
 inst/doc
+src-*

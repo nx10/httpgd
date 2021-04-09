@@ -452,23 +452,24 @@ namespace httpgd::dc
         os.reserve((m_dcs.size() + m_cps.size()) * 128 + 512);
         fmt::format_to(os, R""(<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="httpgd" )"");
         fmt::format_to(os,
-                   R""(width="{:.2f}" height="{:.2f}" viewBox="0 0 {:.2f} {:.2f}")"",
-                   m_size.x, m_size.y, m_size.x, m_size.y);
-        fmt::format_to(os, ">\n<defs>\n"
-              "  <style type='text/css'><![CDATA[\n"
-              "    .httpgd line, .httpgd polyline, .httpgd polygon, .httpgd path, .httpgd rect, .httpgd circle {{\n"
-              "      fill: none;\n"
-              "      stroke: #000000;\n"
-              "      stroke-linecap: round;\n"
-              "      stroke-linejoin: round;\n"
-              "      stroke-miterlimit: 10.00;\n"
-              "    }}\n");
-        if (t_extra_css)
-        {
-            fmt::format_to(os, "{}\n", *t_extra_css);
-        }
-        fmt::format_to(os, 
-              "  ]]></style>\n");
+                   R""(viewBox="0 0 {:.2f} {:.2f}")"",
+                   m_size.x, m_size.y);
+        fmt::format_to(os, ">\n<defs>\n");
+        // fmt::format_to(os, ">\n<defs>\n"
+        //       "  <style type='text/css'><![CDATA[\n"
+        //       "    .httpgd line, .httpgd polyline, .httpgd polygon, .httpgd path, .httpgd rect, .httpgd circle {{\n"
+        //       "      fill: none;\n"
+        //       "      stroke: #000000;\n"
+        //       "      stroke-linecap: round;\n"
+        //       "      stroke-linejoin: round;\n"
+        //       "      stroke-miterlimit: 10.00;\n"
+        //       "    }}\n");
+        // if (t_extra_css)
+        // {
+        //     fmt::format_to(os, "{}\n", *t_extra_css);
+        // }
+        // fmt::format_to(os, 
+        //       "  ]]></style>\n");
 
         for (const auto &cp : m_cps)
         {
@@ -476,8 +477,7 @@ namespace httpgd::dc
             fmt::format_to(os, "\n");
         }
         fmt::format_to(os, "</defs>\n");
-        fmt::format_to(os, R""(<rect width="100%" height="100%" style="stroke: none;fill: #{:02X}{:02X}{:02X};"/>)"" "\n",
-                   R_RED(m_fill), R_GREEN(m_fill), R_BLUE(m_fill));
+        fmt::format_to(os, R""(<rect/>)"" "\n");
 
         clip_id_t last_id = m_cps.front().id();
         fmt::format_to(os, R""(<g clip-path='url(#c{:d})'>)"" "\n", last_id);
