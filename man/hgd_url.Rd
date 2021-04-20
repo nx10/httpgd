@@ -10,7 +10,8 @@ hgd_url(
   websockets = TRUE,
   width = -1,
   height = -1,
-  history = TRUE
+  history = TRUE,
+  host = NULL
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ or a plot index or ID.)}
 or a plot index or ID.)}
 
 \item{history}{Should the plot history sidebar be visible.}
+
+\item{host}{Replaces hostname.}
 }
 \value{
 URL.

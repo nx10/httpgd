@@ -104,11 +104,11 @@ hgd <-
       fix_text_width, extra_css
     )) {
       if (!silent && webserver) {
-        cat("httpgd server running at:\n  ",
-          hgd_url(websockets = websockets),
-          "\n",
-          sep = ""
-        )
+        cat("httpgd server running at:\n")
+        if (host == "0.0.0.0") {
+          cat("  ", hgd_url(websockets = websockets, host = "127.0.0.1"),"\n", sep="")
+        }
+        cat("  ", hgd_url(websockets = websockets), "\n", sep="")
       }
     } else {
       hgd_close()
@@ -344,6 +344,7 @@ build_http_query <- function(x) {
 #' @param height Height of the plot. (Only used when `endpoint` is `"svg"`,
 #'   or a plot index or ID.)
 #' @param history Should the plot history sidebar be visible.
+#' @param host Replaces hostname.
 #'
 #' @return URL.
 #'
@@ -366,7 +367,8 @@ hgd_url <- function(
                     websockets = TRUE,
                     width = -1,
                     height = -1,
-                    history = TRUE) {
+                    history = TRUE, 
+                    host = NULL) {
   l <- hgd_state(which)
   q <- list()
   if (is.numeric(endpoint) || (class(endpoint) == "httpgd_pid")) {
@@ -396,12 +398,14 @@ hgd_url <- function(
   if (!history) {
     q["sidebar"] <- "0"
   }
-  paste0(
-    "http://",
-    sub("0.0.0.0", Sys.info()[["nodename"]], l$host, fixed = TRUE),
-    ":",
+  if (!is.null(host)) {
+    l$host <- host
+  } else if (l$host == "0.0.0.0") {
+    l$host <- Sys.info()[["nodename"]]
+  }
+  sprintf("http://%s:%s/%s%s",
+    l$host,
     l$port,
-    "/",
     endpoint,
     ifelse(length(q) == 0, "", paste0("?", build_http_query(q)))
   )
