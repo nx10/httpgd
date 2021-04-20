@@ -345,6 +345,7 @@ build_http_query <- function(x) {
 #'   or a plot index or ID.)
 #' @param history Should the plot history sidebar be visible.
 #' @param host Replaces hostname.
+#' @param port Replaces port.
 #'
 #' @return URL.
 #'
@@ -368,7 +369,8 @@ hgd_url <- function(
                     width = -1,
                     height = -1,
                     history = TRUE, 
-                    host = NULL) {
+                    host = NULL, 
+                    port = NULL) {
   l <- hgd_state(which)
   q <- list()
   if (is.numeric(endpoint) || (class(endpoint) == "httpgd_pid")) {
@@ -402,6 +404,9 @@ hgd_url <- function(
     l$host <- host
   } else if (l$host == "0.0.0.0") {
     l$host <- Sys.info()[["nodename"]]
+  }
+  if (!is.null(port)) {
+    l$port <- paste(port)
   }
   sprintf("http://%s:%s/%s%s",
     l$host,

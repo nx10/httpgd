@@ -11,7 +11,8 @@ hgd_url(
   width = -1,
   height = -1,
   history = TRUE,
-  host = NULL
+  host = NULL,
+  port = NULL
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ or a plot index or ID.)}
 \item{history}{Should the plot history sidebar be visible.}
 
 \item{host}{Replaces hostname.}
+
+\item{port}{Replaces port.}
 }
 \value{
 URL.
