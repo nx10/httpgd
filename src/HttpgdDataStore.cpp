@@ -17,7 +17,7 @@ namespace httpgd
         return (t_index == -1 ? (m_pages.size() - 1) : t_index);
     }
 
-    page_index_t HttpgdDataStore::append(vertex<double> t_size)
+    page_index_t HttpgdDataStore::append(gvertex<double> t_size)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         m_pages.emplace_back(m_id_counter, t_size);
@@ -95,9 +95,9 @@ namespace httpgd
             return;
         }
         auto index = m_index_to_pos(t_index);
-        m_pages[index].fill(t_fill);
+        m_pages[index].fill = t_fill;
     }
-    void HttpgdDataStore::resize(page_index_t t_index, vertex<double> t_size)
+    void HttpgdDataStore::resize(page_index_t t_index, gvertex<double> t_size)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
@@ -105,10 +105,10 @@ namespace httpgd
             return;
         }
         auto index = m_index_to_pos(t_index);
-        m_pages[index].size(t_size);
+        m_pages[index].size = t_size;
         m_pages[index].clear();
     }
-    httpgd::vertex<double> HttpgdDataStore::size(page_index_t t_index)
+    httpgd::gvertex<double> HttpgdDataStore::size(page_index_t t_index)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
@@ -116,9 +116,9 @@ namespace httpgd
             return {10, 10};
         }
         auto index = m_index_to_pos(t_index);
-        return m_pages[index].size();
+        return m_pages[index].size;
     }
-    void HttpgdDataStore::clip(page_index_t t_index, rect<double> t_rect)
+    void HttpgdDataStore::clip(page_index_t t_index, grect<double> t_rect)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
@@ -129,7 +129,7 @@ namespace httpgd
         m_pages[index].clip(t_rect);
     }
 
-    bool HttpgdDataStore::diff(page_index_t t_index, vertex<double> t_size)
+    bool HttpgdDataStore::diff(page_index_t t_index, gvertex<double> t_size)
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
@@ -139,8 +139,8 @@ namespace httpgd
         auto index = m_index_to_pos(t_index);
 
         // get current state
-        vertex<double> new_size = t_size;
-        vertex<double> old_size = m_pages[index].size();
+        gvertex<double> new_size = t_size;
+        gvertex<double> old_size = m_pages[index].size;
 
         if (new_size.x < 0.1)
         {
@@ -155,16 +155,17 @@ namespace httpgd
         return (std::fabs(new_size.x - old_size.x) > 0.1 ||
                 std::fabs(new_size.y - old_size.y) > 0.1);
     }
-    const char *SVG_EMPTY = "<svg width=\"10\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"></svg>";
-    std::string HttpgdDataStore::svg(page_index_t t_index)
+    
+    bool HttpgdDataStore::render(page_index_t t_index, dc::Renderer *t_renderer) 
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
         {
-            return std::string(SVG_EMPTY);
+            return false;
         }
         auto index = m_index_to_pos(t_index);
-        return m_pages[index].svg(m_extra_css);
+        t_renderer->render(m_pages[index]);
+        return true;
     }
 
     boost::optional<int> HttpgdDataStore::find_index(page_id_t t_id)
@@ -172,7 +173,7 @@ namespace httpgd
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         for (std::size_t i = 0; i != m_pages.size(); i++)
         {
-            if (m_pages[i].id() == t_id)
+            if (m_pages[i].id == t_id)
             {
                 return static_cast<int>(i);
             }
@@ -206,7 +207,7 @@ namespace httpgd
         std::vector<page_id_t> res(m_pages.size());
         for (std::size_t i = 0; i != m_pages.size(); i++)
         {
-            res[i] = m_pages[i].id();
+            res[i] = m_pages[i].id;
         }
         return {{m_upid,
                  m_pages.size(),
@@ -228,7 +229,7 @@ namespace httpgd
         return {{m_upid,
                  m_pages.size(),
                  m_device_active},
-                {m_pages[index].id()}};
+                {m_pages[index].id}};
     }
     HttpgdQueryResults HttpgdDataStore::query_range(page_id_t t_offset, page_id_t t_limit)
     {
@@ -251,7 +252,7 @@ namespace httpgd
         std::vector<page_id_t> res(end - index);
         for (std::size_t i = index; i != end; i++)
         {
-            res[i - index] = m_pages[i].id();
+            res[i - index] = m_pages[i].id;
         }
         return {{m_upid,
                  m_pages.size(),

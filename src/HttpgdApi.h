@@ -6,18 +6,20 @@
 #include <vector>
 #include <boost/optional.hpp>
 #include "HttpgdCommons.h"
+#include "DrawData.h"
 
 namespace httpgd
 {
     class HttpgdApi
     {
     public:
-        virtual void api_render(int index, double width, double height) = 0;
+        virtual void api_prerender(int index, double width, double height) = 0;
         virtual bool api_remove(int index) = 0;
         virtual bool api_clear() = 0;
 
-        virtual std::string api_svg(int index, double width, double height) = 0;
+        virtual bool api_render(int index, double width, double height, dc::Renderer *t_renderer) = 0;
         virtual boost::optional<int> api_index(int32_t id) = 0;
+        
 
         virtual HttpgdState api_state() = 0;
 

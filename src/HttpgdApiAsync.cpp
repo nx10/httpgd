@@ -65,7 +65,7 @@ namespace httpgd
         return true;
     }
 
-    void HttpgdApiAsync::api_render(int index, double width, double height)
+    void HttpgdApiAsync::api_prerender(int index, double width, double height)
     {
         const std::lock_guard<std::mutex> lock(m_rdevice_alive_mutex);
         if (!m_rdevice_alive)
@@ -80,21 +80,21 @@ namespace httpgd
         asynclater::later([](void *t_dat) {
             auto dat = static_cast<AsyncApiCallIndexSizeData *>(t_dat);
             HttpgdApi *api = dat->api;
-            api->api_render(dat->index, dat->width, dat->height);
+            api->api_prerender(dat->index, dat->width, dat->height);
             delete dat;
         },
                      dat, 0.0);
         asynclater::awaitLater();
     }
-
-    std::string HttpgdApiAsync::api_svg(int index, double width, double height)
+    
+    bool HttpgdApiAsync::api_render(int index, double width, double height, dc::Renderer *t_renderer) 
     {
         if (m_data_store->diff(index, {width, height}))
         {
-            api_render(index, width, height); // use async render call
+            api_prerender(index, width, height); // use async render call
             // todo perform sync diff again and sync render svg
         }
-        return m_data_store->svg(index);
+        return m_data_store->render(index, t_renderer);
     }
 
     boost::optional<int> HttpgdApiAsync::api_index(int32_t id)

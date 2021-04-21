@@ -22,19 +22,20 @@ namespace httpgd
     public:
         boost::optional<page_index_t> find_index(page_id_t t_id);
 
-        bool diff(page_index_t t_index, vertex<double> t_size);
+        bool diff(page_index_t t_index, gvertex<double> t_size);
         std::string svg(page_index_t t_index);
+        bool render(page_index_t t_index, dc::Renderer *t_renderer);
 
-        page_index_t append(vertex<double> t_size);
+        page_index_t append(gvertex<double> t_size);
         void clear(page_index_t t_index, bool t_silent);
         bool remove(page_index_t t_index, bool t_silent);
         bool remove_all();
-        void resize(page_index_t t_index, vertex<double> t_size);
-        vertex<double> size(page_index_t t_index);
+        void resize(page_index_t t_index, gvertex<double> t_size);
+        gvertex<double> size(page_index_t t_index);
 
         void fill(page_index_t t_index, color_t t_fill);
         void add_dc(page_index_t t_index, std::shared_ptr<dc::DrawCall> t_dc, bool t_silent);
-        void clip(page_index_t t_index, rect<double> t_rect);
+        void clip(page_index_t t_index, grect<double> t_rect);
 
         HttpgdState state();
         void set_device_active(bool t_active);

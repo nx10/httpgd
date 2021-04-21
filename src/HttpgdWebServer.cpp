@@ -6,6 +6,9 @@
 #include <fmt/ostream.h>
 #include <boost/optional.hpp>
 
+#include "RendererSVG.h"
+#include "RendererJSON.h"
+
 namespace httpgd
 {
     namespace web
@@ -279,7 +282,47 @@ namespace httpgd
                 {
                     ctx.res.set("content-type", "image/svg+xml");
                     ctx.res.result(OB::Belle::Status::ok);
-                    ctx.res.body() = m_watcher->api_svg(*index, p_width.get_value_or(-1), p_height.get_value_or(-1));
+                    dc::RendererSVG renderer(boost::none);
+                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer)) {
+                        ctx.res.body() = renderer.to_string();
+                    } else {
+                        ctx.res.body() = std::string("<svg width=\"10\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"></svg>");
+                    }
+                }
+                else
+                {
+                    throw OB::Belle::Status::not_found;
+                }
+            });
+
+            m_app.on_http("/json", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
+                if (!authorized(m_conf, ctx))
+                {
+                    throw OB::Belle::Status::unauthorized;
+                }
+
+                auto qparams = ctx.req.params();
+                auto p_width = param_double(qparams, "width");
+                auto p_height = param_double(qparams, "height");
+                auto p_id = param_long(qparams, "id");
+
+                boost::optional<int> index;
+                if (p_id)
+                {
+                    index = m_watcher->api_index(*p_id);
+                }
+                else
+                {
+                    index = param_int(qparams, "index").get_value_or(-1);
+                }
+
+                if (index)
+                {
+                    ctx.res.set("content-type", "application/json");
+                    ctx.res.result(OB::Belle::Status::ok);
+                    dc::RendererJSON renderer;
+                    m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer);
+                    ctx.res.body() = renderer.to_string();
                 }
                 else
                 {

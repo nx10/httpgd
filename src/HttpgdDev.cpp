@@ -177,7 +177,7 @@ namespace httpgd
      * Including the graphics headers and reading the values directly
      * is about 40 times faster, but is probably not allowed by CRAN.
      */
-    inline vertex<double> find_minsize()
+    inline gvertex<double> find_minsize()
     {
         const auto par = cpp11::package("graphics")["par"];
         const auto mai = cpp11::as_cpp<cpp11::doubles>(cpp11::as_cpp<cpp11::list>(par())["mai"]);
@@ -245,7 +245,7 @@ namespace httpgd
 
     void HttpgdDev::dev_line(double x1, double y1, double x2, double y2, pGEcontext gc, pDevDesc dd)
     {
-        put(std::make_shared<dc::Line>(gc_lineinfo(gc), vertex<double>{x1, y1}, vertex<double>{x2, y2}));
+        put(std::make_shared<dc::Line>(gc_lineinfo(gc), gvertex<double>{x1, y1}, gvertex<double>{x2, y2}));
     }
     void HttpgdDev::dev_text(double x, double y, const char *str, double rot, double hadj, pGEcontext gc, pDevDesc dd)
     {
@@ -266,7 +266,7 @@ namespace httpgd
             feature += (i == font_info.n_features - 1 ? ";" : ",");
         }
 
-        put(std::make_shared<dc::Text>(gc->col, vertex<double>{x, y}, str, rot, hadj,
+        put(std::make_shared<dc::Text>(gc->col, gvertex<double>{x, y}, str, rot, hadj,
                                        dc::TextInfo{
                                            weight,
                                            feature,
@@ -281,11 +281,11 @@ namespace httpgd
     }
     void HttpgdDev::dev_circle(double x, double y, double r, pGEcontext gc, pDevDesc dd)
     {
-        put(std::make_shared<dc::Circle>(gc_lineinfo(gc), gc_fill(gc), vertex<double>{x, y}, r));
+        put(std::make_shared<dc::Circle>(gc_lineinfo(gc), gc_fill(gc), gvertex<double>{x, y}, r));
     }
     void HttpgdDev::dev_polygon(int n, double *x, double *y, pGEcontext gc, pDevDesc dd)
     {
-        std::vector<vertex<double>> points(n);
+        std::vector<gvertex<double>> points(n);
         for (int i = 0; i < n; ++i)
         {
             points[i] = {x[i], y[i]};
@@ -294,7 +294,7 @@ namespace httpgd
     }
     void HttpgdDev::dev_polyline(int n, double *x, double *y, pGEcontext gc, pDevDesc dd)
     {
-        std::vector<vertex<double>> points(n);
+        std::vector<gvertex<double>> points(n);
         for (int i = 0; i < n; ++i)
         {
             points[i] = {x[i], y[i]};
@@ -309,7 +309,7 @@ namespace httpgd
         {
             npoints += val;
         }
-        std::vector<vertex<double>> points(npoints);
+        std::vector<gvertex<double>> points(npoints);
         for (int i = 0; i < npoints; ++i)
         {
             points[i] = {x[i], y[i]};
@@ -323,7 +323,7 @@ namespace httpgd
         const double abs_width = std::abs(width);
 
         std::vector<unsigned int> vraster(raster, raster + (w * h));
-        put(std::make_shared<dc::Raster>(std::move(vraster), vertex<int>{w, h}, rect<double>{x, y - abs_height, abs_width, abs_height}, rot, interpolate));
+        put(std::make_shared<dc::Raster>(std::move(vraster), gvertex<int>{w, h}, grect<double>{x, y - abs_height, abs_width, abs_height}, rot, interpolate));
     }
 
     // OTHER
@@ -336,7 +336,7 @@ namespace httpgd
         m_data_store->add_dc(m_target.get_index(), dc, replaying);
     }
 
-    void HttpgdDev::api_render(int index, double width, double height)
+    void HttpgdDev::api_prerender(int index, double width, double height)
     {
         if (index == -1)
             index = m_target.get_newest_index();
@@ -410,17 +410,17 @@ namespace httpgd
 
         return r;
     }
-
-    std::string HttpgdDev::api_svg(int index, double width, double height)
+    
+    bool HttpgdDev::api_render(int index, double width, double height, dc::Renderer *t_renderer) 
     {
         debug_print("DIFF \n");
         if (m_data_store->diff(index, {width, height}))
         {
             debug_print("RENDER \n");
-            api_render(index, width, height);
+            api_prerender(index, width, height);
         }
         debug_print("SVG \n");
-        return m_data_store->svg(index);
+        return m_data_store->render(index, t_renderer);
     }
 
     boost::optional<int> HttpgdDev::api_index(int32_t id)

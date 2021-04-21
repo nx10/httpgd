@@ -11,6 +11,7 @@
 #include <string>
 
 #include "HttpgdDev.h"
+#include "RendererSvg.h"
 
 namespace httpgd
 {
@@ -144,7 +145,9 @@ std::string httpgd_svg_(int devnum, int page, double width, double height)
 {
     auto dev = validate_httpgddev(devnum);
 
-    return dev->api_svg(page, width, height);
+    httpgd::dc::RendererSVG renderer(boost::none);
+    dev->api_render(page, width, height, &renderer);
+    return renderer.to_string();
 }
 
 [[cpp11::register]]
@@ -159,7 +162,9 @@ std::string httpgd_svg_id_(int devnum, std::string id, double width, double heig
         cpp11::stop("Not a valid plot ID.");
     }
 
-    return dev->api_svg(*page, width, height);
+    httpgd::dc::RendererSVG renderer(boost::none);
+    dev->api_render(*page, width, height, &renderer);
+    return renderer.to_string();
 }
 
 [[cpp11::register]]

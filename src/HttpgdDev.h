@@ -66,14 +66,14 @@ namespace httpgd
 
         // API functions
 
-        virtual void api_render(int index, double width, double height) override;
+        virtual void api_prerender(int index, double width, double height) override;
         virtual bool api_remove(int index) override;
         virtual bool api_clear() override;
         virtual HttpgdState api_state() override;
         HttpgdQueryResults api_query_all() override;
         HttpgdQueryResults api_query_index(int index) override;
         HttpgdQueryResults api_query_range(int offset, int limit) override;
-        virtual std::string api_svg(int index, double width, double height) override;
+        bool api_render(int index, double width, double height, dc::Renderer *t_renderer) override;
         virtual boost::optional<int> api_index(int32_t id) override;
         virtual std::shared_ptr<HttpgdServerConfig> api_server_config() override;
 
