@@ -8,6 +8,7 @@
 
 #include "RendererSVG.h"
 #include "RendererJSON.h"
+#include "RendererCairo.h"
 
 namespace httpgd
 {
@@ -98,7 +99,8 @@ namespace httpgd
             return buf.str();
         }
 
-        inline bool authorized(std::shared_ptr<httpgd::HttpgdServerConfig> &m_conf, OB::Belle::Server::Http_Ctx &ctx)
+        template<typename T>
+        inline bool authorized(std::shared_ptr<httpgd::HttpgdServerConfig> &m_conf, T &ctx)
         {
             if (!m_conf->use_token)
             {
@@ -284,9 +286,9 @@ namespace httpgd
                     ctx.res.result(OB::Belle::Status::ok);
                     dc::RendererSVG renderer(boost::none);
                     if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer)) {
-                        ctx.res.body() = renderer.to_string();
+                        ctx.res.body() = renderer.get();
                     } else {
-                        ctx.res.body() = std::string("<svg width=\"10\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\"></svg>");
+                        throw OB::Belle::Status::not_found;
                     }
                 }
                 else
@@ -323,6 +325,44 @@ namespace httpgd
                     dc::RendererJSON renderer;
                     m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer);
                     ctx.res.body() = renderer.to_string();
+                }
+                else
+                {
+                    throw OB::Belle::Status::not_found;
+                }
+            });
+
+            m_app.on_http("/tet", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx_dyn &ctx) {
+                if (!authorized(m_conf, ctx))
+                {
+                    throw OB::Belle::Status::unauthorized;
+                }
+
+                auto qparams = ctx.req.params();
+                auto p_width = param_double(qparams, "width");
+                auto p_height = param_double(qparams, "height");
+                auto p_id = param_long(qparams, "id");
+
+                boost::optional<int> index;
+                if (p_id)
+                {
+                    index = m_watcher->api_index(*p_id);
+                }
+                else
+                {
+                    index = param_int(qparams, "index").get_value_or(-1);
+                }
+
+                if (index)
+                {
+                    ctx.res.set("content-type", "image/png");
+                    ctx.res.result(OB::Belle::Status::ok);
+                    dc::RendererCairo renderer;
+                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer)) {
+                        ctx.res.body() = renderer.get();
+                    } else {
+                        throw OB::Belle::Status::not_found;
+                    }
                 }
                 else
                 {

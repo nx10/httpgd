@@ -352,12 +352,12 @@ namespace httpgd::dc
         fmt::format_to(os, "</g>\n</svg>");
     }
     
-    std::string RendererSVG::to_string() 
+    std::string RendererSVG::get() const 
     {
         return fmt::to_string(os);
     }
 
-    void RendererSVG::dc(const DrawCall &t_dc)
+    void RendererSVG::dc(const DrawCall &)
     {
         fmt::format_to(os, "<!-- unknown draw call -->");
     }

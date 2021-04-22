@@ -142,6 +142,7 @@ SOFTWARE.
 #include <limits>
 #include <type_traits>
 #include <thread>
+#include <vector>
 
 namespace OB::Belle
 {
@@ -1040,6 +1041,7 @@ public:
   }; // class Http_Ctx_Basic
 
   using Http_Ctx = Http_Ctx_Basic<http::string_body>;
+  using Http_Ctx_dyn = Http_Ctx_Basic<http::vector_body<unsigned char>>;
 
   class Websocket_Ctx
   {
@@ -1080,6 +1082,7 @@ public:
   // callbacks
   using fn_on_signal = std::function<void(error_code, int)>;
   using fn_on_http = std::function<void(Http_Ctx&)>;
+  using fn_on_http_dyn = std::function<void(Http_Ctx_dyn&)>;
   using fn_on_websocket = std::function<void(Websocket_Ctx&)>;
 
   struct fns_on_websocket
@@ -1100,6 +1103,8 @@ public:
   // aliases
   using Http_Routes =
     Ordered_Map<std::string, std::unordered_map<int, fn_on_http>>;
+  using Http_Routes_dyn =
+    Ordered_Map<std::string, std::unordered_map<int, fn_on_http_dyn>>;
 
   using Websocket_Routes =
     std::vector<std::pair<std::string, fns_on_websocket>>;
@@ -1139,6 +1144,7 @@ private:
 
     // http routes
     Http_Routes http_routes {};
+    Http_Routes_dyn http_routes_dyn {};
 
     // websocket routes
     Websocket_Routes websocket_routes {};
@@ -1740,6 +1746,104 @@ private:
       return 404;
     }
 
+    int serve_dynamic_dyn()
+    {
+      if (! _attr->http_dynamic || _attr->http_routes_dyn.empty())
+      {
+        return 404;
+      }
+
+      // regex variables
+      std::smatch rx_match {};
+      std::regex_constants::syntax_option_type const rx_opts {std::regex::ECMAScript};
+      std::regex_constants::match_flag_type const rx_flgs {std::regex_constants::match_not_null};
+
+      // the request path
+      std::string path {_ctx.req.target().to_string()};
+
+      // separate the query parameters
+      auto params = Detail::split(path, "?", 1);
+      path = params.at(0);
+
+      // iterate over routes
+      for (auto const& regex_method : _attr->http_routes_dyn)
+      {
+        bool method_match {false};
+        auto match = (*regex_method).second.find(0);
+
+        if (match != (*regex_method).second.end())
+        {
+          method_match = true;
+        }
+        else
+        {
+          match = (*regex_method).second.find(static_cast<int>(_ctx.req.method()));
+
+          if (match != (*regex_method).second.end())
+          {
+            method_match = true;
+          }
+        }
+
+        if (method_match)
+        {
+          std::regex rx_str {(*regex_method).first, rx_opts};
+          if (std::regex_match(path, rx_match, rx_str, rx_flgs))
+          {
+            // set the path
+            for (auto const& e : rx_match)
+            {
+              _ctx.req.path().emplace_back(e.str());
+            }
+
+            // parse target params
+            _ctx.req.params_parse();
+
+            // set callback function
+            auto const& user_func = match->second;
+
+            try
+            {
+              Http_Ctx_dyn ctx_dyn {
+                _ctx.req,
+                {http::status::ok, _ctx.req.version()},
+                _ctx.data
+              };
+              ctx_dyn.res.keep_alive(_ctx.req.keep_alive());
+
+              // run user function
+              user_func(ctx_dyn);
+
+              send(derived().shared_from_this(), std::move(ctx_dyn.res));
+              return 0;
+            }
+            catch (int const e)
+            {
+              return e;
+            }
+            catch (unsigned int const e)
+            {
+              return static_cast<int>(e);
+            }
+            catch (Status const e)
+            {
+              return static_cast<int>(e);
+            }
+            catch (std::exception const&)
+            {
+              return 500;
+            }
+            catch (...)
+            {
+              return 500;
+            }
+          }
+        }
+      }
+
+      return 404;
+    }
+
     void serve_error(int err)
     {
       _ctx.res.result(static_cast<unsigned int>(err));
@@ -1812,6 +1916,20 @@ private:
       if (dyna != 404)
       {
         this->serve_error(dyna);
+        return;
+      }
+
+      // serve dynamic content
+      auto dyna_dyn = this->serve_dynamic_dyn();
+      // success
+      if (dyna_dyn == 0)
+      {
+        return;
+      }
+      // error
+      if (dyna_dyn != 404)
+      {
+        this->serve_error(dyna_dyn);
         return;
       }
 
@@ -2602,6 +2720,57 @@ public:
     return *this;
   }
 
+  // set http callback matching a single method
+  // called after http read
+  Server& on_http(std::string route_, Method method_, fn_on_http_dyn on_http_)
+  {
+    if (_attr->http_routes_dyn.find(route_) == _attr->http_routes_dyn.map_end())
+    {
+      _attr->http_routes_dyn(route_, {{static_cast<int>(method_), on_http_}});
+    }
+    else
+    {
+      _attr->http_routes_dyn.at(route_)[static_cast<int>(method_)] = on_http_;
+    }
+
+    return *this;
+  }
+
+  // set http callback matching multiple methods
+  // called after http read
+  Server& on_http(std::string route_, std::vector<Method> methods_, fn_on_http_dyn on_http_)
+  {
+    for (auto const& e : methods_)
+    {
+      if (_attr->http_routes_dyn.find(route_) == _attr->http_routes_dyn.map_end())
+      {
+        _attr->http_routes_dyn(route_, {{static_cast<int>(e), on_http_}});
+      }
+      else
+      {
+        _attr->http_routes_dyn.at(route_)[static_cast<int>(e)] = on_http_;
+      }
+    }
+
+    return *this;
+  }
+
+  // set http callback matching all methods
+  // called after http read
+  Server& on_http(std::string route_, fn_on_http_dyn on_http_)
+  {
+    if (_attr->http_routes_dyn.find(route_) == _attr->http_routes_dyn.map_end())
+    {
+      _attr->http_routes_dyn(route_, {{0, on_http_}});
+    }
+    else
+    {
+      _attr->http_routes_dyn.at(route_)[0] = on_http_;
+    }
+
+    return *this;
+  }
+
   // set http error callback
   // called when an exception or error occurs
   Server& on_http_error(fn_on_http on_http_error_)
@@ -2683,6 +2852,12 @@ public:
   Http_Routes& http_routes()
   {
     return _attr->http_routes;
+  }
+
+  // get http routes
+  Http_Routes_dyn& http_routes_dyn()
+  {
+    return _attr->http_routes_dyn;
   }
 
   // get websocket routes

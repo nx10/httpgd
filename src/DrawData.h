@@ -39,6 +39,12 @@ namespace httpgd::dc
         constexpr bool opaque(color_t x) { return alpha(x) == byte_mask; };
         constexpr bool transparent(color_t x) { return alpha(x) == 0; };
         constexpr bool tranwhite(color_t x) { return x == rgba(byte_mask, byte_mask, byte_mask, 0); };
+
+        constexpr double byte_frac(color_t x) { return x / static_cast<double>(byte_mask); };
+        constexpr double red_frac(color_t x) { return byte_frac(red(x)); }
+        constexpr double green_frac(color_t x) { return byte_frac(green(x)); }
+        constexpr double blue_frac(color_t x) { return byte_frac(blue(x)); }
+        constexpr double alpha_frac(color_t x) { return byte_frac(alpha(x)); }
     }
 
     using clip_id_t = int;
@@ -265,6 +271,13 @@ namespace httpgd::dc
         {
             return dc(t_raster);
         };
+    };
+
+    template<typename T>
+    class TargetRenderer : public Renderer
+    {
+    public:
+        [[nodiscard]] virtual T get() const = 0;
     };
 
 } // namespace httpgd::dc

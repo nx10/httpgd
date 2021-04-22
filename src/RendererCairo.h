@@ -1,18 +1,19 @@
-#ifndef RENDERER_SVG_H
-#define RENDERER_SVG_H
+#ifndef RENDERER_CAIRO_H
+#define RENDERER_CAIRO_H
 
 #include "DrawData.h"
+
+#include <cairo.h>
 #include <fmt/format.h>
-#include <boost/optional.hpp>
+#include <vector>
 
 namespace httpgd::dc
 {
-    class RendererSVG : public TargetRenderer<std::string>
+    class RendererCairo : public TargetRenderer<std::vector<unsigned char>>
     {
     public:
-        explicit RendererSVG(boost::optional<std::string> t_extra_css);
         void render(const Page &t_page) override;
-        [[nodiscard]] std::string get() const override;
+        [[nodiscard]] std::vector<unsigned char> get() const override;
         void dc(const DrawCall &t_dc) override;
         void rect(const Rect &t_rect) override;
         void text(const Text &t_text) override;
@@ -22,11 +23,12 @@ namespace httpgd::dc
         void polygon(const Polygon &t_polygon) override;
         void path(const Path &t_path) override;
         void raster(const Raster &t_raster) override;
-    
+
     private:
-        fmt::memory_buffer os;
-        boost::optional<std::string> m_extra_css;
+        std::vector<unsigned char> m_render_data{};
+        cairo_surface_t *surface = nullptr;
+        cairo_t *cr = nullptr;
     };
-    
+
 } // namespace httpgd::dc
-#endif // RENDERER_SVG_H
+#endif // RENDERER_CAIRO_H
