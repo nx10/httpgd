@@ -237,47 +237,76 @@ namespace httpgd::dc
     class Renderer
     {
     public:
-        virtual void render(const Page &t_page) = 0;
-        virtual void dc(const DrawCall &t_dc) = 0;
+        virtual ~Renderer() = default;
+
+        virtual void page(const Page &t_page)
+        {
+        }
+        virtual void dc(const DrawCall &t_dc)
+        {
+        }
         virtual void rect(const Rect &t_rect)
         {
-            return dc(t_rect);
-        };
+            dc(t_rect);
+        }
         virtual void text(const Text &t_text)
         {
-            return dc(t_text);
-        };
+            dc(t_text);
+        }
         virtual void circle(const Circle &t_circle)
         {
-            return dc(t_circle);
-        };
+            dc(t_circle);
+        }
         virtual void line(const Line &t_line)
         {
-            return dc(t_line);
-        };
+            dc(t_line);
+        }
         virtual void polyline(const Polyline &t_polyline)
         {
-            return dc(t_polyline);
-        };
+            dc(t_polyline);
+        }
         virtual void polygon(const Polygon &t_polygon)
         {
-            return dc(t_polygon);
-        };
+            dc(t_polygon);
+        }
         virtual void path(const Path &t_path)
         {
-            return dc(t_path);
-        };
+            dc(t_path);
+        }
         virtual void raster(const Raster &t_raster)
         {
-            return dc(t_raster);
-        };
+            dc(t_raster);
+        }
     };
 
-    template<typename T>
-    class TargetRenderer : public Renderer
+    class RenderingTarget
     {
     public:
-        [[nodiscard]] virtual T get() const = 0;
+        virtual ~RenderingTarget() = default;
+        virtual void render(const Page &t_page)
+        {
+        }
+    };
+
+    class StringRenderingTarget : public RenderingTarget
+    {
+    public:
+        virtual ~StringRenderingTarget() = default;
+        [[nodiscard]] 
+        virtual std::string get_string() const
+        {
+            return std::string("");
+        }
+    };
+    class BinaryRenderingTarget : public RenderingTarget
+    {
+    public:
+        virtual ~BinaryRenderingTarget() = default; 
+        [[nodiscard]] 
+        virtual std::vector<unsigned char> get_binary() const
+        {
+            return {};
+        }
     };
 
 } // namespace httpgd::dc

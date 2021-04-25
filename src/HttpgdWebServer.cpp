@@ -7,8 +7,6 @@
 #include <boost/optional.hpp>
 
 #include "RendererSVG.h"
-#include "RendererJSON.h"
-#include "RendererCairo.h"
 
 namespace httpgd
 {
@@ -127,6 +125,7 @@ namespace httpgd
               m_conf(t_watcher->api_server_config()),
               m_app()
         {
+            m_renderers = RendererManager::generate_default();
         }
 
         unsigned short WebServer::port()
@@ -214,6 +213,49 @@ namespace httpgd
                 ctx.res.body() = json_make_state(m_watcher->api_state());
             });
 
+            m_app.on_http("/renderers", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
+                if (!authorized(m_conf, ctx))
+                {
+                    throw OB::Belle::Status::unauthorized;
+                }
+
+                ctx.res.set("content-type", "application/json");
+                ctx.res.result(OB::Belle::Status::ok);
+
+                fmt::memory_buffer buf;
+                fmt::format_to(buf, "{{\n \"renderers\": [\n");
+
+                for (auto it = m_renderers.string_renderers().begin(); it != m_renderers.string_renderers().end(); it++) 
+                {
+                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": false }})"",
+                        it->second.id,
+                        it->second.mime,
+                        it->second.fileext,
+                        it->second.name,
+                        it->second.type
+                    );
+                    if (std::next(it) != m_renderers.string_renderers().end())
+                    {
+                        fmt::format_to(buf, ",\n");
+                    }
+                }
+                for (auto it = m_renderers.binary_renderers().begin(); it != m_renderers.binary_renderers().end(); it++) 
+                {
+                    fmt::format_to(buf, ",\n");
+                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": true }})"",
+                        it->second.id,
+                        it->second.mime,
+                        it->second.fileext,
+                        it->second.name,
+                        it->second.type
+                    );
+                }
+                
+                fmt::format_to(buf, "\n ]\n}}");
+
+                ctx.res.body() = fmt::to_string(buf);
+            });
+
             m_app.on_http("/plots", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
@@ -286,7 +328,7 @@ namespace httpgd
                     ctx.res.result(OB::Belle::Status::ok);
                     dc::RendererSVG renderer(boost::none);
                     if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer)) {
-                        ctx.res.body() = renderer.get();
+                        ctx.res.body() = renderer.get_string();
                     } else {
                         throw OB::Belle::Status::not_found;
                     }
@@ -297,7 +339,7 @@ namespace httpgd
                 }
             });
 
-            m_app.on_http("/json", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
+            m_app.on_http("/plot", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
                     throw OB::Belle::Status::unauthorized;
@@ -307,41 +349,7 @@ namespace httpgd
                 auto p_width = param_double(qparams, "width");
                 auto p_height = param_double(qparams, "height");
                 auto p_id = param_long(qparams, "id");
-
-                boost::optional<int> index;
-                if (p_id)
-                {
-                    index = m_watcher->api_index(*p_id);
-                }
-                else
-                {
-                    index = param_int(qparams, "index").get_value_or(-1);
-                }
-
-                if (index)
-                {
-                    ctx.res.set("content-type", "application/json");
-                    ctx.res.result(OB::Belle::Status::ok);
-                    dc::RendererJSON renderer;
-                    m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer);
-                    ctx.res.body() = renderer.to_string();
-                }
-                else
-                {
-                    throw OB::Belle::Status::not_found;
-                }
-            });
-
-            m_app.on_http("/tet", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx_dyn &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                auto qparams = ctx.req.params();
-                auto p_width = param_double(qparams, "width");
-                auto p_height = param_double(qparams, "height");
-                auto p_id = param_long(qparams, "id");
+                auto p_renderer = param_str(qparams, "renderer").get_value_or("svg");
 
                 boost::optional<int> index;
                 if (p_id)
@@ -357,9 +365,58 @@ namespace httpgd
                 {
                     ctx.res.set("content-type", "image/png");
                     ctx.res.result(OB::Belle::Status::ok);
-                    dc::RendererCairo renderer;
-                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer)) {
-                        ctx.res.body() = renderer.get();
+
+                    const auto find_renderer = m_renderers.find_string(p_renderer);
+                    if (!find_renderer) {
+                        throw OB::Belle::Status::not_found;
+                    }
+                    const auto renderer = (*find_renderer).renderer();
+                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), renderer.get())) {
+                        ctx.res.set("content-type", (*find_renderer).mime);
+                        ctx.res.body() = renderer->get_string();
+                    } else {
+                        throw OB::Belle::Status::not_found;
+                    }
+                }
+                else
+                {
+                    throw OB::Belle::Status::not_found;
+                }
+            });
+            m_app.on_http("/plot", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx_dyn &ctx) {
+                if (!authorized(m_conf, ctx))
+                {
+                    throw OB::Belle::Status::unauthorized;
+                }
+
+                auto qparams = ctx.req.params();
+                auto p_width = param_double(qparams, "width");
+                auto p_height = param_double(qparams, "height");
+                auto p_id = param_long(qparams, "id");
+                auto p_renderer = param_str(qparams, "renderer").get_value_or("png");
+
+                boost::optional<int> index;
+                if (p_id)
+                {
+                    index = m_watcher->api_index(*p_id);
+                }
+                else
+                {
+                    index = param_int(qparams, "index").get_value_or(-1);
+                }
+
+                if (index)
+                {
+                    ctx.res.result(OB::Belle::Status::ok);
+
+                    const auto find_renderer = m_renderers.find_binary(p_renderer);
+                    if (!find_renderer) {
+                        throw OB::Belle::Status::not_found;
+                    }
+                    const auto renderer = (*find_renderer).renderer();
+                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), renderer.get())) {
+                        ctx.res.set("content-type", (*find_renderer).mime);
+                        ctx.res.body() = renderer->get_binary();
                     } else {
                         throw OB::Belle::Status::not_found;
                     }

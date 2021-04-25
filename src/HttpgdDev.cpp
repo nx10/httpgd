@@ -411,7 +411,7 @@ namespace httpgd
         return r;
     }
     
-    bool HttpgdDev::api_render(int index, double width, double height, dc::Renderer *t_renderer) 
+    bool HttpgdDev::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer) 
     {
         debug_print("DIFF \n");
         if (m_data_store->diff(index, {width, height}))

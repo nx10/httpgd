@@ -147,7 +147,7 @@ std::string httpgd_svg_(int devnum, int page, double width, double height)
 
     httpgd::dc::RendererSVG renderer(boost::none);
     dev->api_render(page, width, height, &renderer);
-    return renderer.get();
+    return renderer.get_string();
 }
 
 [[cpp11::register]]
@@ -164,7 +164,7 @@ std::string httpgd_svg_id_(int devnum, std::string id, double width, double heig
 
     httpgd::dc::RendererSVG renderer(boost::none);
     dev->api_render(*page, width, height, &renderer);
-    return renderer.get();
+    return renderer.get_string();
 }
 
 [[cpp11::register]]

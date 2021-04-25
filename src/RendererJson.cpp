@@ -2,26 +2,34 @@
 
 namespace httpgd::dc
 {
-    RendererJSON::RendererJSON()
-        : os()
+    
+    void RendererJSON::render(const Page &t_page) 
     {
+        page(t_page);
     }
     
-    void RendererJSON::render(const Page &obj) 
+    std::string RendererJSON::get_string() const 
     {
-        fmt::format_to(os, "{{\n \"draw_calls\": [\n");
-        for (const auto &dc : obj.dcs)
+        return fmt::to_string(os);
+    }
+    
+    void RendererJSON::page(const Page &t_page) 
+    {
+        fmt::format_to(os, "{{\n \"clips\": [\n");
+        for (const auto &cp : t_page.cps)
+        {
+            fmt::format_to(os, R""(  {{ "id": "{}", "x": "{:.2f}", "y": "{:.2f}", "w": "{:.2f}", "h": "{:.2f}" }})"", cp.id, cp.rect.x, cp.rect.y, cp.rect.width, cp.rect.height);
+            fmt::format_to(os, ",\n");
+        }
+        
+        fmt::format_to(os, " ],\n \"draw_calls\": [\n");
+        for (const auto &dc : t_page.dcs)
         {
             fmt::format_to(os, "  {{ ");
             dc->render(this);
             fmt::format_to(os, " }},\n");
         }
         fmt::format_to(os, " ]\n}}");
-    }
-    
-    std::string RendererJSON::to_string() 
-    {
-        return fmt::to_string(os);
     }
 
     void RendererJSON::dc(const DrawCall &t_dc)
@@ -31,22 +39,22 @@ namespace httpgd::dc
 
     void RendererJSON::rect(const Rect &t_rect)
     {
-        fmt::format_to(os, "\"type\": \"rect\"");
+        fmt::format_to(os, R""("type": "rect", "x": "{:.2f}", "y": "{:.2f}", "w": "{:.2f}", "h": "{:.2f}")"", t_rect.rect.x, t_rect.rect.y, t_rect.rect.width, t_rect.rect.height);
     }
 
-    void RendererJSON::text(const Text &obj)
+    void RendererJSON::text(const Text &t_text)
     {
-        fmt::format_to(os, "\"type\": \"text\"");
+        fmt::format_to(os, R""("type": "text", "x": "{:.2f}" "y": "{:.2f}", "str": "{}" )"", t_text.pos.x, t_text.pos.y, t_text.str);
     }
 
     void RendererJSON::circle(const Circle &t_circle)
     {
-        fmt::format_to(os, R""("type": "circle", "x": "{:.2f}" "y": "{:.2f}" "r": "{:.2f}" )"", t_circle.pos.x, t_circle.pos.y, t_circle.radius);
+        fmt::format_to(os, R""("type": "circle", "x": "{:.2f}" "y": "{:.2f}" "r": "{:.2f}")"", t_circle.pos.x, t_circle.pos.y, t_circle.radius);
     }
 
-    void RendererJSON::line(const Line &obj)
+    void RendererJSON::line(const Line &t_line)
     {
-        fmt::format_to(os, "\"type\": \"line\"");
+        fmt::format_to(os, R""("type": "line", "x0": "{:.2f}", "y0": "{:.2f}", "x1": "{:.2f}", "y1": "{:.2f}")"", t_line.orig.x, t_line.orig.y, t_line.dest.x, t_line.dest.y);
     }
 
     void RendererJSON::polyline(const Polyline &obj)

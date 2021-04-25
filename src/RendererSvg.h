@@ -7,12 +7,16 @@
 
 namespace httpgd::dc
 {
-    class RendererSVG : public TargetRenderer<std::string>
+    class RendererSVG : public Renderer, public StringRenderingTarget
     {
     public:
         explicit RendererSVG(boost::optional<std::string> t_extra_css);
         void render(const Page &t_page) override;
-        [[nodiscard]] std::string get() const override;
+        [[nodiscard]] 
+        std::string get_string() const override;
+
+        // Renderer
+        void page(const Page &t_page) override;
         void dc(const DrawCall &t_dc) override;
         void rect(const Rect &t_rect) override;
         void text(const Text &t_text) override;

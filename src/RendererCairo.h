@@ -9,12 +9,10 @@
 
 namespace httpgd::dc
 {
-    class RendererCairo : public TargetRenderer<std::vector<unsigned char>>
+    class RendererCairo : public Renderer
     {
     public:
-        void render(const Page &t_page) override;
-        [[nodiscard]] std::vector<unsigned char> get() const override;
-        void dc(const DrawCall &t_dc) override;
+        void page(const Page &t_page) override;
         void rect(const Rect &t_rect) override;
         void text(const Text &t_text) override;
         void circle(const Circle &t_circle) override;
@@ -24,10 +22,51 @@ namespace httpgd::dc
         void path(const Path &t_path) override;
         void raster(const Raster &t_raster) override;
 
-    private:
-        std::vector<unsigned char> m_render_data{};
+    protected:
         cairo_surface_t *surface = nullptr;
         cairo_t *cr = nullptr;
+    };
+
+    /*class BinaryRendererCairo : public BinaryRenderingTarget, public RendererCairo
+    {
+    public:
+        void render(const Page &t_page) override;
+        [[nodiscard]] std::vector<unsigned char> get() const override;
+        
+    private:
+        std::vector<unsigned char> m_render_data{};
+    };
+    
+    class StringRendererCairo : public StringRenderingTarget, public RendererCairo
+    {
+    public:
+        void render(const Page &t_page) override;
+        [[nodiscard]] std::string get() const override;
+
+    private:
+        std::string m_render_data;
+    };*/
+
+    class RendererCairoPng : public BinaryRenderingTarget, public RendererCairo
+    {
+    public:
+        void render(const Page &t_page) override;
+        [[nodiscard]] 
+        std::vector<unsigned char> get_binary() const override;
+        
+    private:
+        std::vector<unsigned char> m_render_data{};
+    };
+    
+    class RendererCairoPdf : public BinaryRenderingTarget, public RendererCairo
+    {
+    public:
+        void render(const Page &t_page) override;
+        [[nodiscard]] 
+        std::vector<unsigned char> get_binary() const override;
+        
+    private:
+        std::vector<unsigned char> m_render_data{};
     };
 
 } // namespace httpgd::dc

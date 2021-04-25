@@ -87,7 +87,7 @@ namespace httpgd
         asynclater::awaitLater();
     }
     
-    bool HttpgdApiAsync::api_render(int index, double width, double height, dc::Renderer *t_renderer) 
+    bool HttpgdApiAsync::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer) 
     {
         if (m_data_store->diff(index, {width, height}))
         {

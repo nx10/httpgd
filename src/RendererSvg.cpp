@@ -307,6 +307,16 @@ namespace httpgd::dc
     
     void RendererSVG::render(const Page &t_page) 
     {
+        this->page(t_page);
+    }
+    
+    std::string RendererSVG::get_string() const 
+    {
+        return fmt::to_string(os);
+    }
+    
+    void RendererSVG::page(const Page &t_page) 
+    {
         os.reserve((t_page.dcs.size() + t_page.cps.size()) * 128 + 512);
         fmt::format_to(os, R""(<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="httpgd" )"");
         fmt::format_to(os,
@@ -350,11 +360,6 @@ namespace httpgd::dc
             fmt::format_to(os, "\n");
         }
         fmt::format_to(os, "</g>\n</svg>");
-    }
-    
-    std::string RendererSVG::get() const 
-    {
-        return fmt::to_string(os);
     }
 
     void RendererSVG::dc(const DrawCall &)
@@ -506,20 +511,20 @@ namespace httpgd::dc
         {
             if (left == 0)
             {
-                left = *it_poly;
+                left = (*it_poly) - 1;
                 ++it_poly;
-                if (it != t_path.points.begin())
-                {
-                    fmt::format_to(os, "Z");
-                }
-                fmt::format_to(os, "M ");
+                fmt::format_to(os, "M{:.2f} {:.2f}", it->x, it->y);
             }
             else
             {
                 --left;
-                fmt::format_to(os, "L ");
+                fmt::format_to(os, "L{:.2f} {:.2f}", it->x, it->y);
+
+                if (left == 0)
+                {
+                    fmt::format_to(os, "Z");
+                }
             }
-            fmt::format_to(os, "{:.2f},{:.2f}", it->x, it->y);
         }
 
         // Finish path data
