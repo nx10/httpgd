@@ -11,3 +11,4 @@ windows
 inst/doc
 revdep
 configure.log
+src/Makevars
