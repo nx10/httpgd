@@ -49,7 +49,10 @@ RoxygenNote: 7.1.1
 Encoding: UTF-8
 SystemRequirements: 
     C++17,
-    libpng
+    libpng,
+    cairo,
+    freetype2, 
+    fontconfig
 URL: https://github.com/nx10/httpgd
 BugReports: https://github.com/nx10/httpgd/issues
 VignetteBuilder: knitr
