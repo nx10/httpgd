@@ -6,7 +6,7 @@
 #include <fmt/ostream.h>
 #include <boost/optional.hpp>
 
-#include "RendererSVG.h"
+#include "RendererSvg.h"
 
 namespace httpgd
 {
