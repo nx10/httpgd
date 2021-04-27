@@ -40,7 +40,7 @@ jobs:
           writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
         shell: Rscript {0}
 
-      - name: Cache R packages
+      - name: Restore R package cache
         if: runner.os != 'Windows'
         uses: actions/cache@v2
         with:
@@ -56,6 +56,11 @@ jobs:
             eval sudo $cmd
           done < <(Rscript -e 'writeLines(remotes::system_requirements("ubuntu", "20.04"))')
 
+      - name: Install macOS cairo dependencies
+        if: matrix.config.os == 'macOS-latest'
+        run: |
+           brew install fontconfig cairo freetype2
+           
       - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
@@ -65,7 +70,9 @@ jobs:
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        run: |
+          options(crayon.enabled = TRUE)
+          rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
         shell: Rscript {0}
 
       - name: Upload check results
