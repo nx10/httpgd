@@ -1,0 +1,332 @@
+$highlight-color: #07c;
+$warn-color: #da4567;
+$sidebar-width: 20%;
+
+body {
+    margin: 0;
+}
+
+#container {
+    height: 100%;
+    display: relative;
+}
+
+.plotview {
+    height: 100%;
+    width: 100% - $sidebar-width;
+    position: relative;
+    transition: width 0.3s;
+}
+
+.plotview.nohist {
+    width: 100%;
+    transition: width 0.3s;
+}
+
+#drawing {
+    width: 100%;
+    height: 100%;
+}
+
+.history {
+    width: $sidebar-width;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: fixed;
+    top: 0;
+    right: 0;
+    transition: right 0.3s;
+}
+
+.history.nohist {
+    right: -$sidebar-width;
+    visibility: hidden;
+    transition: right 0.3s, visibility 0.3s;
+}
+
+.history-item {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    margin: 8;
+    cursor: pointer;
+    position: relative;
+
+    img {
+        width: 100%;
+        height: 12vw;
+    }
+    a {
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: rgba(0, 0, 0, 0.5);
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 22px;
+        padding: 0px 4px 0px 0px;
+        margin: -2px 0px 0px 0px;
+        display: none;
+    }
+    a:hover {
+        color: $warn-color;
+    }
+
+    &:hover {
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        a {
+            display: inline;
+        }
+    }
+}
+
+#toolbar {
+    float: left;
+    position: absolute;
+    right: 0;
+    top: 0px;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: rgba(253, 253, 254, 0.8);
+    border-color: rgba(253, 253, 254, 0.8);
+    border-radius: 2px;
+}
+
+#tb-tools > span {
+    padding: 2px 2px 2px 2px;
+    margin: 0px 2px 0px 2px;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+#tb-tools > span > a {
+    margin: 0px -2px 0px -2px;
+}
+
+#tb-tools > span > a:hover {
+    color: $highlight-color;
+}
+
+.icon,
+.icon-warn {
+    position: relative;
+    top: 5px;
+    fill: rgba(0, 0, 0, 0.5);
+}
+
+.icon:hover {
+    fill: $highlight-color;
+}
+
+.icon-warn:hover {
+    fill: $warn-color;
+}
+
+#overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(92, 92, 92, 0.685);
+    z-index: 2;
+}
+
+#overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    font-size: 40px;
+    font-family: arial, sans-serif;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 8px rgb(46, 46, 46);
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+
+    .tooltiptext {
+        visibility: hidden;
+        font-size: 12px;
+        font-weight: normal;
+        width: 80px;
+        background-color: rgb(71, 71, 71);
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        top: 150%;
+        left: 50%;
+        margin-left: -40px;
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent rgb(71, 71, 71) transparent;
+        }
+    }
+
+    &:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+.fade-out {
+    opacity: 0;
+    transform: translateY(-100px);
+    transition: opacity 0.5s, transform 0.5s step-end 0.5s;
+}
+
+.drop {
+    position: relative;
+    display: inline-block;
+    height: 34px;
+    ul {
+        position: absolute;
+        right: -2px;
+        top: 20px;
+        transition: all 0.3s ease;
+        transform: scale(0);
+        transform-origin: top right;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+        padding: 0px;
+        background-color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    ul li {
+        display: block;
+        width: 100%;
+    }
+
+    ul li a {
+        width: 100%;
+        padding: 10px 14px 10px 12px;
+        display: flex;
+        white-space: pre;
+        box-sizing: border-box;
+        fill: rgba(0, 0, 0, 0.5);
+    }
+
+    ul li a svg {
+        padding-right: 8px;
+    }
+
+    ul li a span {
+        position: relative;
+        top: 4px;
+    }
+
+    ul li a span.drop-kbd {
+        margin-left: auto;
+        padding-left: 12px;
+        color: rgba(0, 0, 0, 0.3);
+    }
+
+    ul li a:hover {
+        background: #ebebeb;
+        color: $highlight-color;
+        fill: $highlight-color;
+    }
+
+    ul li a.warn-hover:hover {
+        color: $warn-color;
+        fill: $warn-color;
+    }
+}
+
+.drop-open ul {
+    transform: scale(1);
+}
+
+.notransition {
+    transition: none !important;
+}
+
+.modal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.modal-close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+input[type="text"],
+select {
+    padding: 8px 16px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:hover,
+input[type="text"]:focus {
+    border-color: $highlight-color;
+    outline-color: $highlight-color;
+}
+
+input[type="submit"] {
+    background-color: #888;
+    color: white;
+    padding: 8px 16px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: $highlight-color;
+}
+
+.export-options {
+    padding-bottom: 32;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+}

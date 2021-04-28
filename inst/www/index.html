@@ -15,6 +15,40 @@
     <div id="overlay">
       <div id="overlay-text"></div>
     </div>
+
+    <div id="myModal" class="modal">
+
+      <!-- Modal content -->
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <img src="plot-none.svg" style="width: 100%;height: 40%;">
+
+        <div class="export-options">
+          <div style="float: left;">
+            Size: <input type="text" id="ie-width" value="800" style="width: 80;">
+            <span style="vertical-align: middle; font-size: 24; color: #888;">&times;</span>
+            <input type="text" id="ie-height" value="600" style="width: 80;">
+            <span style="vertical-align: middle; font-size: 24; color: #888;">~</span>
+            <input type="text" id="ie-scale"  value="100 %" style="width: 80;">
+          </div>
+
+          <div style="float: right;">
+            <input type="submit" value="Copy">
+            <input type="submit" value="Download">
+          </div>
+
+          <div style="float: right; padding-right: 30;">
+            <span style="padding-right: 20; font-size: 16; color: #888;">~ 777 MB</span>
+            <select id="ie-format">
+              <option value="svg">SVG</option>
+              <option value="png">PNG</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
     <div id="gallery-container">
     </div>
     <div class="plotview" id="plotview">
@@ -92,6 +126,10 @@
                     <path
                       d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z" />
                   </svg><span>Clear all plots</span><span class="drop-kbd">Alt+D</span></a></li>
+              <li><a id="tb-export"><svg height="24" viewBox="0 0 24 24">
+                    <path
+                      d="M12,1L8,5H11V14H13V5H16M18,23H6C4.89,23 4,22.1 4,21V9A2,2 0 0,1 6,7H9V9H6V21H18V9H15V7H18A2,2 0 0,1 20,9V21A2,2 0 0,1 18,23Z" />
+                  </svg><span>Export</span><span class="drop-kbd">E</span></a></li>
               <li><a id="tb-history"><svg height="24" viewBox="0 0 24 24">
                     <path d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z" />
                   </svg><span>Show history</span><span class="drop-kbd">H</span></a></li>
@@ -106,181 +144,7 @@
     <div class="history" id="sidebar"></div>
   </div>
   <script>
-    const sparams = new URL(window.location.href).searchParams;
-
-    if (sparams.has("sidebar") && sparams.get("sidebar")) {
-        document.getElementById("sidebar").classList.add('notransition');
-        document.getElementById("plotview").classList.add('notransition');
-        document.getElementById("sidebar").classList.add('nohist');
-        document.getElementById("plotview").classList.add('nohist');
-        setTimeout(() => {
-          document.getElementById("sidebar").classList.remove('notransition');
-          document.getElementById("plotview").classList.remove('notransition');
-        },300);
-      }
-
-    var httpgdViewer = new HttpgdViewer(
-      sparams.has("host") ? sparams.get("host") : window.location.host,
-      sparams.has("token") ? sparams.get("token") : null,
-      sparams.has("ws") ? (sparams.get("ws") != "0") : true
-    );
-
-    window.onload = function () {
-
-      const dropElem = document.getElementById("tb-more").parentElement;
-      dropElem.onmouseenter = () => {
-        dropElem.classList.add('drop-open');
-      };
-      dropElem.onmouseleave = () => {
-        dropElem.classList.remove('drop-open');
-      };
-      function closeDropdown() {
-        dropElem.classList.remove('drop-open');
-      }
-
-      httpgdViewer.onZoomStringChange = (s) => {
-        document.getElementById("tb-zlvl").childNodes[0].nodeValue = s;
-      }
-      httpgdViewer.onIndexStringChange = (s) => {
-        document.getElementById("tb-pnum").childNodes[0].nodeValue = s;
-      }
-      httpgdViewer.onDisconnectedChange = (d) => {
-        document.getElementById("overlay-text").innerText = "Connection lost.";
-        document.getElementById("overlay").style.display = d ? "inline" : "none";
-      }
-      var httpgd_inactive_delayed;
-      httpgdViewer.onDeviceActiveChange = (d) => {
-        if (!d) {
-          clearTimeout(httpgd_inactive_delayed);
-          document.getElementById("overlay").style.display = "none";
-        }
-        else {
-          httpgd_inactive_delayed = setTimeout(() => {
-            document.getElementById("overlay-text").innerText = "Device inactive.";
-            document.getElementById("overlay").style.display = "inline";
-          }, 1000);
-        }
-      }
-      window.addEventListener('resize', () => httpgdViewer.resize());
-
-      httpgdViewer.init(document.getElementById("drawing"), document.getElementById("sidebar"));
-
-      document.getElementById("tb-left").onclick = () => httpgdViewer.navPrevious();
-      document.getElementById("tb-right").onclick = () => httpgdViewer.navNext();
-      document.getElementById("tb-pnum").onclick = () => httpgdViewer.navNewest();
-      document.getElementById("tb-save-svg").onclick = () => {
-        httpgdViewer.downloadPlotSVG(document.getElementById("drawing"));
-        closeDropdown();
-      }
-      document.getElementById("tb-save-png").onclick = () => {
-        httpgdViewer.downloadPlotPNG(document.getElementById("drawing"));
-        closeDropdown();
-      };
-      document.getElementById("tb-copy-png").onclick = () => {
-        httpgdViewer.copyPlotPNG(document.getElementById("drawing"));
-        closeDropdown();
-      };
-      document.getElementById("tb-plus").onclick = () => httpgdViewer.zoomIn();
-      document.getElementById("tb-minus").onclick = () => httpgdViewer.zoomOut();
-      document.getElementById("tb-zlvl").onclick = () => httpgdViewer.zoomReset();
-      document.getElementById("tb-clear").onclick = () => {
-        httpgdViewer.navClear();
-        closeDropdown();
-      };
-      document.getElementById("tb-remove").onclick = () => httpgdViewer.navRemove();
-
-
-      function toggleSidebar() {
-        document.getElementById("sidebar").classList.toggle('nohist')
-        document.getElementById("plotview").classList.toggle('nohist')
-        setTimeout(() => httpgdViewer.checkResize(), 300);
-        closeDropdown();
-      }
-
-      const elem_his = document.getElementById("tb-history");
-      document.getElementById("tb-history").onclick = () => toggleSidebar();
-
-      const shortcuts = [
-        {
-          keys: [37, 40],
-          fun: () => httpgdViewer.navPrevious()
-        },
-        {
-          keys: [39, 38],
-          fun: () => httpgdViewer.navNext()
-        },
-        {
-          keys: [78],
-          fun: () => httpgdViewer.navNewest()
-        },
-        {
-          keys: [187],
-          fun: () => httpgdViewer.zoomIn()
-        },
-        {
-          keys: [189],
-          fun: () => httpgdViewer.zoomOut()
-        },
-        {
-          altKey: true,
-          keys: [68],
-          fun: () => httpgdViewer.navClear()
-        },
-        {
-          keys: [46, 68],
-          fun: () => httpgdViewer.navRemove()
-        },
-        {
-          keys: [83],
-          fun: () => httpgdViewer.downloadPlotSVG(document.getElementById("drawing"))
-        },
-        {
-          keys: [80],
-          fun: () => httpgdViewer.downloadPlotPNG(document.getElementById("drawing"))
-        },
-        {
-          keys: [48],
-          fun: () => httpgdViewer.zoomReset()
-        },
-        {
-          keys: [67],
-          fun: () => httpgdViewer.copyPlotPNG(document.getElementById("drawing"))
-        },
-        {
-          keys: [72],
-          fun: () => toggleSidebar()
-        }
-      ];
-
-      window.addEventListener('keydown', (e) => {
-        for (let action of shortcuts) {
-          for (let keyCode of action.keys) {
-            if (keyCode == e.keyCode) {
-              if (!action.altKey || e.altKey) {
-                action.fun();
-                e.preventDefault();
-                return;
-              }
-            }
-          }
-        }
-      });
-
-
-      const elem_tbt = document.getElementById("toolbar");
-      const elem_cnt = document.getElementById("container");
-      const TB_FADE_TIMEOUT = 4000;
-
-      var httpgd_tb_fade = setTimeout(() => elem_tbt.classList.add("fade-out"), TB_FADE_TIMEOUT);
-      elem_cnt.onmousemove = function () {
-        elem_tbt.classList.remove("fade-out");
-        clearTimeout(httpgd_tb_fade);
-        httpgd_tb_fade = setTimeout(() => elem_tbt.classList.add("fade-out"), TB_FADE_TIMEOUT);
-      }
-      elem_cnt.onmouseleave = function (mouseEvent) {
-        elem_tbt.classList.add("fade-out");
-      }
-    }
+    
   </script>
 </body>
 
