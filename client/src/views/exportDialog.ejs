@@ -1,0 +1,30 @@
+<div id="exp-modal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <img src="<%=require('./assets/plot-none.svg')%>" style="width: 100%;height: 40%;">
+
+        <div class="export-options">
+            <div style="float: left;">
+                Size: <input type="text" id="ie-width" value="800" style="width: 80;">
+                <span style="vertical-align: middle; font-size: 24; color: #888;">&times;</span>
+                <input type="text" id="ie-height" value="600" style="width: 80;">
+                <span style="vertical-align: middle; font-size: 24; color: #888;">~</span>
+                <input type="text" id="ie-scale" value="100 %" style="width: 80;">
+            </div>
+
+            <div style="float: right;">
+                <input type="submit" value="Copy">
+                <input type="submit" value="Download">
+            </div>
+
+            <div style="float: right; padding-right: 30;">
+                <span style="padding-right: 20; font-size: 16; color: #888;">~ 777 MB</span>
+                <select id="ie-format">
+                    <option value="svg">SVG</option>
+                    <option value="png">PNG</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+</div>

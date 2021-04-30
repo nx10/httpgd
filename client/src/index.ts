@@ -219,18 +219,11 @@ window.onload = function () {
         elem_tbt.classList.add("fade-out");
     }
 
-    // Get the modal
-    var modal = getById("myModal");
-
-
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("modal-close")[0] as HTMLElement;
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function () {
+    const modal = getById("exp-modal");
+    const modal_close = document.getElementsByClassName("modal-close")[0] as HTMLElement;
+    modal_close.onclick = function () {
         modal.style.display = "none";
     }
-
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event: MouseEvent) {
         if (event.target == modal) {

@@ -1,0 +1,81 @@
+<div id="toolbar">
+    <div id="tb-tools">
+        <span>
+            <a title="Previous (&larr;)" id="tb-left" class="tooltip">
+                <%- include ../assets/icons/arrow-left.svg %>
+                    <span class="tooltiptext">Previous (&larr;)</span>
+            </a>
+            <a title="Newest (N)" id="tb-pnum" class="tooltip">
+                0/0
+                <span class="tooltiptext">Newest (N)</span>
+            </a>
+            <a title="Next (&rarr;)" id="tb-right" class="tooltip">
+                <%- include ../assets/icons/arrow-right.svg %>
+                    <span class="tooltiptext">Next (&rarr;)</span>
+            </a>
+            <!--
+    -->
+        </span>
+        <span>
+            <a title="Zoom out (-)" id="tb-minus" class="tooltip">
+                <%- include ../assets/icons/magnify-minus.svg %>
+                    <span class="tooltiptext">Zoom out (-)</span>
+            </a>
+            <a title="Reset zoom (0)" id="tb-zlvl" class="tooltip">
+                100%
+                <span class="tooltiptext">Reset zoom (0)</span>
+            </a>
+            <a title="Zoom in (+)" id="tb-plus" class="tooltip">
+                <%- include ../assets/icons/magnify-plus.svg %>
+                    <span class="tooltiptext">Zoom in (+)</span>
+            </a>
+            <!--
+    -->
+        </span>
+        <span>
+            <a title="Delete (D)" id="tb-remove" class="tooltip">
+                <%- include ../assets/icons/cross.svg %>
+                    <span class="tooltiptext">Delete (D)</span>
+            </a>
+            <!--
+    -->
+        </span>
+        <span class="drop">
+            <a title="More" id="tb-more">
+                <%- include ../assets/icons/vdots.svg %>
+            </a>
+            <ul>
+                <li><a title="Download SVG (S)" id="tb-save-svg">
+                        <%- include ../assets/icons/download.svg %>
+                            <span>Download SVG</span>
+                            <span class="drop-kbd">S</span>
+                    </a></li>
+                <li><a title="Download PNG (P)" id="tb-save-png">
+                        <%- include ../assets/icons/image.svg %>
+                            <span>Download PNG</span><span class="drop-kbd">P</span>
+                    </a></li>
+                <li><a title="Copy PNG (C)" id="tb-copy-png">
+                        <%- include ../assets/icons/copy.svg %>
+                            <span>Copy PNG</span><span class="drop-kbd">C</span>
+                    </a></li>
+                <li><a id="tb-clear" class="warn-hover">
+                        <%- include ../assets/icons/trash.svg %>
+                            <span>Clear all plots</span>
+                            <span class="drop-kbd">Alt+D</span>
+                    </a></li>
+                <li><a id="tb-export">
+                        <%- include ../assets/icons/export.svg %>
+                            <span>Export</span>
+                            <span class="drop-kbd">E</span>
+                    </a></li>
+                <li><a id="tb-history">
+                        <%- include ../assets/icons/hamburger.svg %>
+                            <span>Show history</span>
+                            <span class="drop-kbd">H</span>
+                    </a></li>
+            </ul>
+            <!--
+    -->
+        </span>
+    </div>
+</div>
