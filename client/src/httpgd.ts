@@ -1,3 +1,4 @@
+const plot_none_uri = require('./assets/plot-none.svg')
 
 // httpgd connection ----------------------------------------------------------
 
@@ -317,7 +318,7 @@ class HttpgdNavigator {
     }
 
     public next(api: HttpgdApi, c?: string): string | undefined {
-        if (!this.data || this.data.plots.length == 0) return './plot-none.svg';
+        if (!this.data || this.data.plots.length == 0) return plot_none_uri;
         if ((this.last_id !== this.data.plots[this.index].id) ||
             (Math.abs(this.last_width - this.width) > 0.1) ||
             (Math.abs(this.last_height - this.height) > 0.1))

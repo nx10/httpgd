@@ -1,7 +1,8 @@
+import './style/style.scss';
 import { HttpgdViewer } from './httpgd'
 
 function getById(id: string): HTMLElement {
-    const el = getById(id);
+    const el = document.getElementById(id);
     if (!el) {
         throw new ReferenceError(id + " is not defined");
     }
@@ -59,7 +60,7 @@ window.onload = function () {
         getById("overlay-text").innerText = "Connection lost.";
         getById("overlay").style.display = d ? "inline" : "none";
     }
-    var httpgd_inactive_delayed: number | undefined;
+    var httpgd_inactive_delayed: ReturnType<typeof setTimeout>;
     httpgdViewer.onDeviceActiveChange = (d) => {
         if (!d) {
             clearTimeout(httpgd_inactive_delayed);
