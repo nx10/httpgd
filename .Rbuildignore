@@ -15,3 +15,5 @@
 ^revdep$
 ^configure.log$
 ^src/Makevars$
+^client/$
+^client$
