@@ -24,8 +24,8 @@ namespace httpgd
         manager.add({
           "png",
           "image/png",
-          ".svg",
-          "SVG",
+          ".png",
+          "PNG",
           "plot",
           []() { return std::make_unique<dc::RendererCairoPng>(); }
         });

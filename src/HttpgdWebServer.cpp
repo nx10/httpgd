@@ -350,6 +350,7 @@ namespace httpgd
                 auto p_height = param_double(qparams, "height");
                 auto p_id = param_long(qparams, "id");
                 auto p_renderer = param_str(qparams, "renderer").get_value_or("svg");
+                auto p_download = param_str(qparams, "download");
 
                 boost::optional<int> index;
                 if (p_id)
@@ -373,6 +374,9 @@ namespace httpgd
                     const auto renderer = (*find_renderer).renderer();
                     if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), renderer.get())) {
                         ctx.res.set("content-type", (*find_renderer).mime);
+                        if (p_download) {
+                            ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
+                        }
                         ctx.res.body() = renderer->get_string();
                     } else {
                         throw OB::Belle::Status::not_found;
@@ -394,6 +398,7 @@ namespace httpgd
                 auto p_height = param_double(qparams, "height");
                 auto p_id = param_long(qparams, "id");
                 auto p_renderer = param_str(qparams, "renderer").get_value_or("png");
+                auto p_download = param_str(qparams, "download");
 
                 boost::optional<int> index;
                 if (p_id)
@@ -416,6 +421,9 @@ namespace httpgd
                     const auto renderer = (*find_renderer).renderer();
                     if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), renderer.get())) {
                         ctx.res.set("content-type", (*find_renderer).mime);
+                        if (p_download) {
+                            ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
+                        }
                         ctx.res.body() = renderer->get_binary();
                     } else {
                         throw OB::Belle::Status::not_found;

@@ -277,8 +277,11 @@ body {
     background-color: #fefefe;
     margin: auto;
     padding: 20px;
-    border: 1px solid #888;
     width: 80%;
+
+    & > img {
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+    }
 }
 
 .modal-close {
@@ -311,7 +314,7 @@ input[type="text"]:focus {
     outline-color: $highlight-color;
 }
 
-input[type="submit"] {
+input[type="button"] {
     background-color: #888;
     color: white;
     padding: 8px 16px;
@@ -319,10 +322,10 @@ input[type="submit"] {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-}
 
-input[type="submit"]:hover {
-    background-color: $highlight-color;
+    &:hover {
+        background-color: $highlight-color;
+    }
 }
 
 .export-options {

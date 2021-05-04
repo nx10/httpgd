@@ -1,13 +1,7 @@
-import './style/style.scss';
-import { HttpgdViewer } from './httpgd'
+import "./style/style.scss";
+import { HttpgdViewer } from "./httpgdViewer";
+import { getById, strcmp, downloadURL } from "./utils";
 
-function getById(id: string): HTMLElement {
-    const el = document.getElementById(id);
-    if (!el) {
-        throw new ReferenceError(id + " is not defined");
-    }
-    return el;
-}
 
 const sparams = new URL(window.location.href).searchParams;
 
@@ -76,7 +70,8 @@ window.onload = function () {
     window.addEventListener('resize', () => httpgdViewer.resize());
 
     const elem_img = getById("drawing") as HTMLImageElement;
-    httpgdViewer.init(elem_img, getById("sidebar"));
+    const exp_format = getById("ie-format") as HTMLSelectElement;
+    httpgdViewer.init(elem_img, getById("sidebar"), exp_format);
 
 
     function toggleSidebar() {
@@ -85,6 +80,46 @@ window.onload = function () {
         setTimeout(() => httpgdViewer.checkResize(), 300);
         closeDropdown();
     }
+
+    
+    const modal_close = document.getElementsByClassName("modal-close")[0] as HTMLElement;
+    modal_close.onclick = function () {
+        modal.style.display = "none";
+    }
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event: MouseEvent) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    const exp_image = getById("exp-image") as HTMLImageElement;
+
+    const exp_width = getById("ie-width") as HTMLInputElement;
+    const exp_height = getById("ie-height") as HTMLInputElement;
+    //const exp_scale = getById("ie-scale") as HTMLInputElement; 
+    //const exp_btn_copy = getById("ie-btn-copy") as HTMLButtonElement;
+    const exp_btn_download = getById("ie-btn-download") as HTMLButtonElement;
+    
+
+    exp_btn_download.onclick = (ev) => {
+        const w = Math.min(parseInt(exp_width.value), 10000);
+        const h = Math.min(parseInt(exp_height.value), 10000);
+        const r = httpgdViewer.renderers.find((r) => r.id == exp_format.value);
+        const url = httpgdViewer.plot(httpgdViewer.id(), r.id, w, h, undefined, "plot_" + httpgdViewer.id() + r.ext).href;
+        downloadURL(url);
+    };
+
+    function exp_change() {
+        const w = Math.min(parseInt(exp_width.value), 10000);
+        const h = Math.min(parseInt(exp_height.value), 10000);
+        exp_image.src = httpgdViewer.plot(httpgdViewer.id(), "svg", w, h).href;
+    }
+    exp_change();
+
+    exp_width.addEventListener('input', exp_change);
+    exp_height.addEventListener('input', exp_change);
+    //exp_scale.addEventListener('input', exp_change);
 
     const actions: HttpgdAction[] = [
         {
@@ -174,9 +209,10 @@ window.onload = function () {
         },
         {
             id: "export",
-            keys: [72],
+            keys: [69],
             fun: () => {
                 modal.style.display = "block";
+                exp_change();
             },
             onclickId: "tb-export",
         }
@@ -195,7 +231,9 @@ window.onload = function () {
         }
     }
 
+    const modal = getById("exp-modal");
     window.addEventListener('keydown', (e) => {
+        if (modal.style.display !== "none") return;
         const a = shortcuts[e.keyCode];
         if (a && (!a.altKey || e.altKey)) {
             a.fun();
@@ -219,15 +257,4 @@ window.onload = function () {
         elem_tbt.classList.add("fade-out");
     }
 
-    const modal = getById("exp-modal");
-    const modal_close = document.getElementsByClassName("modal-close")[0] as HTMLElement;
-    modal_close.onclick = function () {
-        modal.style.display = "none";
-    }
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event: MouseEvent) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
 }
