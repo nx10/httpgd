@@ -24,3 +24,11 @@ export function downloadURL(url: string, filename?: string) {
     dl.click();
     document.body.removeChild(dl);
 }
+
+export function copyClipboardPNG(url: string) {
+    fetch(url).then(res => res.blob()).then(blob => {
+        if (blob) {
+            navigator?.clipboard?.write([new ClipboardItem({ [blob.type]: blob })])
+        }
+    })
+}
