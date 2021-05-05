@@ -52,4 +52,9 @@ module.exports = {
         path: path.resolve(__dirname, '../inst/www'),
         clean: true,
     },
+    devServer: {
+        contentBase: path.join(__dirname, '../inst/www'),
+        compress: true,
+        port: 9000,
+    },
 };

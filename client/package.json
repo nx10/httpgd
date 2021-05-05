@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:dev": "webpack --mode development",
-    "build:prod": "webpack --mode production"
+    "build:prod": "webpack --mode production",
+    "watch:dev": "webpack --watch --mode development",
+    "watch:prod": "webpack --watch --mode production",
+    "serve": "webpack serve --mode development"
   },
   "author": "",
   "license": "ISC",
@@ -16,13 +19,14 @@
     "ejs-loader": "^0.5.0",
     "html-loader": "^2.1.2",
     "html-webpack-plugin": "^5.3.1",
-    "mini-css-extract-plugin": "^1.5.1",
+    "mini-css-extract-plugin": "^1.6.0",
     "node-sass": "^5.0.0",
     "sass-loader": "^11.0.1",
     "style-loader": "^2.0.0",
     "ts-loader": "^9.1.1",
     "typescript": "^4.2.4",
-    "webpack": "^5.36.0",
-    "webpack-cli": "^4.6.0"
+    "webpack": "^5.36.2",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
   }
 }
