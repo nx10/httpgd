@@ -11,7 +11,7 @@ namespace httpgd::dc
     {
     public:
         explicit RendererSVG(boost::optional<std::string> t_extra_css);
-        void render(const Page &t_page) override;
+        void render(const Page &t_page, double t_scale) override;
         [[nodiscard]] 
         std::string get_string() const override;
 
@@ -30,6 +30,7 @@ namespace httpgd::dc
     private:
         fmt::memory_buffer os;
         boost::optional<std::string> m_extra_css;
+        double m_scale;
     };
     
 } // namespace httpgd::dc

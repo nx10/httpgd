@@ -219,6 +219,7 @@ hgd_id <- function(index = 0, limit = 1, which = dev.cur(), state = FALSE) {
 #'   be selected.
 #' @param height Height of the plot. If this is set to `-1`, the last height
 #'   will be selected.
+#' @param zoom Zoom level. (For example: `2` corresponds to 200%, `0.5` would be 50%.)
 #' @param which Which device (ID).
 #' @param file Filepath to save SVG. (No file will be created if this is NA)
 #'
@@ -238,16 +239,16 @@ hgd_id <- function(index = 0, limit = 1, which = dev.cur(), state = FALSE) {
 #'
 #' dev.off()
 #' }
-hgd_svg <- function(page = 0, width = -1, height = -1, which = dev.cur(),
+hgd_svg <- function(page = 0, width = -1, height = -1, zoom = 1, which = dev.cur(),
                     file = NA) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
   }
   else {
     if (class(page) == "httpgd_pid") {
-      svg <- httpgd_svg_id_(which, page$id, width, height)
+      svg <- httpgd_svg_id_(which, page$id, width, height, zoom)
     } else {
-      svg <- httpgd_svg_(which, page - 1, width, height)
+      svg <- httpgd_svg_(which, page - 1, width, height, zoom)
     }
     if (!is.na(file)) {
       cat(svg, file = file)

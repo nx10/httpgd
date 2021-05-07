@@ -141,17 +141,22 @@ std::string httpgd_random_token_(int len)
 }
 
 [[cpp11::register]]
-std::string httpgd_svg_(int devnum, int page, double width, double height)
+std::string httpgd_svg_(int devnum, int page, double width, double height, double zoom)
 {
     auto dev = validate_httpgddev(devnum);
 
+    if (width < 0 || height < 0)
+    {
+        zoom = 1;
+    }
+
     httpgd::dc::RendererSVG renderer(boost::none);
-    dev->api_render(page, width, height, &renderer);
+    dev->api_render(page, width / zoom, height / zoom, &renderer, zoom);
     return renderer.get_string();
 }
 
 [[cpp11::register]]
-std::string httpgd_svg_id_(int devnum, std::string id, double width, double height)
+std::string httpgd_svg_id_(int devnum, std::string id, double width, double height, double zoom)
 {
     long pid = validate_plotid(id);
 
@@ -162,8 +167,13 @@ std::string httpgd_svg_id_(int devnum, std::string id, double width, double heig
         cpp11::stop("Not a valid plot ID.");
     }
 
+    if (width < 0 || height < 0)
+    {
+        zoom = 1;
+    }
+
     httpgd::dc::RendererSVG renderer(boost::none);
-    dev->api_render(*page, width, height, &renderer);
+    dev->api_render(*page, width / zoom, height / zoom, &renderer, zoom);
     return renderer.get_string();
 }
 

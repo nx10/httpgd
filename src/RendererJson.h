@@ -9,7 +9,7 @@ namespace httpgd::dc
     class RendererJSON : public StringRenderingTarget, public Renderer
     {
     public:
-        void render(const Page &t_page) override;
+        void render(const Page &t_page, double t_scale) override;
         [[nodiscard]]
         std::string get_string() const override;
 

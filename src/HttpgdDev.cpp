@@ -411,7 +411,7 @@ namespace httpgd
         return r;
     }
     
-    bool HttpgdDev::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer) 
+    bool HttpgdDev::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer, double t_scale) 
     {
         debug_print("DIFF \n");
         if (m_data_store->diff(index, {width, height}))
@@ -420,7 +420,7 @@ namespace httpgd
             api_prerender(index, width, height);
         }
         debug_print("SVG \n");
-        return m_data_store->render(index, t_renderer);
+        return m_data_store->render(index, t_renderer, t_scale);
     }
 
     boost::optional<int> HttpgdDev::api_index(int32_t id)

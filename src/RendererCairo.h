@@ -50,7 +50,7 @@ namespace httpgd::dc
     class RendererCairoPng : public BinaryRenderingTarget, public RendererCairo
     {
     public:
-        void render(const Page &t_page) override;
+        void render(const Page &t_page, double t_scale) override;
         [[nodiscard]] 
         std::vector<unsigned char> get_binary() const override;
         
@@ -61,7 +61,7 @@ namespace httpgd::dc
     class RendererCairoPdf : public BinaryRenderingTarget, public RendererCairo
     {
     public:
-        void render(const Page &t_page) override;
+        void render(const Page &t_page, double t_scale) override;
         [[nodiscard]] 
         std::vector<unsigned char> get_binary() const override;
         

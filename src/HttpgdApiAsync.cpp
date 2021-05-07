@@ -87,14 +87,14 @@ namespace httpgd
         asynclater::awaitLater();
     }
     
-    bool HttpgdApiAsync::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer) 
+    bool HttpgdApiAsync::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer, double t_scale) 
     {
         if (m_data_store->diff(index, {width, height}))
         {
             api_prerender(index, width, height); // use async render call
             // todo perform sync diff again and sync render svg
         }
-        return m_data_store->render(index, t_renderer);
+        return m_data_store->render(index, t_renderer, t_scale);
     }
 
     boost::optional<int> HttpgdApiAsync::api_index(int32_t id)

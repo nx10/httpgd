@@ -24,7 +24,7 @@ namespace httpgd
 
         bool diff(page_index_t t_index, gvertex<double> t_size);
         std::string svg(page_index_t t_index);
-        bool render(page_index_t t_index, dc::RenderingTarget *t_renderer);
+        bool render(page_index_t t_index, dc::RenderingTarget *t_renderer, double t_scale);
 
         page_index_t append(gvertex<double> t_size);
         void clear(page_index_t t_index, bool t_silent);

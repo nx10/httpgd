@@ -17,7 +17,7 @@ namespace httpgd
         virtual bool api_remove(int index) = 0;
         virtual bool api_clear() = 0;
 
-        virtual bool api_render(int index, double width, double height, dc::RenderingTarget *t_renderer) = 0;
+        virtual bool api_render(int index, double width, double height, dc::RenderingTarget *t_renderer, double t_scale) = 0;
         virtual boost::optional<int> api_index(int32_t id) = 0;
         
 

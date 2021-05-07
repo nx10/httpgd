@@ -73,7 +73,7 @@ namespace httpgd
         HttpgdQueryResults api_query_all() override;
         HttpgdQueryResults api_query_index(int index) override;
         HttpgdQueryResults api_query_range(int offset, int limit) override;
-        bool api_render(int index, double width, double height, dc::RenderingTarget *t_renderer) override;
+        bool api_render(int index, double width, double height, dc::RenderingTarget *t_renderer, double t_scale) override;
         virtual boost::optional<int> api_index(int32_t id) override;
         virtual std::shared_ptr<HttpgdServerConfig> api_server_config() override;
 

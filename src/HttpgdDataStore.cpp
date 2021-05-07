@@ -156,7 +156,7 @@ namespace httpgd
                 std::fabs(new_size.y - old_size.y) > 0.1);
     }
     
-    bool HttpgdDataStore::render(page_index_t t_index, dc::RenderingTarget *t_renderer) 
+    bool HttpgdDataStore::render(page_index_t t_index, dc::RenderingTarget *t_renderer, double t_scale) 
     {
         const std::lock_guard<std::mutex> lock(m_store_mutex);
         if (!m_valid_index(t_index))
@@ -164,7 +164,7 @@ namespace httpgd
             return false;
         }
         auto index = m_index_to_pos(t_index);
-        t_renderer->render(m_pages[index]);
+        t_renderer->render(m_pages[index], std::fabs(t_scale));
         return true;
     }
 

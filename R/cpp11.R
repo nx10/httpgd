@@ -12,12 +12,12 @@ httpgd_random_token_ <- function(len) {
   .Call(`_httpgd_httpgd_random_token_`, len)
 }
 
-httpgd_svg_ <- function(devnum, page, width, height) {
-  .Call(`_httpgd_httpgd_svg_`, devnum, page, width, height)
+httpgd_svg_ <- function(devnum, page, width, height, zoom) {
+  .Call(`_httpgd_httpgd_svg_`, devnum, page, width, height, zoom)
 }
 
-httpgd_svg_id_ <- function(devnum, id, width, height) {
-  .Call(`_httpgd_httpgd_svg_id_`, devnum, id, width, height)
+httpgd_svg_id_ <- function(devnum, id, width, height, zoom) {
+  .Call(`_httpgd_httpgd_svg_id_`, devnum, id, width, height, zoom)
 }
 
 httpgd_remove_ <- function(devnum, page) {

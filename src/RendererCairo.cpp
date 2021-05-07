@@ -376,11 +376,13 @@ namespace httpgd::dc
         return CAIRO_STATUS_SUCCESS;
     }
     
-    void RendererCairoPng::render(const Page &t_page) 
+    void RendererCairoPng::render(const Page &t_page, double t_scale) 
     {
-        surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, t_page.size.x, t_page.size.y);
+        surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, t_page.size.x * t_scale, t_page.size.y * t_scale);
 
         cr = cairo_create(surface);
+        
+        cairo_scale(cr, t_scale, t_scale);
 
         page(t_page);
 
@@ -395,11 +397,13 @@ namespace httpgd::dc
         return m_render_data;
     }
     
-    void RendererCairoPdf::render(const Page &t_page) 
+    void RendererCairoPdf::render(const Page &t_page, double t_scale) 
     {
-        surface = cairo_pdf_surface_create_for_stream(cairowrite_ucvec, &m_render_data, t_page.size.x, t_page.size.y);
+        surface = cairo_pdf_surface_create_for_stream(cairowrite_ucvec, &m_render_data, t_page.size.x * t_scale, t_page.size.y * t_scale);
 
         cr = cairo_create(surface);
+
+        cairo_scale(cr, t_scale, t_scale);
 
         page(t_page);
 

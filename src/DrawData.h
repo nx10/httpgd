@@ -283,7 +283,7 @@ namespace httpgd::dc
     {
     public:
         virtual ~RenderingTarget() = default;
-        virtual void render(const Page &t_page)
+        virtual void render(const Page &t_page, double t_scale)
         {
         }
     };

@@ -26,17 +26,17 @@ extern "C" SEXP _httpgd_httpgd_random_token_(SEXP len) {
   END_CPP11
 }
 // Httpgd.cpp
-std::string httpgd_svg_(int devnum, int page, double width, double height);
-extern "C" SEXP _httpgd_httpgd_svg_(SEXP devnum, SEXP page, SEXP width, SEXP height) {
+std::string httpgd_svg_(int devnum, int page, double width, double height, double zoom);
+extern "C" SEXP _httpgd_httpgd_svg_(SEXP devnum, SEXP page, SEXP width, SEXP height, SEXP zoom) {
   BEGIN_CPP11
-    return cpp11::as_sexp(httpgd_svg_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<int>>(page), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height)));
+    return cpp11::as_sexp(httpgd_svg_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<int>>(page), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(zoom)));
   END_CPP11
 }
 // Httpgd.cpp
-std::string httpgd_svg_id_(int devnum, std::string id, double width, double height);
-extern "C" SEXP _httpgd_httpgd_svg_id_(SEXP devnum, SEXP id, SEXP width, SEXP height) {
+std::string httpgd_svg_id_(int devnum, std::string id, double width, double height, double zoom);
+extern "C" SEXP _httpgd_httpgd_svg_id_(SEXP devnum, SEXP id, SEXP width, SEXP height, SEXP zoom) {
   BEGIN_CPP11
-    return cpp11::as_sexp(httpgd_svg_id_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<std::string>>(id), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height)));
+    return cpp11::as_sexp(httpgd_svg_id_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<std::string>>(id), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(zoom)));
   END_CPP11
 }
 // Httpgd.cpp
@@ -77,8 +77,8 @@ extern SEXP _httpgd_httpgd_random_token_(SEXP);
 extern SEXP _httpgd_httpgd_remove_(SEXP, SEXP);
 extern SEXP _httpgd_httpgd_remove_id_(SEXP, SEXP);
 extern SEXP _httpgd_httpgd_state_(SEXP);
-extern SEXP _httpgd_httpgd_svg_(SEXP, SEXP, SEXP, SEXP);
-extern SEXP _httpgd_httpgd_svg_id_(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _httpgd_httpgd_svg_(SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _httpgd_httpgd_svg_id_(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_",              (DL_FUNC) &_httpgd_httpgd_,              13},
@@ -88,8 +88,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_remove_",       (DL_FUNC) &_httpgd_httpgd_remove_,        2},
     {"_httpgd_httpgd_remove_id_",    (DL_FUNC) &_httpgd_httpgd_remove_id_,     2},
     {"_httpgd_httpgd_state_",        (DL_FUNC) &_httpgd_httpgd_state_,         1},
-    {"_httpgd_httpgd_svg_",          (DL_FUNC) &_httpgd_httpgd_svg_,           4},
-    {"_httpgd_httpgd_svg_id_",       (DL_FUNC) &_httpgd_httpgd_svg_id_,        4},
+    {"_httpgd_httpgd_svg_",          (DL_FUNC) &_httpgd_httpgd_svg_,           5},
+    {"_httpgd_httpgd_svg_id_",       (DL_FUNC) &_httpgd_httpgd_svg_id_,        5},
     {NULL, NULL, 0}
 };
 }

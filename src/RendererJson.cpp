@@ -3,7 +3,7 @@
 namespace httpgd::dc
 {
     
-    void RendererJSON::render(const Page &t_page) 
+    void RendererJSON::render(const Page &t_page, double t_scale) 
     {
         page(t_page);
     }

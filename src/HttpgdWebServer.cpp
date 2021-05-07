@@ -310,6 +310,19 @@ namespace httpgd
                 auto qparams = ctx.req.params();
                 auto p_width = param_double(qparams, "width");
                 auto p_height = param_double(qparams, "height");
+                double width, height, zoom;
+                if (p_width && p_height)
+                {
+                    zoom = param_double(qparams, "zoom").get_value_or(1);
+                    width = (*p_width) / zoom;
+                    height = (*p_height) / zoom;
+                } 
+                else
+                {
+                    zoom = 1;
+                    width = p_width.get_value_or(-1);
+                    height = p_height.get_value_or(-1);
+                }
                 auto p_id = param_long(qparams, "id");
 
                 boost::optional<int> index;
@@ -327,7 +340,7 @@ namespace httpgd
                     ctx.res.set("content-type", "image/svg+xml");
                     ctx.res.result(OB::Belle::Status::ok);
                     dc::RendererSVG renderer(boost::none);
-                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), &renderer)) {
+                    if (m_watcher->api_render(*index, width, height, &renderer, zoom)) {
                         ctx.res.body() = renderer.get_string();
                     } else {
                         throw OB::Belle::Status::not_found;
@@ -348,6 +361,19 @@ namespace httpgd
                 auto qparams = ctx.req.params();
                 auto p_width = param_double(qparams, "width");
                 auto p_height = param_double(qparams, "height");
+                double width, height, zoom;
+                if (p_width && p_height)
+                {
+                    zoom = param_double(qparams, "zoom").get_value_or(1);
+                    width = (*p_width) / zoom;
+                    height = (*p_height) / zoom;
+                } 
+                else
+                {
+                    zoom = 1;
+                    width = p_width.get_value_or(-1);
+                    height = p_height.get_value_or(-1);
+                }
                 auto p_id = param_long(qparams, "id");
                 auto p_renderer = param_str(qparams, "renderer").get_value_or("svg");
                 auto p_download = param_str(qparams, "download");
@@ -372,7 +398,7 @@ namespace httpgd
                         throw OB::Belle::Status::not_found;
                     }
                     const auto renderer = (*find_renderer).renderer();
-                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), renderer.get())) {
+                    if (m_watcher->api_render(*index, width, height, renderer.get(), zoom)) {
                         ctx.res.set("content-type", (*find_renderer).mime);
                         if (p_download) {
                             ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
@@ -396,6 +422,19 @@ namespace httpgd
                 auto qparams = ctx.req.params();
                 auto p_width = param_double(qparams, "width");
                 auto p_height = param_double(qparams, "height");
+                double width, height, zoom;
+                if (p_width && p_height)
+                {
+                    zoom = param_double(qparams, "zoom").get_value_or(1);
+                    width = (*p_width) / zoom;
+                    height = (*p_height) / zoom;
+                } 
+                else
+                {
+                    zoom = 1;
+                    width = p_width.get_value_or(-1);
+                    height = p_height.get_value_or(-1);
+                }
                 auto p_id = param_long(qparams, "id");
                 auto p_renderer = param_str(qparams, "renderer").get_value_or("png");
                 auto p_download = param_str(qparams, "download");
@@ -419,7 +458,7 @@ namespace httpgd
                         throw OB::Belle::Status::not_found;
                     }
                     const auto renderer = (*find_renderer).renderer();
-                    if (m_watcher->api_render(*index, p_width.get_value_or(-1), p_height.get_value_or(-1), renderer.get())) {
+                    if (m_watcher->api_render(*index, width, height, renderer.get(), zoom)) {
                         ctx.res.set("content-type", (*find_renderer).mime);
                         if (p_download) {
                             ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));

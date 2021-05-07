@@ -305,8 +305,9 @@ namespace httpgd::dc
     {
     }
     
-    void RendererSVG::render(const Page &t_page) 
+    void RendererSVG::render(const Page &t_page, double t_scale) 
     {
+        m_scale = t_scale;
         this->page(t_page);
     }
     
@@ -321,7 +322,7 @@ namespace httpgd::dc
         fmt::format_to(os, R""(<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="httpgd" )"");
         fmt::format_to(os,
                    R""(width="{:.2f}" height="{:.2f}" viewBox="0 0 {:.2f} {:.2f}")"",
-                   t_page.size.x, t_page.size.y, t_page.size.x, t_page.size.y);
+                   t_page.size.x * m_scale, t_page.size.y * m_scale, t_page.size.x, t_page.size.y);
         fmt::format_to(os, ">\n<defs>\n"
               "  <style type='text/css'><![CDATA[\n"
               "    .httpgd line, .httpgd polyline, .httpgd polygon, .httpgd path, .httpgd rect, .httpgd circle {{\n"
