@@ -65,22 +65,23 @@ export class HttpgdApi {
         }
     }
 
-    public svg_index(index: number, width?: number, height?: number, c?: string): URL {
-        const url = this.svg_ext(width, height, c);
+    public svg_index(index: number, width?: number, height?: number, zoom?: number, c?: string): URL {
+        const url = this.svg_ext(width, height, zoom, c);
         url.searchParams.append('index', index.toString());
         return url;
     }
 
-    public svg_id(id: string, width?: number, height?: number, c?: string): URL {
-        const url = this.svg_ext(width, height, c);
+    public svg_id(id: string, width?: number, height?: number, zoom?: number, c?: string): URL {
+        const url = this.svg_ext(width, height, zoom, c);
         url.searchParams.append('id', id);
         return url;
     }
 
-    private svg_ext(width?: number, height?: number, c?: string): URL {
+    private svg_ext(width?: number, height?: number, zoom?: number, c?: string): URL {
         const url = new URL(this.httpSVG);
         if (width) url.searchParams.append('width', Math.round(width).toString());
         if (height) url.searchParams.append('height', Math.round(height).toString());
+        if (zoom) url.searchParams.append('zoom', zoom.toString());
         // Token needs to be included in query params because request headers can't be set
         // when setting image.src
         // upid is included to avoid caching
@@ -143,12 +144,13 @@ export class HttpgdApi {
         return await (res.json() as Promise<HttpgdRenderersResponse>);
     }
 
-    public plot_id(id: string, renderer: string, width?: number, height?: number, c?: string, download?: string): URL {
+    public plot_id(id: string, renderer: string, width?: number, height?: number, zoom?: number, c?: string, download?: string): URL {
         const url = new URL(this.httpPlot);
         url.searchParams.append('id', id);
         url.searchParams.append('renderer', renderer);
         if (width) url.searchParams.append('width', Math.round(width).toString());
         if (height) url.searchParams.append('height', Math.round(height).toString());
+        if (zoom) url.searchParams.append('zoom', zoom.toString());
         if (download) url.searchParams.append('download', download);
         // Token needs to be included in query params because request headers can't be set
         // when setting image.src
@@ -326,10 +328,12 @@ export class HttpgdNavigator {
     private index: number = -1;
     private width: number = 0;
     private height: number = 0;
+    private zoom: number = 0;
 
     private last_id: string = "";
     private last_width: number = 0;
     private last_height: number = 0;
+    private last_zoom: number = 0;
 
     public navigate(offset: number): void {
         if (!this.data) return;
@@ -351,9 +355,10 @@ export class HttpgdNavigator {
         }
     }
 
-    public resize(width: number, height: number): void {
+    public resize(width: number, height: number, zoom: number): void {
         this.width = width;
         this.height = height;
+        this.zoom = zoom;
     }
 
     public next(api: HttpgdApi, c?: string): string | undefined {
@@ -361,7 +366,7 @@ export class HttpgdNavigator {
         if ((this.last_id !== this.data.plots[this.index].id) ||
             (Math.abs(this.last_width - this.width) > 0.1) ||
             (Math.abs(this.last_height - this.height) > 0.1))
-            return api.svg_id(this.data.plots[this.index].id, this.width, this.height, c).href;
+            return api.svg_id(this.data.plots[this.index].id, this.width, this.height, this.zoom, c).href;
         return undefined;
     }
 

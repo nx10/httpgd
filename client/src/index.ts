@@ -2,6 +2,7 @@ import "./style/style.scss";
 import { HttpgdViewer } from "./httpgdViewer";
 import { getById, strcmp, downloadURL } from "./utils";
 
+const ASSET_PLOT_NONE: string = require('./assets/plot-none.svg');
 
 const sparams = new URL(window.location.href).searchParams;
 
@@ -87,7 +88,7 @@ window.onload = function () {
         modal.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event: MouseEvent) {
+    window.onmousedown = function (event: MouseEvent) {
         if (event.target == modal) {
             modal.style.display = "none";
         }
@@ -97,7 +98,7 @@ window.onload = function () {
 
     const exp_width = getById("ie-width") as HTMLInputElement;
     const exp_height = getById("ie-height") as HTMLInputElement;
-    //const exp_scale = getById("ie-scale") as HTMLInputElement; 
+    const exp_scale = getById("ie-scale") as HTMLInputElement; 
     //const exp_btn_copy = getById("ie-btn-copy") as HTMLButtonElement;
     const exp_btn_download = getById("ie-btn-download") as HTMLButtonElement;
     
@@ -105,21 +106,29 @@ window.onload = function () {
     exp_btn_download.onclick = (ev) => {
         const w = Math.min(parseInt(exp_width.value), 10000);
         const h = Math.min(parseInt(exp_height.value), 10000);
+        const z = Math.max(parseInt(exp_scale.value) / 100, 0.01);
         const r = httpgdViewer.renderers.find((r) => r.id == exp_format.value);
-        const url = httpgdViewer.plot(httpgdViewer.id(), r.id, w, h, undefined, "plot_" + httpgdViewer.id() + r.ext).href;
+        const url = httpgdViewer.plot(httpgdViewer.id(), r.id, w, h, z, undefined, "plot_" + httpgdViewer.id() + r.ext).href;
         downloadURL(url);
     };
 
     function exp_change() {
+        const id = httpgdViewer.id();
+        if (!id)
+        {
+            exp_image.src = ASSET_PLOT_NONE;
+            return;
+        }
         const w = Math.min(parseInt(exp_width.value), 10000);
         const h = Math.min(parseInt(exp_height.value), 10000);
-        exp_image.src = httpgdViewer.plot(httpgdViewer.id(), "svg", w, h).href;
+        const z = Math.max(parseInt(exp_scale.value) / 100, 0.01);
+        exp_image.src = httpgdViewer.plot(id, "svg", w, h, z).href;
     }
     exp_change();
 
     exp_width.addEventListener('input', exp_change);
     exp_height.addEventListener('input', exp_change);
-    //exp_scale.addEventListener('input', exp_change);
+    exp_scale.addEventListener('input', exp_change);
 
     const actions: HttpgdAction[] = [
         {

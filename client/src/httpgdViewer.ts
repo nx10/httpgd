@@ -4,7 +4,7 @@ import {strcmp} from './utils'
 
 export class HttpgdViewer {
     static readonly COOLDOWN_RESIZE: number = 200;
-    static readonly SCALE_DEFAULT: number = 0.8;
+    static readonly SCALE_DEFAULT: number = 1.25;
     static readonly SCALE_STEP: number = HttpgdViewer.SCALE_DEFAULT / 12.0;
 
     private navi: HttpgdNavigator = new HttpgdNavigator();
@@ -139,14 +139,14 @@ export class HttpgdViewer {
     }
 
     // User interaction
-    public zoomIn(): void {
+    public zoomOut(): void {
         if (this.scale - HttpgdViewer.SCALE_STEP > 0.05) {
             this.scale -= HttpgdViewer.SCALE_STEP;
         }
         this.onZoomStringChange?.(this.getZoomString());
         this.checkResize();
     }
-    public zoomOut(): void {
+    public zoomIn(): void {
         this.scale += HttpgdViewer.SCALE_STEP;
         this.onZoomStringChange?.(this.getZoomString());
         this.checkResize();
@@ -157,7 +157,7 @@ export class HttpgdViewer {
         this.checkResize();
     }
     public getZoomString(): string {
-        return Math.ceil(HttpgdViewer.SCALE_DEFAULT / this.scale * 100) + '%';
+        return Math.ceil( this.scale / HttpgdViewer.SCALE_DEFAULT * 100) + '%';
     }
     public navPrevious(): void {
         this.navi.navigate(-1);
@@ -242,7 +242,7 @@ export class HttpgdViewer {
     public checkResize() {
         if (!this.image) return;
         const rect = this.image.getBoundingClientRect();
-        this.navi.resize(rect.width * this.scale, rect.height * this.scale);
+        this.navi.resize(rect.width, rect.height, this.scale);
         this.updateImage();
     }
 
@@ -258,11 +258,11 @@ export class HttpgdViewer {
     }
     
 
-    public id(): string {
+    public id(): string | undefined {
         return this.navi.id();
     }
 
-    public plot(id: string, renderer: string, width?: number, height?: number, c?: string, download?: string): URL {
-        return this.connection.api.plot_id(id, renderer, width, height, c, download);
+    public plot(id: string, renderer: string, width?: number, height?: number, zoom?: number, c?: string, download?: string): URL {
+        return this.connection.api.plot_id(id, renderer, width, height, zoom, c, download);
     }
 }
