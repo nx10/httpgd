@@ -21,6 +21,8 @@ namespace httpgd
           []() { return std::make_unique<dc::RendererSVG>(boost::none); }
         });
         
+#ifndef HTTPGD_NO_CAIRO
+        
         manager.add({
           "png",
           "image/png",
@@ -38,6 +40,8 @@ namespace httpgd
           "plot",
           []() { return std::make_unique<dc::RendererCairoPdf>(); }
         });
+        
+#endif
         
         manager.add({
           "json",

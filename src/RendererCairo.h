@@ -1,6 +1,8 @@
 #ifndef RENDERER_CAIRO_H
 #define RENDERER_CAIRO_H
 
+#ifndef HTTPGD_NO_CAIRO
+
 #include "DrawData.h"
 
 #include <cairo.h>
@@ -70,4 +72,7 @@ namespace httpgd::dc
     };
 
 } // namespace httpgd::dc
+
+#endif
+
 #endif // RENDERER_CAIRO_H

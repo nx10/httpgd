@@ -1,5 +1,7 @@
 #include "RendererCairo.h"
 
+#ifndef HTTPGD_NO_CAIRO
+
 #include <boost/math/constants/constants.hpp>
 #include <cairo-pdf.h>
 //#include <cairo-svg.h>
@@ -418,3 +420,5 @@ namespace httpgd::dc
     
 
 } // namespace httpgd::dc
+
+#endif

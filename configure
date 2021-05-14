@@ -79,7 +79,9 @@ if [ $? -ne 0 ]; then
   echo "---------------------------[ ERROR MESSAGE ]----------------------------"
   cat configure.log
   echo "------------------------------------------------------------------------"
-  exit 1
+  PKG_CFLAGS="-DHTTPGD_NO_CAIRO"
+  PKG_LIBS=""
+  # exit 1
 fi
 
 # Write to Makevars
