@@ -1,3 +1,6 @@
+# Based on davidgohel/gdtools package source with minimal modifications:
+# https://github.com/davidgohel/gdtools/blob/master/configure
+
 # Anticonf script by Jeroen Ooms (2020)
 # The script will try 'pkg-config' to find required cflags and ldflags.
 # Make sure this executable is in PATH when installing the package.
@@ -66,6 +69,11 @@ echo "Using PKG_LIBS=$PKG_LIBS"
 # Test configuration
 ${CC} ${CPPFLAGS} ${PKG_CFLAGS} ${CFLAGS} -E ${PKG_TEST_FILE} >/dev/null 2>configure.log
 if [ $? -ne 0 ]; then
+  echo "------------------------------[ CAIRO ]---------------------------------"
+  echo "Info: Configuration failed to find cairo system library."
+  echo "httpgd is fully functional without cairo, but some plot file formats"
+  echo "will not be available."
+  echo "If you want to install cairo see below error for troubleshooting."
   echo "-----------------------------[ ANTICONF ]-------------------------------"
   echo "Configuration failed to find libraries. Try installing:"
   echo " * deb: $PKG_DEB_NAME (Debian, Ubuntu)"
@@ -81,7 +89,6 @@ if [ $? -ne 0 ]; then
   echo "------------------------------------------------------------------------"
   PKG_CFLAGS="-DHTTPGD_NO_CAIRO"
   PKG_LIBS=""
-  # exit 1
 fi
 
 # Write to Makevars
