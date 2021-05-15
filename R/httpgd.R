@@ -153,6 +153,41 @@ hgd_state <- function(which = dev.cur()) {
   }
 }
 
+#' httpgd device renderers.
+#'
+#' Get a list of available renderers.
+#' This function will only work after starting a device with [hgd()].
+#'
+#' @param which Which device (ID).
+#'
+#' @return List of renderers with the following named items:
+#'   `$id`: Renderer ID,
+#'   `$mime`: File mime type,
+#'   `$ext`: File extension,
+#'   `$name`: Human readable name,
+#'   `$type`: Renderer type (currently either `plot` or `other`),
+#'   `$bin`: Is the file a binary blob or text.
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' hgd()
+#' hgd_renderers()
+#'
+#' dev.off()
+#' }
+hgd_renderers <- function(which = dev.cur()) {
+  if (names(which) != "httpgd") {
+    stop("Device is not of type httpgd")
+  }
+  else {
+    return(httpgd_renderers_(which))
+  }
+}
+
 #' Query httpgd plot IDs
 #'
 #' Query httpgd graphics device static plot IDs.

@@ -94,5 +94,11 @@ namespace httpgd
         }
         return boost::none;
     }
+    
+    std::size_t RendererManager::size() const
+    {
+        return m_string_renderers.size() + m_binary_renderers.size();
+    }
+    
 
 } // namespace httpgd

@@ -38,6 +38,8 @@ namespace httpgd
         boost::optional<StringRendererInfo &> find_string(const std::string &id);
         boost::optional<BinaryRendererInfo &> find_binary(const std::string &id);
 
+        std::size_t size() const;
+
     private:
         std::unordered_map<std::string, StringRendererInfo> m_string_renderers;
         std::unordered_map<std::string, BinaryRendererInfo> m_binary_renderers;

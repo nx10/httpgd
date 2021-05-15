@@ -12,6 +12,7 @@
 
 #include "HttpgdDev.h"
 #include "RendererSvg.h"
+#include "RendererManager.h"
 
 namespace httpgd
 {
@@ -128,6 +129,42 @@ cpp11::list httpgd_state_(int devnum)
         "hsize"_nm = state.hsize,
         "upid"_nm = state.upid,
         "active"_nm = state.active};
+}
+
+[[cpp11::register]]
+cpp11::list httpgd_renderers_(int devnum)
+{
+    auto dev = validate_httpgddev(devnum);
+
+    auto m_renderers = httpgd::RendererManager::generate_default();
+    
+    using namespace cpp11::literals;
+
+    cpp11::writable::list rens{static_cast<R_xlen_t>(m_renderers.size())};
+
+    R_xlen_t i = 0;
+    for (auto it = m_renderers.string_renderers().begin(); it != m_renderers.string_renderers().end(); it++) 
+    {
+        rens[i++] = cpp11::writable::list{
+                "id"_nm = it->second.id,
+                "mime"_nm = it->second.mime,
+                "ext"_nm = it->second.fileext,
+                "name"_nm = it->second.name,
+                "type"_nm = it->second.type,
+                "bin"_nm = false};
+    }
+    for (auto it = m_renderers.binary_renderers().begin(); it != m_renderers.binary_renderers().end(); it++) 
+    {
+        rens[i++] = cpp11::writable::list{
+                "id"_nm = it->second.id,
+                "mime"_nm = it->second.mime,
+                "ext"_nm = it->second.fileext,
+                "name"_nm = it->second.name,
+                "type"_nm = it->second.type,
+                "bin"_nm = true};
+    }
+
+    return rens;
 }
 
 [[cpp11::register]]
