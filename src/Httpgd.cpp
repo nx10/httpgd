@@ -4,6 +4,7 @@
 #include <cpp11/list.hpp>
 #include <cpp11/integers.hpp>
 #include <cpp11/as.hpp>
+#include <cpp11/raws.hpp>
 
 //#include <R_ext/GraphicsEngine.h>
 
@@ -177,55 +178,70 @@ std::string httpgd_random_token_(int len)
 }
 
 [[cpp11::register]]
-std::string httpgd_svg_(int devnum, int page, double width, double height, double zoom)
+bool httpgd_renderer_is_str_(std::string renderer_id)
 {
-    auto dev = validate_httpgddev(devnum);
-
-    if (width < 0 || height < 0)
-    {
-        zoom = 1;
-    }
-
-    httpgd::dc::RendererSVG renderer(boost::none);
-    dev->api_render(page, width / zoom, height / zoom, &renderer, zoom);
-    return renderer.get_string();
+    return httpgd::RendererManager::defaults().find_string(renderer_id) ? true : false;
+}
+[[cpp11::register]]
+bool httpgd_renderer_is_raw_(std::string renderer_id)
+{
+    return httpgd::RendererManager::defaults().find_binary(renderer_id) ? true : false;
 }
 
 [[cpp11::register]]
-std::string httpgd_plot_(int devnum, int page, double width, double height, double zoom)
+int httpgd_plot_find_(int devnum, std::string plot_id)
 {
-    auto dev = validate_httpgddev(devnum);
-
-    if (width < 0 || height < 0)
-    {
-        zoom = 1;
-    }
-
-    httpgd::dc::RendererSVG renderer(boost::none);
-    dev->api_render(page, width / zoom, height / zoom, &renderer, zoom);
-    return renderer.get_string();
-}
-
-[[cpp11::register]]
-std::string httpgd_svg_id_(int devnum, std::string id, double width, double height, double zoom)
-{
-    long pid = validate_plotid(id);
-
+    long pid = validate_plotid(plot_id);
     auto dev = validate_httpgddev(devnum);
     auto page = dev->api_index(pid);
     if (!page)
     {
         cpp11::stop("Not a valid plot ID.");
     }
+    return *page;
+}
+
+[[cpp11::register]]
+std::string httpgd_plot_str_(int devnum, int page, double width, double height, double zoom, std::string renderer_id)
+{
+    auto dev = validate_httpgddev(devnum);
 
     if (width < 0 || height < 0)
     {
         zoom = 1;
     }
 
-    httpgd::dc::RendererSVG renderer(boost::none);
-    dev->api_render(*page, width / zoom, height / zoom, &renderer, zoom);
-    return renderer.get_string();
+    auto fi_renderer = httpgd::RendererManager::defaults().find_string(renderer_id);
+    if (!fi_renderer)
+    {
+        cpp11::stop("Not a valid string renderer ID.");
+    }
+    auto renderer = (*fi_renderer).renderer();
+    dev->api_render(page, width / zoom, height / zoom, renderer.get(), zoom);
+    return renderer->get_string();
+}
+
+[[cpp11::register]]
+cpp11::raws httpgd_plot_raw_(int devnum, int page, double width, double height, double zoom, std::string renderer_id)
+{
+    auto dev = validate_httpgddev(devnum);
+
+    if (width < 0 || height < 0)
+    {
+        zoom = 1;
+    }
+
+    auto fi_renderer = httpgd::RendererManager::defaults().find_binary(renderer_id);
+    if (!fi_renderer)
+    {
+        cpp11::stop("Not a valid binary renderer ID.");
+    }
+    auto renderer = (*fi_renderer).renderer();
+    dev->api_render(page, width / zoom, height / zoom, renderer.get(), zoom);
+
+    auto bin = renderer->get_binary();
+    cpp11::writable::raws raw(bin.begin(), bin.end());
+    return raw;
 }
 
 [[cpp11::register]]

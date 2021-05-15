@@ -33,17 +33,38 @@ extern "C" SEXP _httpgd_httpgd_random_token_(SEXP len) {
   END_CPP11
 }
 // Httpgd.cpp
-std::string httpgd_svg_(int devnum, int page, double width, double height, double zoom);
-extern "C" SEXP _httpgd_httpgd_svg_(SEXP devnum, SEXP page, SEXP width, SEXP height, SEXP zoom) {
+bool httpgd_renderer_is_str_(std::string renderer_id);
+extern "C" SEXP _httpgd_httpgd_renderer_is_str_(SEXP renderer_id) {
   BEGIN_CPP11
-    return cpp11::as_sexp(httpgd_svg_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<int>>(page), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(zoom)));
+    return cpp11::as_sexp(httpgd_renderer_is_str_(cpp11::as_cpp<cpp11::decay_t<std::string>>(renderer_id)));
   END_CPP11
 }
 // Httpgd.cpp
-std::string httpgd_svg_id_(int devnum, std::string id, double width, double height, double zoom);
-extern "C" SEXP _httpgd_httpgd_svg_id_(SEXP devnum, SEXP id, SEXP width, SEXP height, SEXP zoom) {
+bool httpgd_renderer_is_raw_(std::string renderer_id);
+extern "C" SEXP _httpgd_httpgd_renderer_is_raw_(SEXP renderer_id) {
   BEGIN_CPP11
-    return cpp11::as_sexp(httpgd_svg_id_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<std::string>>(id), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(zoom)));
+    return cpp11::as_sexp(httpgd_renderer_is_raw_(cpp11::as_cpp<cpp11::decay_t<std::string>>(renderer_id)));
+  END_CPP11
+}
+// Httpgd.cpp
+int httpgd_plot_find_(int devnum, std::string plot_id);
+extern "C" SEXP _httpgd_httpgd_plot_find_(SEXP devnum, SEXP plot_id) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(httpgd_plot_find_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<std::string>>(plot_id)));
+  END_CPP11
+}
+// Httpgd.cpp
+std::string httpgd_plot_str_(int devnum, int page, double width, double height, double zoom, std::string renderer_id);
+extern "C" SEXP _httpgd_httpgd_plot_str_(SEXP devnum, SEXP page, SEXP width, SEXP height, SEXP zoom, SEXP renderer_id) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(httpgd_plot_str_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<int>>(page), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(zoom), cpp11::as_cpp<cpp11::decay_t<std::string>>(renderer_id)));
+  END_CPP11
+}
+// Httpgd.cpp
+cpp11::raws httpgd_plot_raw_(int devnum, int page, double width, double height, double zoom, std::string renderer_id);
+extern "C" SEXP _httpgd_httpgd_plot_raw_(SEXP devnum, SEXP page, SEXP width, SEXP height, SEXP zoom, SEXP renderer_id) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(httpgd_plot_raw_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<int>>(page), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(zoom), cpp11::as_cpp<cpp11::decay_t<std::string>>(renderer_id)));
   END_CPP11
 }
 // Httpgd.cpp
@@ -80,25 +101,31 @@ extern "C" {
 extern SEXP _httpgd_httpgd_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _httpgd_httpgd_clear_(SEXP);
 extern SEXP _httpgd_httpgd_id_(SEXP, SEXP, SEXP);
+extern SEXP _httpgd_httpgd_plot_find_(SEXP, SEXP);
+extern SEXP _httpgd_httpgd_plot_raw_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _httpgd_httpgd_plot_str_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _httpgd_httpgd_random_token_(SEXP);
 extern SEXP _httpgd_httpgd_remove_(SEXP, SEXP);
 extern SEXP _httpgd_httpgd_remove_id_(SEXP, SEXP);
+extern SEXP _httpgd_httpgd_renderer_is_raw_(SEXP);
+extern SEXP _httpgd_httpgd_renderer_is_str_(SEXP);
 extern SEXP _httpgd_httpgd_renderers_(SEXP);
 extern SEXP _httpgd_httpgd_state_(SEXP);
-extern SEXP _httpgd_httpgd_svg_(SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _httpgd_httpgd_svg_id_(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_httpgd_httpgd_",              (DL_FUNC) &_httpgd_httpgd_,              13},
-    {"_httpgd_httpgd_clear_",        (DL_FUNC) &_httpgd_httpgd_clear_,         1},
-    {"_httpgd_httpgd_id_",           (DL_FUNC) &_httpgd_httpgd_id_,            3},
-    {"_httpgd_httpgd_random_token_", (DL_FUNC) &_httpgd_httpgd_random_token_,  1},
-    {"_httpgd_httpgd_remove_",       (DL_FUNC) &_httpgd_httpgd_remove_,        2},
-    {"_httpgd_httpgd_remove_id_",    (DL_FUNC) &_httpgd_httpgd_remove_id_,     2},
-    {"_httpgd_httpgd_renderers_",    (DL_FUNC) &_httpgd_httpgd_renderers_,     1},
-    {"_httpgd_httpgd_state_",        (DL_FUNC) &_httpgd_httpgd_state_,         1},
-    {"_httpgd_httpgd_svg_",          (DL_FUNC) &_httpgd_httpgd_svg_,           5},
-    {"_httpgd_httpgd_svg_id_",       (DL_FUNC) &_httpgd_httpgd_svg_id_,        5},
+    {"_httpgd_httpgd_",                 (DL_FUNC) &_httpgd_httpgd_,                 13},
+    {"_httpgd_httpgd_clear_",           (DL_FUNC) &_httpgd_httpgd_clear_,            1},
+    {"_httpgd_httpgd_id_",              (DL_FUNC) &_httpgd_httpgd_id_,               3},
+    {"_httpgd_httpgd_plot_find_",       (DL_FUNC) &_httpgd_httpgd_plot_find_,        2},
+    {"_httpgd_httpgd_plot_raw_",        (DL_FUNC) &_httpgd_httpgd_plot_raw_,         6},
+    {"_httpgd_httpgd_plot_str_",        (DL_FUNC) &_httpgd_httpgd_plot_str_,         6},
+    {"_httpgd_httpgd_random_token_",    (DL_FUNC) &_httpgd_httpgd_random_token_,     1},
+    {"_httpgd_httpgd_remove_",          (DL_FUNC) &_httpgd_httpgd_remove_,           2},
+    {"_httpgd_httpgd_remove_id_",       (DL_FUNC) &_httpgd_httpgd_remove_id_,        2},
+    {"_httpgd_httpgd_renderer_is_raw_", (DL_FUNC) &_httpgd_httpgd_renderer_is_raw_,  1},
+    {"_httpgd_httpgd_renderer_is_str_", (DL_FUNC) &_httpgd_httpgd_renderer_is_str_,  1},
+    {"_httpgd_httpgd_renderers_",       (DL_FUNC) &_httpgd_httpgd_renderers_,        1},
+    {"_httpgd_httpgd_state_",           (DL_FUNC) &_httpgd_httpgd_state_,            1},
     {NULL, NULL, 0}
 };
 }

@@ -276,20 +276,65 @@ hgd_id <- function(index = 0, limit = 1, which = dev.cur(), state = FALSE) {
 #' }
 hgd_svg <- function(page = 0, width = -1, height = -1, zoom = 1, which = dev.cur(),
                     file = NA) {
+  hgd_plot(page = page, width = width, height = height, zoom = zoom, renderer = "svg", which = which, file = file)
+}
+
+#' Render httpgd plot.
+#'
+#' This function will only work after starting a device with [hgd()].
+#'
+#' @param page Plot page to render. If this is set to `0`, the last page will
+#'   be selected. Can be set to a numeric plot index or plot ID
+#'   (see [hgd_id()]).
+#' @param width Width of the plot. If this is set to `-1`, the last width will
+#'   be selected.
+#' @param height Height of the plot. If this is set to `-1`, the last height
+#'   will be selected.
+#' @param zoom Zoom level. (For example: `2` corresponds to 200%, `0.5` would be 50%.)
+#' @param renderer Renderer.
+#' @param which Which device (ID).
+#' @param file Filepath to save SVG. (No file will be created if this is NA)
+#'
+#' @return Rendered SVG string.
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' hgd()
+#' plot(1, 1)
+#' s <- hgd_svg(width = 600, height = 400)
+#' hist(rnorm(100))
+#' hgd_svg(file = tempfile(), width = 600, height = 400)
+#'
+#' dev.off()
+#' }
+hgd_plot <- function(page = 0, width = -1, height = -1, zoom = 1, renderer = "svg", 
+                     which = dev.cur(), file = NA) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd")
   }
-  else {
-    if (class(page) == "httpgd_pid") {
-      svg <- httpgd_svg_id_(which, page$id, width, height, zoom)
-    } else {
-      svg <- httpgd_svg_(which, page - 1, width, height, zoom)
-    }
+  if (class(page) == "httpgd_pid") {
+    page <- httpgd_plot_find_(which, page$id)
+  } 
+  if (httpgd_renderer_is_str_(renderer)) {
+    ret <- httpgd_plot_str_(which, page - 1, width, height, zoom, renderer)
     if (!is.na(file)) {
-      cat(svg, file = file)
+      cat(ret, file = file)
+      return()
     }
-    return(svg)
+  } else if (httpgd_renderer_is_raw_(renderer)) {
+    ret <- httpgd_plot_raw_(which, page - 1, width, height, zoom, renderer)
+    if (!is.na(file)) {
+      writeBin(ret, con = file)
+      return()
+    }
+  } else {
+    stop("Not a valid renderer ID.")
   }
+  return(ret)
 }
 
 #' Remove a httpgd plot page.

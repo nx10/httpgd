@@ -16,12 +16,24 @@ httpgd_random_token_ <- function(len) {
   .Call(`_httpgd_httpgd_random_token_`, len)
 }
 
-httpgd_svg_ <- function(devnum, page, width, height, zoom) {
-  .Call(`_httpgd_httpgd_svg_`, devnum, page, width, height, zoom)
+httpgd_renderer_is_str_ <- function(renderer_id) {
+  .Call(`_httpgd_httpgd_renderer_is_str_`, renderer_id)
 }
 
-httpgd_svg_id_ <- function(devnum, id, width, height, zoom) {
-  .Call(`_httpgd_httpgd_svg_id_`, devnum, id, width, height, zoom)
+httpgd_renderer_is_raw_ <- function(renderer_id) {
+  .Call(`_httpgd_httpgd_renderer_is_raw_`, renderer_id)
+}
+
+httpgd_plot_find_ <- function(devnum, plot_id) {
+  .Call(`_httpgd_httpgd_plot_find_`, devnum, plot_id)
+}
+
+httpgd_plot_str_ <- function(devnum, page, width, height, zoom, renderer_id) {
+  .Call(`_httpgd_httpgd_plot_str_`, devnum, page, width, height, zoom, renderer_id)
+}
+
+httpgd_plot_raw_ <- function(devnum, page, width, height, zoom, renderer_id) {
+  .Call(`_httpgd_httpgd_plot_raw_`, devnum, page, width, height, zoom, renderer_id)
 }
 
 httpgd_remove_ <- function(devnum, page) {
