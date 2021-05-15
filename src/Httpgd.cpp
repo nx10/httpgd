@@ -134,8 +134,6 @@ cpp11::list httpgd_state_(int devnum)
 [[cpp11::register]]
 cpp11::list httpgd_renderers_(int devnum)
 {
-    auto dev = validate_httpgddev(devnum);
-
     auto m_renderers = httpgd::RendererManager::generate_default();
     
     using namespace cpp11::literals;

@@ -13,6 +13,7 @@ namespace httpgd
     class HttpgdApi
     {
     public:
+        virtual ~HttpgdApi() = default; 
         virtual void api_prerender(int index, double width, double height) = 0;
         virtual bool api_remove(int index) = 0;
         virtual bool api_clear() = 0;

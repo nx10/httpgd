@@ -32,15 +32,15 @@ namespace httpgd::dc
         {
             return ((r << red_offset) | (g << green_offset) | (b << blue_offset) | (a << alpha_offset));
         }
-        constexpr color_t red(color_t x) { return (x >> red_offset) & byte_mask; };
-        constexpr color_t green(color_t x) { return (x >> green_offset) & byte_mask; };
-        constexpr color_t blue(color_t x) { return (x >> blue_offset) & byte_mask; };
-        constexpr color_t alpha(color_t x) { return (x >> alpha_offset) & byte_mask; };
-        constexpr bool opaque(color_t x) { return alpha(x) == byte_mask; };
-        constexpr bool transparent(color_t x) { return alpha(x) == 0; };
-        constexpr bool tranwhite(color_t x) { return x == rgba(byte_mask, byte_mask, byte_mask, 0); };
+        constexpr color_t red(color_t x) { return (x >> red_offset) & byte_mask; }
+        constexpr color_t green(color_t x) { return (x >> green_offset) & byte_mask; }
+        constexpr color_t blue(color_t x) { return (x >> blue_offset) & byte_mask; }
+        constexpr color_t alpha(color_t x) { return (x >> alpha_offset) & byte_mask; }
+        constexpr bool opaque(color_t x) { return alpha(x) == byte_mask; }
+        constexpr bool transparent(color_t x) { return alpha(x) == 0; }
+        constexpr bool tranwhite(color_t x) { return x == rgba(byte_mask, byte_mask, byte_mask, 0); }
 
-        constexpr double byte_frac(color_t x) { return x / static_cast<double>(byte_mask); };
+        constexpr double byte_frac(color_t x) { return x / static_cast<double>(byte_mask); }
         constexpr double red_frac(color_t x) { return byte_frac(red(x)); }
         constexpr double green_frac(color_t x) { return byte_frac(green(x)); }
         constexpr double blue_frac(color_t x) { return byte_frac(blue(x)); }
@@ -109,6 +109,7 @@ namespace httpgd::dc
     class DrawCall
     {
     public:
+        virtual ~DrawCall() = default; 
         virtual void render(Renderer *t_renderer) const;
 
         clip_id_t clip_id = 0;

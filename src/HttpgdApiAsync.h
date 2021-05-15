@@ -15,6 +15,7 @@ namespace httpgd
     class PlotChangedEventListener
     {
     public:
+        virtual ~PlotChangedEventListener() = default; 
         virtual void plot_changed(int upid) = 0;
     };
 
