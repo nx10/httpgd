@@ -10,6 +10,7 @@
 
 namespace httpgd
 {
+
     template <typename T>
     struct RendererManagerInfo
     {
@@ -27,7 +28,7 @@ namespace httpgd
     class RendererManager
     {
     public:
-        static const RendererManager generate_default();
+        static const RendererManager &defaults();
 
         [[nodiscard]] const std::unordered_map<std::string, StringRendererInfo> &string_renderers() const;
         [[nodiscard]] const std::unordered_map<std::string, BinaryRendererInfo> &binary_renderers() const;
@@ -35,12 +36,14 @@ namespace httpgd
         void add(const StringRendererInfo &renderer);
         void add(const BinaryRendererInfo &renderer);
         
-        boost::optional<StringRendererInfo &> find_string(const std::string &id);
-        boost::optional<BinaryRendererInfo &> find_binary(const std::string &id);
+        boost::optional<const StringRendererInfo &> find_string(const std::string &id) const;
+        boost::optional<const BinaryRendererInfo &> find_binary(const std::string &id) const;
 
         std::size_t size() const;
 
     private:
+        static const RendererManager generate_default();
+        static const RendererManager defaults_;
         std::unordered_map<std::string, StringRendererInfo> m_string_renderers;
         std::unordered_map<std::string, BinaryRendererInfo> m_binary_renderers;
     };

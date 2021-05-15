@@ -8,6 +8,13 @@
 
 namespace httpgd
 {
+    const RendererManager RendererManager::defaults_ = RendererManager::generate_default();
+
+    const RendererManager &RendererManager::defaults() 
+    {
+        return RendererManager::defaults_;
+    }
+
     const RendererManager RendererManager::generate_default() 
     {
         RendererManager manager;
@@ -75,7 +82,7 @@ namespace httpgd
         m_binary_renderers[renderer.id] = renderer;
     }
     
-    boost::optional<StringRendererInfo &> RendererManager::find_string(const std::string &id) 
+    boost::optional<const StringRendererInfo &> RendererManager::find_string(const std::string &id) const
     {
         auto it = m_string_renderers.find(id);
         if (it != m_string_renderers.end())
@@ -85,7 +92,7 @@ namespace httpgd
         return boost::none;
     }
     
-    boost::optional<BinaryRendererInfo &> RendererManager::find_binary(const std::string &id) 
+    boost::optional<const BinaryRendererInfo &> RendererManager::find_binary(const std::string &id) const
     {
         auto it = m_binary_renderers.find(id);
         if (it != m_binary_renderers.end())

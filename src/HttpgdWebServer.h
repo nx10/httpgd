@@ -32,7 +32,6 @@ namespace httpgd
             int m_last_upid = -1;
             bool m_last_active = true;
             std::thread m_server_thread;
-            RendererManager m_renderers;
 
             void run();
         };

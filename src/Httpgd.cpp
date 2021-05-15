@@ -134,14 +134,15 @@ cpp11::list httpgd_state_(int devnum)
 [[cpp11::register]]
 cpp11::list httpgd_renderers_(int devnum)
 {
-    auto m_renderers = httpgd::RendererManager::generate_default();
     
     using namespace cpp11::literals;
 
-    cpp11::writable::list rens{static_cast<R_xlen_t>(m_renderers.size())};
+    const auto &renderers = httpgd::RendererManager::defaults();
+
+    cpp11::writable::list rens{static_cast<R_xlen_t>(renderers.size())};
 
     R_xlen_t i = 0;
-    for (auto it = m_renderers.string_renderers().begin(); it != m_renderers.string_renderers().end(); it++) 
+    for (auto it = renderers.string_renderers().begin(); it != renderers.string_renderers().end(); it++) 
     {
         rens[i++] = cpp11::writable::list{
                 "id"_nm = it->second.id,
@@ -151,7 +152,7 @@ cpp11::list httpgd_renderers_(int devnum)
                 "type"_nm = it->second.type,
                 "bin"_nm = false};
     }
-    for (auto it = m_renderers.binary_renderers().begin(); it != m_renderers.binary_renderers().end(); it++) 
+    for (auto it = renderers.binary_renderers().begin(); it != renderers.binary_renderers().end(); it++) 
     {
         rens[i++] = cpp11::writable::list{
                 "id"_nm = it->second.id,
@@ -177,6 +178,21 @@ std::string httpgd_random_token_(int len)
 
 [[cpp11::register]]
 std::string httpgd_svg_(int devnum, int page, double width, double height, double zoom)
+{
+    auto dev = validate_httpgddev(devnum);
+
+    if (width < 0 || height < 0)
+    {
+        zoom = 1;
+    }
+
+    httpgd::dc::RendererSVG renderer(boost::none);
+    dev->api_render(page, width / zoom, height / zoom, &renderer, zoom);
+    return renderer.get_string();
+}
+
+[[cpp11::register]]
+std::string httpgd_plot_(int devnum, int page, double width, double height, double zoom)
 {
     auto dev = validate_httpgddev(devnum);
 

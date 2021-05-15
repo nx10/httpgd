@@ -125,7 +125,6 @@ namespace httpgd
               m_conf(t_watcher->api_server_config()),
               m_app()
         {
-            m_renderers = RendererManager::generate_default();
         }
 
         unsigned short WebServer::port()
@@ -224,8 +223,10 @@ namespace httpgd
 
                 fmt::memory_buffer buf;
                 fmt::format_to(buf, "{{\n \"renderers\": [\n");
+                
+                const auto &renderers = RendererManager::defaults();
 
-                for (auto it = m_renderers.string_renderers().begin(); it != m_renderers.string_renderers().end(); it++) 
+                for (auto it = renderers.string_renderers().begin(); it != renderers.string_renderers().end(); it++) 
                 {
                     fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": false }})"",
                         it->second.id,
@@ -234,12 +235,12 @@ namespace httpgd
                         it->second.name,
                         it->second.type
                     );
-                    if (std::next(it) != m_renderers.string_renderers().end())
+                    if (std::next(it) != renderers.string_renderers().end())
                     {
                         fmt::format_to(buf, ",\n");
                     }
                 }
-                for (auto it = m_renderers.binary_renderers().begin(); it != m_renderers.binary_renderers().end(); it++) 
+                for (auto it = renderers.binary_renderers().begin(); it != renderers.binary_renderers().end(); it++) 
                 {
                     fmt::format_to(buf, ",\n");
                     fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": true }})"",
@@ -393,7 +394,7 @@ namespace httpgd
                     ctx.res.set("content-type", "image/png");
                     ctx.res.result(OB::Belle::Status::ok);
 
-                    const auto find_renderer = m_renderers.find_string(p_renderer);
+                    const auto find_renderer = RendererManager::defaults().find_string(p_renderer);
                     if (!find_renderer) {
                         throw OB::Belle::Status::not_found;
                     }
@@ -453,7 +454,7 @@ namespace httpgd
                 {
                     ctx.res.result(OB::Belle::Status::ok);
 
-                    const auto find_renderer = m_renderers.find_binary(p_renderer);
+                    const auto find_renderer = RendererManager::defaults().find_binary(p_renderer);
                     if (!find_renderer) {
                         throw OB::Belle::Status::not_found;
                     }
