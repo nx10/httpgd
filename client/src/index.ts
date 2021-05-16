@@ -99,7 +99,7 @@ window.onload = function () {
     const exp_width = getById("ie-width") as HTMLInputElement;
     const exp_height = getById("ie-height") as HTMLInputElement;
     const exp_scale = getById("ie-scale") as HTMLInputElement; 
-    //const exp_btn_copy = getById("ie-btn-copy") as HTMLButtonElement;
+    const exp_btn_open = getById("ie-btn-open") as HTMLButtonElement;
     const exp_btn_download = getById("ie-btn-download") as HTMLButtonElement;
     
 
@@ -110,6 +110,15 @@ window.onload = function () {
         const r = httpgdViewer.renderers.find((r) => r.id == exp_format.value);
         const url = httpgdViewer.plot(httpgdViewer.id(), r.id, w, h, z, undefined, "plot_" + httpgdViewer.id() + r.ext).href;
         downloadURL(url);
+    };
+    
+    exp_btn_open.onclick = (ev) => {
+        const w = Math.min(parseInt(exp_width.value), 10000);
+        const h = Math.min(parseInt(exp_height.value), 10000);
+        const z = Math.max(parseInt(exp_scale.value) / 100, 0.01);
+        const r = httpgdViewer.renderers.find((r) => r.id == exp_format.value);
+        const url = httpgdViewer.plot(httpgdViewer.id(), r.id, w, h, z, undefined).href;
+        window.open(url, '_blank');
     };
 
     function exp_change() {
