@@ -4,6 +4,7 @@
 #include "RendererSvg.h"
 #include "RendererJson.h"
 #include "RendererCairo.h"
+#include "RendererTikZ.h"
 
 
 namespace httpgd
@@ -57,6 +58,15 @@ namespace httpgd
           "JSON",
           "plot",
           []() { return std::make_unique<dc::RendererJSON>(); }
+        });
+        
+        manager.add({
+          "tikz",
+          "text/plain",
+          ".tex",
+          "TikZ",
+          "plot",
+          []() { return std::make_unique<dc::RendererTikZ>(); }
         });
 
         return manager;
