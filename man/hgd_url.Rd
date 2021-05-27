@@ -10,6 +10,7 @@ hgd_url(
   websockets = TRUE,
   width = -1,
   height = -1,
+  renderer = NA,
   history = TRUE,
   host = NULL,
   port = NULL

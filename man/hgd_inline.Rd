@@ -4,7 +4,16 @@
 \alias{hgd_inline}
 \title{Inline SVG rendering.}
 \usage{
-hgd_inline(code, page = 0, page_width = -1, page_height = -1, file = NA, ...)
+hgd_inline(
+  code,
+  page = 0,
+  page_width = -1,
+  page_height = -1,
+  zoom = 1,
+  renderer = "svg",
+  file = NA,
+  ...
+)
 }
 \arguments{
 \item{code}{Plotting code. See examples for more information.}
@@ -18,6 +27,10 @@ will be selected.}
 
 \item{page_height}{Height of the plot. If this is set to \code{-1}, the last
 height will be selected.}
+
+\item{zoom}{Zoom level. (For example: \code{2} corresponds to 200\%, \code{0.5} would be 50\%.)}
+
+\item{renderer}{Renderer.}
 
 \item{file}{Filepath to save SVG. (No file will be created if this is \code{NA})}
 

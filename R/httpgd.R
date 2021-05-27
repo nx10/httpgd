@@ -449,6 +449,7 @@ hgd_url <- function(
                     websockets = TRUE,
                     width = -1,
                     height = -1,
+                    renderer = NA,
                     history = TRUE, 
                     host = NULL, 
                     port = NULL) {
@@ -464,13 +465,16 @@ hgd_url <- function(
     }
     endpoint <- "svg"
   }
-  if (endpoint == "svg") {
+  if (endpoint == "svg" || endpoint == "plot") {
     if (width > 0) {
       q["width"] <- width
     }
     if (height > 0) {
       q["height"] <- height
     }
+  }
+  if (!is.na(renderer)) {
+    q["renderer"] <- renderer
   }
   if (nchar(l$token) > 0) {
     q["token"] <- l$token
@@ -597,6 +601,8 @@ hgd_generate_token <- function(len) {
 #'   will be selected.
 #' @param page_height Height of the plot. If this is set to `-1`, the last
 #'   height will be selected.
+#' @param zoom Zoom level. (For example: `2` corresponds to 200%, `0.5` would be 50%.)
+#' @param renderer Renderer.
 #' @param file Filepath to save SVG. (No file will be created if this is `NA`)
 #' @param ... Additional parameters passed to `hgd(webserver=FALSE, ...)`
 #'
@@ -613,12 +619,12 @@ hgd_generate_token <- function(len) {
 #'   lines(c(0.5, 1, 0.5), c(0.5, 1, 1))
 #' })
 #' cat(s)
-hgd_inline <- function(code, page = 0, page_width = -1, page_height = -1,
+hgd_inline <- function(code, page = 0, page_width = -1, page_height = -1, zoom = 1, renderer = "svg",
                        file = NA, ...) {
   hgd(webserver = FALSE, ...)
   tryCatch(code,
     finally = {
-      s <- hgd_svg(page = page, width = page_width, height = page_height)
+      s <- hgd_plot(page = page, width = page_width, height = page_height, zoom = zoom, renderer = renderer)
       dev.off()
     }
   )
