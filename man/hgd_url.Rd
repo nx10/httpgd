@@ -31,6 +31,8 @@ or a plot index or ID.)}
 \item{height}{Height of the plot. (Only used when \code{endpoint} is \code{"svg"},
 or a plot index or ID.)}
 
+\item{renderer}{Renderer.}
+
 \item{history}{Should the plot history sidebar be visible.}
 
 \item{host}{Replaces hostname.}

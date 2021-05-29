@@ -424,6 +424,7 @@ build_http_query <- function(x) {
 #'   or a plot index or ID.)
 #' @param height Height of the plot. (Only used when `endpoint` is `"svg"`,
 #'   or a plot index or ID.)
+#' @param renderer Renderer.
 #' @param history Should the plot history sidebar be visible.
 #' @param host Replaces hostname.
 #' @param port Replaces port.
