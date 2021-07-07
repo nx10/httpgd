@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: './src/index.ts',
+    devtool: 'inline-source-map',
     plugins: [
         new MiniCssExtractPlugin({
             filename: "style.css",
@@ -29,6 +30,11 @@ module.exports = {
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
                 type: 'asset/resource',
+                exclude: /icons/,
+            },
+            { 
+                test: /icons.*\.svg$/i, 
+                loader: 'svg-inline-loader' 
             },
             {
                 test: /\.ejs$/,
@@ -41,7 +47,7 @@ module.exports = {
                         }
                     }
                 }
-            }
+            },
         ],
     },
     resolve: {
@@ -53,7 +59,7 @@ module.exports = {
         clean: true,
     },
     devServer: {
-        contentBase: path.join(__dirname, '../inst/www'),
+        static: path.join(__dirname, '../inst/www'),
         compress: true,
         port: 9000,
     },

@@ -1,9 +1,9 @@
-export function getById(id: string): HTMLElement {
+export function getById<T extends HTMLElement>(id: string): T {
     const el = document.getElementById(id);
     if (!el) {
         throw new ReferenceError(id + " is not defined");
     }
-    return el;
+    return el as T;
 }
 
 export function strcmp(a: string, b: string): number {
@@ -16,19 +16,103 @@ export function strcmp(a: string, b: string): number {
     return 0;
 }
 
-export function downloadURL(url: string, filename?: string) {
+export function downloadURL(url: string, filename?: string, tab?: boolean): void {
     const dl = document.createElement('a');
     dl.href = url;
     if (filename) { dl.download = filename; }
+    if (tab) { dl.target = '_blank'; }
     document.body.appendChild(dl);
     dl.click();
     document.body.removeChild(dl);
 }
 
-export function copyClipboardPNG(url: string) {
+export function copyClipboardPNG(url: string): void {
     fetch(url).then(res => res.blob()).then(blob => {
         if (blob) {
             navigator?.clipboard?.write([new ClipboardItem({ [blob.type]: blob })])
         }
     })
+}
+
+export function imageTempCanvas(image: HTMLImageElement, fn: (canvas: HTMLCanvasElement) => void): void {
+    const canvas = document.createElement('canvas');
+    document.body.appendChild(canvas);
+    const rect = image.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    fn(canvas);
+    document.body.removeChild(canvas);
+}
+
+export function downloadImgSVG(image: HTMLImageElement, filename: string): void {
+    fetch(image.src).then((response) => {
+        return response.blob();
+    }).then(blob => {
+        downloadURL(URL.createObjectURL(blob), filename);
+    });
+}
+
+export function downloadImgPNG(image: HTMLImageElement, filename: string): void {
+    imageTempCanvas(image, canvas => {
+        const imgURI = canvas
+            .toDataURL('image/png')
+            .replace('image/png', 'image/octet-stream');
+        downloadURL(imgURI, filename);
+    });
+}
+
+export function copyImgSVGasPNG(image: HTMLImageElement): void {
+    if (!navigator.clipboard) return;
+    imageTempCanvas(image, canvas => {
+        canvas.toBlob(blob => {
+            if (blob) {
+                navigator.clipboard.write?.([new ClipboardItem({ 'image/png': blob })]);
+            }
+        });
+    });
+}
+
+export class StateChangeListener<T> {
+    private fun: ((newState: T, oldState?: T) => void)[] = [];
+    private oldState?: T;
+
+    public notify(newState: T): void {
+        for (let i = 0; i < this.fun.length; ++i) {
+            this.fun[i](newState, this.oldState);
+        }
+        this.oldState = newState;
+    }
+
+    public subscribe(fun: (newState: T, oldState?: T) => void): void {
+        this.fun.push(fun);
+    }
+}
+
+export function validNumberInput(input: HTMLInputElement, min: number, max: number): boolean {
+    const s = input.value;
+    if (!s.match(/^\d+$/)) return false;
+    const v = parseInt(s);
+    return (v >= min) && (v <= max);
+}
+
+export function setCssClass(element: HTMLElement, set: boolean, cssClass: string): boolean {
+    if (set) {
+        element.classList.add(cssClass);
+    } else {
+        element.classList.remove(cssClass);
+    }
+    return set;
+}
+
+const supportsNativeSmoothScroll = 'scrollBehavior' in document.documentElement.style;
+
+export function safeScrollTo(elem: Element, options: ScrollToOptions): void {
+    if (supportsNativeSmoothScroll) {
+        elem.scrollTo(options);
+    } else {
+        elem.scrollTo(options.left ? options.left : 0, options.top ? options.top : 0);
+    }
 }

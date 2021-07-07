@@ -1,65 +1,165 @@
-import {HttpgdNavigator, HttpgdConnection, HttpgdPlots, HttpgdState, HttpgdRenderer} from './httpgd'
-import {strcmp} from './utils'
-
+import { Httpgd } from './httpgd'
+import { HttpgdPlotsResponse } from './types';
+import { ExportView } from './views/exportView';
+import { OverlayView } from './views/overlayView';
+import { PlotView } from './views/plotView';
 
 export class HttpgdViewer {
-    static readonly COOLDOWN_RESIZE: number = 200;
-    static readonly SCALE_DEFAULT: number = 1.25;
-    static readonly SCALE_STEP: number = HttpgdViewer.SCALE_DEFAULT / 12.0;
+    static readonly COOLDOWN_DEVICE_INACTIVE: number = 1000;
 
-    private navi: HttpgdNavigator = new HttpgdNavigator();
-    private plotUpid: number = -1;
-    private scale: number = HttpgdViewer.SCALE_DEFAULT; // zoom level
+    public httpgd: Httpgd;
+    public plotView?: PlotView;
+    public overlayView?: OverlayView;
+    public exportView?: ExportView;
 
-    private connection: HttpgdConnection;
-    private deviceActive: boolean = true;
-    private image?: HTMLImageElement = undefined;
-    private sidebar?: HTMLElement = undefined;
+    private deviceInactiveDelayed?: ReturnType<typeof setTimeout>;
 
     public onDeviceActiveChange?: (deviceActive: boolean) => void;
     public onDisconnectedChange?: (disconnected: boolean) => void;
     public onIndexStringChange?: (indexString: string) => void;
     public onZoomStringChange?: (zoomString: string) => void;
 
-    public renderers: HttpgdRenderer[] = [];
-
     public constructor(host: string, token?: string, allowWebsockets?: boolean) {
-        this.connection = new HttpgdConnection(host, token, allowWebsockets);
-        this.connection.remoteStateChanged = (remoteState: HttpgdState) => this.serverChanges(remoteState);
-        this.connection.connectionChanged = (disconnected: boolean) => this.onDisconnectedChange?.(disconnected);
+        this.httpgd = new Httpgd(host, token, allowWebsockets);
+
+        this.httpgd.onPlotsChanged((newState) => this.plotsChanged(newState));
+        this.httpgd.onConnectionChange((newState) => this.connectionChanged(newState));
+        this.httpgd.onDeviceActiveChanged((newState) => this.deviceActiveChanged(newState));
     }
 
-    public init(image: HTMLImageElement, sidebar?: HTMLElement, exportSelect?: HTMLSelectElement): void {
-        this.image = image;
-        this.sidebar = sidebar;
+    private plotsChanged(newState: HttpgdPlotsResponse): void {
+        this.plotView?.updatePlots(newState);
+        this.plotView?.update();
+    }
 
-        this.connection.open();
-        this.checkResize();
+    private connectionChanged(newState: boolean): void {
+        if (newState) {
+            this.overlayView?.show(OverlayView.TEXT_CONNECTION_LOST);
+        } else {
+            this.overlayView?.hide();
+        }
+    }
 
-        // Force reload on visibility change
-        // Firefox otherwise shows a blank screen on tab change 
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                this.updateImage('v');
-            }
-        }, false);
+    private deviceActiveChanged(active: boolean): void {
+        if (this.deviceInactiveDelayed) {
+            clearTimeout(this.deviceInactiveDelayed);
+        }
+        if (!active) {
+            this.deviceInactiveDelayed = setTimeout(
+                () => this.overlayView?.show(OverlayView.TEXT_DEVICE_INACTIVE),
+                HttpgdViewer.COOLDOWN_DEVICE_INACTIVE);
+        } else {
+            this.overlayView?.hide();
+        }
+    }
 
-        this.onIndexStringChange?.(this.navi.indexStr());
-        this.onZoomStringChange?.(this.getZoomString());
+    public init(): void {
 
-        console.log('initial update plots')
-        this.updatePlots(true);
-
-        this.connection.api.get_renderers().then((res) => {
-            this.renderers = res.renderers.sort((a, b) => strcmp(a.name, b.name));
-            this.renderers.sort((a, b) => strcmp(a.name, b.name)).forEach((r) => {
-                const o = document.createElement("option");
-                o.value = r.id;
-                o.text = r.name + " (*"+ r.ext + ")";
-                exportSelect.add(o);
-            });
-            exportSelect.value = "svg"
+        this.plotView = new PlotView(this);
+        this.overlayView = new OverlayView(this);
+        this.exportView = new ExportView(this);
+        
+        this.httpgd.connect().then(() => {
+            this.exportView.initRenderers();
         });
+
+        this.plotView.toolbar.registerActions([
+            {
+                keys: [37, 40],
+                f: () => this.plotView.prevPage(),
+                id: "tb-left",
+            },
+            {
+                keys: [39, 38],
+                f: () => this.plotView.nextPage(),
+                id: "tb-right",
+            },
+            {
+                keys: [78],
+                f: () => this.plotView.newestPage(),
+                id: "tb-pnum",
+            },
+            {
+                keys: [187],
+                f: () => this.plotView.zoomIn(),
+                id: "tb-plus",
+            },
+            {
+                keys: [189],
+                f: () => this.plotView.zoomOut(),
+                id: "tb-minus",
+            },
+            {
+                keys: [48],
+                f: () => this.plotView.zoomReset(),
+                id: "tb-zlvl",
+            },
+            {
+                id: "tb-clear",
+                altKey: true,
+                keys: [68],
+                f: () => this.plotView.clearPlots(),
+            },
+            {
+                id: "tb-remove",
+                keys: [46, 68],
+                f: () => this.plotView.removePlot(),
+            },
+            {
+                id: "tb-save-svg",
+                keys: [83],
+                f: () => this.plotView.downloadSVG(),
+            },
+            {
+                id: "tb-save-png",
+                keys: [80],
+                f: () => this.plotView.downloadPNG(),
+            },
+            {
+                id: "tb-copy-png",
+                keys: [67],
+                f: () => this.plotView.copyPNG(),
+            },
+            {
+                id: "tb-history",
+                keys: [72],
+                f: () => this.plotView.sidebar.toggle(),
+            },
+            {
+                id: "tb-export",
+                keys: [69],
+                f: () => this.exportView.show(),
+            },
+        ]);
+        /*
+                // Force reload on visibility change
+                // Firefox otherwise shows a blank screen on tab change 
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) {
+                        this.updateImage('v');
+                    }
+                }, false);
+        
+                this.onIndexStringChange?.(this.navi.indexStr());
+                this.onZoomStringChange?.(this.getZoomString());
+        
+                console.log('initial update plots')
+                this.updatePlots(true);
+        
+                this.connection.api.get_renderers().then((res) => {
+                    this.renderers = res.renderers.sort((a, b) => strcmp(a.name, b.name));
+                    this.renderers.sort((a, b) => strcmp(a.name, b.name)).forEach((r) => {
+                        const o = document.createElement("option");
+                        o.value = r.id;
+                        o.text = r.name + " (*"+ r.ext + ")";
+                        exportSelect.add(o);
+                    });
+                    exportSelect.value = "svg"
+                });*/
+    }
+
+    /*private plotsChanged(newState: HttpgdPlotsResponse, oldState?: HttpgdPlotsResponse): void {
+        const url = this.httpgd.getPlotURL(newState.plots[newState.plots.length -1]);
     }
 
     private updatePlots(scroll: boolean = false) {
@@ -105,6 +205,9 @@ export class HttpgdViewer {
                 this.updatePlots();
             };
             const elem_img = document.createElement("img");
+            elem_card.classList.add("history-item");
+            if (idx == 1)
+                elem_card.classList.add("history-selected");
             elem_card.classList.add("history-item");
             elem_img.setAttribute('src', this.connection.api.svg_id(p.id).href);
             elem_card.onclick = () => {
@@ -186,44 +289,24 @@ export class HttpgdViewer {
         }
     }
 
-    private static downloadURL(url: string, filename?: string) {
-        const dl = document.createElement('a');
-        dl.href = url;
-        if (filename) { dl.download = filename; }
-        document.body.appendChild(dl);
-        dl.click();
-        document.body.removeChild(dl);
-    }
+    
     public downloadPlotSVG(image: HTMLImageElement) {
         if (!this.navi.id()) return;
         fetch(image.src).then((response) => {
             return response.blob();
         }).then(blob => {
-            HttpgdViewer.downloadURL(URL.createObjectURL(blob), 'plot_'+this.navi.id()+'.svg');
+            downloadURL(URL.createObjectURL(blob), 'plot_'+this.navi.id()+'.svg');
         });
-    }
-
-    private static imageTempCanvas(image: HTMLImageElement, fn: (canvas: HTMLCanvasElement) => void) {
-        const canvas = document.createElement('canvas');
-        document.body.appendChild(canvas);
-        const rect = image.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        fn(canvas);
-        document.body.removeChild(canvas);
     }
 
     public downloadPlotPNG(image: HTMLImageElement) {
         if (!image) return;
         if (!this.navi.id()) return;
-        HttpgdViewer.imageTempCanvas(image, canvas => {
+        imageTempCanvas(image, canvas => {
             const imgURI = canvas
                 .toDataURL('image/png')
                 .replace('image/png', 'image/octet-stream');
-            HttpgdViewer.downloadURL(imgURI, 'plot_'+this.navi.id()+'.png');
+            downloadURL(imgURI, 'plot_'+this.navi.id()+'.png');
         });
     }
 
@@ -231,7 +314,7 @@ export class HttpgdViewer {
         if (!image) return;
         if (!this.navi.id()) return;
         if (!navigator.clipboard) return;
-        HttpgdViewer.imageTempCanvas(image, canvas => {
+        imageTempCanvas(image, canvas => {
             canvas.toBlob(blob => { 
                 if (blob) 
                     navigator.clipboard.write?.([new ClipboardItem({ 'image/png': blob })]) 
@@ -239,23 +322,7 @@ export class HttpgdViewer {
         });
     }
 
-    public checkResize() {
-        if (!this.image) return;
-        const rect = this.image.getBoundingClientRect();
-        this.navi.resize(rect.width, rect.height, this.scale);
-        this.updateImage();
-    }
-
-    // this is called by window.addEventListener('resize', ...)
-    private resizeBlocked: boolean = false;
-    public resize() {
-        if (this.resizeBlocked) return;
-        this.resizeBlocked = true;
-        setTimeout(() => {
-            this.checkResize();
-            this.resizeBlocked = false;
-        }, HttpgdViewer.COOLDOWN_RESIZE);
-    }
+    
     
 
     public id(): string | undefined {
@@ -264,5 +331,5 @@ export class HttpgdViewer {
 
     public plot(id: string, renderer: string, width?: number, height?: number, zoom?: number, c?: string, download?: string): URL {
         return this.connection.api.plot_id(id, renderer, width, height, zoom, c, download);
-    }
+    }*/
 }

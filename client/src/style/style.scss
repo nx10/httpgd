@@ -1,7 +1,12 @@
-$highlight-color: #07c;
-$warn-color: #da4567;
+$highlight-color: rgb(0, 119, 204);
+$warn-color: rgb(218, 69, 103);
+$warn-color-light: rgb(255, 170, 170);
 $sidebar-width: 20%;
 $font-family: Helvetica, Arial, sans-serif;
+$ttime: 0.3s;
+$default-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+
+// layout
 
 body {
     margin: 0;
@@ -16,18 +21,45 @@ body {
     height: 100%;
     width: 100% - $sidebar-width;
     position: relative;
-    transition: width 0.3s;
+    transition: width $ttime;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    z-index: 1;
 }
 
 .plotview.nohist {
     width: 100%;
-    transition: width 0.3s;
+    transition: width $ttime;
 }
 
 #drawing {
     width: 100%;
     height: 100%;
 }
+
+// overlay
+
+#overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(92, 92, 92, 0.685);
+    z-index: 2;
+}
+
+#overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    font-size: 40px;
+    font-family: $font-family;
+    color: rgb(255, 255, 255);
+    text-shadow: 2px 2px 8px rgb(46, 46, 46);
+}
+
+// history
 
 .history {
     width: $sidebar-width;
@@ -37,13 +69,14 @@ body {
     position: fixed;
     top: 0;
     right: 0;
-    transition: right 0.3s;
+    transition: right $ttime;
+    background-color: rgb(252, 252, 252);
 }
 
 .history.nohist {
     right: -$sidebar-width;
     visibility: hidden;
-    transition: right 0.3s, visibility 0.3s;
+    transition: right $ttime, visibility $ttime;
 }
 
 .history-item {
@@ -51,6 +84,7 @@ body {
     margin: 8;
     cursor: pointer;
     position: relative;
+    background-color: rgb(255, 255, 255);
 
     img {
         width: 100%;
@@ -80,6 +114,12 @@ body {
     }
 }
 
+.history-selected {
+    outline: rgba(0, 119, 204, 0.3) solid 3px;
+}
+
+// toolbar
+
 #toolbar {
     float: left;
     position: absolute;
@@ -101,50 +141,30 @@ body {
     margin: 0px 2px 0px 2px;
     color: rgba(0, 0, 0, 0.5);
     cursor: pointer;
+
+    & > a {
+        margin: 0px -2px 0px -2px;
+
+        &:hover {
+            color: $highlight-color;
+        }
+    }
 }
 
-#tb-tools > span > a {
-    margin: 0px -2px 0px -2px;
-}
-
-#tb-tools > span > a:hover {
-    color: $highlight-color;
-}
-
-.icon,
-.icon-warn {
+.icon {
+    width: 24px;
+    height: 24px;
     position: relative;
     top: 5px;
     fill: rgba(0, 0, 0, 0.5);
-}
 
-.icon:hover {
-    fill: $highlight-color;
+    &:hover {
+        fill: $highlight-color;
+    }
 }
 
 .icon-warn:hover {
     fill: $warn-color;
-}
-
-#overlay {
-    position: fixed;
-    display: none;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(92, 92, 92, 0.685);
-    z-index: 2;
-}
-
-#overlay-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    font-size: 40px;
-    font-family: arial, sans-serif;
-    color: rgb(255, 255, 255);
-    text-shadow: 2px 2px 8px rgb(46, 46, 46);
 }
 
 .tooltip {
@@ -201,55 +221,60 @@ body {
         position: absolute;
         right: -2px;
         top: 20px;
-        transition: all 0.3s ease;
+        transition: all $ttime ease;
         transform: scale(0);
         transform-origin: top right;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: $default-shadow;
         padding: 0px;
         background-color: #fff;
         font-size: 16px;
         font-weight: bold;
+
+        li {
+            display: block;
+            width: 100%;
+
+            a {
+                width: 100%;
+                padding: 10px 14px 10px 12px;
+                display: flex;
+                white-space: pre;
+                box-sizing: border-box;
+                fill: rgba(0, 0, 0, 0.5);
+
+                svg {
+                    padding-right: 10px;
+                    margin-top: -4px;
+                    padding-bottom: 4px;
+                }
+
+                span {
+                    position: relative;
+                    top: 4px;
+
+                    &.drop-kbd {
+                        margin-left: auto;
+                        padding-left: 12px;
+                        color: rgba(0, 0, 0, 0.3);
+                    }
+                }
+
+                &:hover {
+                    background: #ebebeb;
+                    color: $highlight-color;
+                    svg {
+                        fill: $highlight-color;
+                    }
+                }
+
+                &.warn-hover:hover {
+                    color: $warn-color;
+                    fill: $warn-color;
+                }
+            }
+        }
     }
 
-    ul li {
-        display: block;
-        width: 100%;
-    }
-
-    ul li a {
-        width: 100%;
-        padding: 10px 14px 10px 12px;
-        display: flex;
-        white-space: pre;
-        box-sizing: border-box;
-        fill: rgba(0, 0, 0, 0.5);
-    }
-
-    ul li a svg {
-        padding-right: 8px;
-    }
-
-    ul li a span {
-        position: relative;
-        top: 4px;
-    }
-
-    ul li a span.drop-kbd {
-        margin-left: auto;
-        padding-left: 12px;
-        color: rgba(0, 0, 0, 0.3);
-    }
-
-    ul li a:hover {
-        background: #ebebeb;
-        color: $highlight-color;
-        fill: $highlight-color;
-    }
-
-    ul li a.warn-hover:hover {
-        color: $warn-color;
-        fill: $warn-color;
-    }
 }
 
 .drop-open ul {
@@ -260,17 +285,19 @@ body {
     transition: none !important;
 }
 
+
+// modal
+
 .modal {
     display: none;
     position: fixed;
-    z-index: 1;
+    z-index: 10;
     padding-top: 100px;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
 }
 
@@ -289,11 +316,11 @@ body {
 
     img {
         height: 100%;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: $default-shadow;
     }
 }
 
-.modal-close {
+#exp-modal-close {
     color: #aaaaaa;
     float: right;
     font-size: 32px;
@@ -315,6 +342,10 @@ select {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+.invalid-input {
+    background-color: $warn-color-light;
 }
 
 .num-input:hover,
