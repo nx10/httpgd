@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:dev": "webpack --mode development",
+    "build:dev": "webpack --mode development --devtool inline-source-map",
     "build:prod": "webpack --mode production",
     "watch:dev": "webpack --watch --mode development",
     "watch:prod": "webpack --watch --mode production",
-    "serve": "webpack serve --mode development"
+    "serve": "webpack serve --mode development --devtool inline-source-map"
   },
   "author": "",
   "license": "ISC",
