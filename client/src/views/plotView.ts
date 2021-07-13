@@ -23,20 +23,30 @@ export class PlotView {
     private page: number = 1;
     private plots?: HttpgdPlotsResponse;
 
-    constructor(viewer: HttpgdViewer) {
+    constructor(viewer: HttpgdViewer, sidebarHidden?: boolean) {
         this.viewer = viewer;
         this.toolbar = new ToolbarView(viewer);
-        this.sidebar = new SidebarView(viewer);
+        this.sidebar = new SidebarView(viewer, sidebarHidden);
         this.image = getById("drawing");
         this.image.src = ASSET_PLOT_NONE;
         window.addEventListener("resize", () => this.resize());
+
+        // TODO
+        /*
+        // Force reload on visibility change
+        // Firefox otherwise shows a blank screen on tab change 
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.updateImage('v');
+            }
+        }, false);*/
     }
 
     public updatePlots(newState: HttpgdPlotsResponse): void {
         this.plots = newState;
+        this.page = newState.plots.length;
         this.updatePageLabel();
         this.sidebar.update(newState);
-        this.page = this.plots.plots.length;
     }
 
     public getCurrentPlotId(): string | null {
@@ -51,7 +61,7 @@ export class PlotView {
     }
 
     public update(): void {
-        if (!this.plots) {
+        if (!this.plots || this.plots.plots.length == 0) {
             this.image.src = ASSET_PLOT_NONE;
             return;
         }
@@ -64,7 +74,9 @@ export class PlotView {
             height: rect.height,
             zoom: this.scale,
         })
-        this.image.src = url;
+        if (url) {
+            this.image.src = url;
+        }
 
         this.updatePageLabel();
         this.sidebar.setSelected(plotId);

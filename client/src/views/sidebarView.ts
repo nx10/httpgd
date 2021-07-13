@@ -10,13 +10,26 @@ export class SidebarView {
     private elemPlotView: HTMLElement;
     private elemSidebar: HTMLElement;
 
-    constructor(viewer: HttpgdViewer) {
+    constructor(viewer: HttpgdViewer, hidden?: boolean) {
         this.viewer = viewer;
         this.elemPlotView = getById("plotview");
         this.elemSidebar = getById("sidebar");
+
+        if (hidden) {
+            this.elemSidebar.classList.add('notransition', 'nohist');
+            this.elemPlotView.classList.add('notransition', 'nohist');
+            setTimeout(() => {
+                this.elemSidebar.classList.remove('notransition');
+                this.elemPlotView.classList.remove('notransition');
+            }, 300);
+        }
     }
 
-
+    /**
+     * Loops throgh the plot list and adds or removes sidebar thumbnail cards as needed.
+     * 
+     * @param plots 
+     */
     public update(plots: HttpgdPlotsResponse): void {
         //this.sidebar.innerHTML = '';
 

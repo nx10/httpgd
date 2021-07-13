@@ -1,4 +1,5 @@
 $highlight-color: rgb(0, 119, 204);
+$highlight-color-light: rgb(65, 144, 201);
 $warn-color: rgb(218, 69, 103);
 $warn-color-light: rgb(255, 170, 170);
 $sidebar-width: 20%;
@@ -373,3 +374,23 @@ select {
     font-family: $font-family;
     font-size: 16px;
 }
+
+
+.loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 3;
+    border: 12px solid #f3f3f3; /* Light grey */
+    //border-top: 12px solid $highlight-color; /* Blue */
+    border-color: $highlight-color-light #fbfbfb $highlight-color-light #fbfbfb;
+    border-radius: 50%;
+    width: 14vh;
+    height: 14vh;
+    animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

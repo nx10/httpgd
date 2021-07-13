@@ -16,7 +16,7 @@ const HEADER_TOKEN = 'X-HTTPGD-TOKEN';
 function make_headers(b: HttpgdBackend): Headers {
     const headers = new Headers();
     if (b.token) {
-        headers.set(HEADER_TOKEN, this.token);
+        headers.set(HEADER_TOKEN, b.token);
     }
     return headers;
 }
@@ -31,7 +31,7 @@ async function fetch_url<ResponseType>(b: HttpgdBackend, url: string): Promise<R
 // API -------------------------------------------------------------------------------------------
 
 export function url_websocket(b: HttpgdBackend): string {
-    return URL_WS + b.host;
+    return URL_WS + b.host;// + (b.token ? ('&token='+b.token) : '');
 }
 
 export function new_websocket(b: HttpgdBackend): WebSocket {

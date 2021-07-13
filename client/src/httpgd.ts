@@ -7,8 +7,8 @@ import { HttpgdConnection } from './connection';
 import { StateChangeListener } from './utils';
 
 interface HttpgdData {
-    renderers: HttpgdRenderersResponse | null,
-    plots: HttpgdPlotsResponse | null,
+    renderers?: HttpgdRenderersResponse,
+    plots?: HttpgdPlotsResponse,
 }
 
 export class Httpgd {
@@ -20,7 +20,7 @@ export class Httpgd {
     private deviceActiveChanged: StateChangeListener<boolean> = new StateChangeListener();
 
     constructor(host: string, token?: string, allowWebsockets?: boolean) {
-        this.data = { renderers: null, plots: null };
+        this.data = { };
         this.backend = { host: host, token: token };
         this.connection = new HttpgdConnection(this.backend, allowWebsockets);
         this.connection.onRemoteChange((newState, oldState?) => this.remoteStateChanged(newState, oldState));
@@ -47,6 +47,10 @@ export class Httpgd {
         }
     }
 
+    private localStateChanged(newState: HttpgdStateResponse) {
+        this.remoteStateChanged(newState, this.data.plots?.state);
+    }
+
     private updateRenderers(): Promise<void> {
         return fetch_renderers(this.backend).then(res => {
             this.data.renderers = res;
@@ -61,15 +65,15 @@ export class Httpgd {
     }
 
     public getPlots(): HttpgdIdResponse[] {
-        return this.data.plots.plots;
+        return this.data.plots ? this.data.plots.plots : [];
     }
 
     public getRenderers(): HttpgdRendererResponse[] {
-        return this.data.renderers.renderers;
+        return this.data.renderers ? this.data.renderers.renderers : [];
     }
 
-    public getPlotURL(r: HttpgdPlotRequest): string {
-        return url_plot(this.backend, r, true, this.data.plots.state.upid.toString());
+    public getPlotURL(r: HttpgdPlotRequest): string | undefined {
+        return this.data.plots ? url_plot(this.backend, r, true, this.data.plots.state.upid.toString()) : undefined;
     }
 
     public onPlotsChanged(fun: (newState: HttpgdPlotsResponse, oldState?: HttpgdPlotsResponse) => void): void {
@@ -80,12 +84,12 @@ export class Httpgd {
         this.deviceActiveChanged.subscribe(fun);
     }
 
-    public removePlot(r: HttpgdRemoveRequest): void {
-        fetch_remove(this.backend, r);
+    public removePlot(r: HttpgdRemoveRequest): void{
+        fetch_remove(this.backend, r).then((state) => this.localStateChanged(state));
     }
 
     public clearPlots(): void {
-        fetch_clear(this.backend);
+        fetch_clear(this.backend).then((state) => this.localStateChanged(state));
     }
 }
 
