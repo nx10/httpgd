@@ -50,7 +50,7 @@ export class PlotView {
     }
 
     public getCurrentPlotId(): string | null {
-        if (!this.plots) return null;
+        if (!this.plots || this.plots.plots.length == 0) return null;
         while (this.page < 1) {
             this.page += this.plots.plots.length;
         }

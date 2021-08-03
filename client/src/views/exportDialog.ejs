@@ -3,10 +3,11 @@
         <span id="exp-modal-close">&times;</span>
 
         <div class="export-preview">
-        <img id="exp-image" src="<%=require('./assets/plot-none.svg')%>">
+            <img id="exp-image" src="<%=require('./assets/plot-none.svg')%>">
         </div>
 
         <div class="export-options">
+
             <div style="float: left;">
                 Size: <input type="text" id="ie-width" class="num-input" value="800" style="width: 80;">
                 <span style="vertical-align: middle; font-size: 24; color: #888;">&times;</span>
@@ -15,15 +16,13 @@
                 <input type="text" id="ie-scale" class="num-input" value="100" style="width: 80;"> %
             </div>
 
+
             <div style="float: right;">
-                <input id="ie-btn-open" class="but-input" type="button" value="Open">
+                <select id="ie-format"></select>
+                <input id="ie-btn-open" style="margin-left: 10px;" class="but-input" type="button" value="Open">
                 <input id="ie-btn-download" class="but-input" type="button" value="Download">
             </div>
 
-            <div style="float: right; padding-right: 30;">
-                <!--<span style="padding-right: 20; font-size: 16; color: #888;">~ 777 MB</span>-->
-                <select id="ie-format"></select>
-            </div>
         </div>
     </div>
 </div>
