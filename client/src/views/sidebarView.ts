@@ -54,7 +54,6 @@ export class SidebarView {
             };
             const elem_img = document.createElement("img");
             elem_card.classList.add("history-item");
-            elem_card.classList.add("history-item");
             elem_img.setAttribute('src', this.viewer.httpgd.getPlotURL({ id: p.id }));
             elem_card.onclick = () => this.viewer.plotView.setPage(p.id);
             elem_card.appendChild(elem_img);
