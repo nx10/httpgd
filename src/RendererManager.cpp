@@ -5,6 +5,7 @@
 #include "RendererJson.h"
 #include "RendererCairo.h"
 #include "RendererTikZ.h"
+#include "RendererStrings.h"
 
 
 namespace httpgd
@@ -67,6 +68,15 @@ namespace httpgd
           "TikZ",
           "plot",
           []() { return std::make_unique<dc::RendererTikZ>(); }
+        });
+        
+        manager.add({
+          "strings",
+          "text/plain",
+          ".txt",
+          "Strings",
+          "data",
+          []() { return std::make_unique<dc::RendererStrings>(); }
         });
 
         return manager;
