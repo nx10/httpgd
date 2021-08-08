@@ -6,6 +6,7 @@
 #include "RendererCairo.h"
 #include "RendererTikZ.h"
 #include "RendererStrings.h"
+#include "RendererMeta.h"
 
 
 namespace httpgd
@@ -77,6 +78,15 @@ namespace httpgd
           "Strings",
           "data",
           []() { return std::make_unique<dc::RendererStrings>(); }
+        });
+        
+        manager.add({
+          "meta",
+          "application/json",
+          ".json",
+          "Meta",
+          "data",
+          []() { return std::make_unique<dc::RendererMeta>(); }
         });
 
         return manager;
