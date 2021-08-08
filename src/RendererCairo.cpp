@@ -248,6 +248,7 @@ namespace httpgd::dc
                 cairo_line_to(cr, it->x, it->y);
             }
         }
+        cairo_close_path(cr);
         cairo_stroke(cr);
 
         if (!color::transparent(t_polygon.fill))
