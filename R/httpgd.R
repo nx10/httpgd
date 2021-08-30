@@ -58,6 +58,7 @@
 #' @return No return value, called to initialize graphics device.
 #'
 #' @importFrom systemfonts match_font
+#' @importFrom utils getOption
 #' @export
 #'
 #' @examples
@@ -73,21 +74,21 @@
 #' dev.off() # alternatively: hgd_close()
 #' }
 hgd <-
-  function(host = "127.0.0.1",
-           port = 0,
-           width = 720,
-           height = 576,
-           bg = "white",
-           pointsize = 12,
-           system_fonts = list(),
-           user_fonts = list(),
-           cors = FALSE,
-           token = TRUE,
-           silent = FALSE,
-           websockets = TRUE,
-           webserver = TRUE,
-           fix_text_width = TRUE,
-           extra_css = "") {
+  function(host = getOption("httpgd.host", "127.0.0.1"),
+           port = getOption("httpgd.port", 0),
+           width = getOption("httpgd.width", 720),
+           height = getOption("httpgd.height", 576),
+           bg = getOption("httpgd.bg", "white"),
+           pointsize = getOption("httpgd.pointsize", 12),
+           system_fonts = getOption("httpgd.system_fonts", list()),
+           user_fonts = getOption("httpgd.user_fonts", list()),
+           cors = getOption("httpgd.cors", FALSE),
+           token = getOption("httpgd.token", TRUE),
+           silent = getOption("httpgd.silent", FALSE),
+           websockets = getOption("httpgd.websockets", TRUE),
+           webserver = getOption("httpgd.webserver", TRUE),
+           fix_text_width = getOption("httpgd.fix_text_width", TRUE),
+           extra_css = getOption("httpgd.extra_css", "")) {
     tok <- ""
     if (is.character(token)) {
       tok <- token
