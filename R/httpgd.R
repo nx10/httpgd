@@ -58,7 +58,6 @@
 #' @return No return value, called to initialize graphics device.
 #'
 #' @importFrom systemfonts match_font
-#' @importFrom utils getOption
 #' @export
 #'
 #' @examples
