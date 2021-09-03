@@ -308,10 +308,6 @@ namespace httpgd::dc
         cairo_translate(cr, t_raster.rect.x, t_raster.rect.y);
         cairo_rotate(cr, -t_raster.rot*MATH_PI/180);
         cairo_scale(cr, t_raster.rect.width/t_raster.wh.x, t_raster.rect.height/t_raster.wh.y);
-        /* Flip vertical first */
-        cairo_translate(cr, 0, t_raster.wh.y/2.0);
-        cairo_scale(cr, 1, -1);
-        cairo_translate(cr, 0, -t_raster.wh.y/2.0);
 
         std::vector<unsigned char> imageData(t_raster.raster.size() * 4);
 
