@@ -27,15 +27,26 @@ export function downloadURL(url: string, filename?: string, tab?: boolean): void
 }
 
 export function copyClipboardPNG(url: string): void {
+    if (!navigator.clipboard?.write) {
+        console.warn("No clipboard API support!");
+        return;
+    }
+
     fetch(url).then(res => res.blob()).then(blob => {
-        if (blob) {
-            navigator?.clipboard?.write([new ClipboardItem({ [blob.type]: blob })])
-        }
+        if (!blob)
+            return;
+        navigator.clipboard.write([new ClipboardItem(
+            Object.defineProperty({}, "image/png", {
+                value: blob,
+                enumerable: true
+            })
+        )]);
     })
 }
 
-export function imageTempCanvas(image: HTMLImageElement, fn: (canvas: HTMLCanvasElement) => void): void {
+export function imageTempCanvas(image: HTMLImageElement, fn: (canvas: HTMLCanvasElement) => Promise<void>): void {
     const canvas = document.createElement('canvas');
+    canvas.style.display = "none";
     document.body.appendChild(canvas);
     const rect = image.getBoundingClientRect();
     canvas.width = rect.width;
@@ -43,8 +54,7 @@ export function imageTempCanvas(image: HTMLImageElement, fn: (canvas: HTMLCanvas
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    fn(canvas);
-    document.body.removeChild(canvas);
+    fn(canvas).finally(() => document.body.removeChild(canvas));
 }
 
 export function downloadImgSVG(image: HTMLImageElement, filename: string): void {
@@ -56,7 +66,7 @@ export function downloadImgSVG(image: HTMLImageElement, filename: string): void 
 }
 
 export function downloadImgPNG(image: HTMLImageElement, filename: string): void {
-    imageTempCanvas(image, canvas => {
+    imageTempCanvas(image, async canvas => {
         const imgURI = canvas
             .toDataURL('image/png')
             .replace('image/png', 'image/octet-stream');
@@ -65,14 +75,22 @@ export function downloadImgPNG(image: HTMLImageElement, filename: string): void 
 }
 
 export function copyImgSVGasPNG(image: HTMLImageElement): void {
-    if (!navigator.clipboard) return;
-    imageTempCanvas(image, canvas => {
-        canvas.toBlob(blob => {
-            if (blob) {
-                navigator.clipboard.write?.([new ClipboardItem({ 'image/png': blob })]);
-            }
-        });
+    if (!navigator.clipboard?.write) {
+        console.warn("No clipboard API support!");
+        return;
+    }
+    imageTempCanvas(image, async canvas => {
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve));
+        if (!blob)
+            return;
+        return await navigator.clipboard.write([new ClipboardItem(
+            Object.defineProperty({}, blob.type, {
+                value: blob,
+                enumerable: true
+            })
+        )]);
     });
+
 }
 
 export class StateChangeListener<T> {
