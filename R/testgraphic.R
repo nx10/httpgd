@@ -2,6 +2,8 @@
 #' Plot a test pattern that can be used to evaluate and compare graphics 
 #' devices.
 #'
+#' @importFrom grDevices as.raster lines plot.new plot.window points polygon 
+#'   rasterImage rect segments text xinch yinch
 #' @export
 #'
 #' @examples
@@ -80,7 +82,7 @@ hgd_test_pattern <- function() {
        c("plain", "bold", "italic", "bold-italic"),
        font = 1:4)
   
-  text(32, 74, "éè øØ å<Å æ<Æ")
+  text(32, 74, "\u00E9\u00E8 \u00F8\u00D8 \u00E5\u00C5 \u00E6\u00C6")
   
   text(25, 80, "0", srt = 0)
   text(30, 80, "25", srt = 25)
