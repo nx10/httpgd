@@ -2,8 +2,9 @@
 #' Plot a test pattern that can be used to evaluate and compare graphics 
 #' devices.
 #'
-#' @importFrom grDevices as.raster lines plot.new plot.window points polygon 
-#'   rasterImage rect segments text xinch yinch
+#' @importFrom grDevices as.raster 
+#' @importFrom graphics lines plot.new plot.window points polygon rasterImage
+#'   rect segments text xinch yinch
 #' @export
 #'
 #' @examples
