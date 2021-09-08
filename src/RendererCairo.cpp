@@ -5,7 +5,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <cairo-pdf.h>
 //#include <cairo-svg.h>
-//#include <cairo-ps.h>
+#include <cairo-ps.h>
 
 // Implementation based on grDevices::cairo
 // https://github.com/wch/r-source/blob/trunk/src/library/grDevices/src/cairo/cairoFns.c
@@ -358,13 +358,13 @@ namespace httpgd::dc
     
     // TARGETS
 
-    /*static cairo_status_t cairowrite_fmt(void *closure, unsigned char const *data, unsigned int length) {
+    static cairo_status_t cairowrite_fmt(void *closure, unsigned char const *data, unsigned int length) {
         auto *os = static_cast<fmt::memory_buffer *>(closure);
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         std::string s( reinterpret_cast<char const*>(data), length ) ;
         fmt::format_to(*os, "{}", s);
         return CAIRO_STATUS_SUCCESS;
-    }*/
+    }
 
     static cairo_status_t cairowrite_ucvec(void *closure, unsigned char const *data, unsigned int length)
     {
@@ -412,6 +412,45 @@ namespace httpgd::dc
     std::vector<unsigned char> RendererCairoPdf::get_binary() const 
     {
         return m_render_data;
+    }
+    
+    void RendererCairoPs::render(const Page &t_page, double t_scale) 
+    {
+        surface = cairo_ps_surface_create_for_stream(cairowrite_fmt, &m_os, t_page.size.x * t_scale, t_page.size.y * t_scale);
+        
+        cr = cairo_create(surface);
+        
+        cairo_scale(cr, t_scale, t_scale);
+
+        page(t_page);
+
+        cairo_destroy(cr);
+        cairo_surface_destroy(surface);
+    }
+    
+    std::string RendererCairoPs::get_string() const 
+    {
+        return fmt::to_string(m_os);
+    }
+    
+    void RendererCairoEps::render(const Page &t_page, double t_scale) 
+    {
+        surface = cairo_ps_surface_create_for_stream(cairowrite_fmt, &m_os, t_page.size.x * t_scale, t_page.size.y * t_scale);
+        cairo_ps_surface_set_eps(surface, true);
+        
+        cr = cairo_create(surface);
+        
+        cairo_scale(cr, t_scale, t_scale);
+
+        page(t_page);
+
+        cairo_destroy(cr);
+        cairo_surface_destroy(surface);
+    }
+    
+    std::string RendererCairoEps::get_string() const 
+    {
+        return fmt::to_string(m_os);
     }
     
 

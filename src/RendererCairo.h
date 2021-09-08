@@ -29,26 +29,6 @@ namespace httpgd::dc
         cairo_t *cr = nullptr;
     };
 
-    /*class BinaryRendererCairo : public BinaryRenderingTarget, public RendererCairo
-    {
-    public:
-        void render(const Page &t_page) override;
-        [[nodiscard]] std::vector<unsigned char> get() const override;
-        
-    private:
-        std::vector<unsigned char> m_render_data{};
-    };
-    
-    class StringRendererCairo : public StringRenderingTarget, public RendererCairo
-    {
-    public:
-        void render(const Page &t_page) override;
-        [[nodiscard]] std::string get() const override;
-
-    private:
-        std::string m_render_data;
-    };*/
-
     class RendererCairoPng : public BinaryRenderingTarget, public RendererCairo
     {
     public:
@@ -69,6 +49,28 @@ namespace httpgd::dc
         
     private:
         std::vector<unsigned char> m_render_data{};
+    };
+    
+    class RendererCairoPs : public StringRenderingTarget, public RendererCairo
+    {
+    public:
+        void render(const Page &t_page, double t_scale) override;
+        [[nodiscard]] 
+        std::string get_string() const override;
+        
+    private:
+        fmt::memory_buffer m_os;
+    };
+    
+    class RendererCairoEps : public StringRenderingTarget, public RendererCairo
+    {
+    public:
+        void render(const Page &t_page, double t_scale) override;
+        [[nodiscard]] 
+        std::string get_string() const override;
+        
+    private:
+        fmt::memory_buffer m_os;
     };
 
 } // namespace httpgd::dc

@@ -51,6 +51,24 @@ namespace httpgd
           []() { return std::make_unique<dc::RendererCairoPdf>(); }
         });
         
+        manager.add({
+          "ps",
+          "application/postscript",
+          ".ps",
+          "PS",
+          "plot",
+          []() { return std::make_unique<dc::RendererCairoPs>(); }
+        });
+
+        manager.add({
+          "eps",
+          "application/postscript",
+          ".eps",
+          "EPS",
+          "plot",
+          []() { return std::make_unique<dc::RendererCairoEps>(); }
+        });
+        
 #endif
         
         manager.add({
