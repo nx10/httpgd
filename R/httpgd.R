@@ -625,7 +625,7 @@ hgd_inline <- function(code, page = 0, page_width = -1, page_height = -1, zoom =
   hgd(webserver = FALSE, ...)
   tryCatch(code,
     finally = {
-      s <- hgd_plot(page = page, width = page_width, height = page_height, zoom = zoom, renderer = renderer)
+      s <- hgd_plot(page = page, width = page_width, height = page_height, zoom = zoom, renderer = renderer, file = file)
       dev.off()
     }
   )
