@@ -122,5 +122,16 @@ hgd_test_pattern <- function() {
   segments(60 + 2.5 * 4, 85, 60 + 0:5 * 4, 70, lty = 0:6)
   points(60 + 0:5 * 4, rep(70, 6))
   
+  segments(85, 90 - 0:4*5, 90, 90 - 0:4*5, lwd = 1:5*3)
+  
+  sapply(0:2, function(x)
+    lines(
+      rep(60 + x * 8, 3) + 0:2 * 2 ,
+      c(60, 63, 60),
+      lwd = 8,
+      lend = x,
+      ljoin = x
+    ))
+  
   points(rep(98, 26), 90 - 0:25 * 3, pch = 0:25, bg = "red")
 }
