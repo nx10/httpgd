@@ -31,6 +31,15 @@ namespace httpgd
           []() { return std::make_unique<dc::RendererSVG>(boost::none); }
         });
         
+        manager.add({
+          "svgp",
+          "image/svg+xml",
+          ".svg",
+          "Portable SVG",
+          "plot",
+          []() { return std::make_unique<dc::RendererSVGPortable>(); }
+        });
+        
 #ifndef HTTPGD_NO_CAIRO
         
         manager.add({
