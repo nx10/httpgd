@@ -118,8 +118,10 @@ namespace httpgd
         dd->eventHelper = nullptr;
         dd->holdflush = nullptr;
 
-#if R_GE_version >= 13
+#if R_GE_version == 13
         dd->deviceVersion = R_GE_definitions;
+#elif R_GE_version >= 14
+        dd->deviceVersion = R_GE_deviceClip;
         dd->deviceClip = static_cast<Rboolean>(0);
 #endif
 
