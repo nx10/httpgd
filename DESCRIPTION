@@ -1,7 +1,7 @@
 Package: httpgd
 Type: Package
 Title: A 'HTTP' Server Graphics Device
-Version: 1.1.1
+Version: 1.2.0
 Authors@R: 
     c(
       person(given = "Florian", family = "Rupprecht", email = "floruppr@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1795-8624")),
@@ -26,7 +26,7 @@ Description: A graphics device for R that is accessible via network protocols.
     This package was created to make it easier to embed live R graphics in 
     integrated development environments and other applications.
     The included 'HTML/JavaScript' client (plot viewer) aims to provide a better overall user experience when dealing with R graphics.
-    The device asynchronously serves 'SVG' graphics via 'HTTP' and 'WebSockets'.
+    The device asynchronously serves graphics via 'HTTP' and 'WebSockets'.
 License: GPL (>= 2)
 Depends:
     R (>= 3.2.0)

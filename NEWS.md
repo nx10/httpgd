@@ -1,3 +1,5 @@
+# httpgd 1.2.0
+
 # httpgd 1.1.1
 
 - Fixed font weight related rendering crash.

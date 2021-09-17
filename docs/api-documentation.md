@@ -15,10 +15,10 @@
 | [`hgd_state()`](#get-state)         | [`/state`](#get-state)         | Get current server state.           |
 | [`hgd_renderers()`](#get-renderers) | [`/renderers`](#get-renderers) | Get list of available renderers.    |
 | ~~[`hgd_svg()`](#render-svg)~~      | ~~[`/svg`](#render-svg)~~      | Get rendered SVG. (Deprecated)      |
-| [`hgd_plot()`](#render-plot)        | [`/svg`](#render-plot)         | Get rendered plot (any format).     |
+| [`hgd_plot()`](#render-plot)        | [`/plot`](#render-plot)        | Get rendered plot (any format).     |
 | [`hgd_clear()`](#remove-plots)      | [`/clear`](#remove-plots)      | Remove all plots.                   |
 | [`hgd_remove()`](#remove-plots)     | [`/remove`](#remove-plots)     | Remove a single plot.               |
-| [`hgd_id()`](#get-static-ids)       | [`/plot`](#get-static-ids)     | Get static plot IDs.                |
+| [`hgd_id()`](#get-static-ids)       | [`/plots`](#get-static-ids)    | Get static plot IDs.                |
 |                                     | `/`                            | Welcome message.                    |
 |                                     | `/live`                        | Live server page.                   |
 
@@ -67,16 +67,15 @@ The following is a complete list of renderers. Note that some may not yet be ava
 | ID        | Mime-Type                | Renderer                                                 | Format | Depends |
 | --------- | ------------------------ | -------------------------------------------------------- | ------ | ------- |
 | `svg`     | `image/svg+xml`          | Scalable Vector Graphics (SVG).                          | string |         |
-| `svg-p`   | `image/svg+xml`          | Version of the SVG renderer that produces portable SVGs. | string |         |
-| `json`    | `application/json`       | JSON format.                                             | string |         |
-| `png`     | `image/png`              | Portable Network Graphics.                               | binary | Cairo   |
-| `jpeg`    | `image/jpeg`             | JPEG format.                                             | binary | Cairo   |
+| `svgp`    | `image/svg+xml`          | Version of the SVG renderer that produces portable SVGs. | string |         |
+| `json`    | `application/json`       | Plot data serialized to JSON format.                     | string |         |
+| `png`     | `image/png`              | Portable Network Graphics (PNG).                         | binary | Cairo   |
 | `pdf`     | `application/pdf`        | Adobe Portable Document Format (PDF).                    | binary | Cairo   |
 | `ps`      | `application/postscript` | PostScript (PS).                                         | string | Cairo   |
 | `eps`     | `application/postscript` | Encapsulated PostScript (EPS).                           | string | Cairo   |
 | `tikz`    | `text/plain`             | LaTeX TikZ code.                                         | string |         |
 | `strings` | `text/plain`             | List of plot strings.                                    | string |         |
-| `metrics` | `application/json`       | Plot metrics.                                            | string |         |
+| `meta`    | `application/json`       | Plot meta information.                                   | string |         |
 
 
 ### From R
@@ -117,7 +116,7 @@ This function returns the plot as a string. The `file` attribute can be used to 
 
 Example:
 ```
-/svg?index=2&width=800&height=600
+/plot?index=2&width=800&height=600
 ```
 
 Parameters:
@@ -188,8 +187,8 @@ Note: The `limit` parameter can be adjusted to obtain multiple or all plot IDs.
 
 Examples:
 ```
-/plot?index=2
-/plot
+/plots?index=2
+/plots
 ```
 
 | Key     | Value                          | Default                                                 |

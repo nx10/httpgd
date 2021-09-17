@@ -10,14 +10,15 @@ A graphics device for R that is accessible via network protocols.
 This package was created to make it easier to embed live R graphics in 
 integrated development environments and other applications.
 The included HTML/JavaScript client (plot viewer) aims to provide a better overall user experience when dealing with R graphics.
-The device asynchronously serves SVG graphics via HTTP and WebSockets.
+The device asynchronously serves graphics via HTTP and WebSockets.
 
 ## Features
 
-* Fast SVG plots
+* Fast plotting
 * Plot resizing and history
 * Interactive plot viewer (client)
 * Platform independent
+* Export to various image formats (SVG, PNG, PDF, EPS, ...)
 * Multiple concurrent clients
 * For developers:
   * HTML/JavaScript client (TypeScript module)
