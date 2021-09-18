@@ -24,3 +24,14 @@ There was 1 NOTE:
 
 ## Downstream dependencies
 There are no downstream dependencies.
+
+## CRAN sumbission errors
+
+### Flavor: r-devel-linux-x86_64-debian-gcc
+
+* Check: whether package can be installed, Result: ERROR
+    Installation failed.
+    See '/srv/hornik/tmp/CRAN/httpgd.Rcheck/00install.out' for details.
+
+  I can not replicate the error with the Rhub Debian container, but from the error message it is clear, that a standard library `#include` was missing. 
+  I have added the include so this issue should be fixed now.
