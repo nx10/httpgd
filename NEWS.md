@@ -1,5 +1,20 @@
 # httpgd 1.2.0
 
+- Client rewrite and static build pipeline.
+- Added client export dialog.
+- Various client UI improvements.
+- Implemented modular rendering.
+  - Cairo based renderers for PNG, PDF, EPS and PS.
+  - Portable SVG renderer (for easyer embedding and styling).
+  - Special renderers: Serialized JSON, meta information and strings.
+  - Addtions to R and HTTP APIs for selecting and listing available renderers. 
+- All startup default parameters can now be set as options.
+- Zoom level is now handled server side.
+- Fix some graphical errors of the SVG renderer.
+- Improved server URL generation.
+- Browser can be specified when the server URL is opened from R.
+- Dependency updates and UCRT support.
+
 # httpgd 1.1.1
 
 - Fixed font weight related rendering crash.

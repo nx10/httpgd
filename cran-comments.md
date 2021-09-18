@@ -1,9 +1,14 @@
 ## Test environments
 GitHub rlib/actions:
-* Windows Server 2019 10.0.17763, R4.0.4
-* Mac OS X 10.15.7, R 4.0.4
-* Ubuntu 20.04.2, R 4.0.4
-* Ubuntu 20.04.2, R devel
+* Windows Server 2019 10.0.17763, R 4.1.1
+* Mac OS X 10.15.7, R 4.1.1
+* Ubuntu 20.04.3, R 4.1.1
+* Ubuntu 20.04.3, R devel
+R-hub builder
+* Windows Server 2008 R2 SP1, R-devel, 32/64 bit
+* Ubuntu Linux 20.04.1 LTS, R-release, GCC
+* Fedora Linux, R-devel, clang, gfortran
+* Debian Linux, R-devel, GCC ASAN/UBSAN
 
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
@@ -19,32 +24,3 @@ There was 1 NOTE:
 
 ## Downstream dependencies
 There are no downstream dependencies.
-
-
-## CRAN Package Check Issues
-
-### Unit test error on r-devel-linux-x86_64-fedora-*
-
-I was able to reproduce the error and fixed it in this update.
-
-### Warning -Wdeprecated-declarations
-
-The warning
-
-`warning: 'allocator<void>' is deprecated [-Wdeprecated-declarations]`
-
-on `r-devel-linux-x86_64-fedora-clang` originates from the boost.asio
-library:
-
-https://github.com/chriskohlhoff/asio/issues/785
-
-It is possibly a false positive:
-
-https://github.com/chriskohlhoff/asio/issues/290
-
-The warning is also only shown with LLVM/clang version 11, 
-GCC does not show the warning.
-
-Would you be able to make an exception in this case and allow the warning?
-I will monitor the boost.asio issue tracker closely from now on, 
-in case a workaround will be released.
