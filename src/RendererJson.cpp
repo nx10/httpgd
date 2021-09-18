@@ -32,6 +32,7 @@ namespace httpgd::dc
 
     void RendererJSON::render(const Page &t_page, double t_scale)
     {
+        m_scale = t_scale;
         page(t_page);
     }
 
@@ -42,8 +43,8 @@ namespace httpgd::dc
 
     void RendererJSON::page(const Page &t_page)
     {
-        fmt::format_to(os, "{{\n " R""("id": "{}", "w": {:.2f}, "h": {:.2f}, "fill": "{}",)"" "\n",
-        t_page.id, t_page.size.x, t_page.size.y, hexcol(t_page.fill));
+        fmt::format_to(os, "{{\n " R""("id": "{}", "w": {:.2f}, "h": {:.2f}, "scale": {:.2f}, "fill": "{}",)"" "\n",
+        t_page.id, t_page.size.x, t_page.size.y, m_scale, hexcol(t_page.fill));
         fmt::format_to(os, " \"clips\": [\n  ");
         for (auto it = t_page.cps.begin(); it != t_page.cps.end(); ++it)
         {

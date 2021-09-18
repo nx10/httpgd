@@ -27,6 +27,7 @@ namespace httpgd::dc
     
     private:
         fmt::memory_buffer os;
+        double m_scale;
     };
     
 } // namespace httpgd::dc
