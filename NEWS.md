@@ -5,9 +5,9 @@
 - Various client UI improvements.
 - Implemented modular rendering.
   - Cairo based renderers for PNG, PDF, EPS and PS.
-  - Portable SVG renderer (for easyer embedding and styling).
+  - Portable SVG renderer (for easier embedding and styling).
   - Special renderers: Serialized JSON, meta information and strings.
-  - Addtions to R and HTTP APIs for selecting and listing available renderers. 
+  - Additions to R and HTTP APIs for selecting and listing available renderers. 
 - All startup default parameters can now be set as options.
 - Zoom level is now handled server side.
 - Fix some graphical errors of the SVG renderer.
