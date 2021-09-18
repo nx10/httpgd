@@ -2,6 +2,7 @@
 #ifndef HTTPGD_COMMONS_H
 #define HTTPGD_COMMONS_H
 
+#include <limits>
 #include <string>
 #include <vector>
 
