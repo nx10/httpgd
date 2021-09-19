@@ -1,5 +1,7 @@
 #include "RendererTikZ.h"
 
+#include <cmath>
+
 namespace httpgd::dc
 {
     static inline void write_tex_escaped(fmt::memory_buffer &os, const std::string &text)
@@ -134,7 +136,7 @@ namespace httpgd::dc
             fmt::format_to(os, ",line join=bevel");
             break;
         case LineInfo::GC_MITRE_JOIN:
-            if (std::abs(line.lmitre - 10.0) > 1e-3)
+            if (std::fabs(line.lmitre - 10.0) > 1e-3)
             {
                 fmt::format_to(os, ",miter limit={:.2f}", line.lmitre);
             }

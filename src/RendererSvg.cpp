@@ -148,7 +148,7 @@ namespace httpgd::dc
             break;
         case LineInfo::GC_MITRE_JOIN:
             fmt::format_to(os, "stroke-linejoin: miter;");
-            if (std::abs(line.lmitre - 10.0) > 1e-3)
+            if (std::fabs(line.lmitre - 10.0) > 1e-3)
             { // 10 is declared to be the default in <style>
                 fmt::format_to(os, "stroke-miterlimit: {:.2f};", line.lmitre);
             }
@@ -522,7 +522,7 @@ namespace httpgd::dc
             break;
         case LineInfo::GC_MITRE_JOIN:
             // default
-            if (std::abs(line.lmitre - 4.0) > 1e-3)
+            if (std::fabs(line.lmitre - 4.0) > 1e-3)
             { // 4 is the SVG default
                 fmt::format_to(os, R""( stroke-miterlimit="{:.2f}")"", line.lmitre);
             }

@@ -319,8 +319,8 @@ namespace httpgd
     }
     void HttpgdDev::dev_raster(unsigned int *raster, int w, int h, double x, double y, double width, double height, double rot, Rboolean interpolate, pGEcontext gc, pDevDesc dd)
     {
-        const double abs_height = std::abs(height);
-        const double abs_width = std::abs(width);
+        const double abs_height = std::fabs(height);
+        const double abs_width = std::fabs(width);
 
         std::vector<unsigned int> vraster(raster, raster + (w * h));
         put(std::make_shared<dc::Raster>(std::move(vraster), gvertex<int>{w, h}, grect<double>{x, y - abs_height, abs_width, abs_height}, rot, interpolate));

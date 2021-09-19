@@ -2,6 +2,7 @@
 #define HTTPGD_GEOM_H
 
 #include <algorithm>
+#include <cmath>
 
 namespace httpgd {
     
@@ -25,18 +26,18 @@ namespace httpgd {
         return {
             std::min(x0, x1),
             std::min(y0, y1),
-            std::abs(x0 - x1),
-            std::abs(y0 - y1)
+            std::fabs(x0 - x1),
+            std::fabs(y0 - y1)
         };
     }
 
     template <class T>
     bool rect_equals(grect<T> r0, grect<T> r1, T eps)
     {
-        return (std::abs(r0.x - r1.x) < eps) &&
-               (std::abs(r0.x - r1.x) < eps) &&
-               (std::abs(r0.width - r1.width) < eps) &&
-               (std::abs(r0.height - r1.height) < eps);
+        return (std::fabs(r0.x - r1.x) < eps) &&
+               (std::fabs(r0.x - r1.x) < eps) &&
+               (std::fabs(r0.width - r1.width) < eps) &&
+               (std::fabs(r0.height - r1.height) < eps);
     }
 
 } // namespace httpgd
