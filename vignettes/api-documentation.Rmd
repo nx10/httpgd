@@ -69,7 +69,7 @@ httpgd accepts WebSocket connections on the same port as the HTTP server. [Serve
 
 httpgd includes multiple renderers that can dynamically render plots to different target formats. As new formats may be added as the development on httpgd continues, and some depend on optional system dependencies, a list of available renderers can be obtained during runtime.
 
-The following is a complete list of renderers. Note that some may not yet be available in the release version of httpgd:
+The following is a complete list of renderers.
 
 | ID        | Mime-Type                | Renderer                                                 | Format | Depends |
 | --------- | ------------------------ | -------------------------------------------------------- | ------ | ------- |

@@ -21,8 +21,9 @@ The device asynchronously serves graphics via HTTP and WebSockets.
 * Export to various image formats (SVG, PNG, PDF, EPS, ...)
 * Multiple concurrent clients
 * For developers:
-  * HTML/JavaScript client (TypeScript module)
   * Stateless asynchronous HTTP/WebSocket API
+  * In-memory access to rendered plots
+  * HTML/JavaScript client (TypeScript module)
   
 
 ## Demo
@@ -120,7 +121,8 @@ Depends on `R` version &geq; 4.0 on windows, and R &geq; 3.2 on linux and macOS 
 
 Note that there is a rare bug in R versions < 4.1, that leads to [some plots disappearing when ggplot2 plots are resized and deleted in a specific way](https://github.com/nx10/httpgd/issues/50).
 
-`libpng` and X11 are required on unix like systems (e.g. Linux, macOS).
+`libpng` and X11 are required on unix like systems (e.g. Linux, macOS). 
+`Cairo` is required on unix like systems to enable PNG, PDF, EPS and PS renderers.
 
 ### macOS
 
