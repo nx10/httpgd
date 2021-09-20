@@ -1,3 +1,8 @@
+# httpgd 1.2.1
+
+- Fix macOS builds.
+- Minor documentation changes.
+
 # httpgd 1.2.0
 
 - Client rewrite and static build pipeline.
