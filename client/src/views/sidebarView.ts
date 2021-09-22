@@ -1,6 +1,6 @@
 
 import { HttpgdViewer } from '../viewer';
-import { HttpgdPlotsResponse } from '../types';
+import { HttpgdPlotsResponse } from 'httpgd/lib/types';
 import { getById, safeScrollTo } from '../utils'
 
 export class SidebarView {

@@ -1,5 +1,5 @@
 import { HttpgdViewer } from '../viewer';
-import { HttpgdRendererResponse } from '../types';
+import { HttpgdRendererResponse } from 'httpgd/lib/types';
 import { downloadURL, getById, validNumberInput, setCssClass, strcmp } from '../utils'
 import { ASSET_PLOT_NONE } from '../resources';
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 import { HttpgdViewer } from '../viewer';
-import { HttpgdPlotsResponse } from '../types';
+import { HttpgdPlotsResponse } from 'httpgd/lib/types';
 import { getById, downloadImgSVG, downloadImgPNG, copyImgSVGasPNG } from '../utils'
 import { ASSET_PLOT_NONE } from '../resources';
 import { ToolbarView } from './toolbarView';

@@ -1,5 +1,6 @@
-import { Httpgd } from './httpgd'
-import { HttpgdPlotsResponse } from './types';
+
+import { Httpgd } from 'httpgd';
+import { HttpgdPlotsResponse } from 'httpgd/lib/types';
 import { ExportView } from './views/exportView';
 import { OverlayView } from './views/overlayView';
 import { PlotView } from './views/plotView';
