@@ -428,6 +428,8 @@ build_http_query <- function(x) {
 #' @param history Should the plot history sidebar be visible.
 #' @param host Replaces hostname.
 #' @param port Replaces port.
+#' @param explicit Ads `hgd={host}:{port}` query parameter. Needed for host 
+#'   resolution in some editors.
 #'
 #' @return URL.
 #'
@@ -453,7 +455,8 @@ hgd_url <- function(
                     renderer = NA,
                     history = TRUE, 
                     host = NULL, 
-                    port = NULL) {
+                    port = NULL,
+                    explicit = FALSE) {
   l <- hgd_state(which)
   q <- list()
   if (is.numeric(endpoint) || (class(endpoint) == "httpgd_pid")) {
@@ -491,6 +494,11 @@ hgd_url <- function(
   } else if (l$host == "0.0.0.0") {
     l$host <- Sys.info()[["nodename"]]
   }
+  if (explicit) {
+    q["hgd"] <- sprintf("%s:%s",
+                        l$host,
+                        l$port)
+  }
   if (!is.null(port)) {
     l$port <- paste(port)
   }
@@ -525,11 +533,36 @@ hgd_url <- function(
 #'
 #' dev.off()
 #' }
-hgd_browse <- function(..., which = dev.cur(), browser = NULL) {
-  if (is.null(browser)) {
-    browser <- getOption("browser")
+hgd_browse <- function(..., which = dev.cur(), browser = getOption("browser")) {
+  browseURL(url = hgd_url(..., which = which), browser = browser)
+}
+
+#' Open httpgd URL in the IDE. 
+#' 
+#' Global option `viewer` needs to be set to a function that accepts the client
+#' URL as a parameter.
+#'
+#' This function will only work after starting a device with [hgd()].
+#' 
+#' @return `viewer` function return value.
+#' 
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' hgd()
+#' hgd_view()
+#' hist(rnorm(100))
+#'
+#' dev.off()
+#' }
+hgd_view <- function() {
+  v <- getOption("viewer")
+  if (is.null(v)) { 
+    stop("'viewer' option not set.") 
   }
-  browseURL(hgd_url(..., which = which), browser)
+  v(hgd_url(explicit = T))
 }
 
 #' Close httpgd device.

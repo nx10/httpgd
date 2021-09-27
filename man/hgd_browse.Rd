@@ -4,7 +4,7 @@
 \alias{hgd_browse}
 \title{Open httpgd URL in the browser.}
 \usage{
-hgd_browse(..., which = dev.cur(), browser = NULL)
+hgd_browse(..., which = dev.cur(), browser = getOption("browser"))
 }
 \arguments{
 \item{...}{Parameters passed to \code{\link[=hgd_url]{hgd_url()}}.}

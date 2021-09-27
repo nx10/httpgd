@@ -13,7 +13,8 @@ hgd_url(
   renderer = NA,
   history = TRUE,
   host = NULL,
-  port = NULL
+  port = NULL,
+  explicit = FALSE
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ or a plot index or ID.)}
 \item{host}{Replaces hostname.}
 
 \item{port}{Replaces port.}
+
+\item{explicit}{Ads \code{hgd={host}:{port}} query parameter. Needed for host
+resolution in some editors.}
 }
 \value{
 URL.
