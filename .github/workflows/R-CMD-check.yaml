@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - if: runner.r == 'devel'
+      - if: ${{ matrix.config.r }} == 'devel'
         run: apt-get install libcurl4-openssl-dev
 
       - uses: r-lib/actions/setup-pandoc@v1
