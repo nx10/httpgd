@@ -27,7 +27,7 @@ export class HttpgdViewer {
         if (sidebarHidden) { this.sidebarHidden = true; }
 
         this.httpgd.onPlotsChanged((newState) => this.plotsChanged(newState));
-        this.httpgd.onConnectionChange((newState) => this.connectionChanged(newState));
+        this.httpgd.onConnectionChanged((newState) => this.connectionChanged(newState));
         this.httpgd.onDeviceActiveChanged((newState) => this.deviceActiveChanged(newState));
     }
 
