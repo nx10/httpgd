@@ -17,7 +17,10 @@
 #
 files: [
  {
-  "source": "/lang/[api|client]/*.csv",
-  "dest": "/inst/www/lang/%locale%.json"
+  "source": "/lang/api/*.csv",
+  "translation": "/lang/api_translations/%locale%/%original_file_name%",
+  "dest": "/inst/www/lang/%locale%/%file_name%.json",
+  "scheme": "identifier,source_or_translation,context",
+  "skip_untranslated_files": true
  }
 ]
