@@ -17,3 +17,4 @@
 ^src/Makevars$
 ^client/$
 ^client$
+^lang$
