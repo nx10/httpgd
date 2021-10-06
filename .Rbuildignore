@@ -18,3 +18,4 @@
 ^client/$
 ^client$
 ^lang$
+^crowdin\.yml$
