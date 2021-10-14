@@ -3,6 +3,8 @@
 #include <cpp11/strings.hpp>
 #include <cpp11/list.hpp>
 #include <cpp11/integers.hpp>
+#include <cpp11/logicals.hpp>
+#include <cpp11/data_frame.hpp>
 #include <cpp11/as.hpp>
 #include <cpp11/raws.hpp>
 
@@ -133,7 +135,7 @@ cpp11::list httpgd_state_(int devnum)
 }
 
 [[cpp11::register]]
-cpp11::list httpgd_renderers_(int devnum)
+cpp11::data_frame httpgd_renderers_(int devnum)
 {
     
     using namespace cpp11::literals;
@@ -142,29 +144,50 @@ cpp11::list httpgd_renderers_(int devnum)
 
     cpp11::writable::list rens{static_cast<R_xlen_t>(renderers.size())};
 
+    const R_xlen_t nren = renderers.size();
+    cpp11::writable::strings ren_id{nren};
+    cpp11::writable::strings ren_mime{nren};
+    cpp11::writable::strings ren_ext{nren};
+    cpp11::writable::strings ren_name{nren};
+    cpp11::writable::strings ren_type{nren};
+    cpp11::writable::logicals ren_bin;
+    ren_bin.resize(nren); // R cpp11 bug?
+    cpp11::writable::strings ren_descr{nren};
+
     R_xlen_t i = 0;
     for (auto it = renderers.string_renderers().begin(); it != renderers.string_renderers().end(); it++) 
     {
-        rens[i++] = cpp11::writable::list{
-                "id"_nm = it->second.id,
-                "mime"_nm = it->second.mime,
-                "ext"_nm = it->second.fileext,
-                "name"_nm = it->second.name,
-                "type"_nm = it->second.type,
-                "bin"_nm = false};
+        ren_id[i] = it->second.id;
+        ren_mime[i] = it->second.mime;
+        ren_ext[i] = it->second.fileext;
+        ren_name[i] = it->second.name;
+        ren_type[i] = it->second.type;
+        ren_bin[i] = false;
+        ren_descr[i] = it->second.description;
+        i++;
     }
     for (auto it = renderers.binary_renderers().begin(); it != renderers.binary_renderers().end(); it++) 
     {
-        rens[i++] = cpp11::writable::list{
-                "id"_nm = it->second.id,
-                "mime"_nm = it->second.mime,
-                "ext"_nm = it->second.fileext,
-                "name"_nm = it->second.name,
-                "type"_nm = it->second.type,
-                "bin"_nm = true};
+        ren_id[i] = it->second.id;
+        ren_mime[i] = it->second.mime;
+        ren_ext[i] = it->second.fileext;
+        ren_name[i] = it->second.name;
+        ren_type[i] = it->second.type;
+        ren_bin[i] = true;
+        ren_descr[i] = it->second.description;
+        i++;
     }
 
-    return rens;
+    cpp11::writable::data_frame res({
+                "id"_nm = ren_id,
+                "mime"_nm = ren_mime,
+                "ext"_nm = ren_ext,
+                "name"_nm = ren_name,
+                "type"_nm = ren_type,
+                "bin"_nm = ren_bin,
+                "descr"_nm = ren_descr
+    });
+    return res;
 }
 
 [[cpp11::register]]

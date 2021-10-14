@@ -20,6 +20,7 @@ namespace httpgd
         std::string name;
         std::string type;
         std::function<std::unique_ptr<T>()> renderer;
+        std::string description;
     };
     
     using StringRendererInfo = RendererManagerInfo<dc::StringRenderingTarget>;

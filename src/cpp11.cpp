@@ -3,6 +3,7 @@
 
 
 #include "cpp11/declarations.hpp"
+#include <R_ext/Visibility.h>
 
 // Httpgd.cpp
 bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent, bool fix_text_width, std::string extra_css);
@@ -19,7 +20,7 @@ extern "C" SEXP _httpgd_httpgd_state_(SEXP devnum) {
   END_CPP11
 }
 // Httpgd.cpp
-cpp11::list httpgd_renderers_(int devnum);
+cpp11::data_frame httpgd_renderers_(int devnum);
 extern "C" SEXP _httpgd_httpgd_renderers_(SEXP devnum) {
   BEGIN_CPP11
     return cpp11::as_sexp(httpgd_renderers_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum)));
@@ -97,21 +98,6 @@ extern "C" SEXP _httpgd_httpgd_clear_(SEXP devnum) {
 }
 
 extern "C" {
-/* .Call calls */
-extern SEXP _httpgd_httpgd_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _httpgd_httpgd_clear_(SEXP);
-extern SEXP _httpgd_httpgd_id_(SEXP, SEXP, SEXP);
-extern SEXP _httpgd_httpgd_plot_find_(SEXP, SEXP);
-extern SEXP _httpgd_httpgd_plot_raw_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _httpgd_httpgd_plot_str_(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _httpgd_httpgd_random_token_(SEXP);
-extern SEXP _httpgd_httpgd_remove_(SEXP, SEXP);
-extern SEXP _httpgd_httpgd_remove_id_(SEXP, SEXP);
-extern SEXP _httpgd_httpgd_renderer_is_raw_(SEXP);
-extern SEXP _httpgd_httpgd_renderer_is_str_(SEXP);
-extern SEXP _httpgd_httpgd_renderers_(SEXP);
-extern SEXP _httpgd_httpgd_state_(SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_",                 (DL_FUNC) &_httpgd_httpgd_,                 13},
     {"_httpgd_httpgd_clear_",           (DL_FUNC) &_httpgd_httpgd_clear_,            1},
@@ -130,7 +116,7 @@ static const R_CallMethodDef CallEntries[] = {
 };
 }
 
-extern "C" void R_init_httpgd(DllInfo* dll){
+extern "C" attribute_visible void R_init_httpgd(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);

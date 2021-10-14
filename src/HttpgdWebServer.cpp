@@ -228,12 +228,13 @@ namespace httpgd
 
                 for (auto it = renderers.string_renderers().begin(); it != renderers.string_renderers().end(); it++) 
                 {
-                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": false }})"",
+                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": false, "descr": "{}" }})"",
                         it->second.id,
                         it->second.mime,
                         it->second.fileext,
                         it->second.name,
-                        it->second.type
+                        it->second.type,
+                        it->second.description
                     );
                     if (std::next(it) != renderers.string_renderers().end())
                     {
@@ -243,12 +244,13 @@ namespace httpgd
                 for (auto it = renderers.binary_renderers().begin(); it != renderers.binary_renderers().end(); it++) 
                 {
                     fmt::format_to(buf, ",\n");
-                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": true }})"",
+                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": true, "descr": "{}" }})"",
                         it->second.id,
                         it->second.mime,
                         it->second.fileext,
                         it->second.name,
-                        it->second.type
+                        it->second.type,
+                        it->second.description
                     );
                 }
                 
