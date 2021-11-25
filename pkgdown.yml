@@ -10,7 +10,7 @@ articles:
   c01_httpgd-api: c01_httpgd-api.html
   c02_benchmarks: c02_benchmarks.html
   c03_technical-docs: c03_technical-docs.html
-last_built: 2021-11-25T17:52Z
+last_built: 2021-11-25T21:13Z
 urls:
   reference: https://nx10.github.io/httpgd/reference
   article: https://nx10.github.io/httpgd/articles
