@@ -1,6 +1,11 @@
-# `httpgd` API documentation
-
-<!-- copy to: vignette/api-documentation.Rmd -->
+---
+title: "httpgd API"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{httpgd API}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 [httpgd](https://github.com/nx10/httpgd/blob/master/README.md) can be accessed both from R and from HTTP/WebSockets.
 

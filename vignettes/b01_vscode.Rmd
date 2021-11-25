@@ -1,0 +1,10 @@
+---
+title: "VS Code"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{VS Code}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+> TODO: How to use httpgd with VS Code

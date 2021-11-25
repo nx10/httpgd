@@ -17,3 +17,5 @@
 ^src/Makevars$
 ^client/$
 ^client$
+^_pkgdown\.yml$
+^pkgdown$

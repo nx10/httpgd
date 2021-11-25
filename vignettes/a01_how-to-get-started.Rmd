@@ -1,0 +1,60 @@
+---
+title: "How to get started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to get started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+> TODO: Expand
+
+Initialize graphics device and start server with:
+
+```R
+hgd()
+```
+
+Copy the displayed link in the browser or call
+
+```R
+hgd_browse()
+```
+
+to open a browser window automatically.
+
+Plot anything.
+
+```R
+x = seq(0, 3 * pi, by = 0.1)
+plot(x, sin(x), type = "l")
+```
+
+Every plotting library will work.
+
+```R
+library(ggplot2)
+ggplot(mpg, aes(displ, hwy, colour = class)) +
+  geom_point()
+```
+
+Stop the server with:
+
+```R
+dev.off()
+```
+
+## Keyboard shortcuts
+
+| Keys | Result |
+|:----:|--------|
+| <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> <kbd>&#8593;</kbd> <kbd>&#8595;</kbd> | Navigate plot history. |
+| <kbd>+</kbd> / <kbd>-</kbd> | Zoom in and out. |
+| <kbd>0</kbd> | Reset zoom level. |
+| <kbd>N</kbd> | Jump to the newest plot. |
+| <kbd>del</kbd> / <kbd>D</kbd> | Delete plot. |
+| <kbd>alt</kbd>+<kbd>D</kbd> | Clear all plots. |
+| <kbd>S</kbd> | Download plot as SVG. |
+| <kbd>P</kbd> | Download plot as PNG. |
+| <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
+| <kbd>H</kbd> | Toggle plot history (sidebar). |

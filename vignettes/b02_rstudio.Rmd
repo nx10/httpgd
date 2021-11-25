@@ -1,0 +1,10 @@
+---
+title: "RStudio"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{RStudio}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+> TODO: How to use httpgd with RStudio

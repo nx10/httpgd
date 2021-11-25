@@ -1,0 +1,10 @@
+---
+title: "Technical documentation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Technical documentation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+> TODO: How does httpgd work on a technical level

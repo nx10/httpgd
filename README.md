@@ -1,4 +1,4 @@
-# `httpgd` <img src="docs/httpgd_logo.svg" align="right" height = 250/>
+# `httpgd` <img src="man/figures/httpgd_logo.svg" align="right" height=250/>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
@@ -41,113 +41,34 @@ install.packages("httpgd")
 Or get the latest development version from GitHub:
 
 ```R
-devtools::install_github("nx10/httpgd")
+remotes::install_github("nx10/httpgd")
 ```
 
-See [system requirements](#System-requirements) for troubleshooting.
-
-## Usage
-
-Initialize graphics device and start server with:
-
-```R
-hgd()
-```
-
-Copy the displayed link in the browser or call
-
-```R
-hgd_browse()
-```
-
-to open a browser window automatically.
-
-Plot anything.
-
-```R
-x = seq(0, 3 * pi, by = 0.1)
-plot(x, sin(x), type = "l")
-```
-
-Every plotting library will work.
-
-```R
-library(ggplot2)
-ggplot(mpg, aes(displ, hwy, colour = class)) +
-  geom_point()
-```
-
-Stop the server with:
-
-```R
-dev.off()
-```
-
-### Keyboard shortcuts
-
-| Keys | Result |
-|:----:|--------|
-| <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> <kbd>&#8593;</kbd> <kbd>&#8595;</kbd> | Navigate plot history. |
-| <kbd>+</kbd> / <kbd>-</kbd> | Zoom in and out. |
-| <kbd>0</kbd> | Reset zoom level. |
-| <kbd>N</kbd> | Jump to the newest plot. |
-| <kbd>del</kbd> / <kbd>D</kbd> | Delete plot. |
-| <kbd>alt</kbd>+<kbd>D</kbd> | Clear all plots. |
-| <kbd>S</kbd> | Download plot as SVG. |
-| <kbd>P</kbd> | Download plot as PNG. |
-| <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
-| <kbd>H</kbd> | Toggle plot history (sidebar). |
-
-### API &amp; Documentation
-
-The API documentation can be found [here](https://github.com/nx10/httpgd/blob/master/docs/api-documentation.md), and is also available as a package vignette.
-
-Technical documentation for developers wanting to contribute to `httpgd` can be found [here](https://github.com/nx10/httpgd/blob/master/docs/tecdoc.md).
-
-## Benchmark
-
-There are currently no other network graphics devices for comparison, `httpgd` can be used in offline mode (with `hgd(webserver = FALSE)`) to compare it with conventional SVG graphics devices.
-
-![](https://user-images.githubusercontent.com/33600480/113184973-232e1f00-9256-11eb-9595-327ec28ba360.png)
-
-This benchmark compares `httpgd` 1.1.0 with `svglite` 2.0.0.
-
-[See benchmark code](https://github.com/nx10/httpgd/blob/master/docs/benchmark.R)
+See [system requirements](#) for troubleshooting.
 
 
-## System requirements
+### Documentation
 
-Depends on `R` version &geq; 4.0 on windows, and R &geq; 3.2 on linux and macOS (a C++ compiler with basic C++17 support [is required](https://github.com/nx10/httpgd/issues/56)).
+- For users:
+  - [How to get started](#)
+  - [Function reference](#)
+  - [Benchmarks](#)
+  - IDEs &amp; evironments:
+    - [VS Code](#)
+    - [RStudio](#)
+    - [Docker](#)
+- For developers:
+  - [httpgd API](#)
+  - [Technical documentation](#)
 
-Note that there is a rare bug in R versions < 4.1, that leads to [some plots disappearing when ggplot2 plots are resized and deleted in a specific way](https://github.com/nx10/httpgd/issues/50).
 
-`libpng` and X11 are required on unix like systems (e.g. Linux, macOS). 
-`Cairo` is required on unix like systems to enable PNG, PDF, EPS and PS renderers.
 
-### macOS
 
-If `libpng` is missing install it via:
-
-```sh
-brew install libpng
-```
-
-If `X11` is missing the error message will include the text:
-
-```sh
-unable to load shared object [...] systemfonts/libs/systemfonts.so [...]
-```
-
-Install [`XQuartz`](https://www.xquartz.org/).
-(see: <https://github.com/r-lib/systemfonts/issues/17>)
-
-## Help welcome!
+## Contributions welcome!
 
 The various components of `httpgd` are written in C++, R and TypeScript. We welcome contributions of any kind.
 
-Other areas in need of improvement are: Testing, documentation, net security and continuous integration.
-
-If you feel lost, the [documentation](#api--documentation) might help.
+Other areas in need of improvement are testing and documentation.
 
 ## Links &amp; Articles
 

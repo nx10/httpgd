@@ -1,7 +1,7 @@
 Package: httpgd
 Type: Package
 Title: A 'HTTP' Server Graphics Device
-Version: 1.2.1
+Version: 1.2.1.9000
 Authors@R: 
     c(
       person(given = "Florian", family = "Rupprecht", email = "floruppr@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1795-8624")),
@@ -53,6 +53,7 @@ SystemRequirements:
     cairo,
     freetype2, 
     fontconfig
-URL: https://github.com/nx10/httpgd
+URL: https://github.com/nx10/httpgd,
+    https://nx10.github.io/httpgd
 BugReports: https://github.com/nx10/httpgd/issues
 VignetteBuilder: knitr

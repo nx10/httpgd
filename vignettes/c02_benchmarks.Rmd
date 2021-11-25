@@ -1,0 +1,17 @@
+---
+title: "Benchmarks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Benchmarks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+> TODO: Overhaul and update benchmarks
+
+There are currently no other network graphics devices for comparison, `httpgd` can be used in offline mode (with `hgd(webserver = FALSE)`) to compare it with conventional SVG graphics devices.
+
+![](https://user-images.githubusercontent.com/33600480/113184973-232e1f00-9256-11eb-9595-327ec28ba360.png)
+
+This benchmark compares `httpgd` 1.1.0 with `svglite` 2.0.0.
+
