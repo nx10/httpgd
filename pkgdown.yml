@@ -1,0 +1,17 @@
+pandoc: 2.7.3
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  a00_installation: a00_installation.html
+  a01_how-to-get-started: a01_how-to-get-started.html
+  b01_vscode: b01_vscode.html
+  b02_rstudio: b02_rstudio.html
+  b03_docker: b03_docker.html
+  c01_httpgd-api: c01_httpgd-api.html
+  c02_benchmarks: c02_benchmarks.html
+  c03_technical-docs: c03_technical-docs.html
+last_built: 2021-11-25T17:52Z
+urls:
+  reference: https://nx10.github.io/httpgd/reference
+  article: https://nx10.github.io/httpgd/articles
+
