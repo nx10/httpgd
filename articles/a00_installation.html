@@ -135,6 +135,21 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">unable</span> to load shared object [...] systemfonts/libs/systemfonts.so [...]</span></code></pre></div>
 <p>Install <a href="https://www.xquartz.org/"><code>XQuartz</code></a>. (see: <a href="https://github.com/r-lib/systemfonts/issues/17" class="uri">https://github.com/r-lib/systemfonts/issues/17</a>)</p>
 </div>
+<div id="linux" class="section level3">
+<h3 class="hasAnchor">
+<a href="#linux" class="anchor"></a>Linux</h3>
+<p>For source installation on Linux, the fontconfig freetype2 library is required to install the <code>systemfonts</code> package, which is a dependency of <code>httpgd</code>.</p>
+<div id="debian-ubuntu-etc-" class="section level4">
+<h4 class="hasAnchor">
+<a href="#debian-ubuntu-etc-" class="anchor"></a>Debian, Ubuntu, etc.</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">apt</span> install libfontconfig1-dev</span></code></pre></div>
+</div>
+<div id="fedora-centos-rhel-etc-" class="section level4">
+<h4 class="hasAnchor">
+<a href="#fedora-centos-rhel-etc-" class="anchor"></a>Fedora, CentOS, RHEL, etc.</h4>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">dnf</span> install fontconfig-devel</span></code></pre></div>
+</div>
+</div>
 </div>
   </div>
 

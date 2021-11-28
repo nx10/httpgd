@@ -113,14 +113,80 @@
 
     
     
-<blockquote>
-<p>TODO: How to use httpgd with Docker</p>
-</blockquote>
+<p>Using <code>httpgd</code> to display R plots in a Docker container (Linux container) may be easier than the traditional and common method; linking the X11 window system.</p>
+<div id="basic-usage" class="section level2">
+<h2 class="hasAnchor">
+<a href="#basic-usage" class="anchor"></a>Basic usage</h2>
+<div id="build-a-docker-image" class="section level3">
+<h3 class="hasAnchor">
+<a href="#build-a-docker-image" class="anchor"></a>Build a docker image</h3>
+<p>See the <code><a href="../articles/a00_installation.html">vignette("a00_installation")</a></code> for details on how to install <code>httpgd</code> on Linux.</p>
+<p>You can create a Docker image with <code>httpgd</code> installed by create a Dockerfile like below.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">FROM</span> r-base:latest</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># Install httpgd and dependent packages.</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">RUN</span> apt-get update \</span>
+<span id="cb1-5"><a href="#cb1-5"></a>    &amp;&amp; apt-get install -y --no-install-recommends \</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    libfontconfig1-dev \</span>
+<span id="cb1-7"><a href="#cb1-7"></a>    &amp;&amp; apt-get autoremove -y &amp;&amp; apt-get clean -y &amp;&amp; rm -rf /var/lib/apt/lists/* \</span>
+<span id="cb1-8"><a href="#cb1-8"></a>    &amp;&amp; install2.r --error --skipinstalled --ncpu -1 \</span>
+<span id="cb1-9"><a href="#cb1-9"></a>    httpgd \</span>
+<span id="cb1-10"><a href="#cb1-10"></a>    &amp;&amp; rm -rf /tmp/downloaded_packages</span></code></pre></div>
+<p>Run the <code>docker build</code> command from your shell to build a Docker image.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">docker</span> build . -f Dockerfile -t httpgd:test</span></code></pre></div>
+</div>
+<div id="create-a-container" class="section level3">
+<h3 class="hasAnchor">
+<a href="#create-a-container" class="anchor"></a>Create a container</h3>
+<p>When creating a container with the <code>docker run</code> command, bind the port to be used by <code>httpgd</code> with the <code>-p</code> (<code>--publish</code>) option.</p>
+<p>If you run R in a container with a command like the following, the 8888 port of the container will be bound to the 8888 port of the Docker host.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">docker</span> run --rm -it -p 8888:8888 httpgd:test R</span></code></pre></div>
+</div>
+<div id="start-httpgd-server" class="section level3">
+<h3 class="hasAnchor">
+<a href="#start-httpgd-server" class="anchor"></a>Start httpgd server</h3>
+<p>Running the following command in the R console will initialize the graphics device and start the server.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">httpgd</span><span class="fu">::</span><span class="fu"><a href="../reference/hgd.html">hgd</a></span><span class="op">(</span>host <span class="op">=</span> <span class="st">"0.0.0.0"</span>, port <span class="op">=</span> <span class="fl">8888</span><span class="op">)</span></code></pre></div>
+<p>Then, copy the displayed link like in the browser.</p>
+<p>If you want to display the link again, execute the <code>hgd_url</code> function as follows.<br>
+The hostname can be replaced with any value (e.g. localhost).</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">httpgd</span><span class="fu">::</span><span class="fu"><a href="../reference/hgd_url.html">hgd_url</a></span><span class="op">(</span>host <span class="op">=</span> <span class="st">"localhost"</span><span class="op">)</span></code></pre></div>
+</div>
+</div>
+<div id="advanced-usage" class="section level2">
+<h2 class="hasAnchor">
+<a href="#advanced-usage" class="anchor"></a>Advanced usage</h2>
+<div id="set-options-in-rprofile" class="section level3">
+<h3 class="hasAnchor">
+<a href="#set-options-in-rprofile" class="anchor"></a>Set options in Rprofile</h3>
+<p>By setting options <code>httpgd.host</code> and <code>httpgd.port</code> in the Rprofile, you can omit setting the arguments when starting the httpgd server by <code><a href="../reference/hgd.html">hgd()</a></code>.</p>
+<p>For example, if you create a Dockerfile with the following contents, you can build an image with these options already set in the Rprofile.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">FROM</span> r-base:latest</span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># Install httpgd and dependent packages.</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="kw">RUN</span> apt-get update \</span>
+<span id="cb6-5"><a href="#cb6-5"></a>    &amp;&amp; apt-get install -y --no-install-recommends \</span>
+<span id="cb6-6"><a href="#cb6-6"></a>    libfontconfig1-dev \</span>
+<span id="cb6-7"><a href="#cb6-7"></a>    &amp;&amp; apt-get autoremove -y &amp;&amp; apt-get clean -y &amp;&amp; rm -rf /var/lib/apt/lists/* \</span>
+<span id="cb6-8"><a href="#cb6-8"></a>    &amp;&amp; install2.r --error --skipinstalled --ncpu -1 \</span>
+<span id="cb6-9"><a href="#cb6-9"></a>    httpgd \</span>
+<span id="cb6-10"><a href="#cb6-10"></a>    &amp;&amp; rm -rf /tmp/downloaded_packages</span>
+<span id="cb6-11"><a href="#cb6-11"></a></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co"># Set default values used in the httpgd::hgd() function.</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="kw">RUN</span> echo <span class="st">'options(httpgd.host = "0.0.0.0", httpgd.port = 8888)'</span> &gt;&gt; /etc/R/Rprofile.site</span>
+<span id="cb6-14"><a href="#cb6-14"></a></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="kw">EXPOSE</span> 8888</span></code></pre></div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
