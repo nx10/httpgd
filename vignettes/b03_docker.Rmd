@@ -24,8 +24,8 @@ FROM r-base:latest
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     libfontconfig1-dev \
-    && apt autoremove -y && apt clean -y && rm -rf /var/lib/apt/lists/* \
-    && install2.r --error --sikipinstalled --ncpu -1 \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
+    && install2.r --error --skipinstalled --ncpu -1 \
     httpgd \
     && rm -rf /tmp/downloaded_packages
 ```
