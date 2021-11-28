@@ -1,5 +1,5 @@
 ---
-title: "Docker (Linux containers)"
+title: "Docker"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Docker}
@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Using `httpgd` to display R plots in a Docker container may be easier than the traditional and common method; linking the X11 window system.
+Using `httpgd` to display R plots in a Docker container (Linux container) may be easier than the traditional and common method; linking the X11 window system.
 
 ## Basic usage
 
