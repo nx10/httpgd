@@ -46,3 +46,19 @@ unable to load shared object [...] systemfonts/libs/systemfonts.so [...]
 
 Install [`XQuartz`](https://www.xquartz.org/).
 (see: <https://github.com/r-lib/systemfonts/issues/17>)
+
+### Linux
+
+For source installation on Linux, the fontconfig freetype2 library is required to install the `systemfonts` package, which is a dependency of `httpgd`.
+
+#### Debian, Ubuntu, etc.
+
+```sh
+apt install libfontconfig1-dev
+```
+
+#### Fedora, CentOS, RHEL, etc.
+
+```sh
+dnf install fontconfig-devel
+```
