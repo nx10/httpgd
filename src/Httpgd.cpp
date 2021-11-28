@@ -15,6 +15,7 @@
 
 #include "HttpgdDev.h"
 #include "HttpgdRng.h"
+#include "HttpgdVersion.h"
 #include "RendererSvg.h"
 #include "RendererManager.h"
 
@@ -134,6 +135,24 @@ cpp11::list httpgd_state_(int devnum)
         "hsize"_nm = state.hsize,
         "upid"_nm = state.upid,
         "active"_nm = state.active};
+}
+
+[[cpp11::register]]
+cpp11::list httpgd_info_(int devnum)
+{
+    auto dev = validate_httpgddev(devnum);
+
+    auto svr_config = dev->api_server_config();
+
+    using namespace cpp11::literals;
+    return cpp11::writable::list{
+        "id"_nm = svr_config->id.c_str(),
+        "version"_nm = cpp11::writable::list{
+        "httpgd"_nm = HTTPGD_VERSION,
+        "boost"_nm = HTTPGD_VERSION_BOOST,
+        "cairo"_nm = HTTPGD_VERSION_CAIRO
+        }
+    };
 }
 
 [[cpp11::register]]

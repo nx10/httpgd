@@ -8,6 +8,10 @@ httpgd_state_ <- function(devnum) {
   .Call(`_httpgd_httpgd_state_`, devnum)
 }
 
+httpgd_info_ <- function(devnum) {
+  .Call(`_httpgd_httpgd_info_`, devnum)
+}
+
 httpgd_renderers_ <- function(devnum) {
   .Call(`_httpgd_httpgd_renderers_`, devnum)
 }

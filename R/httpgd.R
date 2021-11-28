@@ -153,6 +153,37 @@ hgd_state <- function(which = dev.cur()) {
   }
 }
 
+#' httpgd device information.
+#'
+#' Access general information of a httpgd graphics device.
+#' This function will only work after starting a device with [hgd()].
+#'
+#' @param which Which device (ID).
+#'
+#' @return List of status variables with the following named items:
+#'   `$id`: Server unique ID,
+#'   `$version`: httpgd and library versions.
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' hgd()
+#' hgd_info()
+#' 
+#' dev.off()
+#' }
+hgd_info <- function(which = dev.cur()) {
+  if (names(which) != "httpgd") {
+    stop("Device is not of type httpgd")
+  }
+  else {
+    return(httpgd_info_(which))
+  }
+}
+
 #' httpgd device renderers.
 #'
 #' Get a list of available renderers.
