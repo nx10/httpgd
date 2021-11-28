@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate random alphanumeric token. — hgd_generate_token • httpgd</title>
+<title>httpgd device information. — hgd_info • httpgd</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Generate random alphanumeric token. — hgd_generate_token" />
-<meta property="og:description" content="This is mainly used internally by httpgd, but exposed for
-testing purposes." />
+<meta property="og:title" content="httpgd device information. — hgd_info" />
+<meta property="og:description" content="Access general information of a httpgd graphics device.
+This function will only work after starting a device with hgd()." />
 
 
 
@@ -145,34 +145,41 @@ testing purposes." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate random alphanumeric token.</h1>
+    <h1>httpgd device information.</h1>
     <small class="dont-index">Source: <a href='https://github.com/nx10/httpgd/blob/master/R/httpgd.R'><code>R/httpgd.R</code></a></small>
-    <div class="hidden name"><code>hgd_generate_token.Rd</code></div>
+    <div class="hidden name"><code>hgd_info.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This is mainly used internally by httpgd, but exposed for
-testing purposes.</p>
+    <p>Access general information of a httpgd graphics device.
+This function will only work after starting a device with <code><a href='hgd.html'>hgd()</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>hgd_generate_token</span><span class='op'>(</span><span class='va'>len</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>hgd_info</span><span class='op'>(</span>which <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/grDevices/dev.html'>dev.cur</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>len</th>
-      <td><p>Token length (number of characters).</p></td>
+      <th>which</th>
+      <td><p>Which device (ID).</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Random token string.</p>
+    <p>List of status variables with the following named items:
+<code>$id</code>: Server unique ID,
+<code>$version</code>: httpgd and library versions.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='fu'>hgd_generate_token</span><span class='op'>(</span><span class='fl'>6</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "naW3bG"</span>
+    <pre class="examples"><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='hgd.html'>hgd</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>hgd_info</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/grDevices/dev.html'>dev.off</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
 </pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
