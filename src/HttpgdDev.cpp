@@ -9,7 +9,6 @@
 #include <cpp11/list.hpp>
 #include <cpp11/strings.hpp>
 #include <svglite_utils.h>
-#include <random>
 #include <string>
 
 namespace httpgd
@@ -470,27 +469,6 @@ namespace httpgd
     HttpgdQueryResults HttpgdDev::api_query_range(int offset, int limit)
     {
         return m_data_store->query_range(offset, limit);
-    }
-
-    // Can not use R's RNG for this for security reasons.
-    // (Seed could be predicted)
-    std::string HttpgdDev::random_token(int len)
-    {
-        static const char alphanum[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
-        static auto rseed = static_cast<long unsigned int>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-        static std::mt19937 generator(rseed);
-        static std::uniform_int_distribution<int> distribution{0, static_cast<int>((sizeof(alphanum) / sizeof(alphanum[0])) - 2)};
-
-        std::string rand_str(len, '\0');
-        for (int i = 0; i < len; ++i)
-        {
-            rand_str[i] = alphanum[distribution(generator)];
-        }
-
-        return rand_str;
     }
 
 } // namespace httpgd

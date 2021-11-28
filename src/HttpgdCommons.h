@@ -42,6 +42,7 @@ namespace httpgd
         bool record_history;
         bool webserver;
         bool silent;
+        std::string id;
     };
 
 } // namespace httpgd

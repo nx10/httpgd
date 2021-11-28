@@ -6,13 +6,14 @@
 #include <fmt/ostream.h>
 #include <boost/optional.hpp>
 
+#include "HttpgdVersion.h"
 #include "RendererSvg.h"
 
 namespace httpgd
 {
     namespace web
     {
-        boost::optional<std::string> read_txt(const std::string &filepath)
+        static boost::optional<std::string> read_txt(const std::string &filepath)
         {
             std::ifstream t(filepath);
             if (t.fail())
@@ -24,7 +25,7 @@ namespace httpgd
             return buffer.str();
         }
 
-        inline boost::optional<std::string> param_str(OB::Belle::Request::Params params, std::string name)
+        static inline boost::optional<std::string> param_str(OB::Belle::Request::Params params, std::string name)
         {
             auto it = params.find(name);
             if (it == params.end())
@@ -33,7 +34,7 @@ namespace httpgd
             }
             return it->second;
         }
-        inline boost::optional<double> param_double(OB::Belle::Request::Params params, std::string name)
+        static inline boost::optional<double> param_double(OB::Belle::Request::Params params, std::string name)
         {
             auto it = params.find(name);
             if (it == params.end())
@@ -50,7 +51,7 @@ namespace httpgd
                 return boost::none;
             }
         }
-        inline boost::optional<int> param_int(OB::Belle::Request::Params params, std::string name)
+        static inline boost::optional<int> param_int(OB::Belle::Request::Params params, std::string name)
         {
             auto it = params.find(name);
             if (it == params.end())
@@ -67,7 +68,7 @@ namespace httpgd
                 return boost::none;
             }
         }
-        inline boost::optional<long> param_long(OB::Belle::Request::Params params, std::string name)
+        static inline boost::optional<long> param_long(OB::Belle::Request::Params params, std::string name)
         {
             auto it = params.find(name);
             if (it == params.end())
@@ -85,20 +86,37 @@ namespace httpgd
             }
         }
 
-        inline void json_write_state(std::ostream &buf, const HttpgdState &state)
+        static inline void json_write_state(std::ostream &buf, const HttpgdState &state)
         {
             fmt::print(buf, "{{ \"upid\": {}, \"hsize\": {}, \"active\": {} }}", state.upid, state.hsize, state.active);
         }
 
-        inline std::string json_make_state(const HttpgdState &state)
+        static inline std::string json_make_state(const HttpgdState &state)
         {
             std::stringstream buf;
             json_write_state(buf, state);
             return buf.str();
         }
 
+        static inline void json_write_info(std::ostream &buf, std::shared_ptr<httpgd::HttpgdServerConfig> t_conf)
+        {
+            fmt::print(buf, R""({{ "id": "{}", "version": {{ "httpgd": "{}", "boost": "{}", "cairo": "{}" }} }})"", 
+                t_conf->id, 
+                HTTPGD_VERSION, 
+                HTTPGD_VERSION_BOOST, 
+                HTTPGD_VERSION_CAIRO
+            );
+        }
+
+        static inline std::string json_make_info(std::shared_ptr<httpgd::HttpgdServerConfig> t_conf)
+        {
+            std::stringstream buf;
+            json_write_info(buf, t_conf);
+            return buf.str();
+        }
+
         template<typename T>
-        inline bool authorized(std::shared_ptr<httpgd::HttpgdServerConfig> &m_conf, T &ctx)
+        static inline bool authorized(std::shared_ptr<httpgd::HttpgdServerConfig> &m_conf, T &ctx)
         {
             if (!m_conf->use_token)
             {
@@ -146,7 +164,7 @@ namespace httpgd
 
             // set default http headers
             OB::Belle::Headers headers;
-            headers.set(OB::Belle::Header::server, "httpgd 1.0");
+            headers.set(OB::Belle::Header::server, "httpgd " HTTPGD_VERSION);
             //headers.set(OB::Belle::Header::cache_control, "private; max-age=0");
             if (m_conf->cors)
             {
@@ -198,6 +216,18 @@ namespace httpgd
                 std::string filepath = m_app.public_dir() + "/index.html";
                 ctx.res.body() = read_txt(filepath).get_value_or(
                     fmt::format("<html><body><b>ERROR:</b> File not found ({}).<br>Please reload package.</body></html>", filepath));
+            });
+
+            m_app.on_http("/info", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
+                if (!authorized(m_conf, ctx))
+                {
+                    throw 401;
+                }
+
+                ctx.res.set("content-type", "application/json");
+                ctx.res.result(OB::Belle::Status::ok);
+
+                ctx.res.body() = json_make_info(m_conf);
             });
 
             m_app.on_http("/state", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {

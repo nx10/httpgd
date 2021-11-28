@@ -14,6 +14,7 @@
 #include <string>
 
 #include "HttpgdDev.h"
+#include "HttpgdRng.h"
 #include "RendererSvg.h"
 #include "RendererManager.h"
 
@@ -58,7 +59,7 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
     }
 
     auto dev = new httpgd::HttpgdDev(
-        {std::move(host),
+        {host,
          port,
          wwwpath,
          cors,
@@ -66,7 +67,8 @@ bool httpgd_(std::string host, int port, std::string bg, double width, double he
          token,
          recording,
          webserver,
-         silent},
+         silent,
+         httpgd::rng::uuid()},
         {ibg,
          width,
          height,
@@ -197,7 +199,7 @@ std::string httpgd_random_token_(int len)
     {
         cpp11::stop("Length needs to be 0 or higher.");
     }
-    return httpgd::HttpgdDev::random_token(len);
+    return httpgd::rng::token(len);
 }
 
 [[cpp11::register]]

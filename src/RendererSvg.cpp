@@ -1,13 +1,11 @@
 #include "RendererSvg.h"
 
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <cmath>
 #include <fmt/ostream.h>
 #include <functional>
 
 #include "Base64.h"
+#include "HttpgdRng.h"
 
 namespace httpgd::dc
 {
@@ -540,8 +538,7 @@ namespace httpgd::dc
     
     void RendererSVGPortable::render(const Page &t_page, double t_scale) 
     {
-        boost::uuids::random_generator uuid_gen;
-        m_unique_id = boost::uuids::to_string(uuid_gen());
+        m_unique_id = httpgd::rng::uuid();
         m_scale = t_scale;
         this->page(t_page);
     }

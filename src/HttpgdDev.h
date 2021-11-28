@@ -77,9 +77,6 @@ namespace httpgd
         virtual boost::optional<int> api_index(int32_t id) override;
         virtual std::shared_ptr<HttpgdServerConfig> api_server_config() override;
 
-        // static 
-
-        static std::string random_token(int len);
 
     protected:
         // Device callbacks
