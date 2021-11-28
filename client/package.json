@@ -34,6 +34,6 @@
     "webpack-dev-server": "^4.2.1"
   },
   "dependencies": {
-    "httpgd": "file:../../httpgd-js"
+    "httpgd": "^0.1.7"
   }
 }

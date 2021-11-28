@@ -64,6 +64,7 @@ export class HttpgdViewer {
         this.exportView = new ExportView(this);
         
         this.httpgd.connect().then(() => {
+            console.log('Connected to httpgd ' + this.httpgd.getInfo().version.httpgd);
             this.exportView.initRenderers();
         });
 
