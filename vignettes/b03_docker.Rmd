@@ -56,6 +56,9 @@ httpgd::hgd(host = "0.0.0.0", port = 8888)
 
 Then, copy the displayed link like in the browser.
 
+If you want to display the link again, execute the `hgd_url` function as follows.  
+The hostname can be replaced with any value (e.g. localhost).
+
 ```R
 httpgd::hgd_url(host = "localhost")
 ```
