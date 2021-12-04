@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">httpgd</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -85,7 +81,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nx10/httpgd/">
+  <a href="https://github.com/nx10/httpgd/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -106,7 +102,7 @@
       <h1 data-toc-skip>Installation</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nx10/httpgd/blob/master/vignettes/a00_installation.Rmd"><code>vignettes/a00_installation.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nx10/httpgd/blob/HEAD/vignettes/a00_installation.Rmd" class="external-link"><code>vignettes/a00_installation.Rmd</code></a></small>
       <div class="hidden name"><code>a00_installation.Rmd</code></div>
 
     </div>
@@ -115,38 +111,38 @@
     
 <p>Install <code>httpgd</code> from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"httpgd"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"httpgd"</span><span class="op">)</span></code></pre></div>
 <p>Or get the latest development version from GitHub:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"nx10/httpgd"</span><span class="op">)</span></code></pre></div>
 <p>See <a href="#System-requirements">system requirements</a> for troubleshooting.</p>
-<div id="system-requirements" class="section level2">
-<h2 class="hasAnchor">
-<a href="#system-requirements" class="anchor"></a>System requirements</h2>
-<p>Depends on <code>R</code> version ≥ 4.0 on windows, and R ≥ 3.2 on linux and macOS (a C++ compiler with basic C++17 support <a href="https://github.com/nx10/httpgd/issues/56">is required</a>).</p>
-<p>Note that there is a rare bug in R versions &lt; 4.1, that leads to <a href="https://github.com/nx10/httpgd/issues/50">some plots disappearing when ggplot2 plots are resized and deleted in a specific way</a>.</p>
+<div class="section level2">
+<h2 id="system-requirements">System requirements<a class="anchor" aria-label="anchor" href="#system-requirements"></a>
+</h2>
+<p>Depends on <code>R</code> version ≥ 4.0 on windows, and R ≥ 3.2 on linux and macOS (a C++ compiler with basic C++17 support <a href="https://github.com/nx10/httpgd/issues/56" class="external-link">is required</a>).</p>
+<p>Note that there is a rare bug in R versions &lt; 4.1, that leads to <a href="https://github.com/nx10/httpgd/issues/50" class="external-link">some plots disappearing when ggplot2 plots are resized and deleted in a specific way</a>.</p>
 <p><code>libpng</code> and X11 are required on unix like systems (e.g. Linux, macOS). <code>Cairo</code> is required on unix like systems to enable PNG, PDF, EPS and PS renderers.</p>
-<div id="macos" class="section level3">
-<h3 class="hasAnchor">
-<a href="#macos" class="anchor"></a>macOS</h3>
+<div class="section level3">
+<h3 id="macos">macOS<a class="anchor" aria-label="anchor" href="#macos"></a>
+</h3>
 <p>If <code>libpng</code> is missing install it via:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">brew</span> install libpng</span></code></pre></div>
 <p>If <code>X11</code> is missing the error message will include the text:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">unable</span> to load shared object [...] systemfonts/libs/systemfonts.so [...]</span></code></pre></div>
-<p>Install <a href="https://www.xquartz.org/"><code>XQuartz</code></a>. (see: <a href="https://github.com/r-lib/systemfonts/issues/17" class="uri">https://github.com/r-lib/systemfonts/issues/17</a>)</p>
+<p>Install <a href="https://www.xquartz.org/" class="external-link"><code>XQuartz</code></a>. (see: <a href="https://github.com/r-lib/systemfonts/issues/17" class="external-link uri">https://github.com/r-lib/systemfonts/issues/17</a>)</p>
 </div>
-<div id="linux" class="section level3">
-<h3 class="hasAnchor">
-<a href="#linux" class="anchor"></a>Linux</h3>
+<div class="section level3">
+<h3 id="linux">Linux<a class="anchor" aria-label="anchor" href="#linux"></a>
+</h3>
 <p>For source installation on Linux, the fontconfig freetype2 library is required to install the <code>systemfonts</code> package, which is a dependency of <code>httpgd</code>.</p>
-<div id="debian-ubuntu-etc-" class="section level4">
-<h4 class="hasAnchor">
-<a href="#debian-ubuntu-etc-" class="anchor"></a>Debian, Ubuntu, etc.</h4>
+<div class="section level4">
+<h4 id="debian-ubuntu-etc-">Debian, Ubuntu, etc.<a class="anchor" aria-label="anchor" href="#debian-ubuntu-etc-"></a>
+</h4>
 <div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">apt</span> install libfontconfig1-dev</span></code></pre></div>
 </div>
-<div id="fedora-centos-rhel-etc-" class="section level4">
-<h4 class="hasAnchor">
-<a href="#fedora-centos-rhel-etc-" class="anchor"></a>Fedora, CentOS, RHEL, etc.</h4>
+<div class="section level4">
+<h4 id="fedora-centos-rhel-etc-">Fedora, CentOS, RHEL, etc.<a class="anchor" aria-label="anchor" href="#fedora-centos-rhel-etc-"></a>
+</h4>
 <div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">dnf</span> install fontconfig-devel</span></code></pre></div>
 </div>
 </div>
@@ -164,11 +160,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Florian Rupprecht.</p>
+  <p></p>
+<p>Developed by Florian Rupprecht.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -176,6 +174,8 @@
 
   
 
+
+  
 
   </body>
 </html>

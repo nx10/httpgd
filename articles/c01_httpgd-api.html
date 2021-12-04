@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">httpgd</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -85,7 +81,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nx10/httpgd/">
+  <a href="https://github.com/nx10/httpgd/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -106,17 +102,17 @@
       <h1 data-toc-skip>httpgd API</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nx10/httpgd/blob/master/vignettes/c01_httpgd-api.Rmd"><code>vignettes/c01_httpgd-api.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nx10/httpgd/blob/HEAD/vignettes/c01_httpgd-api.Rmd" class="external-link"><code>vignettes/c01_httpgd-api.Rmd</code></a></small>
       <div class="hidden name"><code>c01_httpgd-api.Rmd</code></div>
 
     </div>
 
     
     
-<p><a href="https://github.com/nx10/httpgd/blob/master/README.md">httpgd</a> can be accessed both from R and from HTTP/WebSockets.</p>
-<div id="overview" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
+<p><a href="https://github.com/nx10/httpgd/blob/master/README.md" class="external-link">httpgd</a> can be accessed both from R and from HTTP/WebSockets.</p>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
 <table class="table">
 <thead><tr class="header">
 <th>R</th>
@@ -192,9 +188,9 @@
 </tbody>
 </table>
 </div>
-<div id="get-state" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-state" class="anchor"></a>Get state</h2>
+<div class="section level2">
+<h2 id="get-state">Get state<a class="anchor" aria-label="anchor" href="#get-state"></a>
+</h2>
 <p>While all the APIs can be accessed stateless, the graphics device does have a state defined by.</p>
 <table class="table">
 <colgroup>
@@ -226,16 +222,16 @@
 </tbody>
 </table>
 <p>To receive state changes as they happen <a href="#from-websockets">WebSockets can be used</a>. Alternatively <code>/state</code> may be polled repeatedly.</p>
-<div id="from-r" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-r" class="anchor"></a>From R</h3>
+<div class="section level3">
+<h3 id="from-r">From R<a class="anchor" aria-label="anchor" href="#from-r"></a>
+</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/hgd_state.html">hgd_state</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>Will respond with a list object including fields containing <code>host</code>, <code>port</code> and security <code>token</code> of the server.</p>
 </div>
-<div id="from-http" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-http" class="anchor"></a>From HTTP</h3>
+<div class="section level3">
+<h3 id="from-http">From HTTP<a class="anchor" aria-label="anchor" href="#from-http"></a>
+</h3>
 <pre><code>/state</code></pre>
 <table class="table">
 <colgroup>
@@ -257,15 +253,15 @@
 </table>
 <p>Will respond with a JSON object.</p>
 </div>
-<div id="from-websockets" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-websockets" class="anchor"></a>From WebSockets</h3>
+<div class="section level3">
+<h3 id="from-websockets">From WebSockets<a class="anchor" aria-label="anchor" href="#from-websockets"></a>
+</h3>
 <p>httpgd accepts WebSocket connections on the same port as the HTTP server. <a href="#Server-state">Server state</a> changes will be broadcasted immediately to all connected clients in JSON format.</p>
 </div>
 </div>
-<div id="get-renderers" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-renderers" class="anchor"></a>Get Renderers</h2>
+<div class="section level2">
+<h2 id="get-renderers">Get Renderers<a class="anchor" aria-label="anchor" href="#get-renderers"></a>
+</h2>
 <p>httpgd includes multiple renderers that can dynamically render plots to different target formats. As new formats may be added as the development on httpgd continues, and some depend on optional system dependencies, a list of available renderers can be obtained during runtime.</p>
 <p>The following is a complete list of renderers.</p>
 <table class="table">
@@ -356,16 +352,16 @@
 </tr>
 </tbody>
 </table>
-<div id="from-r-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-r-1" class="anchor"></a>From R</h3>
+<div class="section level3">
+<h3 id="from-r-1">From R<a class="anchor" aria-label="anchor" href="#from-r-1"></a>
+</h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/hgd_renderers.html">hgd_renderers</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>Will respond with a list object.</p>
 </div>
-<div id="from-http-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-http-1" class="anchor"></a>From HTTP</h3>
+<div class="section level3">
+<h3 id="from-http-1">From HTTP<a class="anchor" aria-label="anchor" href="#from-http-1"></a>
+</h3>
 <pre><code>/renderers</code></pre>
 <table class="table">
 <colgroup>
@@ -387,13 +383,13 @@
 </table>
 </div>
 </div>
-<div id="render-plot" class="section level2">
-<h2 class="hasAnchor">
-<a href="#render-plot" class="anchor"></a>Render plot</h2>
+<div class="section level2">
+<h2 id="render-plot">Render plot<a class="anchor" aria-label="anchor" href="#render-plot"></a>
+</h2>
 <p>Plots can be rendered in various file formats from both R and HTTP. The actual plot construction in R is relatively slow so httpgd caches the plot in the last requested size. Subsequent calls with the same width and height or without a size specified will always be fast. (This way “flipping” through plot pages is very fast.)</p>
-<div id="from-r-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-r-2" class="anchor"></a>From R</h3>
+<div class="section level3">
+<h3 id="from-r-2">From R<a class="anchor" aria-label="anchor" href="#from-r-2"></a>
+</h3>
 <p>Example:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/hgd_plot.html">hgd_plot</a></span><span class="op">(</span>page <span class="op">=</span> <span class="fl">3</span>, width <span class="op">=</span> <span class="fl">800</span>, height <span class="op">=</span> <span class="fl">600</span><span class="op">)</span> <span class="co"># Get plot at index 3 with 800*600</span>
@@ -401,9 +397,9 @@
 <p><code>page</code> can either be a number to indicate a plot index or a static plot ID (see: hgd_id()).</p>
 <p>This function returns the plot as a string. The <code>file</code> attribute can be used to save the SVG directly to disk.</p>
 </div>
-<div id="from-http-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-http-2" class="anchor"></a>From HTTP</h3>
+<div class="section level3">
+<h3 id="from-http-2">From HTTP<a class="anchor" aria-label="anchor" href="#from-http-2"></a>
+</h3>
 <p>Example:</p>
 <pre><code>/plot?index=2&amp;width=800&amp;height=600</code></pre>
 <p>Parameters:</p>
@@ -465,28 +461,28 @@
 </blockquote>
 </div>
 </div>
-<div id="render-svg" class="section level2">
-<h2 class="hasAnchor">
-<a href="#render-svg" class="anchor"></a>Render SVG</h2>
+<div class="section level2">
+<h2 id="render-svg">Render SVG<a class="anchor" aria-label="anchor" href="#render-svg"></a>
+</h2>
 <blockquote>
 <p><strong>This API is deprecated and will be removed in the future.</strong></p>
 </blockquote>
 <p><code><a href="../reference/hgd_svg.html">hgd_svg()</a></code> and <code>/svg</code> are equivalent to <a href="#render-plot"><code>hgd_plot()</code></a> and <a href="#render-plot"><code>/plot</code></a> as the default renderer is SVG.</p>
 </div>
-<div id="remove-plots" class="section level2">
-<h2 class="hasAnchor">
-<a href="#remove-plots" class="anchor"></a>Remove plots</h2>
-<div id="from-r-3" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-r-3" class="anchor"></a>From R</h3>
+<div class="section level2">
+<h2 id="remove-plots">Remove plots<a class="anchor" aria-label="anchor" href="#remove-plots"></a>
+</h2>
+<div class="section level3">
+<h3 id="from-r-3">From R<a class="anchor" aria-label="anchor" href="#from-r-3"></a>
+</h3>
 <p>Examples:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/hgd_remove.html">hgd_remove</a></span><span class="op">(</span>page <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># Remove the second page</span>
 <span class="fu"><a href="../reference/hgd_clear.html">hgd_clear</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># Clear all pages</span></code></pre></div>
 </div>
-<div id="from-http-3" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-http-3" class="anchor"></a>From HTTP</h3>
+<div class="section level3">
+<h3 id="from-http-3">From HTTP<a class="anchor" aria-label="anchor" href="#from-http-3"></a>
+</h3>
 <p>Examples:</p>
 <pre><code>/remove?index=2
 /clear</code></pre>
@@ -523,23 +519,23 @@
 </table>
 </div>
 </div>
-<div id="get-static-ids" class="section level2">
-<h2 class="hasAnchor">
-<a href="#get-static-ids" class="anchor"></a>Get static IDs</h2>
+<div class="section level2">
+<h2 id="get-static-ids">Get static IDs<a class="anchor" aria-label="anchor" href="#get-static-ids"></a>
+</h2>
 <p>The problem with requesting individual plots by index is, that a plots index will change when earlier plots are removed from the plot history. To circumvent this, each plot also is assigned a static ID.</p>
 <p>All APIs that access individual plots can also be called with static IDs instead of indices.</p>
-<div id="from-r-4" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-r-4" class="anchor"></a>From R</h3>
+<div class="section level3">
+<h3 id="from-r-4">From R<a class="anchor" aria-label="anchor" href="#from-r-4"></a>
+</h3>
 <p>Examples:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/hgd_id.html">hgd_id</a></span><span class="op">(</span>index <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># Static ID of the second plot</span>
 <span class="fu"><a href="../reference/hgd_id.html">hgd_id</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># Static ID of the last plot</span></code></pre></div>
 <p>Note: The <code>limit</code> parameter can be adjusted to obtain multiple or all plot IDs.</p>
 </div>
-<div id="from-http-4" class="section level3">
-<h3 class="hasAnchor">
-<a href="#from-http-4" class="anchor"></a>From HTTP</h3>
+<div class="section level3">
+<h3 id="from-http-4">From HTTP<a class="anchor" aria-label="anchor" href="#from-http-4"></a>
+</h3>
 <p>Examples:</p>
 <pre><code>/plots?index=2
 /plots</code></pre>
@@ -580,9 +576,9 @@
 </ul>
 </div>
 </div>
-<div id="security" class="section level2">
-<h2 class="hasAnchor">
-<a href="#security" class="anchor"></a>Security</h2>
+<div class="section level2">
+<h2 id="security">Security<a class="anchor" aria-label="anchor" href="#security"></a>
+</h2>
 <p>A security token can be set when starting the device:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/hgd.html">hgd</a></span><span class="op">(</span><span class="va">...</span>, token <span class="op">=</span> <span class="st">"secret"</span><span class="op">)</span></code></pre></div>
@@ -604,11 +600,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Florian Rupprecht.</p>
+  <p></p>
+<p>Developed by Florian Rupprecht.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -616,6 +614,8 @@
 
   
 
+
+  
 
   </body>
 </html>

@@ -1,5 +1,5 @@
 pandoc: 2.7.3
-pkgdown: 1.6.1
+pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   a00_installation: a00_installation.html
@@ -10,7 +10,7 @@ articles:
   c01_httpgd-api: c01_httpgd-api.html
   c02_benchmarks: c02_benchmarks.html
   c03_technical-docs: c03_technical-docs.html
-last_built: 2021-11-28T21:08Z
+last_built: 2021-12-04T23:00Z
 urls:
   reference: https://nx10.github.io/httpgd/reference
   article: https://nx10.github.io/httpgd/articles

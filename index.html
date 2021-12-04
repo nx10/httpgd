@@ -23,6 +23,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -35,18 +37,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">httpgd</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -89,7 +85,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/nx10/httpgd/">
+  <a href="https://github.com/nx10/httpgd/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -106,16 +102,16 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="httpgd-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#httpgd-" class="anchor"></a><code>httpgd</code> <img src="reference/figures/httpgd_logo.svg" align="right" height="250/">
+<div class="section level1">
+<div class="page-header"><h1 id="httpgd-">
+<code>httpgd</code> <img src="reference/figures/httpgd_logo.svg" align="right" height="250/"><a class="anchor" aria-label="anchor" href="#httpgd-"></a>
 </h1></div>
 <!-- badges: start -->
 
 <p>A graphics device for R that is accessible via network protocols. This package was created to make it easier to embed live R graphics in integrated development environments and other applications. The included HTML/JavaScript client (plot viewer) aims to provide a better overall user experience when dealing with R graphics. The device asynchronously serves graphics via HTTP and WebSockets.</p>
-<div id="features" class="section level2">
-<h2 class="hasAnchor">
-<a href="#features" class="anchor"></a>Features</h2>
+<div class="section level2">
+<h2 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h2>
 <ul>
 <li>Fast plotting</li>
 <li>Plot resizing and history</li>
@@ -132,24 +128,26 @@
 </li>
 </ul>
 </div>
-<div id="demo" class="section level2">
-<h2 class="hasAnchor">
-<a href="#demo" class="anchor"></a>Demo</h2>
-<p><img src="https://user-images.githubusercontent.com/33600480/113182768-92eeda80-9253-11eb-9505-79de107024f7.gif" alt="demo"></p>
+<div class="section level2">
+<h2 id="demo">Demo<a class="anchor" aria-label="anchor" href="#demo"></a>
+</h2>
+<div class="figure">
+<img src="https://user-images.githubusercontent.com/33600480/113182768-92eeda80-9253-11eb-9505-79de107024f7.gif" alt=""><p class="caption">demo</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>Install <code>httpgd</code> from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"httpgd"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"httpgd"</span><span class="op">)</span></code></pre></div>
 <p>Or get the latest development version from GitHub:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"nx10/httpgd"</span><span class="op">)</span></code></pre></div>
 <p>See <a href="https://nx10.github.io/httpgd/articles/a00_installation.html#system-requirements">system requirements</a> for troubleshooting.</p>
-<div id="documentation" class="section level3">
-<h3 class="hasAnchor">
-<a href="#documentation" class="anchor"></a>Documentation</h3>
+<div class="section level3">
+<h3 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h3>
 <ul>
 <li>For users:
 <ul>
@@ -174,75 +172,85 @@
 </ul>
 </div>
 </div>
-<div id="contributions-welcome" class="section level2">
-<h2 class="hasAnchor">
-<a href="#contributions-welcome" class="anchor"></a>Contributions welcome!</h2>
+<div class="section level2">
+<h2 id="contributions-welcome">Contributions welcome!<a class="anchor" aria-label="anchor" href="#contributions-welcome"></a>
+</h2>
 <p>The various components of <code>httpgd</code> are written in C++, R and TypeScript. We welcome contributions of any kind.</p>
 <p>Other areas in need of improvement are testing and documentation.</p>
 </div>
-<div id="links--articles" class="section level2">
-<h2 class="hasAnchor">
-<a href="#links--articles" class="anchor"></a>Links &amp; Articles</h2>
+<div class="section level2">
+<h2 id="links--articles">Links &amp; Articles<a class="anchor" aria-label="anchor" href="#links--articles"></a>
+</h2>
 <ul>
-<li><a href="https://renkun.me/2020/06/16/using-httpgd-in-vscode-a-web-based-svg-graphics-device/">Using httpgd in VSCode: A web-based SVG graphics device</a></li>
+<li><a href="https://renkun.me/2020/06/16/using-httpgd-in-vscode-a-web-based-svg-graphics-device/" class="external-link">Using httpgd in VSCode: A web-based SVG graphics device</a></li>
 </ul>
 </div>
-<div id="about--license" class="section level2">
-<h2 class="hasAnchor">
-<a href="#about--license" class="anchor"></a>About &amp; License</h2>
+<div class="section level2">
+<h2 id="about--license">About &amp; License<a class="anchor" aria-label="anchor" href="#about--license"></a>
+</h2>
 <p>Depends on <code>cpp11</code>, <code>later</code> and <code>systemfonts</code>.</p>
-<p>Webserver based on <a href="https://github.com/boostorg/beast"><code>Boost/Beast</code></a> included in the <code>BH</code> package.</p>
-<p>Much of the font handling and SVG rendering code is modified code from the excellent <a href="https://github.com/r-lib/svglite"><code>svglite</code></a> package.</p>
+<p>Webserver based on <a href="https://github.com/boostorg/beast" class="external-link"><code>Boost/Beast</code></a> included in the <code>BH</code> package.</p>
+<p>Much of the font handling and SVG rendering code is modified code from the excellent <a href="https://github.com/r-lib/svglite" class="external-link"><code>svglite</code></a> package.</p>
 <p>This project is licensed GPL v2.0.</p>
-<p>It includes parts of <a href="https://github.com/r-lib/svglite"><code>svglite</code></a> (GPL ≥ 2), <a href="https://github.com/octobanana/belle"><code>Belle</code></a> (MIT) and <a href="https://github.com/fmtlib/fmt"><code>fmt</code></a> (MIT). The HTML client includes <a href="https://github.com/google/material-design-icons">Material Design icons by Google</a> which are licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License Version 2.0</a>.</p>
-<p>Full copies of the license agreements used by these components are included in <a href="https://github.com/nx10/httpgd/tree/master/inst/licenses"><code>./inst/licenses</code></a>.</p>
+<p>It includes parts of <a href="https://github.com/r-lib/svglite" class="external-link"><code>svglite</code></a> (GPL ≥ 2), <a href="https://github.com/octobanana/belle" class="external-link"><code>Belle</code></a> (MIT) and <a href="https://github.com/fmtlib/fmt" class="external-link"><code>fmt</code></a> (MIT). The HTML client includes <a href="https://github.com/google/material-design-icons" class="external-link">Material Design icons by Google</a> which are licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt" class="external-link">Apache License Version 2.0</a>.</p>
+<p>Full copies of the license agreements used by these components are included in <a href="https://github.com/nx10/httpgd/tree/master/inst/licenses" class="external-link"><code>./inst/licenses</code></a>.</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=httpgd">https://​cloud.r-project.org/​package=httpgd</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/nx10/httpgd/">https://​github.com/​nx10/​httpgd/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/nx10/httpgd/issues">https://​github.com/​nx10/​httpgd/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=httpgd" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/nx10/httpgd/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/nx10/httpgd/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>GPL (&gt;= 2)</li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>Florian Rupprecht <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-1795-8624" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="authors.html#citation">Citing httpgd</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/nx10/httpgd/actions"><img src="https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://CRAN.R-project.org/package=httpgd"><img src="https://www.r-pkg.org/badges/version/httpgd" alt="CRAN"></a></li>
+<li>Florian Rupprecht <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-1795-8624" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/nx10/httpgd/actions" class="external-link"><img src="https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://CRAN.R-project.org/package=httpgd" class="external-link"><img src="https://www.r-pkg.org/badges/version/httpgd" alt="CRAN"></a></li>
+</ul>
 </div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Florian Rupprecht.</p>
+  <p></p>
+<p>Developed by Florian Rupprecht.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -250,6 +258,8 @@
 
   
 
+
+  
 
   </body>
 </html>
