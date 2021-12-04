@@ -66,6 +66,14 @@ namespace httpgd
         dd->setMask = [](SEXP path, SEXP ref, pDevDesc dd) { return getDev(dd)->dev_setMask(path, ref, dd); };
         dd->releaseMask = [](SEXP ref, pDevDesc dd) { getDev(dd)->dev_releaseMask(ref, dd); };
 #endif
+#if R_GE_version >= 15
+        dd->defineGroup = nullptr;
+        dd->useGroup = nullptr;
+        dd->releaseGroup = nullptr;
+        dd->stroke = nullptr;
+        dd->fill = nullptr;
+        dd->fillStroke = nullptr;
+#endif
 
         if (m_df_cap)
         {
@@ -108,6 +116,15 @@ namespace httpgd
         dd->haveTransparency = 2;
         dd->haveTransparentBg = 3;
 
+        dd->canGenMouseDown = static_cast<Rboolean>(0);
+        dd->canGenMouseMove = static_cast<Rboolean>(0);
+        dd->canGenMouseUp = static_cast<Rboolean>(0);
+        dd->canGenKeybd = static_cast<Rboolean>(0);
+#if R_GE_version >= 12
+        dd->canGenIdle = static_cast<Rboolean>(0);
+#endif
+        dd->gettingEvent = static_cast<Rboolean>(0);
+
         dd->haveRaster = 2;
         dd->haveCapture = 1;
         dd->haveLocator = 1;
@@ -117,17 +134,24 @@ namespace httpgd
         dd->eventEnv = R_NilValue;
         dd->eventHelper = nullptr;
         dd->holdflush = nullptr;
+        
+#if R_GE_version >= 14
+        dd->deviceClip = static_cast<Rboolean>(0);
+#endif
 
+        // Set maximum version
 #if R_GE_version == 13
         dd->deviceVersion = R_GE_definitions;
-#elif R_GE_version >= 14
+#endif
+#if R_GE_version == 14
         dd->deviceVersion = R_GE_deviceClip;
-        dd->deviceClip = static_cast<Rboolean>(0);
+#endif
+#if R_GE_version >= 15
+        dd->deviceVersion = R_GE_group;
 #endif
 
         // Device specific
         dd->deviceSpecific = this;
-
         return dd;
     }
 
