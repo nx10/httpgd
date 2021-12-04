@@ -6,6 +6,7 @@
 
 #include "Base64.h"
 #include "HttpgdRng.h"
+#include "HttpgdCompress.h"
 
 namespace httpgd::dc
 {
@@ -773,6 +774,26 @@ namespace httpgd::dc
         fmt::format_to(os, " xlink:href=\"data:image/png;base64,");
         fmt::format_to(os, raster_base64(t_raster));
         fmt::format_to(os, "\"/></g>");
+    }
+
+    RendererSVGZ::RendererSVGZ(boost::optional<std::string> t_extra_css) :
+        RendererSVG(t_extra_css)
+    {
+    }
+    
+    std::vector<unsigned char> RendererSVGZ::get_binary() const 
+    {
+        return compr::compress_str(RendererSVG::get_string());
+    }
+    
+    RendererSVGZPortable::RendererSVGZPortable() :
+        RendererSVGPortable()
+    {
+    }
+    
+    std::vector<unsigned char> RendererSVGZPortable::get_binary() const 
+    {
+        return compr::compress_str(RendererSVGPortable::get_string());
     }
 
 } // namespace httpgd::dc

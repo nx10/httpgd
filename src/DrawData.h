@@ -289,7 +289,7 @@ namespace httpgd::dc
         }
     };
 
-    class StringRenderingTarget : public RenderingTarget
+    class StringRenderingTarget : virtual public RenderingTarget
     {
     public:
         virtual ~StringRenderingTarget() = default;
@@ -299,7 +299,7 @@ namespace httpgd::dc
             return std::string("");
         }
     };
-    class BinaryRenderingTarget : public RenderingTarget
+    class BinaryRenderingTarget : virtual public RenderingTarget
     {
     public:
         virtual ~BinaryRenderingTarget() = default; 

@@ -32,6 +32,16 @@ namespace httpgd
           "Scalable Vector Graphics (SVG)."
         });
         
+        manager.add(BinaryRendererInfo{
+          "svgz",
+          "image/svg+xml",
+          ".svgz",
+          "SVGZ",
+          "plot",
+          []() { return std::make_unique<dc::RendererSVGZ>(boost::none); },
+          "Compressed Scalable Vector Graphics (SVGZ)."
+        });
+        
         manager.add({
           "svgp",
           "image/svg+xml",
@@ -40,6 +50,16 @@ namespace httpgd
           "plot",
           []() { return std::make_unique<dc::RendererSVGPortable>(); },
           "Version of the SVG renderer that produces portable SVGs."
+        });
+        
+        manager.add(BinaryRendererInfo{
+          "svgzp",
+          "image/svg+xml",
+          ".svgz",
+          "Portable SVGZ",
+          "plot",
+          []() { return std::make_unique<dc::RendererSVGZPortable>(); },
+          "Version of the SVG renderer that produces portable SVGZs."
         });
         
 #ifndef HTTPGD_NO_CAIRO

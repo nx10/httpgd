@@ -493,6 +493,9 @@ namespace httpgd
                     const auto renderer = (*find_renderer).renderer();
                     if (m_watcher->api_render(*index, width, height, renderer.get(), zoom)) {
                         ctx.res.set("content-type", (*find_renderer).mime);
+                        if ((*find_renderer).id.rfind("svgz", 0) == 0) {
+                            ctx.res.set("Content-Encoding", "gzip"); // todo
+                        }
                         if (p_download) {
                             ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
                         }

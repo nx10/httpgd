@@ -65,6 +65,22 @@ namespace httpgd::dc
         double m_scale;
         std::string m_unique_id;
     };
+
+    class RendererSVGZ : public RendererSVG, public BinaryRenderingTarget
+    {
+    public:
+        explicit RendererSVGZ(boost::optional<std::string> t_extra_css);
+        [[nodiscard]] 
+        std::vector<unsigned char> get_binary() const override;
+    };
+    
+    class RendererSVGZPortable : public RendererSVGPortable, public BinaryRenderingTarget
+    {
+    public:
+        RendererSVGZPortable();
+        [[nodiscard]] 
+        std::vector<unsigned char> get_binary() const override;
+    };
     
 } // namespace httpgd::dc
 #endif // RENDERER_SVG_H
