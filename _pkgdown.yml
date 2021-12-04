@@ -1,2 +1,3 @@
 url: https://nx10.github.io/httpgd
-
+template:
+  bootstrap: 5
