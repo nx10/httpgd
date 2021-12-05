@@ -49,7 +49,7 @@ Install [`XQuartz`](https://www.xquartz.org/).
 
 ### Linux
 
-For source installation on Linux, the fontconfig freetype2 library is required to install the `systemfonts` package, which is a dependency of `httpgd`.
+For source installation on Linux, the fontconfig freetype2 library is required to install the `{systemfonts}` package, which is a dependency of `httpgd`.
 
 #### Debian, Ubuntu, etc.
 
