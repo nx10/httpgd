@@ -1,2 +1,13 @@
-CRT=-ucrt
-include Makevars.win
+CXX_STD = CXX17
+
+PKG_CPPFLAGS = -Ilib \
+	-DBOOST_NO_AUTO_PTR \
+	-DFMT_HEADER_ONLY \
+	-I$(R_TOOLS_SOFT)/include/cairo
+
+PKG_LIBS = -lmswsock -lcairo -lpixman-1 -lfontconfig -lncrypt -lksecdd -lbcrypt -lexpat -lharfbuzz_too -lfreetype_too -lharfbuzz -lfreetype -lpng16 -lpng -lbz2 -lgdi32 -lintl -liconv -lwsock32 -lws2_32 -lz -lcfitsio
+
+all: clean 
+
+clean:
+	rm -f $(OBJECTS)
