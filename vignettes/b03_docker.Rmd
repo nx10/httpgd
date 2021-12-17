@@ -54,9 +54,9 @@ Running the following command in the R console will initialize the graphics devi
 httpgd::hgd(host = "0.0.0.0", port = 8888)
 ```
 
-Then, copy the displayed link like in the browser.
+Then, copy the displayed link in your browser.
 
-If you want to display the link again, execute the `hgd_url` function as follows.  
+If you want to display the link again, execute the `hgd_url()` function as follows.  
 The hostname can be replaced with any value (e.g. localhost).
 
 ```R
