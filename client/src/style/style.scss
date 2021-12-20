@@ -343,6 +343,7 @@ body {
     img {
         width: auto;
         height: 100%;
+        height: -webkit-fill-available; // Fixes RStudio webview. Remove when they update their web engine.
         box-shadow: $default-shadow;
     }
 }
