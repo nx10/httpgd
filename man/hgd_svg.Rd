@@ -24,7 +24,8 @@ be selected.}
 \item{height}{Height of the plot. If this is set to \code{-1}, the last height
 will be selected.}
 
-\item{zoom}{Zoom level. (For example: \code{2} corresponds to 200\%, \code{0.5} would be 50\%.)}
+\item{zoom}{Zoom level. (For example: \code{2} corresponds to 200\%, \code{0.5} would
+be 50\%.)}
 
 \item{which}{Which device (ID).}
 

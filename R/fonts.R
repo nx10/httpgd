@@ -1,4 +1,4 @@
-# fonts.r 
+# fonts.r
 # from: https://github.com/r-lib/svglite/blob/master/R/fonts.R
 
 r_font_families <- c("sans", "serif", "mono", "symbol")
@@ -39,7 +39,8 @@ validate_aliases <- function(system_fonts, user_fonts) {
 
   # Add missing system fonts for base families
   missing_aliases <- setdiff(r_font_families, aliases)
-  system_fonts[missing_aliases] <- lapply(alias_lookup()[missing_aliases], match_family)
+  system_fonts[missing_aliases] <-
+    lapply(alias_lookup()[missing_aliases], match_family)
 
   list(
     system = system_fonts,
@@ -54,9 +55,15 @@ validate_system_alias <- function(alias) {
 
   matched <- match_family(alias)
   if (alias != matched) {
-    warning(call. = FALSE,
-      "System font `", alias, "` not found. ",
-      "Closest match: `", matched, "`")
+    warning(
+      call. = FALSE,
+      "System font `",
+      alias,
+      "` not found. ",
+      "Closest match: `",
+      matched,
+      "`"
+    )
   }
   matched
 }
@@ -69,8 +76,11 @@ is_user_alias <- function(x) {
 
 validate_user_alias <- function(default_name, family) {
   if (!all(names(family) %in% r_font_faces)) {
-    stop("Faces must contain only: `plain`, `bold`, `italic`, `bolditalic`, `symbol`",
-      call. = FALSE)
+    stop(
+      "Faces must contain only: ",
+      paste(sprintf("`%s`", r_font_faces), collapse = ", "),
+      call. = FALSE
+    )
   }
 
   is_alias_object <- vapply_lgl(family, is_user_alias)
@@ -78,8 +88,11 @@ validate_user_alias <- function(default_name, family) {
 
   is_valid_alias <- is_alias_object | is_alias_plain
   if (any(!is_valid_alias)) {
-    stop(call. = FALSE,
-      "The following faces are invalid for `", default_name, "`: ",
+    stop(
+      call. = FALSE,
+      "The following faces are invalid for `",
+      default_name,
+      "`: ",
       paste0(names(family)[!is_valid_alias], collapse = ", ")
     )
   }
@@ -95,7 +108,8 @@ validate_user_alias <- function(default_name, family) {
   file_exists <- vapply_lgl(files, file.exists)
   if (any(!file_exists)) {
     missing <- unlist(files)[!file_exists]
-    stop(call. = FALSE,
+    stop(
+      call. = FALSE,
       "Could not find font file: ",
       paste0(missing, collapse = ", ")
     )
