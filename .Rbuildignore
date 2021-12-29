@@ -19,4 +19,3 @@
 ^client$
 ^_pkgdown\.yml$
 ^pkgdown$
-^inst/doc/_.*$
