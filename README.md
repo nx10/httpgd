@@ -52,14 +52,14 @@ See [system requirements](https://nx10.github.io/httpgd/articles/a00_installatio
 - For users:
   - [How to get started](https://nx10.github.io/httpgd/articles/a01_how-to-get-started.html)
   - [Function reference](https://nx10.github.io/httpgd/reference/index.html)
-  - [Benchmarks](https://nx10.github.io/httpgd/articles/c02_benchmarks.html)
+  <!-- - [Benchmarks](https://nx10.github.io/httpgd/articles/c02_benchmarks.html) -->
   - IDEs &amp; evironments:
     - [VS Code](https://nx10.github.io/httpgd/articles/b01_vscode.html)
     - [RStudio](https://nx10.github.io/httpgd/articles/b02_rstudio.html)
     - [Docker](https://nx10.github.io/httpgd/articles/b03_docker.html)
 - For developers:
   - [httpgd API](https://nx10.github.io/httpgd/articles/c01_httpgd-api.html)
-  - [Technical documentation](https://nx10.github.io/httpgd/articles/c03_technical-docs.html)
+  <!-- - [Technical documentation](https://nx10.github.io/httpgd/articles/c03_technical-docs.html) -->
 
 
 

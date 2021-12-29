@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Starting with version 1.4 `httpgd` fully supports RStudio:
+`httpgd` fully supports RStudio:
 
 ![image](https://user-images.githubusercontent.com/33600480/147690023-0544d9b8-a3a8-4c34-8201-60d1c193b0d8.png)
 
