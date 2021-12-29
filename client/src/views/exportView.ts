@@ -56,6 +56,7 @@ export class ExportView {
             const o = document.createElement("option");
             o.value = r.id;
             o.text = r.name + " (*"+ r.ext + ")";
+            o.title = r.descr;
             this.selectFormat.add(o);
         });
         this.selectFormat.value = "svg";
