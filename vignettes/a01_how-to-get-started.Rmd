@@ -1,15 +1,11 @@
 ---
-title: "How to get started"
+title: "Getting started"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{How to get started}
+  %\VignetteIndexEntry{Getting started}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-> TODO: Expand
-
-Initialize graphics device and start server with:
 
 ```R
 hgd()

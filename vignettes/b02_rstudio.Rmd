@@ -7,4 +7,53 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-> TODO: How to use httpgd with RStudio
+Starting with version 1.4 `httpgd` fully supports RStudio:
+
+![image](https://user-images.githubusercontent.com/33600480/147690023-0544d9b8-a3a8-4c34-8201-60d1c193b0d8.png)
+
+## Usage
+
+To open a client in the embedded RStudio `Viewer`-tab call `hgd_view()` after starting the server:
+
+```R
+library(httpgd)
+hgd()
+hgd_view()
+```
+
+To view a client in an external browser window call:
+
+```R
+# hgd()
+hgd_browse()
+```
+
+## Troubleshooting
+
+Sometimes (if the `Viewer`-tab is resized with any plot in the `Plots`-tab) RStudio will activate its own graphics device, the `Plots`-tab will obtain focus, and `httpgd` will show the message _"Device inactive."_ in the `Viewer`-tab.
+
+The list of graphics devices (`dev.list()`) will look something like this:
+
+```R
+> dev.list()
+RStudioGD   agg_png    httpgd 
+        2         3         4 
+```
+
+This can be easily solved by closing the current (RStudioGD) graphics device:
+
+```R
+> dev.off()
+httpgd 
+     4 
+```
+
+After that `dev.list()` should oinly show a `httpgd` device:
+
+```R
+> dev.list()
+httpgd 
+     4 
+```
+
+The problem should not reappear afterwards, even after resizing the pane.
