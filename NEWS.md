@@ -1,3 +1,13 @@
+# httpgd 1.3.0
+
+- Fixes for R 4.2 UCRT support (thanks Tomas Kalibera and Uwe Ligges).
+- Added 'pkgdown' documentation and various vignettes (thanks eitsupi for the article on Docker).
+- Added RStudio viewer support.
+- Added version info API.
+- Added SVGZ support.
+- Improved client export dialog.
+- Minor fixes and internal changes.
+
 # httpgd 1.2.1
 
 - Fix macOS builds.

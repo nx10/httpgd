@@ -1,6 +1,6 @@
 #pragma once
 
-#define HTTPGD_VERSION "1.2.1.9000"
+#define HTTPGD_VERSION "1.3.0"
 
 #include <boost/version.hpp>
 #define HTTPGD_VERSION_BOOST BOOST_LIB_VERSION

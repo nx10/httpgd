@@ -48,7 +48,7 @@ httpgd
      4 
 ```
 
-After that `dev.list()` should oinly show a `httpgd` device:
+After that `dev.list()` should only show a `httpgd` device:
 
 ```R
 > dev.list()

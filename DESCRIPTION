@@ -1,7 +1,7 @@
 Package: httpgd
 Type: Package
 Title: A 'HTTP' Server Graphics Device
-Version: 1.2.1.9000
+Version: 1.3.0
 Authors@R: 
     c(
       person(given = "Florian", family = "Rupprecht", email = "floruppr@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1795-8624")),
