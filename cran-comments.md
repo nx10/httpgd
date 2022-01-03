@@ -28,3 +28,7 @@ There are no downstream dependencies.
 ## UCRT
 
 I have applied the provided patches for UCRT.
+
+## URL issues
+
+I have fixed the URLs.

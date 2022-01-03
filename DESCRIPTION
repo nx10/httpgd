@@ -54,6 +54,6 @@ SystemRequirements:
     freetype2, 
     fontconfig
 URL: https://github.com/nx10/httpgd,
-    https://nx10.github.io/httpgd
+    https://nx10.github.io/httpgd/
 BugReports: https://github.com/nx10/httpgd/issues
 VignetteBuilder: knitr
