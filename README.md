@@ -28,7 +28,7 @@ The device asynchronously serves graphics via HTTP and WebSockets.
 
 ## Demo
 
-![demo](https://user-images.githubusercontent.com/33600480/113182768-92eeda80-9253-11eb-9505-79de107024f7.gif)
+![](https://user-images.githubusercontent.com/33600480/113182768-92eeda80-9253-11eb-9505-79de107024f7.gif)
 
 ## Installation
 
