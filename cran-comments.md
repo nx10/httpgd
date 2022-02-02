@@ -29,6 +29,23 @@ There are no downstream dependencies.
 
 I have applied the provided patches for UCRT.
 
-## URL issues
+## Failing test on CRAN Windows Server 2022
 
-I have fixed the URLs.
+> Failed tests
+> Failure (test-svglite-text-fonts.R:7:3): font sets weight/style 
+> 
+>   style_attr(text, "font-weight") not equal to c(NA, "bold", NA, "bold").
+>   2/4 mismatches
+>   x[2]: NA
+>   y[2]: "bold"
+>   
+>   x[4]: NA
+>   y[4]: "bold"
+>   
+>   [ FAIL 1 | WARN 1 | SKIP 1 | PASS 101 ]
+>   Error: Test failures
+
+I can not replicate the issue with RHub.
+This seems to be a problem with the `systemfonts` package and the new CRAN windows server 2022 machine. (See: https://github.com/r-lib/svglite/issues/145#issuecomment-1004716572)
+
+I have disabled the font tests on windows and will reenable them as soon as the `systemfonts` issues are resolved.
