@@ -1,4 +1,7 @@
 test_that("font sets weight/style", {
+  if (.Platform$OS.type == "windows") {
+    skip_on_cran()
+  }
   x <- xmlSVG({
     plot.new()
     text(0.5, seq(0.9, 0.1, length = 4), "a", font = 1:4)
@@ -9,6 +12,9 @@ test_that("font sets weight/style", {
 })
 
 test_that("metrics are computed for different weight/style", {
+  if (.Platform$OS.type == "windows") {
+    skip_on_cran()
+  }
   x <- xmlSVG(user_fonts = fontquiver::font_families("Bitstream Vera"), {
     plot.new()
     text(1, 1, "text")
@@ -21,6 +27,9 @@ test_that("metrics are computed for different weight/style", {
 })
 
 test_that("symbol font family is 'Symbol'", {
+  if (.Platform$OS.type == "windows") {
+    skip_on_cran()
+  }
   symbol_font <- alias_lookup()["symbol"]
   matched_symbol_font <- match_family(symbol_font)
 
@@ -33,11 +42,17 @@ test_that("symbol font family is 'Symbol'", {
 })
 
 test_that("throw on malformed alias", {
+  if (.Platform$OS.type == "windows") {
+    skip_on_cran()
+  }
   expect_error(validate_aliases(list(mono = letters), list()), "must be scalar")
   expect_warning(validate_aliases(list(sans = "foobar"), list()), "not found")
 })
 
 test_that("fonts are aliased", {
+  if (.Platform$OS.type == "windows") {
+    skip_on_cran()
+  }
   matched <- match_family("cursive")
   x <- xmlSVG(
     system_fonts = list(sans = matched),
@@ -56,6 +71,9 @@ test_that("fonts are aliased", {
 })
 
 test_that("metrics are computed for different fonts", {
+  if (.Platform$OS.type == "windows") {
+    skip_on_cran()
+  }
   aliases <- fontquiver::font_families("Bitstream Vera")
   x <- xmlSVG(user_fonts = aliases, {
     plot.new()
@@ -71,6 +89,9 @@ test_that("metrics are computed for different fonts", {
 })
 
 test_that("unicode characters in plotmath are handled", {
+  if (.Platform$OS.type == "windows") {
+    skip_on_cran()
+  }
   rho <- suppressWarnings(as.name("\u03c1"))
   expr <- call("*", rho, rho)
 
