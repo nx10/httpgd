@@ -55,3 +55,7 @@ httpgd_id_ <- function(devnum, page, limit) {
 httpgd_clear_ <- function(devnum) {
   .Call(`_httpgd_httpgd_clear_`, devnum)
 }
+
+httpgd_service_ <- function() {
+  .Call(`_httpgd_httpgd_service_`)
+}

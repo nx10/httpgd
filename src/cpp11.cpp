@@ -103,6 +103,13 @@ extern "C" SEXP _httpgd_httpgd_clear_(SEXP devnum) {
     return cpp11::as_sexp(httpgd_clear_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum)));
   END_CPP11
 }
+// Httpgd.cpp
+bool httpgd_service_();
+extern "C" SEXP _httpgd_httpgd_service_() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(httpgd_service_());
+  END_CPP11
+}
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
@@ -119,6 +126,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_renderer_is_raw_", (DL_FUNC) &_httpgd_httpgd_renderer_is_raw_,  1},
     {"_httpgd_httpgd_renderer_is_str_", (DL_FUNC) &_httpgd_httpgd_renderer_is_str_,  1},
     {"_httpgd_httpgd_renderers_",       (DL_FUNC) &_httpgd_httpgd_renderers_,        1},
+    {"_httpgd_httpgd_service_",         (DL_FUNC) &_httpgd_httpgd_service_,          0},
     {"_httpgd_httpgd_state_",           (DL_FUNC) &_httpgd_httpgd_state_,            1},
     {NULL, NULL, 0}
 };

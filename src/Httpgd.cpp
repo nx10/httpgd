@@ -351,3 +351,12 @@ bool httpgd_clear_(int devnum)
     auto dev = validate_httpgddev(devnum);
     return dev->api_clear();
 }
+
+#include "ServiceThread.h"
+
+[[cpp11::register]]
+bool httpgd_service_()
+{
+    httpgd::async::init();
+    return true;
+}
