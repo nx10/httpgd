@@ -31,12 +31,10 @@ License: GPL (>= 2)
 Depends:
     R (>= 3.2.0)
 Imports: 
-    later (>= 1.1.0),
     systemfonts (>= 1.0.0)
 LinkingTo: 
     cpp11 (>= 0.2.4),
     BH (>= 1.75.0),
-    later,
     systemfonts
 Suggests:
     testthat,

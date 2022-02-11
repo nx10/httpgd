@@ -7,12 +7,8 @@
 #include <windows.h>
 
 #include <cpp11/R.hpp>
-#include <cpp11.hpp>
-
+#include <cpp11/protect.hpp>
 #include <thread>
-#include <chrono>
-#include <deque>
-
 
 #include "AsyncUtilsDebug.h"
 
@@ -22,8 +18,6 @@ namespace httpgd
     {
         namespace
         {
-            
-
             const UINT HTTPGD_MESSAGE_ID = WM_USER + 201;
             threadsafe_queue<function_wrapper> work_queue;
 
@@ -33,8 +27,8 @@ namespace httpgd
                 {
                     dbg_print("Do some work!...");
                     try {
-                        R_ToplevelExec([](void *task_ptr){ (*(function_wrapper*)task_ptr).call(); }, &task);
-                        //cpp11::unwind_protect([&](){ task.call(); });
+                        //R_ToplevelExec([](void *task_ptr){ (*(function_wrapper*)task_ptr).call(); }, &task);
+                        cpp11::unwind_protect([&](){ task.call(); });
                     } catch (const std::exception& e) {
                         dbg_print(e.what());
                     } catch (...) {
