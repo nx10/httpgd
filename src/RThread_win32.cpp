@@ -67,14 +67,14 @@ namespace httpgd
                     if (!RegisterClassEx(&wc))
                     {
                         REprintf("Failed to register window class\n");
-                        return;
+                        //return;
                     }
 
                     m_hwind = CreateWindowEx(0, class_name, TEXT("httpgd"), 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
                     if (!m_hwind)
                     {
                         REprintf("Failed to create message-only window\n");
-                        return;
+                        //return;
                     }
 
                     Rprintf("Initialized!\n");
@@ -94,15 +94,14 @@ namespace httpgd
 
             private:
                 HWND m_hwind;
-            } service_timer;
-
+            } message_handler;
         }
 
         void r_thread_impl(function_wrapper &&task)
         {
             dbg_print("Submission.");
             work_queue.push(std::move(task));
-            service_timer.message();
+            message_handler.message();
         }
 
     } // namespace service

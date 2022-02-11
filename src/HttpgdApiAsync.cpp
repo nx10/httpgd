@@ -39,17 +39,6 @@ namespace httpgd
         return async::r_thread([&](){
             return this->m_rdevice->api_remove(index);
         }).get();
-
-        /*asynclater::later([](void *t_dat) {
-            auto dat = static_cast<AsyncApiCallIndexData *>(t_dat);
-            HttpgdApi *api = dat->api;
-            api->api_remove(dat->index);
-            delete dat;
-        },
-                     dat, 0.0);
-        asynclater::awaitLater();
-
-        return true;*/
     }
     bool HttpgdApiAsync::api_clear()
     {
