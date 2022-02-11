@@ -352,11 +352,10 @@ bool httpgd_clear_(int devnum)
     return dev->api_clear();
 }
 
-#include "ServiceThread.h"
+#include "RThread.h"
 
 [[cpp11::register]]
 bool httpgd_service_()
 {
-    httpgd::async::init();
     return true;
 }

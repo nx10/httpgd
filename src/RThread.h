@@ -10,21 +10,19 @@ namespace httpgd
 {
     namespace async
     {
-        const threadsafe_queue<function_wrapper> &get_work_queue();
+        void r_thread_impl(function_wrapper &&f);
 
         template <typename FunctionType>
         std::future<typename std::result_of<FunctionType()>::type>
-        submit(FunctionType f)
+        r_thread(FunctionType f)
         {
             typedef typename std::result_of<FunctionType()>::type
                 result_type;
             std::packaged_task<result_type()> task(std::move(f));
             std::future<result_type> res(task.get_future());
-            get_work_queue().push(std::move(task));
+            r_thread_impl(std::move(task));
             return res;
         }
-
-        void init();
 
     } // namespace async
 } // namespace httpgd

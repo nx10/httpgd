@@ -3,7 +3,7 @@
 
 namespace httpgd
 {
-    namespace asynclater
+    namespace asynclater2
     {
         // Thread safe later
         void later(void (*func)(void *), void *data, double secs);
