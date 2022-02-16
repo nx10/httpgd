@@ -10,6 +10,9 @@ namespace httpgd
 {
     namespace async
     {
+        void ipc_open();
+        void ipc_close();
+
         void r_thread_impl(function_wrapper &&f);
 
         template <typename FunctionType>

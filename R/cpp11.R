@@ -56,6 +56,10 @@ httpgd_clear_ <- function(devnum) {
   .Call(`_httpgd_httpgd_clear_`, devnum)
 }
 
-httpgd_service_ <- function() {
-  .Call(`_httpgd_httpgd_service_`)
+httpgd_ipc_open_ <- function() {
+  invisible(.Call(`_httpgd_httpgd_ipc_open_`))
+}
+
+httpgd_ipc_close_ <- function() {
+  invisible(.Call(`_httpgd_httpgd_ipc_close_`))
 }

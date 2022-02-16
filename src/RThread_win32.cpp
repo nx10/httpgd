@@ -18,25 +18,26 @@ namespace httpgd
     {
         namespace
         {
+            const auto *HTTPGD_WINDOW_CLASS_NAME = TEXT("httpgd_window_class");
             const UINT HTTPGD_MESSAGE_ID = WM_USER + 201;
             threadsafe_queue<function_wrapper> work_queue;
+            bool ipc_initialized{false};
+            HWND message_hwind;
 
             inline void process_tasks() {
                 function_wrapper task;
                 while (work_queue.try_pop(task))
                 {
-                    dbg_print("Do some work!...");
                     try {
+                        // I am not sure which is better:
                         //R_ToplevelExec([](void *task_ptr){ (*(function_wrapper*)task_ptr).call(); }, &task);
                         cpp11::unwind_protect([&](){ task.call(); });
                     } catch (const std::exception& e) {
-                        dbg_print(e.what());
+                        REprintf("httpgd error: '%s'\n", e.what());
                     } catch (...) {
-                        dbg_print("Unknown error");
+                        REprintf("httpgd unknown error.");
                     }
-                    dbg_print("...done!");
                 }
-                dbg_print("Nothing to do!");
             }
 
             LRESULT CALLBACK callbackWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -44,7 +45,6 @@ namespace httpgd
                 switch (message)
                 {
                 case HTTPGD_MESSAGE_ID:
-                    dbg_print("httpgd calls!");
                     process_tasks();
                     return 0;
                 default:
@@ -52,56 +52,80 @@ namespace httpgd
                 }
             }
 
-            class WinMessageHandler
+            inline bool window_class_exists() {
+                WNDCLASSEX wc{};
+                return GetClassInfoEx(GetModuleHandle(NULL), HTTPGD_WINDOW_CLASS_NAME, &wc) != 0;
+            }
+
+            inline bool register_window_class() {
+                WNDCLASSEX wc = {};
+                wc.cbSize = sizeof(WNDCLASSEX);
+                wc.lpfnWndProc = callbackWndProc;
+                wc.hInstance = GetModuleHandle(NULL);
+                wc.lpszClassName = HTTPGD_WINDOW_CLASS_NAME;
+                return RegisterClassEx(&wc) != 0;
+            }
+            
+            inline HWND create_message_window() {
+                return CreateWindowEx(0, HTTPGD_WINDOW_CLASS_NAME, TEXT("httpgd"), 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
+            }
+
+            inline void notify()
             {
-            public:
-                WinMessageHandler()
+                PostMessage(message_hwind, HTTPGD_MESSAGE_ID, 0, 0);
+            }
+        }
+
+        void ipc_open() 
+        {
+            if (ipc_initialized) return;
+
+            if (!window_class_exists()) { 
+                // If there is already another version of httpgd loaded. (E.g. with pkgload::load_all,
+                // which, unfortunately does not call .onUnload),
+                // we have to re-use the (unique) window class, but should not reuse the message window. 
+                // Otherwise we could not destroy the window while it is in use.
+                // As the callback lives inside the window class, messages be received only once.
+                
+                //message_hwind = FindWindowEx(NULL, NULL, HTTPGD_WINDOW_CLASS_NAME, TEXT("httpgd"));
+
+                if (!register_window_class())
                 {
-                    static const TCHAR *class_name = TEXT("httpgd_window_class");
-                    WNDCLASSEX wc = {};
-                    wc.cbSize = sizeof(WNDCLASSEX);
-                    wc.lpfnWndProc = callbackWndProc;
-                    wc.hInstance = NULL;
-                    wc.lpszClassName = class_name;
-
-                    if (!RegisterClassEx(&wc))
-                    {
-                        REprintf("Failed to register window class\n");
-                        //return;
-                    }
-
-                    m_hwind = CreateWindowEx(0, class_name, TEXT("httpgd"), 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
-                    if (!m_hwind)
-                    {
-                        REprintf("Failed to create message-only window\n");
-                        //return;
-                    }
-
-                    Rprintf("Initialized!\n");
+                    REprintf("httpgd: Failed to register window class.\n");
                 }
+            }
 
-                ~WinMessageHandler()
-                {
-                    Rprintf("Destroyed!\n");
-                    DestroyWindow(m_hwind);
-                    Rprintf("done!\n");
-                }
+            message_hwind = create_message_window();
+            if (!message_hwind)
+            {
+                cpp11::stop("httpgd: Failed to create message window.");
+                return;
+            }
+            ipc_initialized = true;
+        }
+        
+        void ipc_close() 
+        {
+            if (!ipc_initialized) return;
 
-                void message()
-                {
-                    PostMessage(m_hwind, HTTPGD_MESSAGE_ID, 0, 0);
-                }
+            if (DestroyWindow(message_hwind) == 0) {
+                REprintf("httpgd: Failed to destroy message window.\n");
+            }
 
-            private:
-                HWND m_hwind;
-            } message_handler;
+            // We can not be sure if there is another dll instance loaded with pkgload::load_all
+            // so we cannot unregister the window class.
+
+            //if (UnregisterClass(HTTPGD_WINDOW_CLASS_NAME, NULL) == 0) {
+            //    REprintf("httpgd: Failed to unregister window class.\n");
+            //}
+
+            ipc_initialized = false;
         }
 
         void r_thread_impl(function_wrapper &&task)
         {
-            dbg_print("Submission.");
             work_queue.push(std::move(task));
-            message_handler.message();
+            notify();
         }
 
     } // namespace service

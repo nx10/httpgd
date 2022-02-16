@@ -40,7 +40,7 @@ namespace httpgd {
             class PosixMessageHandler
             {
             public:
-                PosixMessageHandler()
+                void open()
                 {
                     dbg_print("Message handler initialized.");
 
@@ -52,7 +52,7 @@ namespace httpgd {
                     m_input_handle = addInputHandler(R_InputHandlers, m_fd[0], input_handler, HTTPGD_ACTIVITY_ID);
                 }
 
-                ~PosixMessageHandler()
+                void close()
                 {
                     dbg_print("Message handler destroying...");
                     
@@ -89,6 +89,16 @@ namespace httpgd {
                 dbg_print("input handler");
                 process_tasks();
             }
+        }
+        
+        void ipc_open() 
+        {
+            message_handler.open();
+        }
+        
+        void ipc_close() 
+        {
+            message_handler.close();
         }
 
         void r_thread_impl(function_wrapper &&task)

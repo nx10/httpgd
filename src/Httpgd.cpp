@@ -18,6 +18,7 @@
 #include "HttpgdVersion.h"
 #include "RendererSvg.h"
 #include "RendererManager.h"
+#include "RThread.h"
 
 namespace httpgd
 {
@@ -352,10 +353,14 @@ bool httpgd_clear_(int devnum)
     return dev->api_clear();
 }
 
-#include "RThread.h"
+[[cpp11::register]]
+void httpgd_ipc_open_()
+{
+    httpgd::async::ipc_open();
+}
 
 [[cpp11::register]]
-bool httpgd_service_()
+void httpgd_ipc_close_()
 {
-    return true;
+    httpgd::async::ipc_close();
 }
