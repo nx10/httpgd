@@ -120,21 +120,6 @@ namespace httpgd
         };
     }
 
-    /*inline void print_thread_id()
-    {
-        std::ostringstream oss;
-        oss << std::this_thread::get_id() << std::endl;
-        REprintf("Thread ID: %s", oss.str().c_str());
-    }
-
-    template<typename T>
-    inline void print_thread_id(T message)
-    {
-        std::ostringstream oss;
-        oss << "Thread #" << std::this_thread::get_id() << " : " << message << std::endl;
-        REprintf(oss.str().c_str());
-    }*/
-
 }
 
 #endif // HTTPGD_ASYNC_UTILS_H

@@ -8,8 +8,6 @@
 #include <thread>
 #include <unistd.h>
 
-#include "AsyncUtilsDebug.h"
-
 namespace httpgd {
     namespace async {
         namespace {

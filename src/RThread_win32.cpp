@@ -10,8 +10,6 @@
 #include <cpp11/protect.hpp>
 #include <thread>
 
-#include "AsyncUtilsDebug.h"
-
 namespace httpgd
 {
     namespace async
@@ -23,24 +21,20 @@ namespace httpgd
             threadsafe_queue<function_wrapper> work_queue;
             bool ipc_initialized{false};
             HWND message_hwind;
+            
+            inline void r_print_error(const char *message) {
+                REprintf("Error (httpgd IPC): %s\n", message);
+            }
 
             inline void process_tasks() {
                 function_wrapper task;
                 while (work_queue.try_pop(task))
                 {
-                    try {
-                        // I am not sure which is better:
-                        //R_ToplevelExec([](void *task_ptr){ (*(function_wrapper*)task_ptr).call(); }, &task);
-                        cpp11::unwind_protect([&](){ task.call(); });
-                    } catch (const std::exception& e) {
-                        REprintf("httpgd error: '%s'\n", e.what());
-                    } catch (...) {
-                        REprintf("httpgd unknown error.");
-                    }
+                    task.call();
                 }
             }
 
-            LRESULT CALLBACK callbackWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+            LRESULT CALLBACK window_callback(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 switch (message)
                 {
@@ -58,9 +52,9 @@ namespace httpgd
             }
 
             inline bool register_window_class() {
-                WNDCLASSEX wc = {};
+                WNDCLASSEX wc{};
                 wc.cbSize = sizeof(WNDCLASSEX);
-                wc.lpfnWndProc = callbackWndProc;
+                wc.lpfnWndProc = window_callback;
                 wc.hInstance = GetModuleHandle(NULL);
                 wc.lpszClassName = HTTPGD_WINDOW_CLASS_NAME;
                 return RegisterClassEx(&wc) != 0;
@@ -86,19 +80,19 @@ namespace httpgd
                 // we have to re-use the (unique) window class, but should not reuse the message window. 
                 // Otherwise we could not destroy the window while it is in use.
                 // As the callback lives inside the window class, messages be received only once.
-                
+
                 //message_hwind = FindWindowEx(NULL, NULL, HTTPGD_WINDOW_CLASS_NAME, TEXT("httpgd"));
 
                 if (!register_window_class())
                 {
-                    REprintf("httpgd: Failed to register window class.\n");
+                    r_print_error("httpgd: Failed to register window class.");
                 }
             }
 
             message_hwind = create_message_window();
             if (!message_hwind)
             {
-                cpp11::stop("httpgd: Failed to create message window.");
+                r_print_error("httpgd: Failed to create message window.");
                 return;
             }
             ipc_initialized = true;
@@ -109,14 +103,14 @@ namespace httpgd
             if (!ipc_initialized) return;
 
             if (DestroyWindow(message_hwind) == 0) {
-                REprintf("httpgd: Failed to destroy message window.\n");
+                r_print_error("httpgd: Failed to destroy message window.");
             }
 
             // We can not be sure if there is another dll instance loaded with pkgload::load_all
             // so we cannot unregister the window class.
 
             //if (UnregisterClass(HTTPGD_WINDOW_CLASS_NAME, NULL) == 0) {
-            //    REprintf("httpgd: Failed to unregister window class.\n");
+            //    r_print_error("httpgd: Failed to unregister window class.");
             //}
 
             ipc_initialized = false;
