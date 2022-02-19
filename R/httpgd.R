@@ -733,9 +733,3 @@ hgd_inline <- function(code,
   )
   s
 }
-
-
-#' @export
-hgd_service <- function() {
-  httpgd_service_()
-}
