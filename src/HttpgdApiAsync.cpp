@@ -35,10 +35,12 @@ namespace httpgd
         if (!m_rdevice_alive)
             return false;
 
-
-        return async::r_thread([&](){
-            return this->m_rdevice->api_remove(index);
-        }).get();
+        try {
+            return async::r_thread([&](){
+                return this->m_rdevice->api_remove(index);
+            }).get();
+        } catch (...) {}
+        return false;
     }
     bool HttpgdApiAsync::api_clear()
     {
@@ -46,11 +48,12 @@ namespace httpgd
         if (!m_rdevice_alive)
             return false;
 
-        return async::r_thread([&](){
-            return this->m_rdevice->api_clear();
-        }).get();
-
-        return true;
+        try {
+            return async::r_thread([&](){
+                return this->m_rdevice->api_clear();
+            }).get();
+        } catch (...) {}
+        return false;
     }
 
     void HttpgdApiAsync::api_prerender(int index, double width, double height)
@@ -66,7 +69,6 @@ namespace httpgd
     
     bool HttpgdApiAsync::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer, double t_scale) 
     {
-        async::dbg_print("api_render");
         if (m_data_store->diff(index, {width, height}))
         {
             api_prerender(index, width, height); // use async render call
