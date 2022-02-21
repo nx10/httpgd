@@ -103,6 +103,22 @@ extern "C" SEXP _httpgd_httpgd_clear_(SEXP devnum) {
     return cpp11::as_sexp(httpgd_clear_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum)));
   END_CPP11
 }
+// Httpgd.cpp
+void httpgd_ipc_open_();
+extern "C" SEXP _httpgd_httpgd_ipc_open_() {
+  BEGIN_CPP11
+    httpgd_ipc_open_();
+    return R_NilValue;
+  END_CPP11
+}
+// Httpgd.cpp
+void httpgd_ipc_close_();
+extern "C" SEXP _httpgd_httpgd_ipc_close_() {
+  BEGIN_CPP11
+    httpgd_ipc_close_();
+    return R_NilValue;
+  END_CPP11
+}
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
@@ -110,6 +126,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_clear_",           (DL_FUNC) &_httpgd_httpgd_clear_,            1},
     {"_httpgd_httpgd_id_",              (DL_FUNC) &_httpgd_httpgd_id_,               3},
     {"_httpgd_httpgd_info_",            (DL_FUNC) &_httpgd_httpgd_info_,             1},
+    {"_httpgd_httpgd_ipc_close_",       (DL_FUNC) &_httpgd_httpgd_ipc_close_,        0},
+    {"_httpgd_httpgd_ipc_open_",        (DL_FUNC) &_httpgd_httpgd_ipc_open_,         0},
     {"_httpgd_httpgd_plot_find_",       (DL_FUNC) &_httpgd_httpgd_plot_find_,        2},
     {"_httpgd_httpgd_plot_raw_",        (DL_FUNC) &_httpgd_httpgd_plot_raw_,         6},
     {"_httpgd_httpgd_plot_str_",        (DL_FUNC) &_httpgd_httpgd_plot_str_,         6},
