@@ -733,3 +733,98 @@ hgd_inline <- function(code,
   )
   s
 }
+
+#' Watch for changes in code files and refresh plots automatically.
+#'
+#' This function may be used to rapidly develop visualizations
+#' by replacing a workflow of reloading and executing code manually.
+#'
+#' @param watch Paths that are watched for changes (see [utils::fileSnapshot()])
+#' @param on_change Will be called when a file changes.
+#' @param interval Time interval in which changes are detected (in seconds).
+#' @param on_start Will be called after the httpgd server is started
+#'   (may be set to `NULL`).
+#' @param on_exit Will be called before the server is closed
+#'   (may be set to `NULL`).
+#' @param on_error Will be called when on_change throws an error
+#'   (may be set to `NULL`).
+#' @param ... Additional parameters passed to `hgd(webserver=FALSE, ...)`
+#'
+#' @importFrom utils changedFiles fileSnapshot
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # --- my_code.R ---
+#'
+#' plot(rnorm(100), col = "red")
+#'
+#' # --- Other file / interactive ---
+#'
+#' hgd_watch(
+#'   watch="my_code.R", # When my_code.R changes...
+#'   on_change = function(...) {
+#'     source("my_code.R") # ...call updated plot function.
+#'   }
+#' )
+#'
+#' }
+hgd_watch <- function(watch = ".",
+                      on_change = function(changed_files) {
+                        print(changed_files)
+                      },
+                      interval = 1,
+                      on_start = hgd_browse,
+                      on_exit = NULL,
+                      on_error = print,
+                      ...) {
+  if (is.null(on_error)) {
+    on_error <- function(...) {}
+  }
+
+  hgd(...)
+  tryCatch(
+    {
+      if (!is.null(on_start)) {
+        on_start()
+      }
+      files_previous <- fileSnapshot()
+      tryCatch(
+        {
+          on_change(c())
+        },
+        error = on_error
+      )
+      while (TRUE) {
+        files_current <- fileSnapshot()
+        changes <- changedFiles(files_previous, files_current)
+        if (sum(changes$changes) > 0) {
+          hgd_clear()
+          files_previous <- files_current
+          tryCatch(
+            {
+              on_change(changes$changed)
+            },
+            error = on_error
+          )
+        }
+        Sys.sleep(interval)
+      }
+    },
+    finally = {
+      if (!is.null(on_exit)) {
+        tryCatch(
+          {
+            on_exit()
+          },
+          finally = {
+            dev.off()
+          }
+        )
+      } else {
+        dev.off()
+      }
+    }
+  )
+}
