@@ -1,4 +1,4 @@
-#include "AsyncLater.h"
+#include "RThread.h"
 #include "HttpgdApiAsync.h"
 
 namespace httpgd
@@ -34,20 +34,12 @@ namespace httpgd
         if (!m_rdevice_alive)
             return false;
 
-        auto dat = new AsyncApiCallIndexData{
-            m_rdevice,
-            index};
-
-        asynclater::later([](void *t_dat) {
-            auto dat = static_cast<AsyncApiCallIndexData *>(t_dat);
-            HttpgdApi *api = dat->api;
-            api->api_remove(dat->index);
-            delete dat;
-        },
-                     dat, 0.0);
-        asynclater::awaitLater();
-
-        return true;
+        try {
+            return async::r_thread([&](){
+                return this->m_rdevice->api_remove(index);
+            }).get();
+        } catch (...) {}
+        return false;
     }
     bool HttpgdApiAsync::api_clear()
     {
@@ -55,14 +47,12 @@ namespace httpgd
         if (!m_rdevice_alive)
             return false;
 
-        asynclater::later([](void *t_api) {
-            auto api = static_cast<HttpgdApi *>(t_api);
-            api->api_clear();
-        },
-                     m_rdevice, 0.0);
-        asynclater::awaitLater();
-
-        return true;
+        try {
+            return async::r_thread([&](){
+                return this->m_rdevice->api_clear();
+            }).get();
+        } catch (...) {}
+        return false;
     }
 
     void HttpgdApiAsync::api_prerender(int index, double width, double height)
@@ -71,20 +61,9 @@ namespace httpgd
         if (!m_rdevice_alive)
             return;
 
-        auto dat = new AsyncApiCallIndexSizeData{
-            m_rdevice,
-            index,
-            width,
-            height};
-
-        asynclater::later([](void *t_dat) {
-            auto dat = static_cast<AsyncApiCallIndexSizeData *>(t_dat);
-            HttpgdApi *api = dat->api;
-            api->api_prerender(dat->index, dat->width, dat->height);
-            delete dat;
-        },
-                     dat, 0.0);
-        asynclater::awaitLater();
+        async::r_thread([&](){
+            this->m_rdevice->api_prerender(index, width, height);
+        }).wait();        
     }
     
     bool HttpgdApiAsync::api_render(int index, double width, double height, dc::RenderingTarget *t_renderer, double t_scale) 

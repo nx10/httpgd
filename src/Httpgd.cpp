@@ -18,6 +18,7 @@
 #include "HttpgdVersion.h"
 #include "RendererSvg.h"
 #include "RendererManager.h"
+#include "RThread.h"
 
 namespace httpgd
 {
@@ -350,4 +351,16 @@ bool httpgd_clear_(int devnum)
 {
     auto dev = validate_httpgddev(devnum);
     return dev->api_clear();
+}
+
+[[cpp11::register]]
+void httpgd_ipc_open_()
+{
+    httpgd::async::ipc_open();
+}
+
+[[cpp11::register]]
+void httpgd_ipc_close_()
+{
+    httpgd::async::ipc_close();
 }
