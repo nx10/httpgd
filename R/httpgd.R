@@ -734,6 +734,14 @@ hgd_inline <- function(code,
   s
 }
 
+files_snapshot <- function(files) {
+  data.frame(file=files, mtime=file.info(files)[,"mtime"])
+}
+
+files_changed <- function(snap1, snap2) {
+  snap1$file[snap1$mtime != snap2$mtime]
+}
+
 #' Watch for changes in code files and refresh plots automatically.
 #'
 #' This function may be used to rapidly develop visualizations
@@ -770,7 +778,7 @@ hgd_inline <- function(code,
 #' )
 #'
 #' }
-hgd_watch <- function(watch = ".",
+hgd_watch <- function(watch = list.files(pattern="\\.R$", ignore.case = T),
                       on_change = function(changed_files) {
                         print(changed_files)
                       },
@@ -789,7 +797,7 @@ hgd_watch <- function(watch = ".",
       if (!is.null(on_start)) {
         on_start()
       }
-      files_previous <- fileSnapshot(path = watch)
+      files_previous <- files_snapshot(watch)
       tryCatch(
         {
           on_change(c())
@@ -797,14 +805,14 @@ hgd_watch <- function(watch = ".",
         error = on_error
       )
       while (TRUE) {
-        files_current <- fileSnapshot(path = watch)
-        changes <- changedFiles(files_previous, files_current)
-        if (sum(changes$changes) > 0) {
+        files_current <- files_snapshot(watch)
+        changes <- files_changed(files_previous, files_current)
+        if (length(changes) > 0) {
           hgd_clear()
           files_previous <- files_current
           tryCatch(
             {
-              on_change(changes$changed)
+              on_change(changes)
             },
             error = on_error
           )
