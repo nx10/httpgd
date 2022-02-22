@@ -789,7 +789,7 @@ hgd_watch <- function(watch = ".",
       if (!is.null(on_start)) {
         on_start()
       }
-      files_previous <- fileSnapshot()
+      files_previous <- fileSnapshot(path = watch)
       tryCatch(
         {
           on_change(c())
@@ -797,7 +797,7 @@ hgd_watch <- function(watch = ".",
         error = on_error
       )
       while (TRUE) {
-        files_current <- fileSnapshot()
+        files_current <- fileSnapshot(path = watch)
         changes <- changedFiles(files_previous, files_current)
         if (sum(changes$changes) > 0) {
           hgd_clear()
