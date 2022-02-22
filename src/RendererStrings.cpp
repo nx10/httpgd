@@ -33,9 +33,9 @@ namespace httpgd::dc
     void RendererStrings::text(const Text &t_text)
     {
         if (string_count++ > 0) {
-            fmt::format_to(os, "\n");
+            fmt::format_to(std::back_inserter(os), "\n");
         }
-        fmt::format_to(os, "{}", t_text.str);
+        fmt::format_to(std::back_inserter(os), "{}", t_text.str);
     }
 
     void RendererStrings::circle(const Circle &t_circle)
