@@ -379,6 +379,9 @@ namespace httpgd
         m_target.set_void();
         m_target.set_newest_index(-1);
 
+        if (m_server && m_server_running)
+            m_server->broadcast_state_current();
+
         return r;
     }
 
@@ -406,6 +409,9 @@ namespace httpgd
         }
         m_target.set_newest_index(m_target.get_newest_index() - 1);
         replaying = false;
+
+        if (m_server && m_server_running)
+            m_server->broadcast_state_current();
 
         return r;
     }
