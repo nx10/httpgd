@@ -252,13 +252,13 @@ namespace httpgd
                 ctx.res.result(OB::Belle::Status::ok);
 
                 fmt::memory_buffer buf;
-                fmt::format_to(buf, "{{\n \"renderers\": [\n");
+                fmt::format_to(std::back_inserter(buf), "{{\n \"renderers\": [\n");
                 
                 const auto &renderers = RendererManager::defaults();
 
                 for (auto it = renderers.string_renderers().begin(); it != renderers.string_renderers().end(); it++) 
                 {
-                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": false, "descr": "{}" }})"",
+                    fmt::format_to(std::back_inserter(buf), R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": false, "descr": "{}" }})"",
                         it->second.id,
                         it->second.mime,
                         it->second.fileext,
@@ -268,13 +268,13 @@ namespace httpgd
                     );
                     if (std::next(it) != renderers.string_renderers().end())
                     {
-                        fmt::format_to(buf, ",\n");
+                        fmt::format_to(std::back_inserter(buf), ",\n");
                     }
                 }
                 for (auto it = renderers.binary_renderers().begin(); it != renderers.binary_renderers().end(); it++) 
                 {
-                    fmt::format_to(buf, ",\n");
-                    fmt::format_to(buf, R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": true, "descr": "{}" }})"",
+                    fmt::format_to(std::back_inserter(buf), ",\n");
+                    fmt::format_to(std::back_inserter(buf), R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": true, "descr": "{}" }})"",
                         it->second.id,
                         it->second.mime,
                         it->second.fileext,
@@ -284,7 +284,7 @@ namespace httpgd
                     );
                 }
                 
-                fmt::format_to(buf, "\n ]\n}}");
+                fmt::format_to(std::back_inserter(buf), "\n ]\n}}");
 
                 ctx.res.body() = fmt::to_string(buf);
             });

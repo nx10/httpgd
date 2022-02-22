@@ -362,7 +362,7 @@ namespace httpgd::dc
         auto *os = static_cast<fmt::memory_buffer *>(closure);
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
         std::string s( reinterpret_cast<char const*>(data), length ) ;
-        fmt::format_to(*os, "{}", s);
+        fmt::format_to(std::back_inserter(*os), "{}", s);
         return CAIRO_STATUS_SUCCESS;
     }
 
