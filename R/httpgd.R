@@ -351,9 +351,9 @@ hgd_svg <-
 #'
 #' hgd()
 #' plot(1, 1)
-#' s <- hgd_svg(width = 600, height = 400)
+#' s <- hgd_plot(width = 600, height = 400, renderer = "svg")
 #' hist(rnorm(100))
-#' hgd_svg(file = tempfile(), width = 600, height = 400)
+#' hgd_plot(file = tempfile(), width = 600, height = 400, renderer = "png")
 #'
 #' dev.off()
 #' }
