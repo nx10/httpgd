@@ -20,3 +20,4 @@
 ^_pkgdown\.yml$
 ^pkgdown$
 ^CRAN-SUBMISSION$
+^codecov\.yml$

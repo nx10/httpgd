@@ -4,6 +4,7 @@
 [![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
 [![CRAN](https://www.r-pkg.org/badges/version/httpgd)](https://CRAN.R-project.org/package=httpgd)
 ![downloads](https://cranlogs.r-pkg.org/badges/grand-total/httpgd)
+[![Codecov test coverage](https://codecov.io/gh/nx10/httpgd/branch/master/graph/badge.svg)](https://app.codecov.io/gh/nx10/httpgd?branch=master)
 <!-- badges: end -->
 
 A graphics device for R that is accessible via network protocols.
