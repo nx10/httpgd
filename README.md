@@ -1,4 +1,4 @@
-# `httpgd` <img src="man/figures/httpgd_logo.svg" align="right" height=250/>
+# `httpgd` <img src="man/figures/httpgd_logo.svg" style="float: right" width=25%/>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
@@ -77,7 +77,7 @@ Other areas in need of improvement are testing and documentation.
 
 ## About &amp; License
 
-Depends on `cpp11`, `later` and `systemfonts`.
+Depends on `cpp11` and `systemfonts`.
 
 Webserver based on [`Boost/Beast`](<https://github.com/boostorg/beast>) included in the `BH` package.
     
