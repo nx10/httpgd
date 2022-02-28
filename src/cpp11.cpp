@@ -6,10 +6,10 @@
 #include <R_ext/Visibility.h>
 
 // Httpgd.cpp
-bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent, bool fix_text_width, std::string extra_css);
-extern "C" SEXP _httpgd_httpgd_(SEXP host, SEXP port, SEXP bg, SEXP width, SEXP height, SEXP pointsize, SEXP aliases, SEXP cors, SEXP token, SEXP webserver, SEXP silent, SEXP fix_text_width, SEXP extra_css) {
+bool httpgd_(std::string host, int port, std::string bg, double width, double height, double pointsize, cpp11::list aliases, bool cors, std::string token, bool webserver, bool silent, bool fix_text_width, std::string extra_css, bool reset_par);
+extern "C" SEXP _httpgd_httpgd_(SEXP host, SEXP port, SEXP bg, SEXP width, SEXP height, SEXP pointsize, SEXP aliases, SEXP cors, SEXP token, SEXP webserver, SEXP silent, SEXP fix_text_width, SEXP extra_css, SEXP reset_par) {
   BEGIN_CPP11
-    return cpp11::as_sexp(httpgd_(cpp11::as_cpp<cpp11::decay_t<std::string>>(host), cpp11::as_cpp<cpp11::decay_t<int>>(port), cpp11::as_cpp<cpp11::decay_t<std::string>>(bg), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(pointsize), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(aliases), cpp11::as_cpp<cpp11::decay_t<bool>>(cors), cpp11::as_cpp<cpp11::decay_t<std::string>>(token), cpp11::as_cpp<cpp11::decay_t<bool>>(webserver), cpp11::as_cpp<cpp11::decay_t<bool>>(silent), cpp11::as_cpp<cpp11::decay_t<bool>>(fix_text_width), cpp11::as_cpp<cpp11::decay_t<std::string>>(extra_css)));
+    return cpp11::as_sexp(httpgd_(cpp11::as_cpp<cpp11::decay_t<std::string>>(host), cpp11::as_cpp<cpp11::decay_t<int>>(port), cpp11::as_cpp<cpp11::decay_t<std::string>>(bg), cpp11::as_cpp<cpp11::decay_t<double>>(width), cpp11::as_cpp<cpp11::decay_t<double>>(height), cpp11::as_cpp<cpp11::decay_t<double>>(pointsize), cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(aliases), cpp11::as_cpp<cpp11::decay_t<bool>>(cors), cpp11::as_cpp<cpp11::decay_t<std::string>>(token), cpp11::as_cpp<cpp11::decay_t<bool>>(webserver), cpp11::as_cpp<cpp11::decay_t<bool>>(silent), cpp11::as_cpp<cpp11::decay_t<bool>>(fix_text_width), cpp11::as_cpp<cpp11::decay_t<std::string>>(extra_css), cpp11::as_cpp<cpp11::decay_t<bool>>(reset_par)));
   END_CPP11
 }
 // Httpgd.cpp
@@ -122,7 +122,7 @@ extern "C" SEXP _httpgd_httpgd_ipc_close_() {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_httpgd_httpgd_",                 (DL_FUNC) &_httpgd_httpgd_,                 13},
+    {"_httpgd_httpgd_",                 (DL_FUNC) &_httpgd_httpgd_,                 14},
     {"_httpgd_httpgd_clear_",           (DL_FUNC) &_httpgd_httpgd_clear_,            1},
     {"_httpgd_httpgd_id_",              (DL_FUNC) &_httpgd_httpgd_id_,               3},
     {"_httpgd_httpgd_info_",            (DL_FUNC) &_httpgd_httpgd_info_,             1},

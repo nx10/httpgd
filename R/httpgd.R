@@ -54,6 +54,9 @@
 #'   and background).
 #' @param extra_css Extra CSS to be added to the SVG. This can be used
 #'   to embed webfonts.
+#' @param reset_par If set to `TRUE`, global graphics parameters will be saved 
+#'   on device start and reset every time [hgd_clear()] is called (see 
+#'   [graphics::par()]).
 #'
 #' @return No return value, called to initialize graphics device.
 #'
@@ -87,7 +90,8 @@ hgd <-
            websockets = getOption("httpgd.websockets", TRUE),
            webserver = getOption("httpgd.webserver", TRUE),
            fix_text_width = getOption("httpgd.fix_text_width", TRUE),
-           extra_css = getOption("httpgd.extra_css", "")) {
+           extra_css = getOption("httpgd.extra_css", ""),
+           reset_par = getOption("httpgd.reset_par", FALSE)) {
     tok <- ""
     if (is.character(token)) {
       tok <- token
@@ -101,7 +105,8 @@ hgd <-
     if (httpgd_(
       host, port, bg, width, height,
       pointsize, aliases, cors, tok, webserver, silent,
-      fix_text_width, extra_css
+      fix_text_width, extra_css,
+      reset_par
     )) {
       if (!silent && webserver) {
         cat("httpgd server running at:\n")

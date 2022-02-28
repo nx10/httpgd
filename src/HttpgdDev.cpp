@@ -13,6 +13,14 @@
 
 namespace httpgd
 {
+    static inline void r_graphics_par_set(cpp11::list t_par) {
+        (cpp11::package("graphics")["par"])(t_par);
+    }
+    static inline cpp11::list r_graphics_par_get() {
+        using namespace cpp11::literals;
+        return cpp11::as_cpp<cpp11::list>(cpp11::package("graphics")["par"]("no.readonly"_nm = true));
+    }
+
     int DeviceTarget::get_index() const
     {
         return m_index;
@@ -53,6 +61,8 @@ namespace httpgd
         m_data_store = std::make_shared<HttpgdDataStore>();
         m_data_store->extra_css(t_params.extra_css);
         m_api_async_watcher = std::make_shared<HttpgdApiAsync>(this, m_svr_config, m_data_store);
+
+        m_reset_par = t_params.reset_par ? r_graphics_par_get() : cpp11::list();
 
         // setup http server
         m_server = m_svr_config->webserver ? std::make_shared<web::WebServer>(m_api_async_watcher) : nullptr;
@@ -178,8 +188,7 @@ namespace httpgd
      */
     inline gvertex<double> find_minsize()
     {
-        const auto par = cpp11::package("graphics")["par"];
-        const auto mai = cpp11::as_cpp<cpp11::doubles>(cpp11::as_cpp<cpp11::list>(par())["mai"]);
+        const auto mai = cpp11::as_cpp<cpp11::doubles>(r_graphics_par_get()["mai"]);
         const double minw = (mai[1] + mai[3]) * 72 + 1;
         const double minh = (mai[0] + mai[2]) * 72 + 1;
         return {minw, minh};
@@ -378,6 +387,12 @@ namespace httpgd
         m_history.clear();
         m_target.set_void();
         m_target.set_newest_index(-1);
+
+        if (m_reset_par.size() != 0) 
+        {
+            const auto par = cpp11::package("graphics")["par"];
+            par(m_reset_par);
+        }
 
         if (m_server && m_server_running)
             m_server->broadcast_state_current();

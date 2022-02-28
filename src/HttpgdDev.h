@@ -29,6 +29,7 @@ namespace httpgd
         cpp11::list aliases;
         bool fix_strwidth;
         boost::optional<std::string> extra_css;
+        bool reset_par;
     };
 
     class DeviceTarget
@@ -119,6 +120,9 @@ namespace httpgd
         void resize_device_to_page(pDevDesc dd);
 
         bool m_fix_strwidth  = true;
+        
+        // graphical parameters for reseting
+        cpp11::list m_reset_par;
     };
 
 } // namespace httpgd

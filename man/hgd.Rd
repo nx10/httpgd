@@ -19,7 +19,8 @@ hgd(
   websockets = getOption("httpgd.websockets", TRUE),
   webserver = getOption("httpgd.webserver", TRUE),
   fix_text_width = getOption("httpgd.fix_text_width", TRUE),
-  extra_css = getOption("httpgd.extra_css", "")
+  extra_css = getOption("httpgd.extra_css", ""),
+  reset_par = getOption("httpgd.reset_par", FALSE)
 )
 }
 \arguments{
@@ -81,6 +82,10 @@ and background).}
 
 \item{extra_css}{Extra CSS to be added to the SVG. This can be used
 to embed webfonts.}
+
+\item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
+on device start and reset every time \code{\link[=hgd_clear]{hgd_clear()}} is called (see
+\code{\link[graphics:par]{graphics::par()}}).}
 }
 \value{
 No return value, called to initialize graphics device.
