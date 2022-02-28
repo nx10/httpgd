@@ -86,7 +86,8 @@ a browser.</p>
   websockets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.websockets"</span>, <span class="cn">TRUE</span><span class="op">)</span>,
   webserver <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.webserver"</span>, <span class="cn">TRUE</span><span class="op">)</span>,
   fix_text_width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.fix_text_width"</span>, <span class="cn">TRUE</span><span class="op">)</span>,
-  extra_css <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.extra_css"</span>, <span class="st">""</span><span class="op">)</span>
+  extra_css <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.extra_css"</span>, <span class="st">""</span><span class="op">)</span>,
+  reset_par <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.reset_par"</span>, <span class="cn">FALSE</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -151,6 +152,10 @@ and background).</p></dd>
 <dt>extra_css</dt>
 <dd><p>Extra CSS to be added to the SVG. This can be used
 to embed webfonts.</p></dd>
+<dt>reset_par</dt>
+<dd><p>If set to <code>TRUE</code>, global graphics parameters will be saved
+on device start and reset every time <code><a href="hgd_clear.html">hgd_clear()</a></code> is called (see
+<code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">graphics::par()</a></code>).</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
