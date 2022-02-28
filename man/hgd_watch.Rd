@@ -11,6 +11,7 @@ hgd_watch(
   on_start = hgd_browse,
   on_exit = NULL,
   on_error = print,
+  reset_par = TRUE,
   ...
 )
 }
@@ -29,6 +30,10 @@ hgd_watch(
 
 \item{on_error}{Will be called when on_change throws an error
 (may be set to \code{NULL}).}
+
+\item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
+on device start and reset every time \code{\link[=hgd_clear]{hgd_clear()}} is called (see
+\code{\link[graphics:par]{graphics::par()}}).}
 
 \item{...}{Additional parameters passed to \code{hgd(webserver=FALSE, ...)}}
 }

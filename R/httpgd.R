@@ -54,8 +54,8 @@
 #'   and background).
 #' @param extra_css Extra CSS to be added to the SVG. This can be used
 #'   to embed webfonts.
-#' @param reset_par If set to `TRUE`, global graphics parameters will be saved 
-#'   on device start and reset every time [hgd_clear()] is called (see 
+#' @param reset_par If set to `TRUE`, global graphics parameters will be saved
+#'   on device start and reset every time [hgd_clear()] is called (see
 #'   [graphics::par()]).
 #'
 #' @return No return value, called to initialize graphics device.
@@ -761,6 +761,9 @@ files_changed <- function(snap1, snap2) {
 #'   (may be set to `NULL`).
 #' @param on_error Will be called when on_change throws an error
 #'   (may be set to `NULL`).
+#' @param reset_par If set to `TRUE`, global graphics parameters will be saved
+#'   on device start and reset every time [hgd_clear()] is called (see
+#'   [graphics::par()]).
 #' @param ... Additional parameters passed to `hgd(webserver=FALSE, ...)`
 #'
 #' @importFrom utils changedFiles fileSnapshot
@@ -791,12 +794,13 @@ hgd_watch <- function(watch = list.files(pattern="\\.R$", ignore.case = T),
                       on_start = hgd_browse,
                       on_exit = NULL,
                       on_error = print,
+                      reset_par = TRUE,
                       ...) {
   if (is.null(on_error)) {
     on_error <- function(...) {}
   }
 
-  hgd(...)
+  hgd(..., reset_par = reset_par)
   tryCatch(
     {
       if (!is.null(on_start)) {
