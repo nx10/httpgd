@@ -1,4 +1,4 @@
-# `httpgd` <img src="man/figures/httpgd_logo.svg" style="float: right" width=25%/>
+# `httpgd` <img src="man/figures/httpgd_logo.svg" align="right" width="25%"/>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
