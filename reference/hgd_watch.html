@@ -72,6 +72,7 @@ by replacing a workflow of reloading and executing code manually.</p>
   on_start <span class="op">=</span> <span class="va">hgd_browse</span>,
   on_exit <span class="op">=</span> <span class="cn">NULL</span>,
   on_error <span class="op">=</span> <span class="va">print</span>,
+  reset_par <span class="op">=</span> <span class="cn">TRUE</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -93,6 +94,10 @@ by replacing a workflow of reloading and executing code manually.</p>
 <dt>on_error</dt>
 <dd><p>Will be called when on_change throws an error
 (may be set to <code>NULL</code>).</p></dd>
+<dt>reset_par</dt>
+<dd><p>If set to <code>TRUE</code>, global graphics parameters will be saved
+on device start and reset every time <code><a href="hgd_clear.html">hgd_clear()</a></code> is called (see
+<code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">graphics::par()</a></code>).</p></dd>
 <dt>...</dt>
 <dd><p>Additional parameters passed to <code>hgd(webserver=FALSE, ...)</code></p></dd>
 </dl></div>
