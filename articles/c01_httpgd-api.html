@@ -241,89 +241,95 @@
 <p>The following is a complete list of renderers.</p>
 <table class="table">
 <colgroup>
-<col width="8%">
-<col width="23%">
-<col width="54%">
-<col width="5%">
-<col width="6%">
+<col width="10%">
+<col width="25%">
+<col width="57%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
-<th>ID</th>
-<th>Mime-Type</th>
-<th>Renderer</th>
-<th>Format</th>
-<th>Depends</th>
+<th align="left">ID</th>
+<th align="left">Mime-Type</th>
+<th align="left">Renderer</th>
+<th align="left">Format</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code>svg</code></td>
-<td><code>image/svg+xml</code></td>
-<td>Scalable Vector Graphics (SVG).</td>
-<td>string</td>
-<td></td>
+<td align="left"><code>eps</code></td>
+<td align="left"><code>application/postscript</code></td>
+<td align="left">Encapsulated PostScript (EPS).</td>
+<td align="left">Text</td>
 </tr>
 <tr class="even">
-<td><code>svgp</code></td>
-<td><code>image/svg+xml</code></td>
-<td>Version of the SVG renderer that produces portable SVGs.</td>
-<td>string</td>
-<td></td>
+<td align="left"><code>json</code></td>
+<td align="left"><code>application/json</code></td>
+<td align="left">Plot data serialized to JSON format.</td>
+<td align="left">Text</td>
 </tr>
 <tr class="odd">
-<td><code>json</code></td>
-<td><code>application/json</code></td>
-<td>Plot data serialized to JSON format.</td>
-<td>string</td>
-<td></td>
+<td align="left"><code>meta</code></td>
+<td align="left"><code>application/json</code></td>
+<td align="left">Plot meta information.</td>
+<td align="left">Text</td>
 </tr>
 <tr class="even">
-<td><code>png</code></td>
-<td><code>image/png</code></td>
-<td>Portable Network Graphics (PNG).</td>
-<td>binary</td>
-<td>Cairo</td>
+<td align="left"><code>pdf</code></td>
+<td align="left"><code>application/pdf</code></td>
+<td align="left">Adobe Portable Document Format (PDF).</td>
+<td align="left">Binary</td>
 </tr>
 <tr class="odd">
-<td><code>pdf</code></td>
-<td><code>application/pdf</code></td>
-<td>Adobe Portable Document Format (PDF).</td>
-<td>binary</td>
-<td>Cairo</td>
+<td align="left"><code>png</code></td>
+<td align="left"><code>image/png</code></td>
+<td align="left">Portable Network Graphics (PNG).</td>
+<td align="left">Binary</td>
 </tr>
 <tr class="even">
-<td><code>ps</code></td>
-<td><code>application/postscript</code></td>
-<td>PostScript (PS).</td>
-<td>string</td>
-<td>Cairo</td>
+<td align="left"><code>ps</code></td>
+<td align="left"><code>application/postscript</code></td>
+<td align="left">PostScript (PS).</td>
+<td align="left">Text</td>
 </tr>
 <tr class="odd">
-<td><code>eps</code></td>
-<td><code>application/postscript</code></td>
-<td>Encapsulated PostScript (EPS).</td>
-<td>string</td>
-<td>Cairo</td>
+<td align="left"><code>strings</code></td>
+<td align="left"><code>text/plain</code></td>
+<td align="left">List of strings contained in plot.</td>
+<td align="left">Text</td>
 </tr>
 <tr class="even">
-<td><code>tikz</code></td>
-<td><code>text/plain</code></td>
-<td>LaTeX TikZ code.</td>
-<td>string</td>
-<td></td>
+<td align="left"><code>svg</code></td>
+<td align="left"><code>image/svg+xml</code></td>
+<td align="left">Scalable Vector Graphics (SVG).</td>
+<td align="left">Text</td>
 </tr>
 <tr class="odd">
-<td><code>strings</code></td>
-<td><code>text/plain</code></td>
-<td>List of plot strings.</td>
-<td>string</td>
-<td></td>
+<td align="left"><code>svgp</code></td>
+<td align="left"><code>image/svg+xml</code></td>
+<td align="left">Version of the SVG renderer that produces portable SVGs.</td>
+<td align="left">Text</td>
 </tr>
 <tr class="even">
-<td><code>meta</code></td>
-<td><code>application/json</code></td>
-<td>Plot meta information.</td>
-<td>string</td>
-<td></td>
+<td align="left"><code>svgz</code></td>
+<td align="left"><code>image/svg+xml</code></td>
+<td align="left">Compressed Scalable Vector Graphics (SVGZ).</td>
+<td align="left">Binary</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>svgzp</code></td>
+<td align="left"><code>image/svg+xml</code></td>
+<td align="left">Version of the SVG renderer that produces portable SVGZs.</td>
+<td align="left">Binary</td>
+</tr>
+<tr class="even">
+<td align="left"><code>tiff</code></td>
+<td align="left"><code>image/tiff</code></td>
+<td align="left">Tagged Image File Format (TIFF).</td>
+<td align="left">Binary</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>tikz</code></td>
+<td align="left"><code>text/plain</code></td>
+<td align="left">LaTeX TikZ code.</td>
+<td align="left">Text</td>
 </tr>
 </tbody>
 </table>
