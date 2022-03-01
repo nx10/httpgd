@@ -195,8 +195,6 @@ hgd_info <- function(which = dev.cur()) {
 #' Get a list of available renderers.
 #' This function will only work after starting a device with [hgd()].
 #'
-#' @param which Which device (ID).
-#'
 #' @return List of renderers with the following named items:
 #'   `$id`: Renderer ID,
 #'   `$mime`: File mime type,
@@ -209,13 +207,9 @@ hgd_info <- function(which = dev.cur()) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'
-#' hgd()
+#' 
 #' hgd_renderers()
 #'
-#' dev.off()
-#' }
 hgd_renderers <- function() {
   httpgd_renderers_()
 }

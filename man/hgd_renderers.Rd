@@ -6,9 +6,6 @@
 \usage{
 hgd_renderers()
 }
-\arguments{
-\item{which}{Which device (ID).}
-}
 \value{
 List of renderers with the following named items:
 \verb{$id}: Renderer ID,
@@ -23,11 +20,7 @@ Get a list of available renderers.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
 
-hgd()
 hgd_renderers()
 
-dev.off()
-}
 }
