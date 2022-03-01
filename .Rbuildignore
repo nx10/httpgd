@@ -21,3 +21,4 @@
 ^pkgdown$
 ^CRAN-SUBMISSION$
 ^codecov\.yml$
+^\.covrignore$
