@@ -7,6 +7,8 @@
 //#include <cairo-svg.h>
 #include <cairo-ps.h>
 
+#include <tiffio.hxx>
+
 // Implementation based on grDevices::cairo
 // https://github.com/wch/r-source/blob/trunk/src/library/grDevices/src/cairo/cairoFns.c
 
@@ -451,6 +453,66 @@ namespace httpgd::dc
     std::string RendererCairoEps::get_string() const 
     {
         return fmt::to_string(m_os);
+    }
+    
+    // see: https://research.cs.wisc.edu/graphics/Courses/638-f1999/libtiff_tutorial.htm
+    void RendererCairoTiff::render(const Page &t_page, double t_scale)
+    {
+        const int argb_size = 4;
+        const int width = t_page.size.x * t_scale;
+        const int height = t_page.size.y * t_scale;
+        const int stride = cairo_format_stride_for_width (CAIRO_FORMAT_ARGB32, width);
+
+        std::vector<unsigned char> raw_buffer(stride * height);
+        surface = cairo_image_surface_create_for_data(raw_buffer.data(), CAIRO_FORMAT_ARGB32, width, height, stride);
+
+        cr = cairo_create(surface);
+        cairo_scale(cr, t_scale, t_scale);
+        page(t_page);
+
+        std::ostringstream tiff_ostream;
+        TIFF* tiff = TIFFStreamOpen("memory", &tiff_ostream); // filename is ignored
+
+        TIFFSetField(tiff, TIFFTAG_IMAGEWIDTH, width);
+        TIFFSetField(tiff, TIFFTAG_IMAGELENGTH, height);
+        TIFFSetField(tiff, TIFFTAG_SAMPLESPERPIXEL, argb_size);
+        TIFFSetField(tiff, TIFFTAG_BITSPERSAMPLE, 8);
+        TIFFSetField(tiff, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
+        TIFFSetField(tiff, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+        TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+
+        TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
+        const uint16 extras[] = { EXTRASAMPLE_ASSOCALPHA };
+        TIFFSetField(tiff, TIFFTAG_EXTRASAMPLES, EXTRASAMPLE_ASSOCALPHA, extras);
+        TIFFSetField(tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff, width * argb_size));
+
+        std::vector<unsigned char> line(width * argb_size);
+        for (int row = 0; row < height; ++row) {
+            for (int x = 0; x < width * argb_size; x += argb_size) {
+                const int raw_offset = stride * row + x;
+                line[x]     = raw_buffer[raw_offset + 2];
+                line[x + 1] = raw_buffer[raw_offset + 1];
+                line[x + 2] = raw_buffer[raw_offset];
+                line[x + 3] = raw_buffer[raw_offset + 3];
+            }
+  	        if (TIFFWriteScanline(tiff, line.data(), row) < 0)
+            {
+                break;
+            }
+        }
+        
+        TIFFClose(tiff);
+
+        cairo_destroy(cr);
+        cairo_surface_destroy(surface);
+
+        const auto out = tiff_ostream.str();
+        m_render_data.assign(out.begin(), out.end());
+    }
+    
+    std::vector<unsigned char> RendererCairoTiff::get_binary() const 
+    {
+        return m_render_data;
     }
     
 

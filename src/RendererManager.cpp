@@ -104,6 +104,16 @@ namespace httpgd
           "Encapsulated PostScript (EPS)."
         });
         
+        manager.add({
+          "tiff",
+          "image/tiff",
+          ".tiff",
+          "TIFF",
+          "plot",
+          []() { return std::make_unique<dc::RendererCairoTiff>(); },
+          "Tagged Image File Format (TIFF)."
+        });
+        
 #endif
         
         manager.add({
