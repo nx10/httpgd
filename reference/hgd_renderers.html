@@ -69,11 +69,6 @@ This function will only work after starting a device with <code><a href="hgd.htm
     </div>
 
     <div class="section level2">
-    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>which</dt>
-<dd><p>Which device (ID).</p></dd>
-</dl></div>
-    <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>List of renderers with the following named items:
 <code>$id</code>: Renderer ID,
@@ -86,13 +81,37 @@ This function will only work after starting a device with <code><a href="hgd.htm
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="hgd.html">hgd</a></span><span class="op">(</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
 <span class="r-in"><span class="fu">hgd_renderers</span><span class="op">(</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         id                   mime   ext          name type   bin</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     meta       application/json .json          Meta data FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  strings             text/plain  .txt       Strings data FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     tikz             text/plain  .tex          TikZ plot FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4      eps application/postscript  .eps           EPS plot FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       ps application/postscript   .ps            PS plot FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     json       application/json .json          JSON plot FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     svgp          image/svg+xml  .svg  Portable SVG plot FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      svg          image/svg+xml  .svg           SVG plot FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     tiff             image/tiff .tiff          TIFF plot  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     pdf        application/pdf  .pdf           PDF plot  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11     png              image/png  .png           PNG plot  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   svgzp          image/svg+xml .svgz Portable SVGZ plot  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13    svgz          image/svg+xml .svgz          SVGZ plot  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                        descr</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                                     Plot meta information.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                         List of strings contained in plot.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                                           LaTeX TikZ code.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                             Encapsulated PostScript (EPS).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                           PostScript (PS).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                       Plot data serialized to JSON format.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   Version of the SVG renderer that produces portable SVGs.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                            Scalable Vector Graphics (SVG).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                           Tagged Image File Format (TIFF).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                     Adobe Portable Document Format (PDF).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                          Portable Network Graphics (PNG).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 Version of the SVG renderer that produces portable SVGZs.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13               Compressed Scalable Vector Graphics (SVGZ).</span>
 <span class="r-in"></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
