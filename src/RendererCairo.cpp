@@ -482,7 +482,7 @@ namespace httpgd::dc
         TIFFSetField(tiff, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
 
         TIFFSetField(tiff, TIFFTAG_COMPRESSION, COMPRESSION_DEFLATE);
-        const uint16 extras[] = { EXTRASAMPLE_ASSOCALPHA };
+        const uint16_t extras[] = { EXTRASAMPLE_ASSOCALPHA };
         TIFFSetField(tiff, TIFFTAG_EXTRASAMPLES, EXTRASAMPLE_ASSOCALPHA, extras);
         TIFFSetField(tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff, width * argb_size));
 
