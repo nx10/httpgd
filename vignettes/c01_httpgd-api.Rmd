@@ -69,18 +69,16 @@ httpgd includes multiple renderers that can dynamically render plots to differen
 
 The following is a complete list of renderers.
 
-| ID        | Mime-Type                | Renderer                                                 | Format | Depends |
-| --------- | ------------------------ | -------------------------------------------------------- | ------ | ------- |
-| `svg`     | `image/svg+xml`          | Scalable Vector Graphics (SVG).                          | string |         |
-| `svgp`    | `image/svg+xml`          | Version of the SVG renderer that produces portable SVGs. | string |         |
-| `json`    | `application/json`       | Plot data serialized to JSON format.                     | string |         |
-| `png`     | `image/png`              | Portable Network Graphics (PNG).                         | binary | Cairo   |
-| `pdf`     | `application/pdf`        | Adobe Portable Document Format (PDF).                    | binary | Cairo   |
-| `ps`      | `application/postscript` | PostScript (PS).                                         | string | Cairo   |
-| `eps`     | `application/postscript` | Encapsulated PostScript (EPS).                           | string | Cairo   |
-| `tikz`    | `text/plain`             | LaTeX TikZ code.                                         | string |         |
-| `strings` | `text/plain`             | List of plot strings.                                    | string |         |
-| `meta`    | `application/json`       | Plot meta information.                                   | string |         |
+```{r echo=FALSE}
+df <- httpgd::hgd_renderers()
+df <- df[order(df$id),]
+knitr::kable(data.frame(
+   sprintf("`%s`", df$id),
+   sprintf("`%s`", df$mime),
+   df$descr,
+   ifelse(df$bin, "Binary", "Text")
+), col.names = c("ID", "Mime-Type", "Renderer", "Format"))
+```
 
 
 ### From R

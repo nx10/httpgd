@@ -160,9 +160,8 @@ cpp11::list httpgd_info_(int devnum)
 }
 
 [[cpp11::register]]
-cpp11::data_frame httpgd_renderers_(int devnum)
+cpp11::data_frame httpgd_renderers_()
 {
-    
     using namespace cpp11::literals;
 
     const auto &renderers = httpgd::RendererManager::defaults();

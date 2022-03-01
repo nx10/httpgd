@@ -216,12 +216,8 @@ hgd_info <- function(which = dev.cur()) {
 #'
 #' dev.off()
 #' }
-hgd_renderers <- function(which = dev.cur()) {
-  if (names(which) != "httpgd") {
-    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
-  } else {
-    return(httpgd_renderers_(which))
-  }
+hgd_renderers <- function() {
+  httpgd_renderers_()
 }
 
 #' Query httpgd plot IDs

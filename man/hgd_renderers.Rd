@@ -4,7 +4,7 @@
 \alias{hgd_renderers}
 \title{httpgd device renderers.}
 \usage{
-hgd_renderers(which = dev.cur())
+hgd_renderers()
 }
 \arguments{
 \item{which}{Which device (ID).}
