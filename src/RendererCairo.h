@@ -73,17 +73,6 @@ namespace httpgd::dc
         fmt::memory_buffer m_os;
     };
 
-    class RendererCairoTiff : public BinaryRenderingTarget, public RendererCairo
-    {
-    public:
-        void render(const Page &t_page, double t_scale) override;
-        [[nodiscard]] 
-        std::vector<unsigned char> get_binary() const override;
-        
-    private:
-        std::vector<unsigned char> m_render_data{};
-    };
-
 } // namespace httpgd::dc
 
 #endif
