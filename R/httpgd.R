@@ -1,5 +1,4 @@
 
-
 #' Asynchronous HTTP server graphics device.
 #'
 #' This function initializes a httpgd graphics device and
@@ -61,6 +60,7 @@
 #' @return No return value, called to initialize graphics device.
 #'
 #' @importFrom systemfonts match_font
+#' @importFrom unigd ugd
 #' @export
 #'
 #' @examples
@@ -101,12 +101,12 @@ hgd <-
       tok <- httpgd_random_token_(8)
     }
 
-    aliases <- validate_aliases(system_fonts, user_fonts)
-    if (httpgd_(
-      host, port, bg, width, height,
-      pointsize, aliases, cors, tok, webserver, silent,
-      fix_text_width, extra_css,
-      reset_par
+    u <- ugd()
+
+    #aliases <- validate_aliases(system_fonts, user_fonts) TODO
+    if (httpgd_(u,
+      host, port, cors, tok, webserver, silent,
+      fix_text_width, extra_css
     )) {
       if (!silent && webserver) {
         cat("httpgd server running at:\n")

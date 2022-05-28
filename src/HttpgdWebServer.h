@@ -3,31 +3,43 @@
 
 #include <memory>
 #include <belle.h>
-#include "HttpgdApiAsync.h"
 #include <thread>
-#include "RendererManager.h"
+#include <unigd_api/client.h>
 
 namespace httpgd
 {
     namespace web
     {
+        struct HttpgdServerConfig
+        {
+            std::string host;
+            int port;
+            std::string wwwpath;
+            bool cors;
+            bool use_token;
+            std::string token;
+            bool record_history;
+            bool webserver;
+            bool silent;
+            std::string id;
+        };
+
         namespace net = boost::asio; // from <boost/asio.hpp>
 
-        class WebServer
+        class WebServer : public unigd::graphics_client
         {
         public:
+            WebServer(const HttpgdServerConfig &t_config);
 
-            WebServer(std::shared_ptr<HttpgdApiAsync> t_watcher);
+            void start() override;
+            void close() override;
+            void broadcast_state_current() override;
 
-            bool start();
-            void stop();
             unsigned short port();
-            void broadcast_state(const HttpgdState &state);
-            void broadcast_state_current();
+            void broadcast_state(const unigd::device_state &state);
 
         private:
-            std::shared_ptr<HttpgdApiAsync> m_watcher;
-            std::shared_ptr<HttpgdServerConfig> m_conf;
+            HttpgdServerConfig m_conf;
             OB::Belle::Server m_app;
             int m_last_upid = -1;
             bool m_last_active = true;

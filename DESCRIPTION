@@ -31,11 +31,13 @@ License: GPL (>= 2)
 Depends:
     R (>= 3.2.0)
 Imports: 
-    systemfonts (>= 1.0.0)
+    systemfonts (>= 1.0.0),
+    unigd
 LinkingTo: 
     cpp11 (>= 0.2.4),
     BH (>= 1.75.0),
-    systemfonts
+    systemfonts,
+    unigd
 Suggests:
     testthat,
     xml2 (>= 1.0.0),

@@ -7,7 +7,7 @@
 #include <boost/optional.hpp>
 
 #include "HttpgdVersion.h"
-#include "RendererSvg.h"
+//#include "RendererSvg.h"
 
 namespace httpgd
 {
@@ -86,29 +86,29 @@ namespace httpgd
             }
         }
 
-        static inline void json_write_state(std::ostream &buf, const HttpgdState &state)
+        static inline void json_write_state(std::ostream &buf, const unigd::device_state &state)
         {
             fmt::print(buf, "{{ \"upid\": {}, \"hsize\": {}, \"active\": {} }}", state.upid, state.hsize, state.active);
         }
 
-        static inline std::string json_make_state(const HttpgdState &state)
+        static inline std::string json_make_state(const unigd::device_state &state)
         {
             std::stringstream buf;
             json_write_state(buf, state);
             return buf.str();
         }
 
-        static inline void json_write_info(std::ostream &buf, std::shared_ptr<httpgd::HttpgdServerConfig> t_conf)
+        static inline void json_write_info(std::ostream &buf, const HttpgdServerConfig &t_conf)
         {
             fmt::print(buf, R""({{ "id": "{}", "version": {{ "httpgd": "{}", "boost": "{}", "cairo": "{}" }} }})"", 
-                t_conf->id, 
+                t_conf.id, 
                 HTTPGD_VERSION, 
                 HTTPGD_VERSION_BOOST, 
                 HTTPGD_VERSION_CAIRO
             );
         }
 
-        static inline std::string json_make_info(std::shared_ptr<httpgd::HttpgdServerConfig> t_conf)
+        static inline std::string json_make_info(const HttpgdServerConfig &t_conf)
         {
             std::stringstream buf;
             json_write_info(buf, t_conf);
@@ -116,21 +116,21 @@ namespace httpgd
         }
 
         template<typename T>
-        static inline bool authorized(std::shared_ptr<httpgd::HttpgdServerConfig> &m_conf, T &ctx)
+        static inline bool authorized(const HttpgdServerConfig &m_conf, T &ctx)
         {
-            if (!m_conf->use_token)
+            if (!m_conf.use_token)
             {
                 return true;
             }
             auto token_header = ctx.req.find("x-httpgd-token");
-            if ((token_header != ctx.req.end() && token_header->value() == m_conf->token))
+            if ((token_header != ctx.req.end() && token_header->value() == m_conf.token))
             {
                 return true;
             }
 
             auto &qparams = ctx.req.params();
             auto token_param = qparams.find("token");
-            if ((token_param != qparams.end() && token_param->second == m_conf->token))
+            if ((token_param != qparams.end() && token_param->second == m_conf.token))
             {
                 return true;
             }
@@ -138,9 +138,8 @@ namespace httpgd
             return false;
         }
 
-        WebServer::WebServer(std::shared_ptr<HttpgdApiAsync> t_watcher)
-            : m_watcher(t_watcher),
-              m_conf(t_watcher->api_server_config()),
+        WebServer::WebServer(const HttpgdServerConfig &t_conf)
+            : m_conf(t_conf),
               m_app()
         {
         }
@@ -150,23 +149,23 @@ namespace httpgd
             return m_app.port();
         }
 
-        bool WebServer::start()
+        void WebServer::start()
         {
 
-            m_app.address(m_conf->host);
-            m_app.port(m_conf->port);
+            m_app.address(m_conf.host);
+            m_app.port(m_conf.port);
 
             if (!m_app.available())
             {
                 // port blocked
-                return false;
+                return;//TODO false;
             }
 
             // set default http headers
             OB::Belle::Headers headers;
             headers.set(OB::Belle::Header::server, "httpgd " HTTPGD_VERSION);
             //headers.set(OB::Belle::Header::cache_control, "private; max-age=0");
-            if (m_conf->cors)
+            if (m_conf.cors)
             {
                 headers.set(OB::Belle::Header::access_control_allow_origin, "*");
                 headers.set(OB::Belle::Header::access_control_allow_methods, "GET, POST, PATCH, PUT, DELETE, OPTIONS");
@@ -174,7 +173,7 @@ namespace httpgd
             }
             m_app.http_headers(headers);
 
-            m_app.public_dir(m_conf->wwwpath);
+            m_app.public_dir(m_conf.wwwpath);
 
             m_app.websocket(true);
             m_app.signals({SIGINT, SIGTERM});
@@ -239,9 +238,13 @@ namespace httpgd
                 ctx.res.set("content-type", "application/json");
                 ctx.res.result(OB::Belle::Status::ok);
 
-                ctx.res.body() = json_make_state(m_watcher->api_state());
+                if (auto api_locked = api.lock()) {
+                    ctx.res.body() = json_make_state(api_locked->api_state());
+                } else {
+                    ctx.res.body() = ""; //TODO
+                }
             });
-
+/*
             m_app.on_http("/renderers", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
@@ -540,7 +543,7 @@ namespace httpgd
                 {
                     throw OB::Belle::Status::not_found;
                 }
-            });
+            });*/
 
             m_app.on_http("/clear", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
@@ -548,12 +551,19 @@ namespace httpgd
                     throw OB::Belle::Status::unauthorized;
                 }
 
-                m_watcher->api_clear();
+                if (auto api_locked = api.lock()) {
+                    api_locked->api_clear(); 
 
-                ctx.res.set("content-type", "application/json");
-                ctx.res.result(OB::Belle::Status::ok);
+                    ctx.res.set("content-type", "application/json");
+                    ctx.res.result(OB::Belle::Status::ok);
 
-                ctx.res.body() = json_make_state(m_watcher->api_state());
+                    ctx.res.body() = json_make_state(api_locked->api_state());
+                } else {
+                    ctx.res.set("content-type", "application/json");
+                    ctx.res.result(OB::Belle::Status::internal_server_error);// TODO
+
+                    ctx.res.body() = "";
+                }
             });
 
             // set custom error callback
@@ -583,7 +593,7 @@ namespace httpgd
 
             m_server_thread = std::thread(&WebServer::run, this);
 
-            return true;
+            //return true; TODO
         }
 
         void WebServer::run()
@@ -591,7 +601,7 @@ namespace httpgd
             m_app.listen();
         }
 
-        void WebServer::stop()
+        void WebServer::close()
         {
             // todo: send SIGINT/SIGTERM for clean shutdown?
             m_app.io().stop();
@@ -601,7 +611,7 @@ namespace httpgd
             }
         }
 
-        void WebServer::broadcast_state(const HttpgdState &state)
+        void WebServer::broadcast_state(const unigd::device_state &state)
         {
             if (state.upid != m_last_upid || state.active != m_last_active)
             {
@@ -613,8 +623,12 @@ namespace httpgd
 
         void WebServer::broadcast_state_current()
         {
-            HttpgdState state = m_watcher->api_state();
-            broadcast_state(state);
+            if (auto api_locked = api.lock()) {
+                unigd::device_state state = api_locked->api_state();
+                broadcast_state(state);
+            } else {
+                //TODO
+            }
         }
 
     } // namespace web
