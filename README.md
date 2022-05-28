@@ -1,7 +1,7 @@
 # `httpgd` <img src="man/figures/httpgd_logo.svg" align="right" width="25%"/>
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/nx10/httpgd/workflows/R-CMD-check/badge.svg)](https://github.com/nx10/httpgd/actions)
+[![R-CMD-check](https://github.com/nx10/httpgd/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nx10/httpgd/actions/workflows/R-CMD-check.yaml)
 [![CRAN](https://www.r-pkg.org/badges/version/httpgd)](https://CRAN.R-project.org/package=httpgd)
 ![downloads](https://cranlogs.r-pkg.org/badges/grand-total/httpgd)
 [![Codecov test coverage](https://codecov.io/gh/nx10/httpgd/branch/master/graph/badge.svg)](https://app.codecov.io/gh/nx10/httpgd?branch=master)
