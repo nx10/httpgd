@@ -4,7 +4,7 @@ PKG_CPPFLAGS = @cflags@ -Ilib -DBOOST_NO_AUTO_PTR -DFMT_HEADER_ONLY
 
 #PKG_CXXFLAGS=$(C_VISIBILITY)
 
-PKG_LIBS = @libs@ -lpng -lz -ltiff -ltiffxx -ljpeg
+PKG_LIBS = @libs@ -lpng -lz -ltiff -ltiffxx -ljpeg -lzstd -lwebp -llzma 
 
 all: clean
 

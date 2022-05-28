@@ -49,6 +49,7 @@ Encoding: UTF-8
 SystemRequirements: 
     C++17,
     libpng,
+    libtiff,
     cairo,
     freetype2, 
     fontconfig
