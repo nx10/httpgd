@@ -35,7 +35,7 @@ namespace httpgd {
     bool rect_equals(grect<T> r0, grect<T> r1, T eps)
     {
         return (std::fabs(r0.x - r1.x) < eps) &&
-               (std::fabs(r0.x - r1.x) < eps) &&
+               (std::fabs(r0.y - r1.y) < eps) &&
                (std::fabs(r0.width - r1.width) < eps) &&
                (std::fabs(r0.height - r1.height) < eps);
     }
