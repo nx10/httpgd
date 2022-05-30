@@ -13,6 +13,13 @@ extern "C" SEXP _httpgd_httpgd_(SEXP devnum, SEXP host, SEXP port, SEXP cors, SE
   END_CPP11
 }
 // Httpgd.cpp
+cpp11::list httpgd_details_(int devnum);
+extern "C" SEXP _httpgd_httpgd_details_(SEXP devnum) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(httpgd_details_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum)));
+  END_CPP11
+}
+// Httpgd.cpp
 std::string httpgd_random_token_(int len);
 extern "C" SEXP _httpgd_httpgd_random_token_(SEXP len) {
   BEGIN_CPP11
@@ -23,13 +30,17 @@ extern "C" SEXP _httpgd_httpgd_random_token_(SEXP len) {
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
     {"_httpgd_httpgd_",              (DL_FUNC) &_httpgd_httpgd_,              9},
+    {"_httpgd_httpgd_details_",      (DL_FUNC) &_httpgd_httpgd_details_,      1},
     {"_httpgd_httpgd_random_token_", (DL_FUNC) &_httpgd_httpgd_random_token_, 1},
     {NULL, NULL, 0}
 };
 }
 
+void import_unigd_api(DllInfo* dll);
+
 extern "C" attribute_visible void R_init_httpgd(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
+  import_unigd_api(dll);
   R_forceSymbols(dll, TRUE);
 }

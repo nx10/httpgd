@@ -124,6 +124,12 @@ hgd <-
     }
   }
 
+validate_unigd_device <- function(which) {
+  if (names(which) != "unigd") {
+    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
+  }
+}
+
 #' httpgd device status.
 #'
 #' Access status information of a httpgd graphics device.
@@ -140,24 +146,22 @@ hgd <-
 #'   `$active`: Is the device the currently activated device.
 #'
 #' @importFrom grDevices dev.cur
+#' @importFrom unigd ugd_state
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #'
 #' hgd()
-#' hgd_state()
+#' hgd_details()
 #' plot(1, 1)
-#' hgd_state()
+#' hgd_details()
 #'
 #' dev.off()
 #' }
-hgd_state <- function(which = dev.cur()) {
-  if (names(which) != "httpgd") {
-    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
-  } else {
-    return(httpgd_state_(which))
-  }
+hgd_details <- function(which = dev.cur()) {
+  validate_unigd_device(which)
+  return(httpgd_details_(which))
 }
 
 #' httpgd device information.
@@ -183,11 +187,8 @@ hgd_state <- function(which = dev.cur()) {
 #' dev.off()
 #' }
 hgd_info <- function(which = dev.cur()) {
-  if (names(which) != "httpgd") {
-    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
-  } else {
-    return(httpgd_info_(which))
-  }
+  validate_unigd_device(which)
+  return(httpgd_info_(which))
 }
 
 #' httpgd device renderers.
@@ -227,7 +228,7 @@ hgd_renderers <- function() {
 #'  value > 1 the returned type is a list if IDs.
 #' @param which Which device (ID).
 #' @param state Include the current device state in the returned result
-#'  (see also: [hgd_state()]).
+#'  (see also: [hgd_details()]).
 #'
 #' @return TODO
 #'
@@ -253,9 +254,7 @@ hgd_renderers <- function() {
 #' dev.off()
 #' }
 hgd_id <- function(index = 0, limit = 1, which = dev.cur(), state = FALSE) {
-  if (names(which) != "httpgd") {
-    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
-  }
+  validate_unigd_device(which)
   if (limit == 0 || is.infinite(limit)) {
     limit <- -1
   }
@@ -359,9 +358,7 @@ hgd_plot <- function(page = 0,
                      renderer = "svg",
                      which = dev.cur(),
                      file = NA) {
-  if (names(which) != "httpgd") {
-    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
-  }
+  validate_unigd_device(which)
   if (class(page) == "httpgd_pid") {
     page <- httpgd_plot_find_(which, page$id)
   }
@@ -408,14 +405,12 @@ hgd_plot <- function(page = 0,
 #' dev.off()
 #' }
 hgd_remove <- function(page = 0, which = dev.cur()) {
-  if (names(which) != "httpgd") {
-    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
-  } else {
-    if (class(page) == "httpgd_pid") {
-      return(httpgd_remove_id_(which, page$id))
-    }
-    return(httpgd_remove_(which, page - 1))
+  validate_unigd_device(which)
+  if (class(page) == "httpgd_pid") {
+    return(httpgd_remove_id_(which, page$id))
   }
+  return(httpgd_remove_(which, page - 1))
+  
 }
 
 #' Clear all httpgd plot pages.
@@ -441,11 +436,8 @@ hgd_remove <- function(page = 0, which = dev.cur()) {
 #' dev.off()
 #' }
 hgd_clear <- function(which = dev.cur()) {
-  if (names(which) != "httpgd") {
-    stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
-  } else {
-    return(httpgd_clear_(which))
-  }
+  validate_unigd_device(which)
+  return(httpgd_clear_(which))
 }
 
 
@@ -500,7 +492,7 @@ hgd_url <- function(endpoint = "live",
                     host = NULL,
                     port = NULL,
                     explicit = FALSE) {
-  l <- hgd_state(which)
+  l <- hgd_details(which)
   q <- list()
   if (is.numeric(endpoint) || (class(endpoint) == "httpgd_pid")) {
     if (is.numeric(endpoint)) {
@@ -625,7 +617,8 @@ hgd_view <- function() {
 #' @return Number and name of the new active device (after the specified device
 #'   has been shut down).
 #'
-#' @importFrom grDevices dev.cur dev.list dev.off
+#' @importFrom grDevices dev.cur
+#' @importFrom unigd ugd_close
 #' @export
 #'
 #' @examples
@@ -642,14 +635,7 @@ hgd_view <- function() {
 #' hgd_close(all = TRUE)
 #' }
 hgd_close <- function(which = dev.cur(), all = FALSE) {
-  if (all) {
-    ds <- dev.list()
-    invisible(lapply(ds[names(ds) == "httpgd"], dev.off))
-  } else {
-    if (which != 1 && names(which(dev.list() == which)) == "httpgd") {
-      dev.off(which)
-    }
-  }
+  ugd_close(which, all) # todo: only close httpgd client devices?
 }
 
 #' Generate random alphanumeric token.

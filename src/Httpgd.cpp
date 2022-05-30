@@ -22,6 +22,8 @@
 
 #include "HttpgdWebServer.h"
 
+#include "DebugPrint.h"
+
 namespace httpgd
 {
 
@@ -67,7 +69,26 @@ bool httpgd_(int devnum, std::string host, int port, bool cors, std::string toke
          silent,
          httpgd::rng::uuid()};
 
-    return ugd_attach_client(devnum, std::make_shared<httpgd::web::WebServer>(conf));
+    return unigd::attach_client(devnum, std::make_shared<httpgd::web::WebServer>(conf));
+}
+
+[[cpp11::register]]
+cpp11::list httpgd_details_(int devnum)
+{
+    std::shared_ptr<unigd::graphics_client> client;
+    if (!unigd::get_client(devnum, &client) || client->client_id() != httpgd::web::httpgd_client_id)
+    {
+        cpp11::stop("asiujdhbfiouahs");
+    }
+    auto server = std::static_pointer_cast<httpgd::web::WebServer>(client);
+    const auto svr_config = server->get_config();
+
+        
+    using namespace cpp11::literals;
+    return cpp11::writable::list{
+        "host"_nm = svr_config.host.c_str(),
+        "port"_nm = server->port(),
+        "token"_nm = svr_config.token.c_str()};
 }
 
 [[cpp11::register]]

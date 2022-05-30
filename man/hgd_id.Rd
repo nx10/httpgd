@@ -16,7 +16,7 @@ value > 1 the returned type is a list if IDs.}
 \item{which}{Which device (ID).}
 
 \item{state}{Include the current device state in the returned result
-(see also: \code{\link[=hgd_state]{hgd_state()}}).}
+(see also: \code{\link[=hgd_details]{hgd_details()}}).}
 }
 \value{
 TODO

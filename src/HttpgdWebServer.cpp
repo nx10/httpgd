@@ -144,6 +144,16 @@ namespace httpgd
         {
         }
 
+        int WebServer::client_id()
+        {
+            return httpgd_client_id;
+        }
+
+        const HttpgdServerConfig &WebServer::get_config()
+        {
+            return m_conf;
+        }
+
         unsigned short WebServer::port()
         {
             return m_app.port();

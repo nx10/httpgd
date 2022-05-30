@@ -4,6 +4,10 @@ httpgd_ <- function(devnum, host, port, cors, token, webserver, silent, fix_text
   .Call(`_httpgd_httpgd_`, devnum, host, port, cors, token, webserver, silent, fix_text_width, extra_css)
 }
 
+httpgd_details_ <- function(devnum) {
+  .Call(`_httpgd_httpgd_details_`, devnum)
+}
+
 httpgd_random_token_ <- function(len) {
   .Call(`_httpgd_httpgd_random_token_`, len)
 }

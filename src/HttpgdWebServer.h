@@ -10,6 +10,8 @@ namespace httpgd
 {
     namespace web
     {
+        constexpr int httpgd_client_id = 104;
+
         struct HttpgdServerConfig
         {
             std::string host;
@@ -34,6 +36,8 @@ namespace httpgd
             void start() override;
             void close() override;
             void broadcast_state_current() override;
+            int client_id() override;
+            const HttpgdServerConfig &get_config();
 
             unsigned short port();
             void broadcast_state(const unigd::device_state &state);

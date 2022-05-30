@@ -6,7 +6,9 @@
 \usage{
 hgd_watch(
   watch = list.files(pattern = "\\\\.R$", ignore.case = T),
-  on_change = function(changed_files) {     print(changed_files) },
+  on_change = function(changed_files) {
+     print(changed_files)
+ },
   interval = 1,
   on_start = hgd_browse,
   on_exit = NULL,
