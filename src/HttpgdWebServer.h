@@ -37,6 +37,7 @@ namespace httpgd
             void close() override;
             void broadcast_state_current() override;
             int client_id() override;
+            std::string client_status() override;
             const HttpgdServerConfig &get_config();
 
             unsigned short port();

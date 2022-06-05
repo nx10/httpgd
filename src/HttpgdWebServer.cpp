@@ -8,6 +8,8 @@
 
 #include "HttpgdVersion.h"
 //#include "RendererSvg.h"
+#include <unigd_api.h>
+#include <fmt/format.h>
 
 namespace httpgd
 {
@@ -148,6 +150,11 @@ namespace httpgd
         {
             return httpgd_client_id;
         }
+        
+        std::string WebServer::client_status()
+        {
+            return "httpgd 2.0";
+        }
 
         const HttpgdServerConfig &WebServer::get_config()
         {
@@ -254,7 +261,7 @@ namespace httpgd
                     ctx.res.body() = ""; //TODO
                 }
             });
-/*
+
             m_app.on_http("/renderers", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
@@ -267,36 +274,27 @@ namespace httpgd
                 fmt::memory_buffer buf;
                 fmt::format_to(std::back_inserter(buf), "{{\n \"renderers\": [\n");
                 
-                const auto &renderers = RendererManager::defaults();
-
-                for (auto it = renderers.string_renderers().begin(); it != renderers.string_renderers().end(); it++) 
+                std::vector<unigd::renderer_info> renderers;
+                if (unigd::get_renderer_list(&renderers))
                 {
-                    fmt::format_to(std::back_inserter(buf), R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": false, "descr": "{}" }})"",
-                        it->second.id,
-                        it->second.mime,
-                        it->second.fileext,
-                        it->second.name,
-                        it->second.type,
-                        it->second.description
-                    );
-                    if (std::next(it) != renderers.string_renderers().end())
+                    for (auto it = renderers.begin(); it != renderers.end(); ++it)
                     {
-                        fmt::format_to(std::back_inserter(buf), ",\n");
+                        fmt::format_to(std::back_inserter(buf), R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": {}, "descr": "{}" }})"",
+                            it->id,
+                            it->mime,
+                            it->fileext,
+                            it->name,
+                            it->type,
+                            !it->text,
+                            it->description
+                        );
+                        if (std::next(it) != renderers.end())
+                        {
+                            fmt::format_to(std::back_inserter(buf), ",\n");
+                        }
                     }
                 }
-                for (auto it = renderers.binary_renderers().begin(); it != renderers.binary_renderers().end(); it++) 
-                {
-                    fmt::format_to(std::back_inserter(buf), ",\n");
-                    fmt::format_to(std::back_inserter(buf), R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": true, "descr": "{}" }})"",
-                        it->second.id,
-                        it->second.mime,
-                        it->second.fileext,
-                        it->second.name,
-                        it->second.type,
-                        it->second.description
-                    );
-                }
-                
+
                 fmt::format_to(std::back_inserter(buf), "\n ]\n}}");
 
                 ctx.res.body() = fmt::to_string(buf);
@@ -308,157 +306,51 @@ namespace httpgd
                     throw OB::Belle::Status::unauthorized;
                 }
 
-                HttpgdQueryResults qr;
-
                 auto qparams = ctx.req.params();
                 auto p_index = param_int(qparams, "index");
                 auto p_limit = param_int(qparams, "limit");
 
-                if (p_limit)
-                {
-                    qr = m_watcher->api_query_range(p_index.get_value_or(0), *p_limit);
-                }
-                else if (p_index)
-                {
-                    qr = m_watcher->api_query_index(*p_index);
-                }
-                else
-                {
-                    qr = m_watcher->api_query_all();
-                }
-
-                std::stringstream buf;
-                buf << "{ \"state\": ";
-                json_write_state(buf, qr.state);
-                buf << ", \"plots\": [";
-
-                for (const auto &id : qr.ids)
-                {
-                    if (&id != &qr.ids[0])
+                if (auto api_locked = api.lock()) {
+                    unigd::device_api_query_result qr;
+                    if (p_limit)
                     {
-                        buf << ", ";
+                        qr = api_locked->api_query_range(p_index.get_value_or(0), *p_limit);
                     }
-                    fmt::print(buf, "{{ \"id\": \"{}\" }}", id);
-                }
-                buf << "] }";
-
-                ctx.res.set("content-type", "application/json");
-                ctx.res.result(OB::Belle::Status::ok);
-                ctx.res.body() = buf.str();
-            });
-
-            m_app.on_http("/svg", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                auto qparams = ctx.req.params();
-                auto p_width = param_double(qparams, "width");
-                auto p_height = param_double(qparams, "height");
-                double width, height, zoom;
-                if (p_width && p_height)
-                {
-                    zoom = param_double(qparams, "zoom").get_value_or(1);
-                    width = (*p_width) / zoom;
-                    height = (*p_height) / zoom;
-                } 
-                else
-                {
-                    zoom = 1;
-                    width = p_width.get_value_or(-1);
-                    height = p_height.get_value_or(-1);
-                }
-                auto p_id = param_long(qparams, "id");
-
-                boost::optional<int> index;
-                if (p_id)
-                {
-                    index = m_watcher->api_index(*p_id);
-                }
-                else
-                {
-                    index = param_int(qparams, "index").get_value_or(-1);
-                }
-
-                if (index)
-                {
-                    ctx.res.set("content-type", "image/svg+xml");
-                    ctx.res.result(OB::Belle::Status::ok);
-                    dc::RendererSVG renderer(boost::none);
-                    if (m_watcher->api_render(*index, width, height, &renderer, zoom)) {
-                        ctx.res.body() = renderer.get_string();
-                    } else {
-                        throw OB::Belle::Status::not_found;
+                    else if (p_index)
+                    {
+                        qr = api_locked->api_query_index(*p_index);
                     }
-                }
-                else
-                {
-                    throw OB::Belle::Status::not_found;
-                }
-            });
-
-            m_app.on_http("/plot", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                auto qparams = ctx.req.params();
-                auto p_width = param_double(qparams, "width");
-                auto p_height = param_double(qparams, "height");
-                double width, height, zoom;
-                if (p_width && p_height)
-                {
-                    zoom = param_double(qparams, "zoom").get_value_or(1);
-                    width = (*p_width) / zoom;
-                    height = (*p_height) / zoom;
-                } 
-                else
-                {
-                    zoom = 1;
-                    width = p_width.get_value_or(-1);
-                    height = p_height.get_value_or(-1);
-                }
-                auto p_id = param_long(qparams, "id");
-                auto p_renderer = param_str(qparams, "renderer").get_value_or("svg");
-                auto p_download = param_str(qparams, "download");
-
-                boost::optional<int> index;
-                if (p_id)
-                {
-                    index = m_watcher->api_index(*p_id);
-                }
-                else
-                {
-                    index = param_int(qparams, "index").get_value_or(-1);
-                }
-
-                if (index)
-                {
-                    ctx.res.set("content-type", "image/png");
-                    ctx.res.result(OB::Belle::Status::ok);
-
-                    const auto find_renderer = RendererManager::defaults().find_string(p_renderer);
-                    if (!find_renderer) {
-                        throw OB::Belle::Status::not_found;
+                    else
+                    {
+                        qr = api_locked->api_query_all();
                     }
-                    const auto renderer = (*find_renderer).renderer();
-                    if (m_watcher->api_render(*index, width, height, renderer.get(), zoom)) {
-                        ctx.res.set("content-type", (*find_renderer).mime);
-                        if (p_download) {
-                            ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
+
+                    std::stringstream buf;
+                    buf << "{ \"state\": ";
+                    json_write_state(buf, qr.state);
+                    buf << ", \"plots\": [";
+
+                    for (const auto &id : qr.ids)
+                    {
+                        if (&id != &qr.ids[0])
+                        {
+                            buf << ", ";
                         }
-                        ctx.res.body() = renderer->get_string();
-                    } else {
-                        throw OB::Belle::Status::not_found;
+                        fmt::print(buf, "{{ \"id\": \"{}\" }}", id);
                     }
+                    buf << "] }";
+
+                    ctx.res.set("content-type", "application/json");
+                    ctx.res.result(OB::Belle::Status::ok);
+                    ctx.res.body() = buf.str();
+                } else {
+                    ctx.res.result(OB::Belle::Status::internal_server_error);
+                    ctx.res.body() = "";
                 }
-                else
-                {
-                    throw OB::Belle::Status::not_found;
-                }
+
+                
             });
+
             m_app.on_http("/plot", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx_dyn &ctx) {
                 if (!authorized(m_conf, ctx))
                 {
@@ -481,45 +373,52 @@ namespace httpgd
                     width = p_width.get_value_or(-1);
                     height = p_height.get_value_or(-1);
                 }
-                auto p_id = param_long(qparams, "id");
-                auto p_renderer = param_str(qparams, "renderer").get_value_or("png");
+                auto p_id = param_long(qparams, "id").get_value_or(-1); // todo?
+                auto p_renderer = param_str(qparams, "renderer").get_value_or("svg");
                 auto p_download = param_str(qparams, "download");
 
-                boost::optional<int> index;
-                if (p_id)
-                {
-                    index = m_watcher->api_index(*p_id);
-                }
-                else
-                {
-                    index = param_int(qparams, "index").get_value_or(-1);
-                }
+                if (auto api_locked = api.lock()) {
+                    boost::optional<int> index;
+                    /*if (p_id)
+                    {
+                        index = api_locked->api_index(*p_id);
+                    }
+                    else
+                    {
+                        index = param_int(qparams, "index").get_value_or(-1);
+                    }*/
 
-                if (index)
-                {
-                    ctx.res.result(OB::Belle::Status::ok);
-
-                    const auto find_renderer = RendererManager::defaults().find_binary(p_renderer);
-                    if (!find_renderer) {
+                    unigd::renderer_info rinfo;
+                    if (!unigd::get_renderer_info(p_renderer, &rinfo))
+                    {
                         throw OB::Belle::Status::not_found;
                     }
-                    const auto renderer = (*find_renderer).renderer();
-                    if (m_watcher->api_render(*index, width, height, renderer.get(), zoom)) {
-                        ctx.res.set("content-type", (*find_renderer).mime);
-                        if ((*find_renderer).id.rfind("svgz", 0) == 0) {
-                            ctx.res.set("Content-Encoding", "gzip"); // todo
-                        }
+
+                    
+
+                    const auto render = api_locked->api_render(p_renderer, p_id, width, height, zoom);
+
+                    if (render)
+                    {
+                        const uint8_t *rbuf;
+                        size_t rsize;
+                        render->get_data(&rbuf, &rsize);
+
+                        ctx.res.result(OB::Belle::Status::ok);
+                        ctx.res.set("content-type", rinfo.mime);
                         if (p_download) {
                             ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
                         }
-                        ctx.res.body() = renderer->get_binary();
-                    } else {
+
+                        ctx.res.body().assign(rbuf, rbuf+rsize);// = renderer->get_string();
+                        
+                    }
+                    else
+                    {
                         throw OB::Belle::Status::not_found;
                     }
-                }
-                else
-                {
-                    throw OB::Belle::Status::not_found;
+                } else {
+                    throw OB::Belle::Status::internal_server_error;
                 }
             });
 
@@ -532,28 +431,37 @@ namespace httpgd
                 auto qparams = ctx.req.params();
                 auto p_id = param_long(qparams, "id");
 
-                boost::optional<int> index;
-                if (p_id)
+                if (!p_id)
                 {
-                    index = m_watcher->api_index(*p_id);
-                }
-                else
-                {
-                    index = param_int(qparams, "index").get_value_or(-1);
+                    throw OB::Belle::Status::not_found; 
                 }
 
-                if (index && m_watcher->api_remove(*index))
-                {
-                    ctx.res.set("content-type", "application/json");
-                    ctx.res.result(OB::Belle::Status::ok);
+                if (auto api_locked = api.lock()) {
+                    boost::optional<int> index;
+                    /*if (p_id)
+                    {
+                        index = m_watcher->api_index(*p_id);
+                    }
+                    else
+                    {
+                        index = param_int(qparams, "index").get_value_or(-1);
+                    }*/
 
-                    ctx.res.body() = json_make_state(m_watcher->api_state());
+                    if (api_locked->api_remove(*p_id))
+                    {
+                        ctx.res.set("content-type", "application/json");
+                        ctx.res.result(OB::Belle::Status::ok);
+
+                        ctx.res.body() = json_make_state(api_locked->api_state());
+                    }
+                    else
+                    {
+                        throw OB::Belle::Status::not_found;
+                    }
+                } else {
+                    throw OB::Belle::Status::internal_server_error;
                 }
-                else
-                {
-                    throw OB::Belle::Status::not_found;
-                }
-            });*/
+            });
 
             m_app.on_http("/clear", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
                 if (!authorized(m_conf, ctx))
@@ -569,10 +477,7 @@ namespace httpgd
 
                     ctx.res.body() = json_make_state(api_locked->api_state());
                 } else {
-                    ctx.res.set("content-type", "application/json");
-                    ctx.res.result(OB::Belle::Status::internal_server_error);// TODO
-
-                    ctx.res.body() = "";
+                    throw OB::Belle::Status::internal_server_error;
                 }
             });
 
