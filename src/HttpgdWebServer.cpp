@@ -1,148 +1,117 @@
 //#include <Rcpp.h>
-#include "HttpgdWebServer.h"
-#include <fstream>
-#include <thread>
-#include <sstream>
-#include <fmt/ostream.h>
-#include <boost/optional.hpp>
 
-#include "HttpgdVersion.h"
-//#include "RendererSvg.h"
-#include <unigd_api.h>
+#define CROW_MAIN
+#include <crow.h>
 #include <fmt/format.h>
+#include <unigd_api.h>
+#include <memory>
+
+#include "HttpgdWebServer.h"
+#include "optional_lex.h"
 
 namespace httpgd
 {
     namespace web
     {
-        static boost::optional<std::string> read_txt(const std::string &filepath)
+        namespace
         {
-            std::ifstream t(filepath);
-            if (t.fail())
+            inline boost::optional<std::string> read_txt(const std::string &filepath)
             {
-                return boost::none;
-            }
-            std::stringstream buffer;
-            buffer << t.rdbuf();
-            return buffer.str();
-        }
-
-        static inline boost::optional<std::string> param_str(OB::Belle::Request::Params params, std::string name)
-        {
-            auto it = params.find(name);
-            if (it == params.end())
-            {
-                return boost::none;
-            }
-            return it->second;
-        }
-        static inline boost::optional<double> param_double(OB::Belle::Request::Params params, std::string name)
-        {
-            auto it = params.find(name);
-            if (it == params.end())
-            {
-                return boost::none;
-            }
-            try
-            {
-                double val = std::stod(it->second);
-                return val;
-            }
-            catch (const std::exception &e)
-            {
-                return boost::none;
-            }
-        }
-        static inline boost::optional<int> param_int(OB::Belle::Request::Params params, std::string name)
-        {
-            auto it = params.find(name);
-            if (it == params.end())
-            {
-                return boost::none;
-            }
-            try
-            {
-                int val = std::stoi(it->second);
-                return val;
-            }
-            catch (const std::exception &e)
-            {
-                return boost::none;
-            }
-        }
-        static inline boost::optional<long> param_long(OB::Belle::Request::Params params, std::string name)
-        {
-            auto it = params.find(name);
-            if (it == params.end())
-            {
-                return boost::none;
-            }
-            try
-            {
-                long val = std::stol(it->second);
-                return val;
-            }
-            catch (const std::exception &e)
-            {
-                return boost::none;
-            }
-        }
-
-        static inline void json_write_state(std::ostream &buf, const unigd::device_state &state)
-        {
-            fmt::print(buf, "{{ \"upid\": {}, \"hsize\": {}, \"active\": {} }}", state.upid, state.hsize, state.active);
-        }
-
-        static inline std::string json_make_state(const unigd::device_state &state)
-        {
-            std::stringstream buf;
-            json_write_state(buf, state);
-            return buf.str();
-        }
-
-        static inline void json_write_info(std::ostream &buf, const HttpgdServerConfig &t_conf)
-        {
-            fmt::print(buf, R""({{ "id": "{}", "version": {{ "httpgd": "{}", "boost": "{}", "cairo": "{}" }} }})"", 
-                t_conf.id, 
-                HTTPGD_VERSION, 
-                HTTPGD_VERSION_BOOST, 
-                HTTPGD_VERSION_CAIRO
-            );
-        }
-
-        static inline std::string json_make_info(const HttpgdServerConfig &t_conf)
-        {
-            std::stringstream buf;
-            json_write_info(buf, t_conf);
-            return buf.str();
-        }
-
-        template<typename T>
-        static inline bool authorized(const HttpgdServerConfig &m_conf, T &ctx)
-        {
-            if (!m_conf.use_token)
-            {
-                return true;
-            }
-            auto token_header = ctx.req.find("x-httpgd-token");
-            if ((token_header != ctx.req.end() && token_header->value() == m_conf.token))
-            {
-                return true;
+                std::ifstream t(filepath);
+                if (t.fail())
+                {
+                    return boost::none;
+                }
+                std::stringstream buffer;
+                buffer << t.rdbuf();
+                return buffer.str();
             }
 
-            auto &qparams = ctx.req.params();
-            auto token_param = qparams.find("token");
-            if ((token_param != qparams.end() && token_param->second == m_conf.token))
+            inline crow::json::wvalue device_state_json(const unigd::device_state &state)
             {
-                return true;
+                return crow::json::wvalue({{"upid", state.upid},
+                                           {"hsize", state.hsize},
+                                           {"active", state.active}});
             }
 
-            return false;
+            struct plot_return : public crow::returnable
+            {
+
+                std::string dump() const override
+                {
+                    const uint8_t *rbuf;
+                    size_t rsize;
+                    m_render->get_data(&rbuf, &rsize);
+                    return std::string(rbuf, rbuf + rsize);
+                }
+                
+                plot_return(unigd::renderer_info t_info, std::unique_ptr<unigd::render_data> &&t_render):
+                    crow::returnable(t_info.mime),
+                    m_render(std::move(t_render))
+                {
+                }
+
+                ~plot_return() = default;
+
+            private:
+                const std::unique_ptr<unigd::render_data> m_render;
+            };
+        }
+
+        void HttpgdLogHandler::log(std::string message, crow::LogLevel level)
+        {
+            std::string prefix;
+            switch (level)
+            {
+            case crow::LogLevel::Debug:
+                prefix = "DEBUG   ";
+                break;
+            case crow::LogLevel::Info:
+                prefix = "INFO    ";
+                break;
+            case crow::LogLevel::Warning:
+                prefix = "WARNING ";
+                break;
+            case crow::LogLevel::Error:
+                prefix = "ERROR   ";
+                break;
+            case crow::LogLevel::Critical:
+                prefix = "CRITICAL";
+                break;
+            }
+            unigd::log(std::string("(") + timestamp() + std::string(") [") + prefix + std::string("] ") + message);
+        }
+
+        std::string HttpgdLogHandler::timestamp()
+        {
+            char date[32];
+            time_t t = time(0);
+
+            tm my_tm;
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#ifdef CROW_USE_LOCALTIMEZONE
+            localtime_s(&my_tm, &t);
+#else
+            gmtime_s(&my_tm, &t);
+#endif
+#else
+#ifdef CROW_USE_LOCALTIMEZONE
+            localtime_r(&t, &my_tm);
+#else
+            gmtime_r(&t, &my_tm);
+#endif
+#endif
+
+            size_t sz = strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", &my_tm);
+            return std::string(date, date + sz);
         }
 
         WebServer::WebServer(const HttpgdServerConfig &t_conf)
             : m_conf(t_conf),
-              m_app()
+              m_app(),
+              m_mtx_update_subs(),
+              m_update_subs()
         {
         }
 
@@ -150,10 +119,10 @@ namespace httpgd
         {
             return httpgd_client_id;
         }
-        
+
         std::string WebServer::client_status()
         {
-            return "httpgd 2.0";
+            return "httpgd 2.0 - crow";
         }
 
         const HttpgdServerConfig &WebServer::get_config()
@@ -163,154 +132,76 @@ namespace httpgd
 
         unsigned short WebServer::port()
         {
+            m_app.wait_for_server_start();
             return m_app.port();
         }
 
         void WebServer::start()
         {
+            m_server_thread = std::thread(&WebServer::run, this);
+        }
 
-            m_app.address(m_conf.host);
-            m_app.port(m_conf.port);
+        void WebServer::run()
+        {
+            crow::logger::setHandler(&m_log_handler);
 
-            if (!m_app.available())
-            {
-                // port blocked
-                return;//TODO false;
-            }
+            auto &cors = m_app.get_middleware<crow::CORSHandler>();
+            cors
+                .global()
+                    .headers("Access-Control-Allow-Origin", "*");
 
-            // set default http headers
-            OB::Belle::Headers headers;
-            headers.set(OB::Belle::Header::server, "httpgd " HTTPGD_VERSION);
-            //headers.set(OB::Belle::Header::cache_control, "private; max-age=0");
-            if (m_conf.cors)
-            {
-                headers.set(OB::Belle::Header::access_control_allow_origin, "*");
-                headers.set(OB::Belle::Header::access_control_allow_methods, "GET, POST, PATCH, PUT, DELETE, OPTIONS");
-                headers.set(OB::Belle::Header::access_control_allow_headers, "Origin, Content-Type, X-Auth-Token, X-HTTPGD-TOKEN");
-            }
-            m_app.http_headers(headers);
+           // CROW_ROUTE(m_app, "/")
+           // ([]()
+           //  { return "httpgd server is running!"; });
 
-            m_app.public_dir(m_conf.wwwpath);
+            CROW_ROUTE(m_app, "/live")
+            ([&](const crow::request &, crow::response &res)
+             {
+                const auto filepath = std::string(m_conf.wwwpath) + "/index.html";
+                res.set_static_file_info_unsafe(filepath);
+                res.end(); });
 
-            m_app.websocket(true);
-            m_app.signals({SIGINT, SIGTERM});
-            // set the on signal callback
-            m_app.on_signal([&](auto ec, auto sig) {
-                // print out the signal received
-                //std::cerr << "\nSignal " << sig << "\n";
-
-                // get the io_context and safely stop the server
-                m_app.io().stop();
-            });
-            m_app.channels()["/"] = OB::Belle::Server::Channel();
-
-            m_app.on_http("/", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw 401;
-                }
-
-                ctx.res.set("content-type", "text/html");
-                ctx.res.result(OB::Belle::Status::ok);
-                ctx.res.body() = std::string("httpgd server running.");
-            });
-
-            // cors preflight
-            m_app.on_http("^/.*$", OB::Belle::Method::options, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                ctx.res.result(OB::Belle::Status::ok);
-            });
-
-            m_app.on_http("/live", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw 401;
-                }
-
-                ctx.res.set("content-type", "text/html");
-                ctx.res.result(OB::Belle::Status::ok);
-
-                std::string filepath = m_app.public_dir() + "/index.html";
-                ctx.res.body() = read_txt(filepath).get_value_or(
-                    fmt::format("<html><body><b>ERROR:</b> File not found ({}).<br>Please reload package.</body></html>", filepath));
-            });
-
-            m_app.on_http("/info", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw 401;
-                }
-
-                ctx.res.set("content-type", "application/json");
-                ctx.res.result(OB::Belle::Status::ok);
-
-                ctx.res.body() = json_make_info(m_conf);
-            });
-
-            m_app.on_http("/state", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                ctx.res.set("content-type", "application/json");
-                ctx.res.result(OB::Belle::Status::ok);
-
+            CROW_ROUTE(m_app, "/state")
+            ([&]()
+             {
                 if (auto api_locked = api.lock()) {
-                    ctx.res.body() = json_make_state(api_locked->api_state());
-                } else {
-                    ctx.res.body() = ""; //TODO
-                }
-            });
+                    const auto state = api_locked->api_state();
+                    return crow::response(device_state_json(state));
+                } 
+                return crow::response(404); });
 
-            m_app.on_http("/renderers", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                ctx.res.set("content-type", "application/json");
-                ctx.res.result(OB::Belle::Status::ok);
-
-                fmt::memory_buffer buf;
-                fmt::format_to(std::back_inserter(buf), "{{\n \"renderers\": [\n");
-                
+            CROW_ROUTE(m_app, "/renderers")
+            ([&]()
+             {
                 std::vector<unigd::renderer_info> renderers;
                 if (unigd::get_renderer_list(&renderers))
                 {
+
+                    std::vector<crow::json::wvalue> a;
+                    a.reserve(renderers.size());
                     for (auto it = renderers.begin(); it != renderers.end(); ++it)
                     {
-                        fmt::format_to(std::back_inserter(buf), R""(  {{ "id": "{}", "mime": "{}", "ext": "{}", "name": "{}", "type": "{}", "bin": {}, "descr": "{}" }})"",
-                            it->id,
-                            it->mime,
-                            it->fileext,
-                            it->name,
-                            it->type,
-                            !it->text,
-                            it->description
-                        );
-                        if (std::next(it) != renderers.end())
-                        {
-                            fmt::format_to(std::back_inserter(buf), ",\n");
-                        }
+                        a.push_back(crow::json::wvalue({ 
+                            {"id", it->id},
+                            {"mime", it->mime},
+                            {"ext", it->fileext},
+                            {"name", it->name},
+                            {"type", it->type},
+                            {"bin", !it->text},
+                            {"descr", it->description}
+                        }));
                     }
+                    return crow::response(crow::json::wvalue({{"renderers", a}}));
                 }
+                return crow::response(404); });
 
-                fmt::format_to(std::back_inserter(buf), "\n ]\n}}");
+            CROW_ROUTE(m_app, "/plots")
+            ([&](const crow::request &req)
+             {
+                const auto p_index = param_to<int>(req.url_params.get("index"));
+                const auto p_limit = param_to<int>(req.url_params.get("limit"));
 
-                ctx.res.body() = fmt::to_string(buf);
-            });
-
-            m_app.on_http("/plots", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                auto qparams = ctx.req.params();
-                auto p_index = param_int(qparams, "index");
-                auto p_limit = param_int(qparams, "limit");
-
-                if (auto api_locked = api.lock()) {
+                 if (auto api_locked = api.lock()) {
                     unigd::device_api_query_result qr;
                     if (p_limit)
                     {
@@ -325,45 +216,30 @@ namespace httpgd
                         qr = api_locked->api_query_all();
                     }
 
-                    std::stringstream buf;
-                    buf << "{ \"state\": ";
-                    json_write_state(buf, qr.state);
-                    buf << ", \"plots\": [";
-
-                    for (const auto &id : qr.ids)
+                    std::vector<crow::json::wvalue> plot_list;
+                    plot_list.reserve(qr.ids.size());
+                    for (auto it = qr.ids.begin(); it != qr.ids.end(); ++it)
                     {
-                        if (&id != &qr.ids[0])
-                        {
-                            buf << ", ";
-                        }
-                        fmt::print(buf, "{{ \"id\": \"{}\" }}", id);
+                        plot_list.push_back(crow::json::wvalue({ 
+                            {"id", fmt::format("{}", *it)}
+                        }));
                     }
-                    buf << "] }";
-
-                    ctx.res.set("content-type", "application/json");
-                    ctx.res.result(OB::Belle::Status::ok);
-                    ctx.res.body() = buf.str();
-                } else {
-                    ctx.res.result(OB::Belle::Status::internal_server_error);
-                    ctx.res.body() = "";
+                    return crow::response(crow::json::wvalue({
+                        {"state", device_state_json(qr.state)},
+                        {"plots", plot_list}
+                        }));
                 }
+                return crow::response(404); });
 
-                
-            });
-
-            m_app.on_http("/plot", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx_dyn &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                auto qparams = ctx.req.params();
-                auto p_width = param_double(qparams, "width");
-                auto p_height = param_double(qparams, "height");
+            CROW_ROUTE(m_app, "/plot")
+            ([&](const crow::request &req)
+             {
+                const auto p_width = param_to<int>(req.url_params.get("width"));
+                const auto p_height = param_to<int>(req.url_params.get("height"));
                 double width, height, zoom;
                 if (p_width && p_height)
                 {
-                    zoom = param_double(qparams, "zoom").get_value_or(1);
+                    zoom = param_to<double>(req.url_params.get("zoom")).get_value_or(1);
                     width = (*p_width) / zoom;
                     height = (*p_height) / zoom;
                 } 
@@ -373,166 +249,90 @@ namespace httpgd
                     width = p_width.get_value_or(-1);
                     height = p_height.get_value_or(-1);
                 }
-                auto p_id = param_long(qparams, "id").get_value_or(-1); // todo?
-                auto p_renderer = param_str(qparams, "renderer").get_value_or("svg");
-                auto p_download = param_str(qparams, "download");
-
+                const auto p_id = param_to<long>(req.url_params.get("id")).get_value_or(-1); // todo?
+                const auto p_renderer = param_to<std::string>(req.url_params.get("renderer")).get_value_or("svg");
+                const auto p_download = param_to<const char*>(req.url_params.get("download"));
                 if (auto api_locked = api.lock()) {
-                    boost::optional<int> index;
-                    /*if (p_id)
-                    {
-                        index = api_locked->api_index(*p_id);
-                    }
-                    else
-                    {
-                        index = param_int(qparams, "index").get_value_or(-1);
-                    }*/
-
                     unigd::renderer_info rinfo;
                     if (!unigd::get_renderer_info(p_renderer, &rinfo))
                     {
-                        throw OB::Belle::Status::not_found;
+                        return crow::response(404);
                     }
 
-                    
+                    auto render = api_locked->api_render(p_renderer, p_id, width, height, zoom);
 
-                    const auto render = api_locked->api_render(p_renderer, p_id, width, height, zoom);
-
-                    if (render)
+                    if (!render)
                     {
-                        const uint8_t *rbuf;
-                        size_t rsize;
-                        render->get_data(&rbuf, &rsize);
-
-                        ctx.res.result(OB::Belle::Status::ok);
-                        ctx.res.set("content-type", rinfo.mime);
-                        if (p_download) {
-                            ctx.res.set("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
-                        }
-
-                        ctx.res.body().assign(rbuf, rbuf+rsize);// = renderer->get_string();
-                        
+                        return crow::response(404);
                     }
-                    else
-                    {
-                        throw OB::Belle::Status::not_found;
+
+                    const uint8_t *rbuf;
+                    size_t rsize;
+                    render->get_data(&rbuf, &rsize);
+
+                    auto res = crow::response(plot_return(rinfo, std::move(render)));
+                    if (p_download) {
+                        res.add_header("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
                     }
-                } else {
-                    throw OB::Belle::Status::internal_server_error;
-                }
-            });
-
-            m_app.on_http("/remove", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
+                    return res;
                 }
 
-                auto qparams = ctx.req.params();
-                auto p_id = param_long(qparams, "id");
+                return crow::response(404); });
 
-                if (!p_id)
-                {
-                    throw OB::Belle::Status::not_found; 
-                }
+            CROW_ROUTE(m_app, "/info")
+            ([&]()
+             { return crow::json::wvalue({
+                 {"id", m_conf.id},
+                 {"version", "httpgd 2.0 - crow"}
+                 }); });
 
-                if (auto api_locked = api.lock()) {
-                    boost::optional<int> index;
-                    /*if (p_id)
-                    {
-                        index = m_watcher->api_index(*p_id);
-                    }
-                    else
-                    {
-                        index = param_int(qparams, "index").get_value_or(-1);
-                    }*/
+            CROW_ROUTE(m_app, "/").websocket()
+                .onopen([&](crow::websocket::connection& conn) {
+                    CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
+                    std::lock_guard<std::mutex> _(m_mtx_update_subs);
+                    m_update_subs.insert(&conn);
+                })
+                .onclose([&](crow::websocket::connection& conn, const std::string& reason) {
+                    CROW_LOG_INFO << "websocket connection closed: " << reason;
+                    std::lock_guard<std::mutex> _(m_mtx_update_subs);
+                    m_update_subs.erase(&conn);
+                })
+                .onmessage([&](crow::websocket::connection& /*conn*/, const std::string& data, bool is_binary) {
+                    std::lock_guard<std::mutex> _(m_mtx_update_subs);
+                    for (auto u : m_update_subs)
+                        if (is_binary)
+                            u->send_binary(data);
+                        else
+                            u->send_text(data);
+                });
 
-                    if (api_locked->api_remove(*p_id))
-                    {
-                        ctx.res.set("content-type", "application/json");
-                        ctx.res.result(OB::Belle::Status::ok);
+            CROW_ROUTE(m_app, "/<str>")
+            ([&](crow::response &res, std::string s)
+             {
+                CROW_LOG_INFO << "static: " << s;
+                const auto filepath = std::string(m_conf.wwwpath) + "/" + s;
+                res.set_static_file_info_unsafe(filepath);
+                res.end(); });
 
-                        ctx.res.body() = json_make_state(api_locked->api_state());
-                    }
-                    else
-                    {
-                        throw OB::Belle::Status::not_found;
-                    }
-                } else {
-                    throw OB::Belle::Status::internal_server_error;
-                }
-            });
-
-            m_app.on_http("/clear", OB::Belle::Method::get, [&](OB::Belle::Server::Http_Ctx &ctx) {
-                if (!authorized(m_conf, ctx))
-                {
-                    throw OB::Belle::Status::unauthorized;
-                }
-
-                if (auto api_locked = api.lock()) {
-                    api_locked->api_clear(); 
-
-                    ctx.res.set("content-type", "application/json");
-                    ctx.res.result(OB::Belle::Status::ok);
-
-                    ctx.res.body() = json_make_state(api_locked->api_state());
-                } else {
-                    throw OB::Belle::Status::internal_server_error;
-                }
-            });
-
-            // set custom error callback
-            m_app.on_http_error([](OB::Belle::Server::Http_Ctx &ctx) {
-                // stringstream to hold the response
-                std::stringstream res;
-                res
-                    << "Status: " << ctx.res.result_int() << "\n"
-                    << "Reason: " << ctx.res.result() << "\n";
-
-                // set http response headers
-                ctx.res.set("content-type", "text/plain");
-
-                // echo the http status code
-                ctx.res.body() = res.str();
-            });
-
-            // handle ws connections to index room '/'
-            m_app.on_websocket("/",
-                               // on data: called after every websocket read
-                               [](OB::Belle::Server::Websocket_Ctx &ctx) {
-                                   // register the route
-                                   // data will be broadcasted in the websocket connect and disconnect handlers
-                                   //ctx.send("test1");
-                                   //ctx.broadcast("test2");
-                               });
-
-            m_server_thread = std::thread(&WebServer::run, this);
-
-            //return true; TODO
-        }
-
-        void WebServer::run()
-        {
-            m_app.listen();
+            m_app.bindaddr(m_conf.host).port(m_conf.port).multithreaded().run();
         }
 
         void WebServer::close()
         {
-            // todo: send SIGINT/SIGTERM for clean shutdown?
-            m_app.io().stop();
+            m_app.stop();
+
             if (m_server_thread.joinable())
             {
                 m_server_thread.join();
             }
         }
 
-        void WebServer::broadcast_state(const unigd::device_state &state)
+        void WebServer::broadcast_state(const unigd::device_state &t_state)
         {
-            if (state.upid != m_last_upid || state.active != m_last_active)
+            std::lock_guard<std::mutex> _(m_mtx_update_subs);
+            for (auto u : m_update_subs)
             {
-                m_app.channels().at("/").broadcast(json_make_state(state));
-                m_last_upid = state.upid;
-                m_last_active = state.active;
+                u->send_text(device_state_json(t_state).dump());
             }
         }
 
@@ -541,8 +341,6 @@ namespace httpgd
             if (auto api_locked = api.lock()) {
                 unigd::device_state state = api_locked->api_state();
                 broadcast_state(state);
-            } else {
-                //TODO
             }
         }
 

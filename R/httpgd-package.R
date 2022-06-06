@@ -13,7 +13,7 @@ NULL
 
 #' @importFrom grDevices dev.list dev.off
 .onUnload <- function (libpath) {
-  #hgd_close(all = TRUE)
+  hgd_close(all = TRUE)
   #httpgd_ipc_close_()
   library.dynam.unload("httpgd", libpath)
 }

@@ -11962,7 +11962,7 @@ namespace crow
             port_ = acceptor_.local_endpoint().port();
             handler_->port(port_);
 
-
+            handler_->notify_server_start();
             CROW_LOG_INFO << server_name_ << " server is running at " << (handler_->ssl_used() ? "https://" : "http://") << bindaddr_ << ":" << acceptor_.local_endpoint().port() << " using " << concurrency_ << " threads";
             CROW_LOG_INFO << "Call `app.loglevel(crow::LogLevel::Warning)` to hide Info level logs.";
 
@@ -12391,7 +12391,7 @@ namespace crow
                 {
                     server_->signal_add(snum);
                 }
-                notify_server_start();
+                
                 server_->run();
             }
         }

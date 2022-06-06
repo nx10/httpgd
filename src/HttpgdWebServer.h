@@ -2,9 +2,11 @@
 #define HTTPGD_WEB_TASK_H
 
 #include <memory>
-#include <belle.h>
 #include <thread>
+#include <mutex>
+#include <unordered_set>
 #include <unigd_api/client.h>
+#include <crow.h>
 
 namespace httpgd
 {
@@ -25,8 +27,13 @@ namespace httpgd
             bool silent;
             std::string id;
         };
-
-        namespace net = boost::asio; // from <boost/asio.hpp>
+        
+        class HttpgdLogHandler : public crow::ILogHandler {
+            public:
+                void log(std::string message, crow::LogLevel level) override;
+            private:
+                static std::string timestamp();
+        };
 
         class WebServer : public unigd::graphics_client
         {
@@ -45,7 +52,10 @@ namespace httpgd
 
         private:
             HttpgdServerConfig m_conf;
-            OB::Belle::Server m_app;
+            crow::App<crow::CORSHandler> m_app;
+            HttpgdLogHandler m_log_handler;
+            std::mutex m_mtx_update_subs;
+            std::unordered_set<crow::websocket::connection*> m_update_subs;
             int m_last_upid = -1;
             bool m_last_active = true;
             std::thread m_server_thread;
