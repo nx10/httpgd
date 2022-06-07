@@ -1,0 +1,4 @@
+cat src/Makevars.in > src/Makevars
+
+# Success
+exit 0
