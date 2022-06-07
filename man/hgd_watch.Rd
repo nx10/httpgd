@@ -34,7 +34,7 @@ hgd_watch(
 (may be set to \code{NULL}).}
 
 \item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
-on device start and reset every time \code{\link[=hgd_clear]{hgd_clear()}} is called (see
+on device start and reset every time \code{\link[unigd:ugd_clear]{unigd::ugd_clear()}} is called (see
 \code{\link[graphics:par]{graphics::par()}}).}
 
 \item{...}{Additional parameters passed to \code{hgd(webserver=FALSE, ...)}}

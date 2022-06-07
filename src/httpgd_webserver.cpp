@@ -6,7 +6,8 @@
 #include <unigd_api.h>
 #include <memory>
 
-#include "HttpgdWebServer.h"
+#include "httpgd_webserver.h"
+#include "httpgd_version.h"
 #include "optional_lex.h"
 
 namespace httpgd
@@ -122,7 +123,7 @@ namespace httpgd
 
         std::string WebServer::client_status()
         {
-            return "httpgd 2.0 - crow";
+            return "httpgd " HTTPGD_VERSION;
         }
 
         const HttpgdServerConfig &WebServer::get_config()
@@ -283,7 +284,7 @@ namespace httpgd
             ([&]()
              { return crow::json::wvalue({
                  {"id", m_conf.id},
-                 {"version", "httpgd 2.0 - crow"}
+                 {"version", "httpgd " HTTPGD_VERSION}
                  }); });
 
             CROW_ROUTE(m_app, "/").websocket()

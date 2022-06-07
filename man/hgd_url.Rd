@@ -20,7 +20,7 @@ hgd_url(
 \arguments{
 \item{endpoint}{API endpoint. The default, \code{"live"} is the HTML/JS
 plot viewer. Can be set to a numeric plot index or plot ID
-(see \code{\link[=hgd_id]{hgd_id()}}) to obtain the direct URL to the SVG.}
+(see \code{\link[unigd:ugd_id]{unigd::ugd_id()}}) to obtain the direct URL to the SVG.}
 
 \item{which}{Which device (ID).}
 

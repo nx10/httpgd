@@ -49,10 +49,8 @@
 #'   strings, but may lead to inconsistencies between strings and graphic
 #'   elements that depend on the dimensions of the string (e.g. label borders
 #'   and background).
-#' @param extra_css Extra CSS to be added to the SVG. This can be used
-#'   to embed webfonts.
 #' @param reset_par If set to `TRUE`, global graphics parameters will be saved
-#'   on device start and reset every time [hgd_clear()] is called (see
+#'   on device start and reset every time the plots are cleared (see
 #'   [graphics::par()]).
 #'
 #' @return No return value, called to initialize graphics device.
@@ -87,7 +85,6 @@ hgd <-
            silent = getOption("httpgd.silent", FALSE),
            websockets = getOption("httpgd.websockets", TRUE),
            fix_text_width = getOption("httpgd.fix_text_width", TRUE),
-           extra_css = getOption("httpgd.extra_css", ""),
            reset_par = getOption("httpgd.reset_par", FALSE)) {
     tok <- ""
     if (is.character(token)) {
@@ -108,11 +105,8 @@ hgd <-
       reset_par
     )
 
-    if (httpgd_(u,
-      host, port, cors, tok, webserver, silent,
-      fix_text_width, extra_css
-    )) {
-      if (!silent && webserver) {
+    if (httpgd_(u, host, port, cors, tok, silent)) {
+      if (!silent) {
         cat("httpgd server running at:\n")
         if (host == "0.0.0.0") {
           cat("  ", hgd_url(websockets = websockets, host = "127.0.0.1"),
@@ -181,7 +175,7 @@ build_http_query <- function(x) {
 #'
 #' @param endpoint API endpoint. The default, `"live"` is the HTML/JS
 #'   plot viewer. Can be set to a numeric plot index or plot ID
-#'   (see [hgd_id()]) to obtain the direct URL to the SVG.
+#'   (see [unigd::ugd_id()]) to obtain the direct URL to the SVG.
 #' @param which Which device (ID).
 #' @param websockets Use websockets.
 #' @param width Width of the plot. (Only used when `endpoint` is `"svg"`,
@@ -405,11 +399,12 @@ files_changed <- function(snap1, snap2) {
 #' @param on_error Will be called when on_change throws an error
 #'   (may be set to `NULL`).
 #' @param reset_par If set to `TRUE`, global graphics parameters will be saved
-#'   on device start and reset every time [hgd_clear()] is called (see
+#'   on device start and reset every time [unigd::ugd_clear()] is called (see
 #'   [graphics::par()]).
 #' @param ... Additional parameters passed to `hgd(webserver=FALSE, ...)`
 #'
 #' @importFrom utils changedFiles fileSnapshot
+#' @importFrom unigd ugd_clear
 #' @export
 #'
 #' @examples
@@ -460,7 +455,7 @@ hgd_watch <- function(watch = list.files(pattern="\\.R$", ignore.case = T),
         files_current <- files_snapshot(watch)
         changes <- files_changed(files_previous, files_current)
         if (length(changes) > 0) {
-          hgd_clear()
+          ugd_clear()
           files_previous <- files_current
           tryCatch(
             {

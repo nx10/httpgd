@@ -18,7 +18,6 @@ hgd(
   silent = getOption("httpgd.silent", FALSE),
   websockets = getOption("httpgd.websockets", TRUE),
   fix_text_width = getOption("httpgd.fix_text_width", TRUE),
-  extra_css = getOption("httpgd.extra_css", ""),
   reset_par = getOption("httpgd.reset_par", FALSE)
 )
 }
@@ -76,11 +75,8 @@ strings, but may lead to inconsistencies between strings and graphic
 elements that depend on the dimensions of the string (e.g. label borders
 and background).}
 
-\item{extra_css}{Extra CSS to be added to the SVG. This can be used
-to embed webfonts.}
-
 \item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
-on device start and reset every time \code{\link[=hgd_clear]{hgd_clear()}} is called (see
+on device start and reset every time the plots are cleared (see
 \code{\link[graphics:par]{graphics::par()}}).}
 }
 \value{

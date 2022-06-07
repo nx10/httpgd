@@ -70,13 +70,13 @@ httpgd includes multiple renderers that can dynamically render plots to differen
 The following is a complete list of renderers.
 
 ```{r echo=FALSE}
-df <- httpgd::hgd_renderers()
+df <- unigd::ugd_renderers()
 df <- df[order(df$id),]
 knitr::kable(data.frame(
    sprintf("`%s`", df$id),
    sprintf("`%s`", df$mime),
    df$descr,
-   ifelse(df$bin, "Binary", "Text")
+   ifelse(df$text, "Text", "Binary")
 ), col.names = c("ID", "Mime-Type", "Renderer", "Format"))
 ```
 

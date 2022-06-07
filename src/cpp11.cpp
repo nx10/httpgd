@@ -5,21 +5,21 @@
 #include "cpp11/declarations.hpp"
 #include <R_ext/Visibility.h>
 
-// Httpgd.cpp
-bool httpgd_(int devnum, std::string host, int port, bool cors, std::string token, bool webserver, bool silent, bool fix_text_width, std::string extra_css);
-extern "C" SEXP _httpgd_httpgd_(SEXP devnum, SEXP host, SEXP port, SEXP cors, SEXP token, SEXP webserver, SEXP silent, SEXP fix_text_width, SEXP extra_css) {
+// httpgd.cpp
+bool httpgd_(int devnum, std::string host, int port, bool cors, std::string token, bool silent);
+extern "C" SEXP _httpgd_httpgd_(SEXP devnum, SEXP host, SEXP port, SEXP cors, SEXP token, SEXP silent) {
   BEGIN_CPP11
-    return cpp11::as_sexp(httpgd_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<std::string>>(host), cpp11::as_cpp<cpp11::decay_t<int>>(port), cpp11::as_cpp<cpp11::decay_t<bool>>(cors), cpp11::as_cpp<cpp11::decay_t<std::string>>(token), cpp11::as_cpp<cpp11::decay_t<bool>>(webserver), cpp11::as_cpp<cpp11::decay_t<bool>>(silent), cpp11::as_cpp<cpp11::decay_t<bool>>(fix_text_width), cpp11::as_cpp<cpp11::decay_t<std::string>>(extra_css)));
+    return cpp11::as_sexp(httpgd_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum), cpp11::as_cpp<cpp11::decay_t<std::string>>(host), cpp11::as_cpp<cpp11::decay_t<int>>(port), cpp11::as_cpp<cpp11::decay_t<bool>>(cors), cpp11::as_cpp<cpp11::decay_t<std::string>>(token), cpp11::as_cpp<cpp11::decay_t<bool>>(silent)));
   END_CPP11
 }
-// Httpgd.cpp
+// httpgd.cpp
 cpp11::list httpgd_details_(int devnum);
 extern "C" SEXP _httpgd_httpgd_details_(SEXP devnum) {
   BEGIN_CPP11
     return cpp11::as_sexp(httpgd_details_(cpp11::as_cpp<cpp11::decay_t<int>>(devnum)));
   END_CPP11
 }
-// Httpgd.cpp
+// httpgd.cpp
 std::string httpgd_random_token_(int len);
 extern "C" SEXP _httpgd_httpgd_random_token_(SEXP len) {
   BEGIN_CPP11
@@ -29,7 +29,7 @@ extern "C" SEXP _httpgd_httpgd_random_token_(SEXP len) {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_httpgd_httpgd_",              (DL_FUNC) &_httpgd_httpgd_,              9},
+    {"_httpgd_httpgd_",              (DL_FUNC) &_httpgd_httpgd_,              6},
     {"_httpgd_httpgd_details_",      (DL_FUNC) &_httpgd_httpgd_details_,      1},
     {"_httpgd_httpgd_random_token_", (DL_FUNC) &_httpgd_httpgd_random_token_, 1},
     {NULL, NULL, 0}
