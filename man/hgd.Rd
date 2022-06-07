@@ -17,7 +17,6 @@ hgd(
   token = getOption("httpgd.token", TRUE),
   silent = getOption("httpgd.silent", FALSE),
   websockets = getOption("httpgd.websockets", TRUE),
-  webserver = getOption("httpgd.webserver", TRUE),
   fix_text_width = getOption("httpgd.fix_text_width", TRUE),
   extra_css = getOption("httpgd.extra_css", ""),
   reset_par = getOption("httpgd.reset_par", FALSE)
@@ -66,9 +65,6 @@ when it is set to a number. \code{FALSE} deactivates the token.}
 \item{silent}{When set to \code{FALSE} no information will be printed to console.}
 
 \item{websockets}{Use websockets.}
-
-\item{webserver}{Can be set to \code{FALSE} for offline mode.
-In offline mode the device is only accessible via R.}
 
 \item{fix_text_width}{Should the width of strings be fixed so that it doesn't
 change between SVG renderers depending on their font rendering? Defaults to

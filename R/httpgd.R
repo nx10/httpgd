@@ -40,8 +40,6 @@
 #'   when it is set to a number. `FALSE` deactivates the token.
 #' @param silent When set to `FALSE` no information will be printed to console.
 #' @param websockets Use websockets.
-#' @param webserver Can be set to `FALSE` for offline mode.
-#'   In offline mode the device is only accessible via R.
 #' @param fix_text_width Should the width of strings be fixed so that it doesn't
 #'   change between SVG renderers depending on their font rendering? Defaults to
 #'   `TRUE`. If `TRUE` each string will have the `textLength` CSS property set
@@ -88,7 +86,6 @@ hgd <-
            token = getOption("httpgd.token", TRUE),
            silent = getOption("httpgd.silent", FALSE),
            websockets = getOption("httpgd.websockets", TRUE),
-           webserver = getOption("httpgd.webserver", TRUE),
            fix_text_width = getOption("httpgd.fix_text_width", TRUE),
            extra_css = getOption("httpgd.extra_css", ""),
            reset_par = getOption("httpgd.reset_par", FALSE)) {
@@ -101,9 +98,16 @@ hgd <-
       tok <- httpgd_random_token_(8)
     }
 
-    u <- ugd()
+    u <- ugd(
+      width,
+      height,
+      bg,
+      pointsize,
+      system_fonts,
+      user_fonts,
+      reset_par
+    )
 
-    #aliases <- validate_aliases(system_fonts, user_fonts) TODO
     if (httpgd_(u,
       host, port, cors, tok, webserver, silent,
       fix_text_width, extra_css
@@ -162,282 +166,6 @@ validate_unigd_device <- function(which) {
 hgd_details <- function(which = dev.cur()) {
   validate_unigd_device(which)
   return(httpgd_details_(which))
-}
-
-#' httpgd device information.
-#'
-#' Access general information of a httpgd graphics device.
-#' This function will only work after starting a device with [hgd()].
-#'
-#' @param which Which device (ID).
-#'
-#' @return List of status variables with the following named items:
-#'   `$id`: Server unique ID,
-#'   `$version`: httpgd and library versions.
-#'
-#' @importFrom grDevices dev.cur
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' hgd()
-#' hgd_info()
-#'
-#' dev.off()
-#' }
-hgd_info <- function(which = dev.cur()) {
-  validate_unigd_device(which)
-  return(httpgd_info_(which))
-}
-
-#' httpgd device renderers.
-#'
-#' Get a list of available renderers.
-#' This function will only work after starting a device with [hgd()].
-#'
-#' @return List of renderers with the following named items:
-#'   `$id`: Renderer ID,
-#'   `$mime`: File mime type,
-#'   `$ext`: File extension,
-#'   `$name`: Human readable name,
-#'   `$type`: Renderer type (currently either `plot` or `other`),
-#'   `$bin`: Is the file a binary blob or text.
-#'
-#' @importFrom grDevices dev.cur
-#' @export
-#'
-#' @examples
-#' 
-#' hgd_renderers()
-#'
-hgd_renderers <- function() {
-  httpgd_renderers_()
-}
-
-#' Query httpgd plot IDs
-#'
-#' Query httpgd graphics device static plot IDs.
-#' Available plot IDs starting from `index` will be returned.
-#' `limit` specifies the number of plots.
-#' This function will only work after starting a device with [hgd()].
-#'
-#' @param index Plot index. If this is set to `0`, the last page will be
-#'   selected.
-#' @param limit Limit the number of returned IDs. If this is set to a
-#'  value > 1 the returned type is a list if IDs.
-#' @param which Which device (ID).
-#' @param state Include the current device state in the returned result
-#'  (see also: [hgd_details()]).
-#'
-#' @return TODO
-#'
-#' @importFrom grDevices dev.cur
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' hgd()
-#' plot.new()
-#' text(.5, .5, "#1")
-#' plot.new()
-#' text(.5, .5, "#2")
-#' plot.new()
-#' text(.5, .5, "#3")
-#' third <- hgd_id()
-#' second <- hgd_id(2)
-#' all <- hgd_id(1, limit = Inf)
-#' hgd_remove(1)
-#' hgd_svg(second)
-#'
-#' dev.off()
-#' }
-hgd_id <- function(index = 0, limit = 1, which = dev.cur(), state = FALSE) {
-  validate_unigd_device(which)
-  if (limit == 0 || is.infinite(limit)) {
-    limit <- -1
-  }
-  res <- httpgd_id_(which, index - 1, limit)
-  if (state) {
-    return(res)
-  }
-  if (limit == 1) {
-    return(res$plots[[1]])
-  }
-  return(res$plots)
-}
-
-#' Render httpgd plot to SVG.
-#'
-#' This function will only work after starting a device with [hgd()].
-#'
-#' @param page Plot page to render. If this is set to `0`, the last page will
-#'   be selected. Can be set to a numeric plot index or plot ID
-#'   (see [hgd_id()]).
-#' @param width Width of the plot. If this is set to `-1`, the last width will
-#'   be selected.
-#' @param height Height of the plot. If this is set to `-1`, the last height
-#'   will be selected.
-#' @param zoom Zoom level. (For example: `2` corresponds to 200%, `0.5` would
-#' be 50%.)
-#' @param which Which device (ID).
-#' @param file Filepath to save SVG. (No file will be created if this is NA)
-#'
-#' @return Rendered SVG string.
-#'
-#' @importFrom grDevices dev.cur
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' hgd()
-#' plot(1, 1)
-#' s <- hgd_svg(width = 600, height = 400)
-#' hist(rnorm(100))
-#' hgd_svg(file = tempfile(), width = 600, height = 400)
-#'
-#' dev.off()
-#' }
-hgd_svg <-
-  function(page = 0,
-           width = -1,
-           height = -1,
-           zoom = 1,
-           which = dev.cur(),
-           file = NA) {
-    hgd_plot(
-      page = page,
-      width = width,
-      height = height,
-      zoom = zoom,
-      renderer = "svg",
-      which = which,
-      file = file
-    )
-  }
-
-#' Render httpgd plot.
-#'
-#' This function will only work after starting a device with [hgd()].
-#'
-#' @param page Plot page to render. If this is set to `0`, the last page will
-#'   be selected. Can be set to a numeric plot index or plot ID
-#'   (see [hgd_id()]).
-#' @param width Width of the plot. If this is set to `-1`, the last width will
-#'   be selected.
-#' @param height Height of the plot. If this is set to `-1`, the last height
-#'   will be selected.
-#' @param zoom Zoom level. (For example: `2` corresponds to 200%, `0.5` would
-#' be 50%.)
-#' @param renderer Renderer.
-#' @param which Which device (ID).
-#' @param file Filepath to save SVG. (No file will be created if this is NA)
-#'
-#' @return Rendered SVG string.
-#'
-#' @importFrom grDevices dev.cur
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' hgd()
-#' plot(1, 1)
-#' s <- hgd_plot(width = 600, height = 400, renderer = "svg")
-#' hist(rnorm(100))
-#' hgd_plot(file = tempfile(), width = 600, height = 400, renderer = "png")
-#'
-#' dev.off()
-#' }
-hgd_plot <- function(page = 0,
-                     width = -1,
-                     height = -1,
-                     zoom = 1,
-                     renderer = "svg",
-                     which = dev.cur(),
-                     file = NA) {
-  validate_unigd_device(which)
-  if (class(page) == "httpgd_pid") {
-    page <- httpgd_plot_find_(which, page$id)
-  }
-  if (httpgd_renderer_is_str_(renderer)) {
-    ret <- httpgd_plot_str_(which, page - 1, width, height, zoom, renderer)
-    if (!is.na(file)) {
-      cat(ret, file = file)
-      return()
-    }
-  } else if (httpgd_renderer_is_raw_(renderer)) {
-    ret <- httpgd_plot_raw_(which, page - 1, width, height, zoom, renderer)
-    if (!is.na(file)) {
-      writeBin(ret, con = file)
-      return()
-    }
-  } else {
-    stop("Not a valid renderer ID.")
-  }
-  return(ret)
-}
-
-#' Remove a httpgd plot page.
-#'
-#' This function will only work after starting a device with [hgd()].
-#'
-#' @param page Plot page to remove. If this is set to `0`, the last page will
-#'   be selected. Can be set to a numeric plot index or plot ID
-#'   (see [hgd_id()]).
-#' @param which Which device (ID).
-#'
-#' @return Whether the page existed (and thereby was successfully removed).
-#'
-#' @importFrom grDevices dev.cur
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' hgd()
-#' plot(1, 1) # page 1
-#' hist(rnorm(100)) # page 2
-#' hgd_remove(page = 1) # remove page 1
-#'
-#' dev.off()
-#' }
-hgd_remove <- function(page = 0, which = dev.cur()) {
-  validate_unigd_device(which)
-  if (class(page) == "httpgd_pid") {
-    return(httpgd_remove_id_(which, page$id))
-  }
-  return(httpgd_remove_(which, page - 1))
-  
-}
-
-#' Clear all httpgd plot pages.
-#'
-#' This function will only work after starting a device with [hgd()].
-#'
-#' @param which Which device (ID).
-#'
-#' @return Whether there were any pages to remove.
-#'
-#' @importFrom grDevices dev.cur
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#'
-#' hgd()
-#' plot(1, 1)
-#' hist(rnorm(100))
-#' hgd_clear()
-#' hist(rnorm(100))
-#'
-#' dev.off()
-#' }
-hgd_clear <- function(which = dev.cur()) {
-  validate_unigd_device(which)
-  return(httpgd_clear_(which))
 }
 
 
@@ -654,67 +382,6 @@ hgd_generate_token <- function(len) {
   httpgd_random_token_(len)
 }
 
-
-#' Inline SVG rendering.
-#'
-#' Convenience function for quick inline SVG rendering.
-#' This is similar to [hgd_svg()] but the plotting code is specified inline
-#' and an offline httpgd graphics device is managed (created and closed)
-#' automatically. Starting a device with [hgd()] is therefore not necessary.
-#'
-#' @param code Plotting code. See examples for more information.
-#' @param page Plot page to render. If this is set to `0`, the last page will
-#'   be selected. Can be set to a numeric plot index or plot ID
-#'   (see [hgd_id()]).
-#' @param page_width Width of the plot. If this is set to `-1`, the last width
-#'   will be selected.
-#' @param page_height Height of the plot. If this is set to `-1`, the last
-#'   height will be selected.
-#' @param zoom Zoom level. (For example: `2` corresponds to 200%, `0.5` would
-#'   be 50%.)
-#' @param renderer Renderer.
-#' @param file Filepath to save SVG. (No file will be created if this is `NA`)
-#' @param ... Additional parameters passed to `hgd(webserver=FALSE, ...)`
-#'
-#' @return Rendered SVG string.
-#' @export
-#'
-#' @examples
-#' hgd_inline({
-#'   hist(rnorm(100))
-#' })
-#'
-#' s <- hgd_inline({
-#'   plot.new()
-#'   lines(c(0.5, 1, 0.5), c(0.5, 1, 1))
-#' })
-#' cat(s)
-hgd_inline <- function(code,
-                       page = 0,
-                       page_width = -1,
-                       page_height = -1,
-                       zoom = 1,
-                       renderer = "svg",
-                       file = NA,
-                       ...) {
-  hgd(webserver = FALSE, ...)
-  tryCatch(code,
-    finally = {
-      s <-
-        hgd_plot(
-          page = page,
-          width = page_width,
-          height = page_height,
-          zoom = zoom,
-          renderer = renderer,
-          file = file
-        )
-      dev.off()
-    }
-  )
-  s
-}
-
 files_snapshot <- function(files) {
   data.frame(file=files, mtime=file.info(files)[,"mtime"])
 }
@@ -776,7 +443,7 @@ hgd_watch <- function(watch = list.files(pattern="\\.R$", ignore.case = T),
     on_error <- function(...) {}
   }
 
-  hgd(..., reset_par = reset_par)
+  hgd(..., reset_par = reset_par) # todo move this to unigd, inject client
   tryCatch(
     {
       if (!is.null(on_start)) {
