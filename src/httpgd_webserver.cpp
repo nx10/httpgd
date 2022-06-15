@@ -169,7 +169,7 @@ namespace httpgd
                     const auto state = api_locked->api_state();
                     return crow::response(device_state_json(state));
                 } 
-                return crow::response(404); });
+                return crow::response(crow::status::NOT_FOUND); });
 
             CROW_ROUTE(m_app, "/renderers")
             ([&]()
@@ -194,7 +194,7 @@ namespace httpgd
                     }
                     return crow::response(crow::json::wvalue({{"renderers", a}}));
                 }
-                return crow::response(404); });
+                return crow::response(crow::status::NOT_FOUND); });
 
             CROW_ROUTE(m_app, "/plots")
             ([&](const crow::request &req)
@@ -230,7 +230,7 @@ namespace httpgd
                         {"plots", plot_list}
                         }));
                 }
-                return crow::response(404); });
+                return crow::response(crow::status::NOT_FOUND); });
 
             CROW_ROUTE(m_app, "/plot")
             ([&](const crow::request &req)
@@ -257,14 +257,14 @@ namespace httpgd
                     unigd::renderer_info rinfo;
                     if (!unigd::get_renderer_info(p_renderer, &rinfo))
                     {
-                        return crow::response(404);
+                        return crow::response(crow::status::NOT_FOUND);
                     }
 
                     auto render = api_locked->api_render(p_renderer, p_id, width, height, zoom);
 
                     if (!render)
                     {
-                        return crow::response(404);
+                        return crow::response(crow::status::NOT_FOUND);
                     }
 
                     const uint8_t *rbuf;
@@ -278,7 +278,7 @@ namespace httpgd
                     return res;
                 }
 
-                return crow::response(404); });
+                return crow::response(crow::status::NOT_FOUND); });
 
             CROW_ROUTE(m_app, "/info")
             ([&]()
@@ -286,6 +286,37 @@ namespace httpgd
                  {"id", m_conf.id},
                  {"version", "httpgd " HTTPGD_VERSION}
                  }); });
+
+            CROW_ROUTE(m_app, "/remove")
+            ([&](const crow::request &req)
+             { 
+                const auto p_id = param_to<long>(req.url_params.get("id"));
+                if (!p_id)
+                {
+                    return crow::response(crow::status::NOT_FOUND);
+                }
+                if (auto api_locked = api.lock()) {
+                    if (!api_locked->api_remove(*p_id))
+                    {
+                        const auto state = api_locked->api_state();
+                        return crow::response(device_state_json(state));
+                    }
+                } 
+                return crow::response(crow::status::NOT_FOUND);
+              });
+
+            CROW_ROUTE(m_app, "/clear")
+            ([&]()
+            { 
+                if (auto api_locked = api.lock()) {
+                    if (!api_locked->api_clear())
+                    {
+                        const auto state = api_locked->api_state();
+                        return crow::response(device_state_json(state));
+                    }
+                } 
+                return crow::response(crow::status::INTERNAL_SERVER_ERROR);
+              });
 
             CROW_ROUTE(m_app, "/").websocket()
                 .onopen([&](crow::websocket::connection& conn) {
