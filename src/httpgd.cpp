@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include <unigd_api.h>
+#include "unigd_api_handler.h"
 
 #include "httpgd_rng.h"
 #include "httpgd_version.h"
@@ -62,26 +62,27 @@ bool httpgd_(int devnum, std::string host, int port, bool cors, std::string toke
          silent,
          httpgd::rng::uuid()};
 
-    return unigd::attach_client(devnum, std::make_shared<httpgd::web::WebServer>(conf));
+    return (new httpgd::web::WebServer(conf))->attach(devnum);
 }
 
 [[cpp11::register]]
 cpp11::list httpgd_details_(int devnum)
 {
-    std::shared_ptr<unigd::graphics_client> client;
-    if (!unigd::get_client(devnum, &client) || client->client_id() != httpgd::web::httpgd_client_id)
-    {
-        cpp11::stop("Device is not a ungd device with attached httpgd client.");
+    httpgd::unigd_api_access ugd;
+    auto *client = ugd.api->device_get(devnum, httpgd::web::httpgd_client_id);
+    if (!client) {
+        cpp11::stop("Device is not a unigd device with attached httpgd client.");
     }
-    auto server = std::static_pointer_cast<httpgd::web::WebServer>(client);
-    const auto svr_config = server->get_config();
 
+    auto *server = static_cast<httpgd::web::WebServer *>(client);
+    const auto svr_config = server->get_config();
         
     using namespace cpp11::literals;
     return cpp11::writable::list{
         "host"_nm = svr_config.host.c_str(),
         "port"_nm = server->port(),
         "token"_nm = svr_config.token.c_str()};
+        return cpp11::writable::list{};
 }
 
 [[cpp11::register]]

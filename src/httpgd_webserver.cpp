@@ -3,7 +3,6 @@
 #define CROW_MAIN
 #include <crow.h>
 #include <fmt/format.h>
-#include <unigd_api.h>
 #include <memory>
 
 #include "httpgd_webserver.h"
@@ -28,7 +27,7 @@ namespace httpgd
                 return buffer.str();
             }
 
-            inline crow::json::wvalue device_state_json(const unigd::device_state &state)
+            inline crow::json::wvalue device_state_json(const unigd_device_state &state)
             {
                 return crow::json::wvalue({{"upid", state.upid},
                                            {"hsize", state.hsize},
@@ -40,13 +39,10 @@ namespace httpgd
 
                 std::string dump() const override
                 {
-                    const uint8_t *rbuf;
-                    size_t rsize;
-                    m_render->get_data(&rbuf, &rsize);
-                    return std::string(rbuf, rbuf + rsize);
+                    return std::string(m_render.buffer, m_render.buffer + m_render.size);
                 }
                 
-                plot_return(unigd::renderer_info t_info, std::unique_ptr<unigd::render_data> &&t_render):
+                plot_return(const unigd_renderer_info &t_info, unigd_render_access t_render):
                     crow::returnable(t_info.mime),
                     m_render(std::move(t_render))
                 {
@@ -55,7 +51,7 @@ namespace httpgd
                 ~plot_return() = default;
 
             private:
-                const std::unique_ptr<unigd::render_data> m_render;
+                const unigd_render_access m_render;
             };
         }
 
@@ -80,7 +76,8 @@ namespace httpgd
                 prefix = "CRITICAL";
                 break;
             }
-            unigd::log(std::string("(") + timestamp() + std::string(") [") + prefix + std::string("] ") + message);
+            //if (m_api)
+            //    m_api->log(std::string("(") + timestamp() + std::string(") [") + prefix + std::string("] ") + message);
         }
 
         std::string HttpgdLogHandler::timestamp()
@@ -114,9 +111,22 @@ namespace httpgd
               m_mtx_update_subs(),
               m_update_subs()
         {
+            m_client.close = [](void *client_data){ static_cast<WebServer *>(client_data)->device_close(); };
+            m_client.client_id = [](void *client_data){ return static_cast<WebServer *>(client_data)->device_client_id(); };
+            m_client.start = [](void *client_data){ static_cast<WebServer *>(client_data)->device_start(); };
+            m_client.state_change = [](void *client_data){ static_cast<WebServer *>(client_data)->device_state_change(); };
+        }
+        
+        bool WebServer::attach(int devnum)
+        {
+            if (m_api == nullptr) { unigd_api_v1_create(&m_api); }
+
+            m_ugd_handle = m_api->device_attach(devnum, &m_client, this);
+
+            return m_ugd_handle != nullptr;
         }
 
-        int WebServer::client_id()
+        int WebServer::device_client_id()
         {
             return httpgd_client_id;
         }
@@ -137,7 +147,7 @@ namespace httpgd
             return m_app.port();
         }
 
-        void WebServer::start()
+        void WebServer::device_start()
         {
             m_server_thread = std::thread(&WebServer::run, this);
         }
@@ -165,8 +175,8 @@ namespace httpgd
             CROW_ROUTE(m_app, "/state")
             ([&]()
              {
-                if (auto api_locked = api.lock()) {
-                    const auto state = api_locked->api_state();
+                if (m_api) {
+                    const auto state = m_api->device_state(m_ugd_handle);
                     return crow::response(device_state_json(state));
                 } 
                 return crow::response(crow::status::NOT_FOUND); });
@@ -174,24 +184,28 @@ namespace httpgd
             CROW_ROUTE(m_app, "/renderers")
             ([&]()
              {
-                std::vector<unigd::renderer_info> renderers;
-                if (unigd::get_renderer_list(&renderers))
+                unigd_renderers_list renderers;
+                if (m_api)
                 {
+                    auto renderers_handle = m_api->renderers(&renderers);
 
                     std::vector<crow::json::wvalue> a;
-                    a.reserve(renderers.size());
-                    for (auto it = renderers.begin(); it != renderers.end(); ++it)
+                    a.reserve(renderers.size);
+                    for (uint64_t i = 0; i < renderers.size; ++i)
                     {
+                        const auto &ren = renderers.entries[i];
                         a.push_back(crow::json::wvalue({ 
-                            {"id", it->id},
-                            {"mime", it->mime},
-                            {"ext", it->fileext},
-                            {"name", it->name},
-                            {"type", it->type},
-                            {"bin", !it->text},
-                            {"descr", it->description}
+                            {"id", ren.id},
+                            {"mime", ren.mime},
+                            {"ext", ren.fileext},
+                            {"name", ren.name},
+                            {"type", ren.type},
+                            {"bin", !ren.text},
+                            {"descr", ren.description}
                         }));
                     }
+
+                    m_api->renderers_destroy(renderers_handle);
                     return crow::response(crow::json::wvalue({{"renderers", a}}));
                 }
                 return crow::response(crow::status::NOT_FOUND); });
@@ -202,31 +216,35 @@ namespace httpgd
                 const auto p_index = param_to<int>(req.url_params.get("index"));
                 const auto p_limit = param_to<int>(req.url_params.get("limit"));
 
-                 if (auto api_locked = api.lock()) {
-                    unigd::device_api_query_result qr;
+                 if (m_api) {
+                    UNIGD_FIND_HANDLE find_handle;
+                    unigd_find_results qr;
                     if (p_limit)
                     {
-                        qr = api_locked->api_query_range(p_index.get_value_or(0), *p_limit);
+                        find_handle = m_api->device_plots_find_range(m_ugd_handle, p_index.get_value_or(0), *p_limit, &qr);
                     }
                     else if (p_index)
                     {
-                        qr = api_locked->api_query_index(*p_index);
+                        find_handle = m_api->device_plots_find_index(m_ugd_handle, *p_index, &qr);
                     }
                     else
                     {
-                        qr = api_locked->api_query_all();
+                        find_handle = m_api->device_plots_find(m_ugd_handle, &qr);
                     }
 
                     std::vector<crow::json::wvalue> plot_list;
-                    plot_list.reserve(qr.ids.size());
-                    for (auto it = qr.ids.begin(); it != qr.ids.end(); ++it)
+                    plot_list.reserve(qr.size);
+                    for (UNIGD_PLOT_INDEX i = 0; i < qr.size; ++i)
                     {
                         plot_list.push_back(crow::json::wvalue({ 
-                            {"id", fmt::format("{}", *it)}
+                            {"id", fmt::format("{}", qr.ids[i])}
                         }));
                     }
+                    const auto sj = device_state_json(qr.state);
+                    m_api->device_plots_find_destroy(find_handle);
+
                     return crow::response(crow::json::wvalue({
-                        {"state", device_state_json(qr.state)},
+                        {"state", sj},
                         {"plots", plot_list}
                         }));
                 }
@@ -253,25 +271,29 @@ namespace httpgd
                 const auto p_id = param_to<long>(req.url_params.get("id")).get_value_or(-1); // todo?
                 const auto p_renderer = param_to<std::string>(req.url_params.get("renderer")).get_value_or("svg");
                 const auto p_download = param_to<const char*>(req.url_params.get("download"));
-                if (auto api_locked = api.lock()) {
-                    unigd::renderer_info rinfo;
-                    if (!unigd::get_renderer_info(p_renderer, &rinfo))
+                if (m_api) {
+                    unigd_renderer_info rinfo;
+                    auto rinfo_handle = m_api->renderers_find(p_renderer.c_str(), &rinfo);
+                    
+                    if (!rinfo_handle)
                     {
                         return crow::response(crow::status::NOT_FOUND);
                     }
 
-                    auto render = api_locked->api_render(p_renderer, p_id, width, height, zoom);
+                    unigd_render_access render;
+                    auto render_handle = m_api->device_render_create(m_ugd_handle, p_renderer.c_str(), p_id,{ width, height, zoom }, &render);
 
-                    if (!render)
+                    if (!render_handle)
                     {
+                        m_api->device_render_destroy(render_handle);
+                        m_api->renderers_find_destroy(rinfo_handle);
                         return crow::response(crow::status::NOT_FOUND);
                     }
-
-                    const uint8_t *rbuf;
-                    size_t rsize;
-                    render->get_data(&rbuf, &rsize);
 
                     auto res = crow::response(plot_return(rinfo, std::move(render)));
+                    m_api->device_render_destroy(render_handle);
+                    m_api->renderers_find_destroy(rinfo_handle);
+
                     if (p_download) {
                         res.add_header("Content-Disposition", fmt::format("attachment; filename=\"{}\"", *p_download));
                     }
@@ -295,10 +317,10 @@ namespace httpgd
                 {
                     return crow::response(crow::status::NOT_FOUND);
                 }
-                if (auto api_locked = api.lock()) {
-                    if (!api_locked->api_remove(*p_id))
+                if (m_api) {
+                    if (!m_api->device_plots_remove(m_ugd_handle, *p_id))
                     {
-                        const auto state = api_locked->api_state();
+                        const auto state = m_api->device_state(m_ugd_handle);
                         return crow::response(device_state_json(state));
                     }
                 } 
@@ -308,14 +330,15 @@ namespace httpgd
             CROW_ROUTE(m_app, "/clear")
             ([&]()
             { 
-                if (auto api_locked = api.lock()) {
-                    if (!api_locked->api_clear())
-                    {
-                        const auto state = api_locked->api_state();
-                        return crow::response(device_state_json(state));
-                    }
-                } 
-                return crow::response(crow::status::INTERNAL_SERVER_ERROR);
+                if (!m_api) {
+                    return crow::response(crow::status::INTERNAL_SERVER_ERROR);
+                }
+                if (!m_api->device_plots_clear(m_ugd_handle))
+                {
+                    const auto state = m_api->device_state(m_ugd_handle);
+                    return crow::response(device_state_json(state));
+                }
+                return crow::response(crow::status::NOT_FOUND);
               });
 
             CROW_ROUTE(m_app, "/").websocket()
@@ -349,7 +372,7 @@ namespace httpgd
             m_app.bindaddr(m_conf.host).port(m_conf.port).multithreaded().run();
         }
 
-        void WebServer::close()
+        void WebServer::device_close()
         {
             m_app.stop();
 
@@ -357,9 +380,11 @@ namespace httpgd
             {
                 m_server_thread.join();
             }
+
+            delete this; // attention!
         }
 
-        void WebServer::broadcast_state(const unigd::device_state &t_state)
+        void WebServer::broadcast_state(const unigd_device_state &t_state)
         {
             std::lock_guard<std::mutex> _(m_mtx_update_subs);
             for (auto u : m_update_subs)
@@ -368,12 +393,11 @@ namespace httpgd
             }
         }
 
-        void WebServer::broadcast_state_current()
+        void WebServer::device_state_change()
         {
-            if (auto api_locked = api.lock()) {
-                unigd::device_state state = api_locked->api_state();
-                broadcast_state(state);
-            }
+            if (!m_api) { return; }
+            const auto state = m_api->device_state(m_ugd_handle);
+            broadcast_state(state);
         }
 
     } // namespace web

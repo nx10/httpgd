@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <unordered_set>
-#include <unigd_api/client.h>
+#include <unigd_api.h>
 #include <crow.h>
 
 namespace httpgd
@@ -34,22 +34,29 @@ namespace httpgd
                 static std::string timestamp();
         };
 
-        class WebServer : public unigd::graphics_client
+        class WebServer
         {
         public:
             WebServer(const HttpgdServerConfig &t_config);
 
-            void start() override;
-            void close() override;
-            void broadcast_state_current() override;
-            int client_id() override;
-            std::string client_status() override;
+            bool attach(int devnum);
+
+            void device_start();
+            void device_close();
+            void device_state_change();
+            int device_client_id();
+
+            std::string client_status();
             const HttpgdServerConfig &get_config();
 
             unsigned short port();
-            void broadcast_state(const unigd::device_state &state);
+            void broadcast_state(const unigd_device_state &state);
 
         private:
+            unigd_api_v1 *m_api = nullptr;
+            UNIGD_HANDLE m_ugd_handle;
+            unigd_graphics_client m_client;
+            
             HttpgdServerConfig m_conf;
             crow::App<crow::CORSHandler> m_app;
             HttpgdLogHandler m_log_handler;

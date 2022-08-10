@@ -1,6 +1,6 @@
 test_that("User defined token", {
   testtok <- "123abc"
-  hgd(token=testtok)
+  hgd(token = testtok, silent = TRUE)
   hs <- hgd_details()
   dev.off()
   expect_equal(hs$token, testtok)
