@@ -112,23 +112,17 @@ namespace httpgd
               m_update_subs()
         {
             m_client.close = [](void *client_data){ static_cast<WebServer *>(client_data)->device_close(); };
-            m_client.client_id = [](void *client_data){ return static_cast<WebServer *>(client_data)->device_client_id(); };
             m_client.start = [](void *client_data){ static_cast<WebServer *>(client_data)->device_start(); };
             m_client.state_change = [](void *client_data){ static_cast<WebServer *>(client_data)->device_state_change(); };
         }
         
         bool WebServer::attach(int devnum)
         {
-            if (m_api == nullptr) { unigd_api_v1_create(&m_api); }
+            if (m_api == nullptr) { m_api = ugd::api; }
 
-            m_ugd_handle = m_api->device_attach(devnum, &m_client, this);
+            m_ugd_handle = m_api->device_attach(devnum, &m_client, ugd::httpgd_client_id, this);
 
             return m_ugd_handle != nullptr;
-        }
-
-        int WebServer::device_client_id()
-        {
-            return httpgd_client_id;
         }
 
         std::string WebServer::client_status()

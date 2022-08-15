@@ -5,15 +5,13 @@
 #include <thread>
 #include <mutex>
 #include <unordered_set>
-#include <unigd_api.h>
+#include "unigd_impl.h"
 #include <crow.h>
 
 namespace httpgd
 {
     namespace web
     {
-        constexpr int httpgd_client_id = 104;
-
         struct HttpgdServerConfig
         {
             std::string host;
@@ -44,7 +42,6 @@ namespace httpgd
             void device_start();
             void device_close();
             void device_state_change();
-            int device_client_id();
 
             std::string client_status();
             const HttpgdServerConfig &get_config();

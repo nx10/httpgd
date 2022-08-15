@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include "unigd_api_handler.h"
+#include "unigd_impl.h"
 
 #include "httpgd_rng.h"
 #include "httpgd_version.h"
@@ -68,8 +68,10 @@ bool httpgd_(int devnum, std::string host, int port, bool cors, std::string toke
 [[cpp11::register]]
 cpp11::list httpgd_details_(int devnum)
 {
-    httpgd::unigd_api_access ugd;
-    auto *client = ugd.api->device_get(devnum, httpgd::web::httpgd_client_id);
+    if (httpgd::ugd::api == nullptr) {
+        cpp11::stop("unigd not initialized.");
+    }
+    auto *client = httpgd::ugd::api->device_get(devnum, httpgd::ugd::httpgd_client_id);
     if (!client) {
         cpp11::stop("Device is not a unigd device with attached httpgd client.");
     }
