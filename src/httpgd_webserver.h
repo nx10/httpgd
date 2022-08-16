@@ -34,6 +34,20 @@ namespace httpgd
 
         class WebServer
         {
+            struct TokenGuard : crow::ILocalMiddleware
+            {
+                struct context
+                {
+                };
+
+                void before_handle(crow::request& req, crow::response& res, context& ctx);
+
+                void after_handle(crow::request& req, crow::response& res, context& ctx);
+                
+                bool m_use_token = false;
+                std::string m_token;
+            };
+
         public:
             WebServer(const HttpgdServerConfig &t_config);
 
@@ -55,7 +69,7 @@ namespace httpgd
             unigd_graphics_client m_client;
             
             HttpgdServerConfig m_conf;
-            crow::App<crow::CORSHandler> m_app;
+            crow::App<crow::CORSHandler, TokenGuard> m_app;
             HttpgdLogHandler m_log_handler;
             std::mutex m_mtx_update_subs;
             std::unordered_set<crow::websocket::connection*> m_update_subs;
