@@ -83,7 +83,9 @@ cpp11::list httpgd_details_(int devnum)
     return cpp11::writable::list{
         "host"_nm = svr_config.host.c_str(),
         "port"_nm = server->port(),
-        "token"_nm = svr_config.token.c_str()};
+        "token"_nm = svr_config.token.c_str(),
+        "status"_nm = server->status_info()
+        };
         return cpp11::writable::list{};
 }
 

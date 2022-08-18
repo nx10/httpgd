@@ -57,7 +57,7 @@ namespace httpgd
             void device_close();
             void device_state_change();
 
-            std::string client_status();
+            std::string status_info();
             const HttpgdServerConfig &get_config();
 
             unsigned short port();

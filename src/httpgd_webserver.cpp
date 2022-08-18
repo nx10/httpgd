@@ -15,6 +15,8 @@ namespace httpgd
     {
         namespace
         {
+            const char *HTTPGD_CLIENT_INFO = "httpgd " HTTPGD_VERSION;
+
             inline boost::optional<std::string> read_txt(const std::string &filepath)
             {
                 std::ifstream t(filepath);
@@ -144,6 +146,8 @@ namespace httpgd
             { static_cast<WebServer *>(client_data)->device_start(); };
             m_client.state_change = [](void *client_data)
             { static_cast<WebServer *>(client_data)->device_state_change(); };
+            m_client.info = [](void *client_data)
+            { return HTTPGD_CLIENT_INFO; };
         }
 
         bool WebServer::attach(int devnum)
@@ -158,9 +162,10 @@ namespace httpgd
             return m_ugd_handle != nullptr;
         }
 
-        std::string WebServer::client_status()
+        std::string WebServer::status_info()
         {
-            return "httpgd " HTTPGD_VERSION;
+            const auto ws_count = m_update_subs.size();
+            return fmt::format("httpgd version: " HTTPGD_VERSION "; WebSocket connections: {}", ws_count);
         }
 
         const HttpgdServerConfig &WebServer::get_config()
