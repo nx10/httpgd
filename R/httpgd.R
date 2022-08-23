@@ -216,7 +216,7 @@ hgd_url <- function(endpoint = "live",
                     explicit = FALSE) {
   l <- hgd_details(which)
   q <- list()
-  if (is.numeric(endpoint) || (class(endpoint) == "httpgd_pid")) {
+  if (is.numeric(endpoint) || inherits(endpoint, "httpgd_pid")) {
     if (is.numeric(endpoint)) {
       if (endpoint > 0) {
         q["index"] <- endpoint - 1
