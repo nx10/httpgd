@@ -105,7 +105,7 @@ hgd <-
       reset_par
     )
 
-    if (httpgd_(u, host, port, cors, tok, silent)) {
+    if (httpgd_(u, host, port, cors, tok, silent, system.file("www", package = "httpgd"))) {
       if (!silent) {
         cat("httpgd server running at:\n")
         if (host == "0.0.0.0") {
@@ -224,7 +224,7 @@ hgd_url <- function(endpoint = "live",
     } else {
       q["id"] <- endpoint
     }
-    endpoint <- "svg"
+    endpoint <- "plot"
   }
   if (endpoint == "svg" || endpoint == "plot") {
     if (width > 0) {
