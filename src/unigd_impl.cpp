@@ -39,16 +39,15 @@ namespace httpgd
 
             unigd_api_guard api_guard;
         } // namespace
-    } // namespace ugd
+    }     // namespace ugd
 } // namespace httpgd
 
-[[cpp11::init]] void import_unigd_api(DllInfo *dll)
+// There is a bug in cpp11 / decor where pointer types are not detected when the asterisk is right-aligned
+// see: https://github.com/r-lib/decor/pull/11
+// clang-format off
+[[cpp11::init]] void import_unigd_api(DllInfo* dll)
+// clang-format on
 {
     httpgd::ugd::api_guard.create();
     httpgd::ugd::httpgd_client_id = httpgd::ugd::api->register_client_id();
-    /*if (!unigd::load_api())
-    {
-        Rf_error("ERROR: 'httpgd' was compiled with a version of 'unigd' that is incompatible with the one currently installed. Please install or compile matching versions.");
-        cpp11::stop("");
-    }*/
 }
