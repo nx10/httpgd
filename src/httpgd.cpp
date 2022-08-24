@@ -24,33 +24,16 @@
 
 #include "debug_print.h"
 
-namespace httpgd
-{
-
-    // returns system path to {package}/inst/www/{filename}
-    std::string get_wwwpath(const std::string &filename)
-    {
-        using namespace cpp11::literals;
-
-        auto sys_file = cpp11::package("base")["system.file"];
-
-        cpp11::strings res(sys_file("www", filename,
-                                          "package"_nm = "httpgd"));
-        return res[0];
-    }
-
-    // --------------------------------------
-
-} // namespace httpgd
 
 [[cpp11::register]]
 bool httpgd_(int devnum, std::string host, int port, bool cors, std::string token, 
-             bool silent)
+             bool silent, std::string wwwpath)
 {
+    // wwwpath must be determined in R, because devtools overrides system.path 
+    // with a shim which results in an empty string *sometimes*.
+
     bool recording = true;
     bool use_token = token.length();
-
-    std::string wwwpath(httpgd::get_wwwpath(""));
 
     const httpgd::web::HttpgdServerConfig conf{host,
          port,
