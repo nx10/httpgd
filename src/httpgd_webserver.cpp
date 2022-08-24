@@ -399,7 +399,7 @@ namespace httpgd
                 if (!m_api) {
                     return crow::response(crow::status::INTERNAL_SERVER_ERROR);
                 }
-                if (!m_api->device_plots_clear(m_ugd_handle))
+                if (m_api->device_plots_clear(m_ugd_handle))
                 {
                     const auto state = m_api->device_state(m_ugd_handle);
                     return crow::response(device_state_json(state));
