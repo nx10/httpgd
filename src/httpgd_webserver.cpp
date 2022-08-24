@@ -55,6 +55,27 @@ namespace httpgd
                 const unigd_render_access m_render;
             };
 
+            inline boost::optional<UNIGD_PLOT_ID> req_find_id(unigd_api_v1 *api, UNIGD_HANDLE ugd_handle, const crow::request &req) {
+                if (!api) { return boost::none; }
+                const auto p_id = param_to<UNIGD_PLOT_ID>(req.url_params.get("id"));
+                if (p_id) {
+                    return p_id;
+                }
+                const auto p_index = param_to<UNIGD_PLOT_ID>(req.url_params.get("index"));
+                if (!p_index) {
+                    return boost::none;
+                }
+                
+                boost::optional<UNIGD_PLOT_ID> re = boost::none;
+                unigd_find_results qr;
+                const auto handle = api->device_plots_find_index(ugd_handle, *p_index, &qr);
+                if (qr.size > 0) {
+                    re = qr.ids[0];
+                }
+                api->device_plots_find_destroy(handle);
+                return re;
+            }
+
         }
 
         void HttpgdLogHandler::log(std::string message, crow::LogLevel level)
@@ -313,7 +334,7 @@ namespace httpgd
                     width = p_width.get_value_or(-1);
                     height = p_height.get_value_or(-1);
                 }
-                const auto p_id = param_to<long>(req.url_params.get("id")).get_value_or(-1); // todo?
+                const auto p_id = req_find_id(m_api, m_ugd_handle, req).get_value_or(-1);
                 const auto p_renderer = param_to<std::string>(req.url_params.get("renderer")).get_value_or("svg");
                 const auto p_download = param_to<const char*>(req.url_params.get("download"));
                 if (m_api) {
@@ -356,14 +377,14 @@ namespace httpgd
             CROW_ROUTE(m_app, "/remove")
              .CROW_MIDDLEWARES(m_app, TokenGuard)
             ([&](const crow::request &req)
-             { 
-                const auto p_id = param_to<long>(req.url_params.get("id"));
+             {
+                const auto p_id = req_find_id(m_api, m_ugd_handle, req);
                 if (!p_id)
                 {
                     return crow::response(crow::status::NOT_FOUND);
                 }
                 if (m_api) {
-                    if (!m_api->device_plots_remove(m_ugd_handle, *p_id))
+                    if (m_api->device_plots_remove(m_ugd_handle, *p_id))
                     {
                         const auto state = m_api->device_state(m_ugd_handle);
                         return crow::response(device_state_json(state));
