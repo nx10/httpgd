@@ -46,6 +46,7 @@ Suggests:
     knitr,
     rmarkdown,
     covr,
+    future,
     httr,
     jsonlite
 Roxygen: list(markdown = TRUE)

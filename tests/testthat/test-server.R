@@ -1,6 +1,6 @@
 test_that("State status OK", {
   hgd(token = FALSE, silent = TRUE)
-  res <- httr::GET(hgd_url("state"))
+  res <- fetch_get(hgd_url("state"))
   dev.off()
   expect_equal(httr::status_code(res), 200)
 })
@@ -8,7 +8,7 @@ test_that("State status OK", {
 test_that("live status OK", {
   hgd(token = FALSE, silent = TRUE)
   plot.new()
-  res <- httr::GET(hgd_url("live"))
+  res <- fetch_get(hgd_url("live"))
   dev.off()
   expect_equal(httr::status_code(res), 200)
 })
@@ -16,7 +16,7 @@ test_that("live status OK", {
 test_that("Render status OK", {
   hgd(token = FALSE, silent = TRUE)
   plot.new()
-  res <- httr::GET(hgd_url("plot"))
+  res <- fetch_get(hgd_url("plot"))
   dev.off()
   expect_equal(httr::status_code(res), 200)
 })
@@ -25,7 +25,7 @@ test_that("All renderers OK", {
   hgd(token = FALSE, silent = TRUE)
   plot.new()
   vres <- vapply(unigd::ugd_renderers()$id, function(renderer_id) {
-    httr::status_code(httr::GET(hgd_url("plot", renderer=renderer_id))) == 200
+    httr::status_code(fetch_get(hgd_url("plot", renderer=renderer_id))) == 200
   }, logical(1))
   dev.off()
   expect_true(all(vres))
@@ -34,17 +34,17 @@ test_that("All renderers OK", {
 test_that("Plot identical", {
   hgd(token = FALSE, silent = TRUE)
   plot.new()
-  res <- httr::GET(hgd_url("plot", renderer = "json"))
+  res <- fetch_get(hgd_url("plot", renderer = "json"))
   uplt <- unigd::ugd_render(as = "json")
   dev.off()
-  expect_equal(httr::text_content(res), uplt)
+  expect_equal(httr::content(res, as = "text"), uplt)
 })
 
 test_that("Renderer info identical", {
   hgd(token = FALSE, silent = TRUE)
-  res <- httr::GET(hgd_url("renderers"))
+  res <- fetch_get(hgd_url("renderers"))
   dev.off()
-  df_res <- jsonlite::fromJSON(httr::text_content(res))$renderers
+  df_res <- jsonlite::fromJSON(httr::content(res, as = "text"))$renderers
   df_ugd <- unigd::ugd_renderers()
 
   # this API should change at some point
@@ -66,9 +66,9 @@ test_that("Renderer info identical", {
 test_that("Clear plots", {
   fetch_json_hgd <- function(...) {
     jsonlite::fromJSON(
-      httr::text_content(
-        httr::GET(
-          hgd_url(...))), simplifyVector = FALSE)
+      httr::content(
+        fetch_get(
+          hgd_url(...)), as = "text"), simplifyVector = FALSE)
   }
 
   hgd(token = FALSE, silent = TRUE)
@@ -81,7 +81,7 @@ test_that("Clear plots", {
   expect_equal(length(json_plots$plots), 10)
   expect_equal(json_plots$state$hsize, 10)
 
-  httr::GET(hgd_url("clear"))
+  fetch_get(hgd_url("clear"))
 
   json_plots <- fetch_json_hgd("plots")
 
@@ -93,9 +93,9 @@ test_that("Clear plots", {
 
 test_that("Delete plot", {
   fetch_txt_hgd <- function(...) {
-      httr::text_content(
-        httr::GET(
-          hgd_url(...)))
+      httr::content(
+        fetch_get(
+          hgd_url(...)), as = "text")
   }
 
   hgd(token = FALSE, silent = TRUE)
@@ -109,7 +109,7 @@ test_that("Delete plot", {
   expect_true(grepl("\"str\": \"plot_4\"", json_p4))
   expect_true(grepl("\"str\": \"plot_5\"", json_p5))
 
-  httr::GET(paste0(hgd_url("remove"), "?index=4"))
+  fetch_get(paste0(hgd_url("remove"), "?index=4"))
 
   json_p4 <- fetch_txt_hgd(4, renderer = "json")
   json_p5 <- fetch_txt_hgd(5, renderer = "json")
@@ -126,8 +126,8 @@ test_that("Delete plot status", {
     plot(0, main = sprintf("plot_%i", i))
   }
 
-  expect_equal(httr::status_code(httr::GET(paste0(hgd_url("remove"), "?index=4"))), 200)
-  expect_equal(httr::status_code(httr::GET(paste0(hgd_url("remove"), "?index=999"))), 404)
+  expect_equal(httr::status_code(fetch_get(paste0(hgd_url("remove"), "?index=4"))), 200)
+  expect_equal(httr::status_code(fetch_get(paste0(hgd_url("remove"), "?index=999"))), 404)
 
   dev.off()
 })
