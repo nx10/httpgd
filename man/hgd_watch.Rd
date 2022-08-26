@@ -53,11 +53,10 @@ plot(rnorm(100), col = "red")
 # --- Other file / interactive ---
 
 hgd_watch(
-  watch="my_code.R", # When my_code.R changes...
+  watch = "my_code.R", # When my_code.R changes...
   on_change = function(...) {
     source("my_code.R") # ...call updated plot function.
   }
 )
-
 }
 }

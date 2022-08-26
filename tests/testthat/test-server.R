@@ -5,6 +5,21 @@ test_that("State status OK", {
   expect_equal(httr::status_code(res), 200)
 })
 
+test_that("State token check", {
+  tok <- "abc123"
+  hgd(token = tok, silent = TRUE)
+  res_no_token <- fetch_get(
+    hgd_url("state", omit_token = TRUE))
+  res_wrong_token <- fetch_get(
+    hgd_url("state", omit_token = TRUE, token = "xyz321"))
+  res_correct_token <- fetch_get(
+    hgd_url("state", omit_token = TRUE, token = tok))
+  dev.off()
+  expect_equal(httr::status_code(res_no_token), 401)
+  expect_equal(httr::status_code(res_wrong_token), 401)
+  expect_equal(httr::status_code(res_correct_token), 200)
+})
+
 test_that("live status OK", {
   hgd(token = FALSE, silent = TRUE)
   plot.new()
@@ -103,16 +118,16 @@ test_that("Delete plot", {
     plot(0, main = sprintf("plot_%i", i))
   }
 
-  json_p4 <- fetch_txt_hgd(4, renderer = "json")
-  json_p5 <- fetch_txt_hgd(5, renderer = "json")
+  json_p4 <- fetch_txt_hgd("plot", index = 4 - 1, renderer = "json")
+  json_p5 <- fetch_txt_hgd("plot", index = 5 - 1, renderer = "json")
 
   expect_true(grepl("\"str\": \"plot_4\"", json_p4))
   expect_true(grepl("\"str\": \"plot_5\"", json_p5))
 
-  fetch_get(paste0(hgd_url("remove"), "?index=4"))
+  fetch_get(paste0(hgd_url("remove", index = 5 - 1)))
 
-  json_p4 <- fetch_txt_hgd(4, renderer = "json")
-  json_p5 <- fetch_txt_hgd(5, renderer = "json")
+  json_p4 <- fetch_txt_hgd("plot", index = 4 - 1, renderer = "json")
+  json_p5 <- fetch_txt_hgd("plot", index = 5 - 1, renderer = "json")
 
   expect_true(grepl("\"str\": \"plot_4\"", json_p4))
   expect_true(grepl("\"str\": \"plot_6\"", json_p5))
@@ -126,8 +141,8 @@ test_that("Delete plot status", {
     plot(0, main = sprintf("plot_%i", i))
   }
 
-  expect_equal(httr::status_code(fetch_get(paste0(hgd_url("remove"), "?index=4"))), 200)
-  expect_equal(httr::status_code(fetch_get(paste0(hgd_url("remove"), "?index=999"))), 404)
+  expect_equal(httr::status_code(fetch_get(hgd_url("remove", index = 4))), 200)
+  expect_equal(httr::status_code(fetch_get(hgd_url("remove", index = 99))), 404)
 
   dev.off()
 })

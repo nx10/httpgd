@@ -7,17 +7,16 @@
 hgd(
   host = getOption("httpgd.host", "127.0.0.1"),
   port = getOption("httpgd.port", 0),
+  cors = getOption("httpgd.cors", FALSE),
+  token = getOption("httpgd.token", TRUE),
+  silent = getOption("httpgd.silent", FALSE),
   width = getOption("httpgd.width", 720),
   height = getOption("httpgd.height", 576),
+  zoom = getOption("httpgd.zoom", 1),
   bg = getOption("httpgd.bg", "white"),
   pointsize = getOption("httpgd.pointsize", 12),
   system_fonts = getOption("httpgd.system_fonts", list()),
   user_fonts = getOption("httpgd.user_fonts", list()),
-  cors = getOption("httpgd.cors", FALSE),
-  token = getOption("httpgd.token", TRUE),
-  silent = getOption("httpgd.silent", FALSE),
-  websockets = getOption("httpgd.websockets", TRUE),
-  fix_text_width = getOption("httpgd.fix_text_width", TRUE),
   reset_par = getOption("httpgd.reset_par", FALSE)
 )
 }
@@ -29,9 +28,24 @@ The network security of httpgd has not yet been properly tested.}
 \item{port}{Server port. If this is set to \code{0}, an open port
 will be assigned.}
 
-\item{width}{Graphics device width (pixels).}
+\item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
+When set to \code{TRUE}, CORS header will be set to \code{"*"}.}
 
-\item{height}{Graphics device height (pixels).}
+\item{token}{(Optional) security token. When set, all requests
+need to include a token to be allowed. (Either in a request header
+(\code{X-HTTPGD-TOKEN}) field or as a query parameter.)
+This parameter can be set to \code{TRUE} to generate a random 8 character
+alphanumeric token. A random token of the specified length is generated
+when it is set to a number. \code{FALSE} deactivates the token.}
+
+\item{silent}{When set to \code{FALSE} no information will be printed to console.}
+
+\item{width}{Initial plot width (pixels).}
+
+\item{height}{Initial plot height (pixels).}
+
+\item{zoom}{Initial plot zoom level (For example: 2 corresponds
+to 200\%, 0.5 would be 50\%.).}
 
 \item{bg}{Background color.}
 
@@ -50,30 +64,6 @@ strings containing a path to a font file, or a list containing
 \code{name} and \code{file} elements with \code{name} indicating
 the font alias in the SVG output and \code{file} the path to a
 font file.}
-
-\item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
-When set to \code{TRUE}, CORS header will be set to \code{"*"}.}
-
-\item{token}{(Optional) security token. When set, all requests
-need to include a token to be allowed. (Either in a request header
-(\code{X-HTTPGD-TOKEN}) field or as a query parameter.)
-This parameter can be set to \code{TRUE} to generate a random 8 character
-alphanumeric token. A random token of the specified length is generated
-when it is set to a number. \code{FALSE} deactivates the token.}
-
-\item{silent}{When set to \code{FALSE} no information will be printed to console.}
-
-\item{websockets}{Use websockets.}
-
-\item{fix_text_width}{Should the width of strings be fixed so that it doesn't
-change between SVG renderers depending on their font rendering? Defaults to
-\code{TRUE}. If \code{TRUE} each string will have the \code{textLength} CSS property set
-to the width calculated by systemfonts and
-\code{lengthAdjust='spacingAndGlyphs'}. Setting this to \code{FALSE} can be
-beneficial for heavy post-processing that may change content or style of
-strings, but may lead to inconsistencies between strings and graphic
-elements that depend on the dimensions of the string (e.g. label borders
-and background).}
 
 \item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
 on device start and reset every time the plots are cleared (see
