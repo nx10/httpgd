@@ -143,11 +143,8 @@ namespace httpgd
 #if R_GE_version == 13
         dd->deviceVersion = R_GE_definitions;
 #endif
-#if R_GE_version == 14
+#if R_GE_version >= 14
         dd->deviceVersion = R_GE_deviceClip;
-#endif
-#if R_GE_version >= 15
-        dd->deviceVersion = R_GE_group;
 #endif
 
         // Device specific
