@@ -68,7 +68,7 @@ namespace httpgd
                 
                 boost::optional<UNIGD_PLOT_ID> re = boost::none;
                 unigd_find_results qr;
-                const auto handle = api->device_plots_find_index(ugd_handle, *p_index, &qr);
+                const auto handle = api->device_plots_find(ugd_handle, *p_index, 1, &qr);
                 if (qr.size > 0) {
                     re = qr.ids[0];
                 }
@@ -284,18 +284,7 @@ namespace httpgd
                  if (m_api) {
                     UNIGD_FIND_HANDLE find_handle;
                     unigd_find_results qr;
-                    if (p_limit)
-                    {
-                        find_handle = m_api->device_plots_find_range(m_ugd_handle, p_index.get_value_or(0), *p_limit, &qr);
-                    }
-                    else if (p_index)
-                    {
-                        find_handle = m_api->device_plots_find_index(m_ugd_handle, *p_index, &qr);
-                    }
-                    else
-                    {
-                        find_handle = m_api->device_plots_find(m_ugd_handle, &qr);
-                    }
+                    find_handle = m_api->device_plots_find(m_ugd_handle, p_index.get_value_or(0), p_limit.get_value_or(0), &qr);
 
                     std::vector<crow::json::wvalue> plot_list;
                     plot_list.reserve(qr.size);
