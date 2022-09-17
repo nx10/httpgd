@@ -1,3 +1,12 @@
+# httpgd 2.0.0
+
+- Split graphics rendering and R interface to seperate package 'unigd'.
+- Large refactoring and rewrite.
+- Numerous fixes and improvements in 'unigd' (see NEWS.md there).
+- Migrate to crow web server library (due to belle being deprecated).
+- Add live reload feature.
+- Various library updates.
+
 # httpgd 1.3.0
 
 - Fixes for R 4.2 UCRT support (thanks Tomas Kalibera and Uwe Ligges).

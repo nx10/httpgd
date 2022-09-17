@@ -20,7 +20,7 @@ The device asynchronously serves graphics via HTTP and WebSockets.
 * Supports multiple clients concurrently
 * Plot resizing and history
 * Export various image formats (SVG, PNG, PDF, EPS, ...)
-* Based on [`unigd`](https://github.com/nx10/unigd)
+* Powered by [`unigd`](https://github.com/nx10/unigd)
 * For developers:
   * Stateless asynchronous HTTP/WebSocket API
   * HTML/JavaScript client (TypeScript module)
