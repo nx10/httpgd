@@ -24,7 +24,7 @@
 #'   fonts installed on your system. If unspecified, the R default
 #'   families `sans`, `serif`, `mono` and `symbol`
 #'   are aliased to the family returned by
-#'   [systemfonts::font_info()].
+#'   `systemfonts::font_info()`.
 #' @param user_fonts Named list of fonts to be aliased with font files
 #'   provided by the user rather than fonts properly installed on the
 #'   system. The aliases can be fonts from the fontquiver package,
@@ -47,7 +47,6 @@
 #'
 #' @return No return value, called to initialize graphics device.
 #'
-#' @importFrom systemfonts match_font
 #' @importFrom unigd ugd
 #' @export
 #'

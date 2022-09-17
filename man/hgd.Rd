@@ -55,7 +55,7 @@ to 200\%, 0.5 would be 50\%.).}
 fonts installed on your system. If unspecified, the R default
 families \code{sans}, \code{serif}, \code{mono} and \code{symbol}
 are aliased to the family returned by
-\code{\link[systemfonts:font_info]{systemfonts::font_info()}}.}
+\code{systemfonts::font_info()}.}
 
 \item{user_fonts}{Named list of fonts to be aliased with font files
 provided by the user rather than fonts properly installed on the
