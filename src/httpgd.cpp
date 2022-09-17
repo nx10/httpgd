@@ -22,8 +22,6 @@
 
 #include "httpgd_webserver.h"
 
-#include "debug_print.h"
-
 
 [[cpp11::register]]
 bool httpgd_(int devnum, std::string host, int port, bool cors, std::string token, 
