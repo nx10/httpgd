@@ -1,7 +1,7 @@
 test_that("User defined token", {
   testtok <- "123abc"
-  hgd(webserver=F, token=testtok)
-  hs <- hgd_state()
+  hgd(token = testtok, silent = TRUE)
+  hs <- hgd_details()
   dev.off()
   expect_equal(hs$token, testtok)
 })

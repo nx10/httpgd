@@ -6,21 +6,7 @@ Authors@R:
     c(
       person(given = "Florian", family = "Rupprecht", email = "floruppr@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1795-8624")),
       person(given = "Kun", family = "Ren", role = "ctb", email = "mail@renkun.me"),
-      person("Jeroen", "Ooms", role = c("ctb"), email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289")),
-      person("Hadley", "Wickham", email = "hadley@rstudio.com", role = "cph", comment = "Author of included svglite code"),
-      person("Lionel", "Henry", email = "lionel@rstudio.com", role = "cph", comment = "Author of included svglite code"),
-      person("Thomas Lin", "Pedersen", email = "thomas.pedersen@rstudio.com", role = "cph", comment = "Author and creator of included svglite code"),
-      person("T Jake", "Luciani", email = "jake@apache.org", role = "cph", comment = "Author of included svglite code"),
-      person("Matthieu", "Decorde", email = "matthieu.decorde@ens-lyon.fr", role = "cph", comment = "Author of included svglite code"),
-      person("Vaudor", "Lise", email = "lise.vaudor@ens-lyon.fr", role = "cph", comment = "Author of included svglite code"),
-      person("Tony", "Plate", role = "cph", comment = "Contributor to included svglite code"),
-      person("David", "Gohel", role = "cph", comment = "Contributor to included svglite code"),
-      person("Yixuan", "Qiu", role = "cph", comment = "Contributor to included svglite code"),
-      person("Håkon", "Malmedal", role = "cph", comment = "Contributor to included svglite code"),
-      person("RStudio", role = "cph", comment = "Copyright holder of included svglite code"),
-      person("Brett", "Robinson", role = "cph", comment = "Author of included belle library"),
-      person("Google", role = "cph", comment = "Copyright holder of included material design icons"),
-      person("Victor", "Zverovich", role = "cph", comment = "Author of included fmt library")
+      person("Jeroen", "Ooms", role = c("ctb"), email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289"))
     )
 Description: A graphics device for R that is accessible via network protocols.
     This package was created to make it easier to embed live R graphics in 
@@ -28,30 +14,29 @@ Description: A graphics device for R that is accessible via network protocols.
     The included 'HTML/JavaScript' client (plot viewer) aims to provide a better overall user experience when dealing with R graphics.
     The device asynchronously serves graphics via 'HTTP' and 'WebSockets'.
 License: GPL (>= 2)
+Remotes: github::nx10/unigd
 Depends:
     R (>= 3.2.0)
 Imports: 
-    systemfonts (>= 1.0.0)
+    unigd
 LinkingTo: 
     cpp11 (>= 0.2.4),
     BH (>= 1.75.0),
-    systemfonts
+    unigd
 Suggests:
     testthat,
     xml2 (>= 1.0.0),
-    fontquiver (>= 0.2.0),
     knitr,
     rmarkdown,
-    covr
+    covr,
+    future,
+    httr,
+    jsonlite
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Encoding: UTF-8
 SystemRequirements: 
-    C++17,
-    libpng,
-    cairo,
-    freetype2, 
-    fontconfig
+    C++17
 URL: https://github.com/nx10/httpgd,
     https://nx10.github.io/httpgd/
 BugReports: https://github.com/nx10/httpgd/issues

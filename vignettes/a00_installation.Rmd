@@ -27,38 +27,4 @@ Depends on `R` version &geq; 4.0 on windows, and R &geq; 3.2 on linux and macOS 
 
 Note that there is a rare bug in R versions < 4.1, that leads to [some plots disappearing when ggplot2 plots are resized and deleted in a specific way](https://github.com/nx10/httpgd/issues/50).
 
-`libpng` and X11 are required on unix like systems (e.g. Linux, macOS). 
-`Cairo` is required on unix like systems to enable PNG, PDF, EPS and PS renderers.
-
-### macOS
-
-If `libpng` is missing install it via:
-
-```sh
-brew install libpng
-```
-
-If `X11` is missing the error message will include the text:
-
-```sh
-unable to load shared object [...] systemfonts/libs/systemfonts.so [...]
-```
-
-Install [`XQuartz`](https://www.xquartz.org/).
-(see: <https://github.com/r-lib/systemfonts/issues/17>)
-
-### Linux
-
-For source installation on Linux, the fontconfig freetype2 library is required to install the `{systemfonts}` package, which is a dependency of `httpgd`.
-
-#### Debian, Ubuntu, etc.
-
-```sh
-apt install libfontconfig1-dev
-```
-
-#### Fedora, CentOS, RHEL, etc.
-
-```sh
-dnf install fontconfig-devel
-```
+Also see the [`unigd` system requirements](https://nx10.github.io/unigd/articles/a00_installation.html#system-requirements).

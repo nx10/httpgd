@@ -7,34 +7,19 @@
 hgd_url(
   endpoint = "live",
   which = dev.cur(),
-  websockets = TRUE,
-  width = -1,
-  height = -1,
-  renderer = NA,
-  history = TRUE,
-  host = NULL,
-  port = NULL,
-  explicit = FALSE
+  host = NA,
+  port = NA,
+  explicit = FALSE,
+  omit_token = FALSE,
+  ...
 )
 }
 \arguments{
 \item{endpoint}{API endpoint. The default, \code{"live"} is the HTML/JS
 plot viewer. Can be set to a numeric plot index or plot ID
-(see \code{\link[=hgd_id]{hgd_id()}}) to obtain the direct URL to the SVG.}
+(see \code{\link[unigd:ugd_id]{unigd::ugd_id()}}) to obtain the direct URL to the SVG.}
 
 \item{which}{Which device (ID).}
-
-\item{websockets}{Use websockets.}
-
-\item{width}{Width of the plot. (Only used when \code{endpoint} is \code{"svg"},
-or a plot index or ID.)}
-
-\item{height}{Height of the plot. (Only used when \code{endpoint} is \code{"svg"},
-or a plot index or ID.)}
-
-\item{renderer}{Renderer.}
-
-\item{history}{Should the plot history sidebar be visible.}
 
 \item{host}{Replaces hostname.}
 
@@ -42,6 +27,10 @@ or a plot index or ID.)}
 
 \item{explicit}{Ads \code{hgd={host}:{port}} query parameter. Needed for host
 resolution in some editors.}
+
+\item{omit_token}{Should the security token be omitted from the URL.}
+
+\item{\\dots}{Other query parameters that will be appended to the URL.}
 }
 \value{
 URL.
@@ -49,6 +38,10 @@ URL.
 \description{
 Generate URLs to the plot viewer or to plot SVGs.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
+}
+\details{
+Note: If the included client is used set \code{websockets=0} or
+\code{sidebar=0} to turn off WebSocket or plot history sidebar.
 }
 \examples{
 \dontrun{

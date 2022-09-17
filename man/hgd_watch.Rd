@@ -6,7 +6,9 @@
 \usage{
 hgd_watch(
   watch = list.files(pattern = "\\\\.R$", ignore.case = T),
-  on_change = function(changed_files) {     print(changed_files) },
+  on_change = function(changed_files) {
+     print(changed_files)
+ },
   interval = 1,
   on_start = hgd_browse,
   on_exit = NULL,
@@ -32,7 +34,7 @@ hgd_watch(
 (may be set to \code{NULL}).}
 
 \item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
-on device start and reset every time \code{\link[=hgd_clear]{hgd_clear()}} is called (see
+on device start and reset every time \code{\link[unigd:ugd_clear]{unigd::ugd_clear()}} is called (see
 \code{\link[graphics:par]{graphics::par()}}).}
 
 \item{...}{Additional parameters passed to \code{hgd(webserver=FALSE, ...)}}
@@ -51,11 +53,10 @@ plot(rnorm(100), col = "red")
 # --- Other file / interactive ---
 
 hgd_watch(
-  watch="my_code.R", # When my_code.R changes...
+  watch = "my_code.R", # When my_code.R changes...
   on_change = function(...) {
     source("my_code.R") # ...call updated plot function.
   }
 )
-
 }
 }

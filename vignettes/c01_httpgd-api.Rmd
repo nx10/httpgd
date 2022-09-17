@@ -17,14 +17,12 @@ vignette: >
 | `hgd_close()`                       |                                | Helper: Close device.               |
 | `hgd_url()`                         |                                | Helper: URL generation.             |
 | `hgd_browse()`                      |                                | Helper: Open browser.               |
-| [`hgd_state()`](#get-state)         | [`/state`](#get-state)         | Get current server state.           |
-| [`hgd_renderers()`](#get-renderers) | [`/renderers`](#get-renderers) | Get list of available renderers.    |
-| ~~[`hgd_svg()`](#render-svg)~~      | ~~[`/svg`](#render-svg)~~      | Get rendered SVG. (Deprecated)      |
-| [`hgd_plot()`](#render-plot)        | [`/plot`](#render-plot)        | Get rendered plot (any format).     |
-| [`hgd_clear()`](#remove-plots)      | [`/clear`](#remove-plots)      | Remove all plots.                   |
-| [`hgd_remove()`](#remove-plots)     | [`/remove`](#remove-plots)     | Remove a single plot.               |
-| [`hgd_id()`](#get-static-ids)       | [`/plots`](#get-static-ids)    | Get static plot IDs.                |
-|                                     | `/`                            | Welcome message.                    |
+| [`ugd_state()`](#get-state)         | [`/state`](#get-state)         | Get current server state.           |
+| [`ugd_renderers()`](#get-renderers) | [`/renderers`](#get-renderers) | Get list of available renderers.    |
+| [`ugd_render()`](#render-plot)        | [`/plot`](#render-plot)        | Get rendered plot (any format).     |
+| [`ugd_clear()`](#remove-plots)      | [`/clear`](#remove-plots)      | Remove all plots.                   |
+| [`ugd_remove()`](#remove-plots)     | [`/remove`](#remove-plots)     | Remove a single plot.               |
+| [`ugd_id()`](#get-static-ids)       | [`/plots`](#get-static-ids)    | Get static plot IDs.                |
 |                                     | `/live`                        | Live server page.                   |
 
 ## Get state
@@ -42,10 +40,9 @@ To receive state changes as they happen [WebSockets can be used](#from-websocket
 ### From R
 
 ```R
-hgd_state()
+unigd::ugd_state()
 ```
-
-Will respond with a list object including fields containing `host`, `port` and security `token` of the server.
+Note: Prior to `httpgd 2.0` this function also returned `host`, `port` and security `token` of the server. These fields are now accessed via `hgd_details()`.
 
 ### From HTTP
 
@@ -70,13 +67,13 @@ httpgd includes multiple renderers that can dynamically render plots to differen
 The following is a complete list of renderers.
 
 ```{r echo=FALSE}
-df <- httpgd::hgd_renderers()
+df <- unigd::ugd_renderers()
 df <- df[order(df$id),]
 knitr::kable(data.frame(
    sprintf("`%s`", df$id),
    sprintf("`%s`", df$mime),
    df$descr,
-   ifelse(df$bin, "Binary", "Text")
+   ifelse(df$text, "Text", "Binary")
 ), col.names = c("ID", "Mime-Type", "Renderer", "Format"))
 ```
 
@@ -84,10 +81,10 @@ knitr::kable(data.frame(
 ### From R
 
 ```R
-hgd_renderers()
+unigd::ugd_renderers()
 ```
 
-Will respond with a list object.
+Returns a data frame.
 
 ### From HTTP
 
@@ -107,8 +104,8 @@ Plots can be rendered in various file formats from both R and HTTP. The actual p
 
 Example:
 ```R
-hgd_plot(page = 3, width = 800, height = 600) # Get plot at index 3 with 800*600
-hgd_plot() # Get last plot with cached size
+unigd::ugd_render(page = 3, width = 800, height = 600) # Get plot at index 3 with 800*600
+unigd::ugd_render() # Get last plot with cached size
 ```
 
 `page` can either be a number to indicate a plot index or a static plot ID (see: hgd_id()).
@@ -134,13 +131,7 @@ Parameters:
 | `renderer` | Renderer.                    | `svg`.                                                  |
 | `token`    | [Security token](#security). | (The `X-HTTPGD-TOKEN` header can be set alternatively.) |
 
-> Note that the HTTP API uses 0-based indexing and the R API 1-based indexing. This is done to conform to R and JavaScript on both ends. (This means the the first plot is accessed with `/svg?index=0` and `hgd_svg(page = 1)`.)
-
-## Render SVG
-
-> **This API is deprecated and will be removed in the future.**
-
-`hgd_svg()` and `/svg` are equivalent to [`hgd_plot()`](#render-plot) and [`/plot`](#render-plot) as the default renderer is SVG. 
+> Note that the HTTP API uses 0-based indexing and the R API 1-based indexing. This is done to conform to R and JavaScript on both ends. (This means the the first plot is accessed with `/plot?index=0` and `unigd::ugd_render(page = 1)`.)
 
 
 
@@ -150,8 +141,8 @@ Parameters:
 
 Examples:
 ```R
-hgd_remove(page = 2) # Remove the second page
-hgd_clear() # Clear all pages
+unigd::ugd_remove(page = 2) # Remove the second page
+unigd::ugd_clear() # Clear all pages
 ```
 
 ### From HTTP
@@ -169,6 +160,8 @@ Examples:
 | `token` | [Security token](#security). | (The `X-HTTPGD-TOKEN` header can be set alternatively.) |
 
 
+
+
 ## Get static IDs
 
 The problem with requesting individual plots by index is, that a plots index will change when earlier plots are removed from the plot history.
@@ -180,8 +173,8 @@ All APIs that access individual plots can also be called with static IDs instead
 
 Examples:
 ```R
-hgd_id(index = 2) # Static ID of the second plot
-hgd_id() # Static ID of the last plot
+unigd::ugd_id(index = 2) # Static ID of the second plot
+unigd::ugd_id() # Static ID of the last plot
 ```
 
 Note: The `limit` parameter can be adjusted to obtain multiple or all plot IDs.

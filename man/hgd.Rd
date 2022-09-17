@@ -7,19 +7,16 @@
 hgd(
   host = getOption("httpgd.host", "127.0.0.1"),
   port = getOption("httpgd.port", 0),
+  cors = getOption("httpgd.cors", FALSE),
+  token = getOption("httpgd.token", TRUE),
+  silent = getOption("httpgd.silent", FALSE),
   width = getOption("httpgd.width", 720),
   height = getOption("httpgd.height", 576),
+  zoom = getOption("httpgd.zoom", 1),
   bg = getOption("httpgd.bg", "white"),
   pointsize = getOption("httpgd.pointsize", 12),
   system_fonts = getOption("httpgd.system_fonts", list()),
   user_fonts = getOption("httpgd.user_fonts", list()),
-  cors = getOption("httpgd.cors", FALSE),
-  token = getOption("httpgd.token", TRUE),
-  silent = getOption("httpgd.silent", FALSE),
-  websockets = getOption("httpgd.websockets", TRUE),
-  webserver = getOption("httpgd.webserver", TRUE),
-  fix_text_width = getOption("httpgd.fix_text_width", TRUE),
-  extra_css = getOption("httpgd.extra_css", ""),
   reset_par = getOption("httpgd.reset_par", FALSE)
 )
 }
@@ -30,28 +27,6 @@ The network security of httpgd has not yet been properly tested.}
 
 \item{port}{Server port. If this is set to \code{0}, an open port
 will be assigned.}
-
-\item{width}{Graphics device width (pixels).}
-
-\item{height}{Graphics device height (pixels).}
-
-\item{bg}{Background color.}
-
-\item{pointsize}{Graphics device point size.}
-
-\item{system_fonts}{Named list of font names to be aliased with
-fonts installed on your system. If unspecified, the R default
-families \code{sans}, \code{serif}, \code{mono} and \code{symbol}
-are aliased to the family returned by
-\code{\link[systemfonts:font_info]{systemfonts::font_info()}}.}
-
-\item{user_fonts}{Named list of fonts to be aliased with font files
-provided by the user rather than fonts properly installed on the
-system. The aliases can be fonts from the fontquiver package,
-strings containing a path to a font file, or a list containing
-\code{name} and \code{file} elements with \code{name} indicating
-the font alias in the SVG output and \code{file} the path to a
-font file.}
 
 \item{cors}{Toggles Cross-Origin Resource Sharing (CORS) header.
 When set to \code{TRUE}, CORS header will be set to \code{"*"}.}
@@ -65,26 +40,33 @@ when it is set to a number. \code{FALSE} deactivates the token.}
 
 \item{silent}{When set to \code{FALSE} no information will be printed to console.}
 
-\item{websockets}{Use websockets.}
+\item{width}{Initial plot width (pixels).}
 
-\item{webserver}{Can be set to \code{FALSE} for offline mode.
-In offline mode the device is only accessible via R.}
+\item{height}{Initial plot height (pixels).}
 
-\item{fix_text_width}{Should the width of strings be fixed so that it doesn't
-change between SVG renderers depending on their font rendering? Defaults to
-\code{TRUE}. If \code{TRUE} each string will have the \code{textLength} CSS property set
-to the width calculated by systemfonts and
-\code{lengthAdjust='spacingAndGlyphs'}. Setting this to \code{FALSE} can be
-beneficial for heavy post-processing that may change content or style of
-strings, but may lead to inconsistencies between strings and graphic
-elements that depend on the dimensions of the string (e.g. label borders
-and background).}
+\item{zoom}{Initial plot zoom level (For example: 2 corresponds
+to 200\%, 0.5 would be 50\%.).}
 
-\item{extra_css}{Extra CSS to be added to the SVG. This can be used
-to embed webfonts.}
+\item{bg}{Background color.}
+
+\item{pointsize}{Graphics device point size.}
+
+\item{system_fonts}{Named list of font names to be aliased with
+fonts installed on your system. If unspecified, the R default
+families \code{sans}, \code{serif}, \code{mono} and \code{symbol}
+are aliased to the family returned by
+\code{systemfonts::font_info()}.}
+
+\item{user_fonts}{Named list of fonts to be aliased with font files
+provided by the user rather than fonts properly installed on the
+system. The aliases can be fonts from the fontquiver package,
+strings containing a path to a font file, or a list containing
+\code{name} and \code{file} elements with \code{name} indicating
+the font alias in the SVG output and \code{file} the path to a
+font file.}
 
 \item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
-on device start and reset every time \code{\link[=hgd_clear]{hgd_clear()}} is called (see
+on device start and reset every time the plots are cleared (see
 \code{\link[graphics:par]{graphics::par()}}).}
 }
 \value{
