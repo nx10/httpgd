@@ -74,19 +74,16 @@ a browser.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">hgd</span><span class="op">(</span></span>
 <span>  host <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.host"</span>, <span class="st">"127.0.0.1"</span><span class="op">)</span>,</span>
 <span>  port <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.port"</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>  cors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.cors"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.token"</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  silent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.silent"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.width"</span>, <span class="fl">720</span><span class="op">)</span>,</span>
 <span>  height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.height"</span>, <span class="fl">576</span><span class="op">)</span>,</span>
+<span>  zoom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.zoom"</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  bg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.bg"</span>, <span class="st">"white"</span><span class="op">)</span>,</span>
 <span>  pointsize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.pointsize"</span>, <span class="fl">12</span><span class="op">)</span>,</span>
 <span>  system_fonts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.system_fonts"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  user_fonts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.user_fonts"</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  cors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.cors"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.token"</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>  silent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.silent"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  websockets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.websockets"</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>  webserver <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.webserver"</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>  fix_text_width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.fix_text_width"</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>  extra_css <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.extra_css"</span>, <span class="st">""</span><span class="op">)</span>,</span>
 <span>  reset_par <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"httpgd.reset_par"</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -104,12 +101,35 @@ The network security of httpgd has not yet been properly tested.</p></dd>
 will be assigned.</p></dd>
 
 
+<dt>cors</dt>
+<dd><p>Toggles Cross-Origin Resource Sharing (CORS) header.
+When set to <code>TRUE</code>, CORS header will be set to <code>"*"</code>.</p></dd>
+
+
+<dt>token</dt>
+<dd><p>(Optional) security token. When set, all requests
+need to include a token to be allowed. (Either in a request header
+(<code>X-HTTPGD-TOKEN</code>) field or as a query parameter.)
+This parameter can be set to <code>TRUE</code> to generate a random 8 character
+alphanumeric token. A random token of the specified length is generated
+when it is set to a number. <code>FALSE</code> deactivates the token.</p></dd>
+
+
+<dt>silent</dt>
+<dd><p>When set to <code>FALSE</code> no information will be printed to console.</p></dd>
+
+
 <dt>width</dt>
-<dd><p>Graphics device width (pixels).</p></dd>
+<dd><p>Initial plot width (pixels).</p></dd>
 
 
 <dt>height</dt>
-<dd><p>Graphics device height (pixels).</p></dd>
+<dd><p>Initial plot height (pixels).</p></dd>
+
+
+<dt>zoom</dt>
+<dd><p>Initial plot zoom level (For example: 2 corresponds
+to 200%, 0.5 would be 50%.).</p></dd>
 
 
 <dt>bg</dt>
@@ -138,53 +158,9 @@ the font alias in the SVG output and <code>file</code> the path to a
 font file.</p></dd>
 
 
-<dt>cors</dt>
-<dd><p>Toggles Cross-Origin Resource Sharing (CORS) header.
-When set to <code>TRUE</code>, CORS header will be set to <code>"*"</code>.</p></dd>
-
-
-<dt>token</dt>
-<dd><p>(Optional) security token. When set, all requests
-need to include a token to be allowed. (Either in a request header
-(<code>X-HTTPGD-TOKEN</code>) field or as a query parameter.)
-This parameter can be set to <code>TRUE</code> to generate a random 8 character
-alphanumeric token. A random token of the specified length is generated
-when it is set to a number. <code>FALSE</code> deactivates the token.</p></dd>
-
-
-<dt>silent</dt>
-<dd><p>When set to <code>FALSE</code> no information will be printed to console.</p></dd>
-
-
-<dt>websockets</dt>
-<dd><p>Use websockets.</p></dd>
-
-
-<dt>webserver</dt>
-<dd><p>Can be set to <code>FALSE</code> for offline mode.
-In offline mode the device is only accessible via R.</p></dd>
-
-
-<dt>fix_text_width</dt>
-<dd><p>Should the width of strings be fixed so that it doesn't
-change between SVG renderers depending on their font rendering? Defaults to
-<code>TRUE</code>. If <code>TRUE</code> each string will have the <code>textLength</code> CSS property set
-to the width calculated by systemfonts and
-<code>lengthAdjust='spacingAndGlyphs'</code>. Setting this to <code>FALSE</code> can be
-beneficial for heavy post-processing that may change content or style of
-strings, but may lead to inconsistencies between strings and graphic
-elements that depend on the dimensions of the string (e.g. label borders
-and background).</p></dd>
-
-
-<dt>extra_css</dt>
-<dd><p>Extra CSS to be added to the SVG. This can be used
-to embed webfonts.</p></dd>
-
-
 <dt>reset_par</dt>
 <dd><p>If set to <code>TRUE</code>, global graphics parameters will be saved
-on device start and reset every time <code><a href="hgd_clear.html">hgd_clear()</a></code> is called (see
+on device start and reset every time the plots are cleared (see
 <code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">graphics::par()</a></code>).</p></dd>
 
 </dl></div>

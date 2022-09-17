@@ -96,34 +96,9 @@
 </h2>
 <p>Depends on <code>R</code> version ≥ 4.0 on windows, and R ≥ 3.2 on linux and macOS (a C++ compiler with basic C++17 support <a href="https://github.com/nx10/httpgd/issues/56" class="external-link">is required</a>).</p>
 <p>Note that there is a rare bug in R versions &lt; 4.1, that leads to <a href="https://github.com/nx10/httpgd/issues/50" class="external-link">some plots disappearing when ggplot2 plots are resized and deleted in a specific way</a>.</p>
-<p><code>libpng</code> and X11 are required on unix like systems (e.g. Linux, macOS). <code>Cairo</code> is required on unix like systems to enable PNG, PDF, EPS and PS renderers.</p>
-<div class="section level3">
-<h3 id="macos">macOS<a class="anchor" aria-label="anchor" href="#macos"></a>
-</h3>
-<p>If <code>libpng</code> is missing install it via:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">brew</span> install libpng</span></code></pre></div>
-<p>If <code>X11</code> is missing the error message will include the text:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">unable</span> to load shared object [...] systemfonts/libs/systemfonts.so [...]</span></code></pre></div>
-<p>Install <a href="https://www.xquartz.org/" class="external-link"><code>XQuartz</code></a>. (see: <a href="https://github.com/r-lib/systemfonts/issues/17" class="external-link uri">https://github.com/r-lib/systemfonts/issues/17</a>)</p>
+<p>Also see the <a href="https://nx10.github.io/unigd/articles/a00_installation.html#system-requirements" class="external-link"><code>unigd</code> system requirements</a>.</p>
 </div>
-<div class="section level3">
-<h3 id="linux">Linux<a class="anchor" aria-label="anchor" href="#linux"></a>
-</h3>
-<p>For source installation on Linux, the fontconfig freetype2 library is required to install the <a href="https://github.com/r-lib/systemfonts" class="external-link">systemfonts</a> package, which is a dependency of <code>httpgd</code>.</p>
-<div class="section level4">
-<h4 id="debian-ubuntu-etc-">Debian, Ubuntu, etc.<a class="anchor" aria-label="anchor" href="#debian-ubuntu-etc-"></a>
-</h4>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">apt</span> install libfontconfig1-dev</span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="fedora-centos-rhel-etc-">Fedora, CentOS, RHEL, etc.<a class="anchor" aria-label="anchor" href="#fedora-centos-rhel-etc-"></a>
-</h4>
-<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1"></a><span class="ex">dnf</span> install fontconfig-devel</span></code></pre></div>
-</div>
-</div>
-</div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
-    </nav></aside>
+  </main>
 </div>
 
 

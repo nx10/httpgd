@@ -43,40 +43,13 @@
     <loc>https://nx10.github.io/httpgd/reference/hgd_browse.html</loc>
   </url>
   <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_clear.html</loc>
-  </url>
-  <url>
     <loc>https://nx10.github.io/httpgd/reference/hgd_close.html</loc>
   </url>
   <url>
+    <loc>https://nx10.github.io/httpgd/reference/hgd_details.html</loc>
+  </url>
+  <url>
     <loc>https://nx10.github.io/httpgd/reference/hgd_generate_token.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_id.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_info.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_inline.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_remove.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_renderers.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_state.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_svg.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_test_pattern.html</loc>
   </url>
   <url>
     <loc>https://nx10.github.io/httpgd/reference/hgd_url.html</loc>

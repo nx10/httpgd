@@ -68,14 +68,11 @@ This function will only work after starting a device with <code><a href="hgd.htm
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">hgd_url</span><span class="op">(</span></span>
 <span>  endpoint <span class="op">=</span> <span class="st">"live"</span>,</span>
 <span>  which <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.cur</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  websockets <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  width <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
-<span>  height <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
-<span>  renderer <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  history <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  host <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  port <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  explicit <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  host <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  port <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  explicit <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  omit_token <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -84,33 +81,11 @@ This function will only work after starting a device with <code><a href="hgd.htm
     <dl><dt>endpoint</dt>
 <dd><p>API endpoint. The default, <code>"live"</code> is the HTML/JS
 plot viewer. Can be set to a numeric plot index or plot ID
-(see <code><a href="hgd_id.html">hgd_id()</a></code>) to obtain the direct URL to the SVG.</p></dd>
+(see <code><a href="https://nx10.github.io/unigd/reference/ugd_id.html" class="external-link">unigd::ugd_id()</a></code>) to obtain the direct URL to the SVG.</p></dd>
 
 
 <dt>which</dt>
 <dd><p>Which device (ID).</p></dd>
-
-
-<dt>websockets</dt>
-<dd><p>Use websockets.</p></dd>
-
-
-<dt>width</dt>
-<dd><p>Width of the plot. (Only used when <code>endpoint</code> is <code>"svg"</code>,
-or a plot index or ID.)</p></dd>
-
-
-<dt>height</dt>
-<dd><p>Height of the plot. (Only used when <code>endpoint</code> is <code>"svg"</code>,
-or a plot index or ID.)</p></dd>
-
-
-<dt>renderer</dt>
-<dd><p>Renderer.</p></dd>
-
-
-<dt>history</dt>
-<dd><p>Should the plot history sidebar be visible.</p></dd>
 
 
 <dt>host</dt>
@@ -125,12 +100,25 @@ or a plot index or ID.)</p></dd>
 <dd><p>Ads <code>hgd={host}:{port}</code> query parameter. Needed for host
 resolution in some editors.</p></dd>
 
+
+<dt>omit_token</dt>
+<dd><p>Should the security token be omitted from the URL.</p></dd>
+
+
+<dt>\dots</dt>
+<dd><p>Other query parameters that will be appended to the URL.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
 <p>URL.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Note: If the included client is used set <code>websockets=0</code> or
+<code>sidebar=0</code> to turn off WebSocket or plot history sidebar.</p>
     </div>
 
     <div class="section level2">

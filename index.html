@@ -90,14 +90,14 @@
 </h2>
 <ul>
 <li>Fast plotting</li>
-<li>Plot resizing and history</li>
 <li>Interactive plot viewer (client)</li>
-<li>Platform independent</li>
-<li>Export to various image formats (SVG, PNG, PDF, EPS, …)</li>
-<li>Multiple concurrent clients</li>
+<li>Supports multiple clients concurrently</li>
+<li>Plot resizing and history</li>
+<li>Export various image formats (SVG, PNG, PDF, EPS, …)</li>
+<li>Based on <a href="https://github.com/nx10/unigd" class="external-link"><code>unigd</code></a>
+</li>
 <li>For developers:<ul>
 <li>Stateless asynchronous HTTP/WebSocket API</li>
-<li>In-memory access to rendered plots</li>
 <li>HTML/JavaScript client (TypeScript module)</li>
 </ul>
 </li>
@@ -135,7 +135,7 @@
 </li>
 </ul>
 </li>
-<li>For developers:<ul><li>
+<li>For package developers:<ul><li>
 <a href="https://nx10.github.io/httpgd/articles/c01_httpgd-api.html">httpgd API</a> <!-- - [Technical documentation](https://nx10.github.io/httpgd/articles/c03_technical-docs.html) -->
 </li></ul>
 </li>
@@ -156,11 +156,10 @@
 <div class="section level2">
 <h2 id="about--license">About &amp; License<a class="anchor" aria-label="anchor" href="#about--license"></a>
 </h2>
-<p>Depends on <code>cpp11</code> and <code>systemfonts</code>.</p>
-<p>Webserver based on <a href="https://github.com/boostorg/beast" class="external-link"><code>Boost/Beast</code></a> included in the <code>BH</code> package.</p>
-<p>Much of the font handling and SVG rendering code is modified code from the excellent <a href="https://github.com/r-lib/svglite" class="external-link"><code>svglite</code></a> package.</p>
+<p>Depends on <code>cpp11</code>.</p>
+<p>Webserver based on <a href="https://github.com/CrowCpp/Crow" class="external-link"><code>CrowCpp/Crow</code></a>.</p>
 <p>This project is licensed GPL v2.0.</p>
-<p>It includes parts of <a href="https://github.com/r-lib/svglite" class="external-link"><code>svglite</code></a> (GPL ≥ 2), <a href="https://github.com/octobanana/belle" class="external-link"><code>Belle</code></a> (MIT) and <a href="https://github.com/fmtlib/fmt" class="external-link"><code>fmt</code></a> (MIT). The HTML client includes <a href="https://github.com/google/material-design-icons" class="external-link">Material Design icons by Google</a> which are licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt" class="external-link">Apache License Version 2.0</a>.</p>
+<p>The HTML client includes <a href="https://github.com/google/material-design-icons" class="external-link">Material Design icons by Google</a> which are licensed under the <a href="https://www.apache.org/licenses/LICENSE-2.0.txt" class="external-link">Apache License Version 2.0</a>.</p>
 <p>Full copies of the license agreements used by these components are included in <a href="https://github.com/nx10/httpgd/tree/master/inst/licenses" class="external-link"><code>./inst/licenses</code></a>.</p>
 </div>
 </div>
