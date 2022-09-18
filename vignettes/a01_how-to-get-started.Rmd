@@ -54,3 +54,7 @@ dev.off()
 | <kbd>P</kbd> | Download plot as PNG. |
 | <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
 | <kbd>H</kbd> | Toggle plot history (sidebar). |
+
+## See also
+
+See also the [plotting in `unigd`](https://nx10.github.io/unigd/articles/b00_guide.html) guide.

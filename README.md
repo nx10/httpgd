@@ -50,6 +50,7 @@ See [system requirements](https://nx10.github.io/httpgd/articles/a00_installatio
 
 - For users:
   - [How to get started](https://nx10.github.io/httpgd/articles/a01_how-to-get-started.html)
+  - [Plotting in `unigd`](https://nx10.github.io/unigd/articles/b00_guide.html)
   - [Function reference](https://nx10.github.io/httpgd/reference/index.html)
   <!-- - [Benchmarks](https://nx10.github.io/httpgd/articles/c02_benchmarks.html) -->
   - IDEs &amp; evironments:
