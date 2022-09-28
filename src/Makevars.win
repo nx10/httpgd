@@ -1,4 +1,4 @@
-CXX_STD = CXX17
+CXX_STD = CXX14
 
 VERSION_HARFBUZZ = 2.7.4
 
@@ -8,7 +8,7 @@ PKG_CPPFLAGS = -Ilib -I${RWINLIB_HARFBUZZ}/include \
 	-DBOOST_NO_AUTO_PTR \
 	-DFMT_HEADER_ONLY
 
-PKG_LIBS = -L${RWINLIB_HARFBUZZ}/lib${R_ARCH}${CRT} -lpng -lWs2_32 -lwsock32
+PKG_LIBS = -L${RWINLIB_HARFBUZZ}/lib${R_ARCH}${CRT} -lWs2_32 -lwsock32
 
 all: winlibs
 
