@@ -186,7 +186,7 @@ namespace httpgd
         std::string WebServer::status_info()
         {
             const auto ws_count = m_update_subs.size();
-            return fmt::format("httpgd version: " HTTPGD_VERSION "; WebSocket connections: {}", ws_count);
+            return fmt::format("unigd: {}; httpgd: " HTTPGD_VERSION "; WebSocket connections: {}", m_api->info(), ws_count);
         }
 
         const HttpgdServerConfig &WebServer::get_config()
@@ -361,7 +361,8 @@ namespace httpgd
              .CROW_MIDDLEWARES(m_app, TokenGuard)
             ([&]()
              { return crow::json::wvalue({{"id", m_conf.id},
-                                          {"version", "httpgd " HTTPGD_VERSION}}); });
+                                          {"version", "httpgd " HTTPGD_VERSION},
+                                          {"unigd", m_api ? m_api->info() : ""}}); });
 
             CROW_ROUTE(m_app, "/remove")
              .CROW_MIDDLEWARES(m_app, TokenGuard)
