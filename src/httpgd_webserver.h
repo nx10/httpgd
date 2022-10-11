@@ -69,7 +69,7 @@ class WebServer
 
  private:
   unigd_api_v1* m_api = nullptr;
-  UNIGD_HANDLE m_ugd_handle;
+  UNIGD_HANDLE m_ugd_handle = nullptr;
   unigd_graphics_client m_client;
 
   HttpgdServerConfig m_conf;

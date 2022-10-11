@@ -457,11 +457,22 @@ void WebServer::run()
 
 void WebServer::device_close()
 {
+  
+  //for (auto u : m_update_subs)
+  //{
+  //  u->userdata();
+  //}
+
   m_app.stop();
 
   if (m_server_thread.joinable())
   {
     m_server_thread.join();
+  }
+
+  if (m_api && m_ugd_handle)
+  {
+    m_api->device_destroy(m_ugd_handle);
   }
 
   delete this;  // attention!
