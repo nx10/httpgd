@@ -22,3 +22,4 @@
 ^CRAN-SUBMISSION$
 ^codecov\.yml$
 ^\.covrignore$
+^\.clang-format$

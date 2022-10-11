@@ -1,0 +1,7 @@
+﻿---
+BasedOnStyle: Google
+BreakBeforeBraces: Allman
+ColumnLimit: '90'
+SortIncludes: 'true'
+
+...
