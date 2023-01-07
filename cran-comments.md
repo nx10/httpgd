@@ -1,14 +1,10 @@
 ## Test environments
 GitHub rlib/actions:
-* Windows Server 2019 10.0.17763, R 4.1.2
-* Mac OS X 11.6.2, R 4.1.2
-* Ubuntu 20.04.3, R 4.1.2
-* Ubuntu 20.04.3, R devel
-R-hub builder:
-* Windows Server 2022, R-devel, 64 bit
-* Ubuntu Linux 20.04.1 LTS, R-release, GCC
-* Fedora Linux, R-devel, clang, gfortran
-* Debian Linux, R-devel, GCC ASAN/UBSAN
+* Windows Server 2019 10.0.20348, R 4.2.2
+* Mac OS X 12.6.2, R 4.2.2
+* Ubuntu 22.04.1, R 4.2.2
+* Ubuntu 22.04.1, R 4.1.3
+* Ubuntu 22.04.1, R devel (2023-01-06 r83576)
 
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
@@ -25,27 +21,44 @@ There was 1 NOTE:
 ## Downstream dependencies
 There are no downstream dependencies.
 
-## UCRT
 
-I have applied the provided patches for UCRT.
+## CRAN packages missing inclusion of ´<cstdint>´ 
 
-## Failing test on CRAN Windows Server 2022
-
-> Failed tests
-> Failure (test-svglite-text-fonts.R:7:3): font sets weight/style 
+> POSetR RcppAlgos duckdb fixest flexpolyline fstcore gdalcubes ggiraph
+> gkmSVM groupedSurv httpgd libgeos naryn rayrender readxlsb rgeoda rvg s2
+> svglite spiderbar tgstat vdiffr wkutils
+>
+> See the logs and README.txt at https://www.stats.ox.ac.uk/pub/bdr/gcc13/ .
 > 
->   style_attr(text, "font-weight") not equal to c(NA, "bold", NA, "bold").
->   2/4 mismatches
->   x[2]: NA
->   y[2]: "bold"
->   
->   x[4]: NA
->   y[4]: "bold"
->   
->   [ FAIL 1 | WARN 1 | SKIP 1 | PASS 101 ]
->   Error: Test failures
+> Although you may not have access to gcc 13 to test this, the missingness
+> of the header should be easy to identify from the logs: it defines types
+> such as uint32_t and places them in the std namespace.
+> 
+> Please correct before 2023-01-24 to safely retain your package on CRAN.
+> (CRAN submissions are shut until 2023-01-06.)
 
-I can not replicate the issue with RHub.
-This seems to be a problem with the `systemfonts` package and the new CRAN windows server 2022 machine. (See: https://github.com/r-lib/svglite/issues/145#issuecomment-1004716572)
+I have included the missing header.
 
-I have disabled the font tests on windows and will reenable them as soon as the `systemfonts` issues are resolved.
+
+## Compilation issues with upcoming version of dependency ´BH´ 1.81.0
+
+> Notified by Dirk Eddelbuettel on Thu, Dec 15, 2022.
+
+These have been fixed.
+
+
+## New ´sprintf´ warning using R devel (2023-01-06 r83576)
+
+>checking compiled code ... WARNING
+>  File ‘httpgd/libs/httpgd.so’:
+>    Found ‘__sprintf_chk’, possibly from ‘sprintf’ (C)
+>      Object: ‘HttpgdWebServer.o’
+>  
+>  Compiled code should not call entry points which might terminate R nor
+>  write to stdout/stderr instead of to the console, nor use Fortran I/O
+>  nor system RNGs nor [v]sprintf.
+>  
+>  See ‘Writing portable packages’ in the ‘Writing R Extensions’ manual.
+
+The included code does not have any occurrence of sprintf so I assume
+this is pulled in by a dependency.

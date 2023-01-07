@@ -1,9 +1,9 @@
 # httpgd 1.3.0
 
-- Fix compilation with upcoming BH 1.81.
-- Fix missing cstdint include.
+- Fix compilation with upcoming 'BH' 1.81.
+- Fix missing 'cstdint' include.
 - Fix rare rect clipping issue.
-- Minor fixes
+- Minor fixes.
 
 # httpgd 1.3.0
 
