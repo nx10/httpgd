@@ -367,7 +367,7 @@ hgd_plot <- function(page = 0,
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
   }
-  if (class(page) == "httpgd_pid") {
+  if (inherits(page, "httpgd_pid")) {
     page <- httpgd_plot_find_(which, page$id)
   }
   if (httpgd_renderer_is_str_(renderer)) {
@@ -416,7 +416,7 @@ hgd_remove <- function(page = 0, which = dev.cur()) {
   if (names(which) != "httpgd") {
     stop("Device is not of type httpgd. (Start a device by calling: `hgd()`)")
   } else {
-    if (class(page) == "httpgd_pid") {
+    if (inherits(page, "httpgd_pid")) {
       return(httpgd_remove_id_(which, page$id))
     }
     return(httpgd_remove_(which, page - 1))
@@ -507,7 +507,7 @@ hgd_url <- function(endpoint = "live",
                     explicit = FALSE) {
   l <- hgd_state(which)
   q <- list()
-  if (is.numeric(endpoint) || (class(endpoint) == "httpgd_pid")) {
+  if (is.numeric(endpoint) || inherits(endpoint, "httpgd_pid")) {
     if (is.numeric(endpoint)) {
       if (endpoint > 0) {
         q["index"] <- endpoint - 1
