@@ -1,5 +1,6 @@
 #include "Base64.h"
 #include <cmath>
+#include <cstdint>
 
 extern "C"
 {
