@@ -1,5 +1,12 @@
 # httpgd 1.3.0
 
+- Fix compilation with upcoming BH 1.81.
+- Fix missing cstdint include.
+- Fix rare rect clipping issue.
+- Minor fixes
+
+# httpgd 1.3.0
+
 - Fixes for R 4.2 UCRT support (thanks Tomas Kalibera and Uwe Ligges).
 - Added 'pkgdown' documentation and various vignettes (thanks eitsupi for the article on Docker).
 - Added RStudio viewer support.
