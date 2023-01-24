@@ -1,4 +1,4 @@
-# httpgd 1.3.0
+# httpgd 1.3.1
 
 - Fix compilation with upcoming 'BH' 1.81.
 - Fix missing 'cstdint' include.
