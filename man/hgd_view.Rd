@@ -17,12 +17,12 @@ URL as a parameter.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
+if (interactive() && !is.null(getOption("viewer"))) {
+  hgd()
 
-hgd()
-hgd_view()
-hist(rnorm(100))
+  hgd_view()
+  hist(rnorm(100))
 
-dev.off()
+  dev.off()
 }
 }

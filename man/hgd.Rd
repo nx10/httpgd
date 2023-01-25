@@ -96,15 +96,14 @@ All font settings and descriptions are adopted from the excellent
 'svglite' package.
 }
 \examples{
-\dontrun{
+if (interactive()) {
+  hgd() # Initialize graphics device and start server
+  hgd_browse() # Or copy the displayed link in the browser
 
-hgd() # Initialize graphics device and start server
-hgd_browse() # Or copy the displayed link in the browser
+  # Plot something
+  x <- seq(0, 3 * pi, by = 0.1)
+  plot(x, sin(x), type = "l")
 
-# Plot something
-x <- seq(0, 3 * pi, by = 0.1)
-plot(x, sin(x), type = "l")
-
-dev.off() # alternatively: hgd_close()
+  dev.off() # alternatively: hgd_close()
 }
 }

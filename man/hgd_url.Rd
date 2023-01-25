@@ -51,13 +51,11 @@ Generate URLs to the plot viewer or to plot SVGs.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
-
 hgd()
-my_url <- hgd_url()
+
+plot(1, 1)
 hgd_url(0)
-hgd_url(plot_id(), width = 800, height = 600)
+hgd_url(hgd_id(), width = 800, height = 600)
 
 dev.off()
-}
 }

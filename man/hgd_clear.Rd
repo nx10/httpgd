@@ -16,14 +16,11 @@ Whether there were any pages to remove.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
-
 hgd()
+
 plot(1, 1)
-hist(rnorm(100))
 hgd_clear()
-hist(rnorm(100))
+hgd_clear()
 
 dev.off()
-}
 }

@@ -19,11 +19,9 @@ Access general information of a httpgd graphics device.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
-
 hgd()
+
 hgd_info()
 
 dev.off()
-}
 }

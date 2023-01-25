@@ -41,14 +41,13 @@ Rendered SVG string.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
-
 hgd()
+
 plot(1, 1)
-s <- hgd_svg(width = 600, height = 400)
+s <- hgd_plot(width = 600, height = 400)
+
 hist(rnorm(100))
-hgd_svg(file = tempfile(), width = 600, height = 400)
+hgd_plot(file = tempfile(), width = 600, height = 400)
 
 dev.off()
-}
 }

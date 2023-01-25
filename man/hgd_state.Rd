@@ -23,13 +23,11 @@ Access status information of a httpgd graphics device.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
-
 hgd()
+
 hgd_state()
 plot(1, 1)
 hgd_state()
 
 dev.off()
-}
 }

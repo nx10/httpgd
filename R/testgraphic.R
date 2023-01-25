@@ -5,10 +5,11 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' hgd()
 #'
 #' hgd_test_pattern()
-#' }
+#'
+#' dev.off()
 hgd_test_pattern <- function() {
   graphics::plot.new()
   graphics::plot.window(xlim = c(0, 100), ylim = c(0, 100))

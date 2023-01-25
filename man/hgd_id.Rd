@@ -28,9 +28,8 @@ Available plot IDs starting from \code{index} will be returned.
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
-
 hgd()
+
 plot.new()
 text(.5, .5, "#1")
 plot.new()
@@ -44,5 +43,4 @@ hgd_remove(1)
 hgd_svg(second)
 
 dev.off()
-}
 }

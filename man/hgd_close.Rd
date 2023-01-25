@@ -20,10 +20,7 @@ This achieves the same effect as \code{\link[grDevices:dev]{grDevices::dev.off()
 but will only close the device if it has the httpgd type.
 }
 \examples{
-\dontrun{
-
 hgd()
-hgd_browse() # open browser
 hist(rnorm(100))
 hgd_close() # Equvalent to dev.off()
 
@@ -31,5 +28,4 @@ hgd()
 hgd()
 hgd()
 hgd_close(all = TRUE)
-}
 }

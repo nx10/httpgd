@@ -20,13 +20,11 @@ Whether the page existed (and thereby was successfully removed).
 This function will only work after starting a device with \code{\link[=hgd]{hgd()}}.
 }
 \examples{
-\dontrun{
-
 hgd()
+
 plot(1, 1) # page 1
 hist(rnorm(100)) # page 2
 hgd_remove(page = 1) # remove page 1
 
 dev.off()
-}
 }
