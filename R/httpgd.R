@@ -227,7 +227,7 @@ hgd_renderers <- function(which = dev.cur()) {
 #' @param state Include the current device state in the returned result
 #'  (see also: [hgd_state()]).
 #'
-#' @return TODO
+#' @return a list contains plot IDs.
 #'
 #' @importFrom grDevices dev.cur
 #' @export
@@ -241,11 +241,9 @@ hgd_renderers <- function(which = dev.cur()) {
 #' text(.5, .5, "#2")
 #' plot.new()
 #' text(.5, .5, "#3")
-#' third <- hgd_id()
-#' second <- hgd_id(2)
-#' all <- hgd_id(1, limit = Inf)
-#' hgd_remove(1)
-#' hgd_svg(second)
+#' hgd_id() # The last one
+#' hgd_id(2) # The second one
+#' hgd_id(1, limit = Inf) # The first one and all the followings
 #'
 #' dev.off()
 hgd_id <- function(index = 0, limit = 1, which = dev.cur(), state = FALSE) {
