@@ -291,7 +291,9 @@ hgd_id <- function(index = 0, limit = 1, which = dev.cur(), state = FALSE) {
 #' s <- hgd_svg(width = 600, height = 400)
 #'
 #' hist(rnorm(100))
-#' hgd_svg(file = tempfile(), width = 600, height = 400)
+#' tf <- tempfile()
+#' on.exit(unlink(tf))
+#' hgd_svg(file = tf, width = 600, height = 400)
 #'
 #' dev.off()
 hgd_svg <-
@@ -341,7 +343,9 @@ hgd_svg <-
 #' s <- hgd_plot(width = 600, height = 400)
 #'
 #' hist(rnorm(100))
-#' hgd_plot(file = tempfile(), width = 600, height = 400)
+#' tf <- tempfile()
+#' on.exit(unlink(tf))
+#' hgd_plot(file = tf, width = 600, height = 400)
 #'
 #' dev.off()
 hgd_plot <- function(page = 0,

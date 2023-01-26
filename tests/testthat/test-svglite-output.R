@@ -5,6 +5,7 @@ test_that("different string and file output produce identical svg", {
 
   ## 1. Write to a file
   f1 <- tempfile()
+  on.exit(unlink(f1))
   plot(1:5)
   hgd_svg(file=f1)
   dev.off()
