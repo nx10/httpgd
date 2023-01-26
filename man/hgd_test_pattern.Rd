@@ -15,9 +15,5 @@ Plot a test pattern that can be used to evaluate and compare graphics
 devices.
 }
 \examples{
-hgd()
-
 hgd_test_pattern()
-
-dev.off()
 }
