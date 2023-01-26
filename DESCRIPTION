@@ -6,6 +6,7 @@ Authors@R:
     c(
       person(given = "Florian", family = "Rupprecht", email = "floruppr@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1795-8624")),
       person(given = "Kun", family = "Ren", role = "ctb", email = "mail@renkun.me"),
+      person(given = "Tatsuya", family = "Shima", role = "ctb", email = "ts1s1andn@gmail.com"),
       person("Jeroen", "Ooms", role = c("ctb"), email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289")),
       person("Hadley", "Wickham", email = "hadley@rstudio.com", role = "cph", comment = "Author of included svglite code"),
       person("Lionel", "Henry", email = "lionel@rstudio.com", role = "cph", comment = "Author of included svglite code"),
