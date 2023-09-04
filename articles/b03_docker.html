@@ -8,10 +8,10 @@
 <meta name="description" content="httpgd">
 <title>Docker • httpgd</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Docker">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Docker">
 <meta property="og:description" content="httpgd">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -73,7 +73,8 @@
 
 
 
-<script src="b03_docker_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+
+<div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Docker</h1>
             
@@ -84,43 +85,54 @@
 
     
     
-<p>Using <code>httpgd</code> to display R plots in a Docker container (Linux container) may be easier than the traditional and common method; linking the X11 window system.</p>
+<p>Using <code>httpgd</code> to display R plots in a Docker container
+(Linux container) may be easier than the traditional and common method;
+linking the X11 window system.</p>
 <div class="section level2">
 <h2 id="basic-usage">Basic usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
 </h2>
 <div class="section level3">
 <h3 id="build-a-docker-image">Build a docker image<a class="anchor" aria-label="anchor" href="#build-a-docker-image"></a>
 </h3>
-<p>See the <code><a href="../articles/a00_installation.html">vignette("a00_installation")</a></code> for details on how to install <code>httpgd</code> on Linux.</p>
-<p>You can create a Docker image with <code>httpgd</code> installed by create a Dockerfile like below.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">FROM</span> r-base:latest</span>
-<span id="cb1-2"><a href="#cb1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># Install httpgd and dependent packages.</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">RUN</span> apt-get update \</span>
-<span id="cb1-5"><a href="#cb1-5"></a>    &amp;&amp; apt-get install -y --no-install-recommends \</span>
-<span id="cb1-6"><a href="#cb1-6"></a>    libfontconfig1-dev \</span>
-<span id="cb1-7"><a href="#cb1-7"></a>    &amp;&amp; apt-get autoremove -y &amp;&amp; apt-get clean -y &amp;&amp; rm -rf /var/lib/apt/lists/* \</span>
-<span id="cb1-8"><a href="#cb1-8"></a>    &amp;&amp; install2.r --error --skipinstalled --ncpu -1 \</span>
-<span id="cb1-9"><a href="#cb1-9"></a>    httpgd \</span>
-<span id="cb1-10"><a href="#cb1-10"></a>    &amp;&amp; rm -rf /tmp/downloaded_packages</span></code></pre></div>
-<p>Run the <code>docker build</code> command from your shell to build a Docker image.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">docker</span> build . -f Dockerfile -t httpgd:test</span></code></pre></div>
+<p>See the <code><a href="../articles/a00_installation.html">vignette("a00_installation")</a></code> for details on how
+to install <code>httpgd</code> on Linux.</p>
+<p>You can create a Docker image with <code>httpgd</code> installed by
+create a Dockerfile like below.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> r-base:latest</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Install httpgd and dependent packages.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="dt">\</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> <span class="dt">\</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    libfontconfig1-dev <span class="dt">\</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> autoremove <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> clean <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span> <span class="dt">\</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">install2.r</span> <span class="at">--error</span> <span class="at">--skipinstalled</span> <span class="at">--ncpu</span> <span class="at">-1</span> <span class="dt">\</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    httpgd <span class="dt">\</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /tmp/downloaded_packages</span></code></pre></div>
+<p>Run the <code>docker build</code> command from your shell to build a
+Docker image.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build . <span class="at">-f</span> Dockerfile <span class="at">-t</span> httpgd:test</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-a-container">Create a container<a class="anchor" aria-label="anchor" href="#create-a-container"></a>
 </h3>
-<p>When creating a container with the <code>docker run</code> command, bind the port to be used by <code>httpgd</code> with the <code>-p</code> (<code>--publish</code>) option.</p>
-<p>If you run R in a container with a command like the following, the 8888 port of the container will be bound to the 8888 port of the Docker host.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">docker</span> run --rm -it -p 8888:8888 httpgd:test R</span></code></pre></div>
+<p>When creating a container with the <code>docker run</code> command,
+bind the port to be used by <code>httpgd</code> with the <code>-p</code>
+(<code>--publish</code>) option.</p>
+<p>If you run R in a container with a command like the following, the
+8888 port of the container will be bound to the 8888 port of the Docker
+host.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="at">-p</span> 8888:8888 httpgd:test R</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="start-httpgd-server">Start httpgd server<a class="anchor" aria-label="anchor" href="#start-httpgd-server"></a>
 </h3>
-<p>Running the following command in the R console will initialize the graphics device and start the server.</p>
+<p>Running the following command in the R console will initialize the
+graphics device and start the server.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">httpgd</span><span class="fu">::</span><span class="fu"><a href="../reference/hgd.html">hgd</a></span><span class="op">(</span>host <span class="op">=</span> <span class="st">"0.0.0.0"</span>, port <span class="op">=</span> <span class="fl">8888</span><span class="op">)</span></span></code></pre></div>
 <p>Then, copy the displayed link in your browser.</p>
-<p>If you want to display the link again, execute the <code><a href="../reference/hgd_url.html">hgd_url()</a></code> function as follows.<br>
+<p>If you want to display the link again, execute the
+<code><a href="../reference/hgd_url.html">hgd_url()</a></code> function as follows.<br>
 The hostname can be replaced with any value (e.g. localhost).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">httpgd</span><span class="fu">::</span><span class="fu"><a href="../reference/hgd_url.html">hgd_url</a></span><span class="op">(</span>host <span class="op">=</span> <span class="st">"localhost"</span><span class="op">)</span></span></code></pre></div>
@@ -132,23 +144,27 @@ The hostname can be replaced with any value (e.g. localhost).</p>
 <div class="section level3">
 <h3 id="set-options-in-rprofile">Set options in Rprofile<a class="anchor" aria-label="anchor" href="#set-options-in-rprofile"></a>
 </h3>
-<p>By setting options <code>httpgd.host</code> and <code>httpgd.port</code> in the Rprofile, you can omit setting the arguments when starting the httpgd server by <code><a href="../reference/hgd.html">hgd()</a></code>.</p>
-<p>For example, if you create a Dockerfile with the following contents, you can build an image with these options already set in the Rprofile.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw">FROM</span> r-base:latest</span>
-<span id="cb6-2"><a href="#cb6-2"></a></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># Install httpgd and dependent packages.</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="kw">RUN</span> apt-get update \</span>
-<span id="cb6-5"><a href="#cb6-5"></a>    &amp;&amp; apt-get install -y --no-install-recommends \</span>
-<span id="cb6-6"><a href="#cb6-6"></a>    libfontconfig1-dev \</span>
-<span id="cb6-7"><a href="#cb6-7"></a>    &amp;&amp; apt-get autoremove -y &amp;&amp; apt-get clean -y &amp;&amp; rm -rf /var/lib/apt/lists/* \</span>
-<span id="cb6-8"><a href="#cb6-8"></a>    &amp;&amp; install2.r --error --skipinstalled --ncpu -1 \</span>
-<span id="cb6-9"><a href="#cb6-9"></a>    httpgd \</span>
-<span id="cb6-10"><a href="#cb6-10"></a>    &amp;&amp; rm -rf /tmp/downloaded_packages</span>
-<span id="cb6-11"><a href="#cb6-11"></a></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="co"># Set default values used in the httpgd::hgd() function.</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a><span class="kw">RUN</span> echo <span class="st">'options(httpgd.host = "0.0.0.0", httpgd.port = 8888)'</span> &gt;&gt; /etc/R/Rprofile.site</span>
-<span id="cb6-14"><a href="#cb6-14"></a></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="kw">EXPOSE</span> 8888</span></code></pre></div>
+<p>By setting options <code>httpgd.host</code> and
+<code>httpgd.port</code> in the Rprofile, you can omit setting the
+arguments when starting the httpgd server by <code><a href="../reference/hgd.html">hgd()</a></code>.</p>
+<p>For example, if you create a Dockerfile with the following contents,
+you can build an image with these options already set in the
+Rprofile.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> r-base:latest</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Install httpgd and dependent packages.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="dt">\</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> <span class="dt">\</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    libfontconfig1-dev <span class="dt">\</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> autoremove <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> clean <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span> <span class="dt">\</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">install2.r</span> <span class="at">--error</span> <span class="at">--skipinstalled</span> <span class="at">--ncpu</span> <span class="at">-1</span> <span class="dt">\</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    httpgd <span class="dt">\</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /tmp/downloaded_packages</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Set default values used in the httpgd::hgd() function.</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="bu">echo</span> <span class="st">'options(httpgd.host = "0.0.0.0", httpgd.port = 8888)'</span> <span class="op">&gt;&gt;</span> /etc/R/Rprofile.site</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 8888</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -164,7 +180,7 @@ The hostname can be replaced with any value (e.g. localhost).</p>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
     </footer>
