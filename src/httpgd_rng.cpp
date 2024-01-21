@@ -1,9 +1,6 @@
 
 #include "httpgd_rng.h"
 
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <chrono>
 #include <random>
 
@@ -13,8 +10,27 @@ namespace rng
 {
 std::string uuid()
 {
-  boost::uuids::random_generator uuid_gen;
-  return boost::uuids::to_string(uuid_gen());
+  const int uuidLength = 36;  // Including hyphens
+  std::string uuid;
+  uuid.reserve(uuidLength);
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dis(0, 15);
+
+  auto randomByte = [&]() {
+      const char hexChars[] = "0123456789abcdef";
+      return hexChars[dis(gen)];
+  };
+
+  for (int i = 0; i < 32; ++i) {
+      if (i == 8 || i == 12 || i == 16 || i == 20) {
+          uuid += '-';
+      }
+      uuid += randomByte();
+  }
+
+  return uuid;
 }
 
 std::string token(int length)

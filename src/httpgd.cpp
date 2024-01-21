@@ -10,7 +10,6 @@
 
 //#include <R_ext/GraphicsEngine.h>
 
-#include <boost/optional.hpp>
 #include <string>
 #include <vector>
 
