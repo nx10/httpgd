@@ -21,7 +21,7 @@ Imports:
     unigd
 LinkingTo: 
     cpp11 (>= 0.2.4),
-    BH (>= 1.75.0),
+    AsioHeaders (>= 1.22.1),
     unigd
 Suggests:
     testthat,

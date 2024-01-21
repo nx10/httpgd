@@ -2,6 +2,7 @@
 #define __UNIGD_HTTPGD_WEBSERVER_H__
 
 #include <crow.h>
+#include <crow/middlewares/cors.h>
 
 #include <memory>
 #include <mutex>
