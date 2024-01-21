@@ -2,8 +2,28 @@
 % Please edit documentation in R/httpgd-package.R
 \docType{package}
 \name{httpgd-package}
+\alias{httpgd}
 \alias{httpgd-package}
 \title{httpgd: HTTP server graphics device}
 \description{
 Asynchronous HTTP server graphics device.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/nx10/httpgd}
+  \item \url{https://nx10.github.io/httpgd/}
+  \item Report bugs at \url{https://github.com/nx10/httpgd/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Florian Rupprecht \email{floruppr@gmail.com} (\href{https://orcid.org/0000-0002-1795-8624}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Kun Ren \email{mail@renkun.me} [contributor]
+  \item Jeroen Ooms \email{jeroen@berkeley.edu} (\href{https://orcid.org/0000-0002-4035-0289}{ORCID}) [contributor]
+}
+
 }
