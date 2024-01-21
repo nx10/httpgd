@@ -549,6 +549,7 @@ namespace crow
                 black_magic::tuple_extract<Middlewares, decltype(fwd)>(fwd))...);
         }
 
+    public:
         /// Notify anything using `wait_for_server_start()` to proceed
         void notify_server_start()
         {

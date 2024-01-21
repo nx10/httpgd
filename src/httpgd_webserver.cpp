@@ -4,6 +4,7 @@
 #define CROW_MAIN
 #include <crow.h>
 #include <fmt/format.h>
+#include <compat/optional.hpp>
 
 #include <memory>
 
@@ -18,12 +19,12 @@ namespace
 {
 const char *HTTPGD_CLIENT_INFO = "httpgd " HTTPGD_VERSION;
 
-inline boost::optional<std::string> read_txt(const std::string &filepath)
+inline std::experimental::optional<std::string> read_txt(const std::string &filepath)
 {
   std::ifstream t(filepath);
   if (t.fail())
   {
-    return boost::none;
+    return std::experimental::nullopt;
   }
   std::stringstream buffer;
   buffer << t.rdbuf();
@@ -54,13 +55,13 @@ struct plot_return : public crow::returnable
   const unigd_render_access m_render;
 };
 
-inline boost::optional<UNIGD_PLOT_ID> req_find_id(unigd_api_v1 *api,
+inline std::experimental::optional<UNIGD_PLOT_ID> req_find_id(unigd_api_v1 *api,
                                                   UNIGD_HANDLE ugd_handle,
                                                   const crow::request &req)
 {
   if (!api)
   {
-    return boost::none;
+    return std::experimental::nullopt;
   }
   const auto p_id = param_to<UNIGD_PLOT_ID>(req.url_params.get("id"));
   if (p_id)
@@ -70,10 +71,10 @@ inline boost::optional<UNIGD_PLOT_ID> req_find_id(unigd_api_v1 *api,
   const auto p_index = param_to<UNIGD_PLOT_ID>(req.url_params.get("index"));
   if (!p_index)
   {
-    return boost::none;
+    return std::experimental::nullopt;
   }
 
-  boost::optional<UNIGD_PLOT_ID> re = boost::none;
+  std::experimental::optional<UNIGD_PLOT_ID> re = std::experimental::nullopt;
   unigd_find_results qr;
   const auto handle = api->device_plots_find(ugd_handle, *p_index, 1, &qr);
   if (qr.size > 0)
@@ -144,7 +145,7 @@ void WebServer::TokenGuard::before_handle(crow::request &req, crow::response &re
   {
     return;
   }
-  boost::optional<std::string> user_token = boost::none;
+  std::experimental::optional<std::string> user_token = std::experimental::nullopt;
   const auto f_header_token = req.headers.find("X-HTTPGD-TOKEN");
   if (f_header_token != req.headers.end())
   {
@@ -155,7 +156,7 @@ void WebServer::TokenGuard::before_handle(crow::request &req, crow::response &re
     user_token = param_to<std::string>(req.url_params.get("token"));
   }
 
-  if (!user_token || (user_token.get() != m_token))
+  if (!user_token || (user_token.value() != m_token))
   {
     res.code = crow::UNAUTHORIZED;
     res.end();
@@ -290,7 +291,7 @@ void WebServer::run()
               UNIGD_FIND_HANDLE find_handle;
               unigd_find_results qr;
               find_handle = m_api->device_plots_find(
-                  m_ugd_handle, p_index.get_value_or(0), p_limit.get_value_or(0), &qr);
+                  m_ugd_handle, p_index.value_or(0), p_limit.value_or(0), &qr);
 
               std::vector<crow::json::wvalue> plot_list;
               plot_list.reserve(qr.size);
@@ -317,19 +318,19 @@ void WebServer::run()
             double width, height, zoom;
             if (p_width && p_height)
             {
-              zoom = param_to<double>(req.url_params.get("zoom")).get_value_or(1);
+              zoom = param_to<double>(req.url_params.get("zoom")).value_or(1);
               width = (*p_width) / zoom;
               height = (*p_height) / zoom;
             }
             else
             {
               zoom = 1;
-              width = p_width.get_value_or(-1);
-              height = p_height.get_value_or(-1);
+              width = p_width.value_or(-1);
+              height = p_height.value_or(-1);
             }
-            const auto p_id = req_find_id(m_api, m_ugd_handle, req).get_value_or(-1);
+            const auto p_id = req_find_id(m_api, m_ugd_handle, req).value_or(-1);
             const auto p_renderer =
-                param_to<std::string>(req.url_params.get("renderer")).get_value_or("svg");
+                param_to<std::string>(req.url_params.get("renderer")).value_or("svg");
             const auto p_download =
                 param_to<const char *>(req.url_params.get("download"));
             if (m_api)
@@ -413,8 +414,7 @@ void WebServer::run()
             return crow::response(crow::status::NOT_FOUND);
           });
 
-  CROW_ROUTE(m_app, "/")
-      .websocket()
+  CROW_WEBSOCKET_ROUTE(m_app, "/")
       .onopen(
           [&](crow::websocket::connection &conn)
           {

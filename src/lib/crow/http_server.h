@@ -138,7 +138,7 @@ namespace crow
             port_ = acceptor_.local_endpoint().port();
             handler_->port(port_);
 
-
+            handler_->notify_server_start();
             CROW_LOG_INFO << server_name_ << " server is running at " << (handler_->ssl_used() ? "https://" : "http://") << bindaddr_ << ":" << acceptor_.local_endpoint().port() << " using " << concurrency_ << " threads";
             CROW_LOG_INFO << "Call `app.loglevel(crow::LogLevel::Warning)` to hide Info level logs.";
 
@@ -254,8 +254,8 @@ namespace crow
         }
 
     private:
-        asio::io_service io_service_;
         std::vector<std::unique_ptr<asio::io_service>> io_service_pool_;
+        asio::io_service io_service_;
         std::vector<detail::task_timer*> task_timer_pool_;
         std::vector<std::function<std::string()>> get_cached_date_str_pool_;
         tcp::acceptor acceptor_;
