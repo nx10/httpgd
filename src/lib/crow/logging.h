@@ -62,7 +62,7 @@ namespace crow
                     prefix = "CRITICAL";
                     break;
             }
-            std::cerr << std::string("(") + timestamp() + std::string(") [") + prefix + std::string("] ") + message << std::endl;
+            //std::cerr << std::string("(") + timestamp() + std::string(") [") + prefix + std::string("] ") + message << std::endl;
         }
 
     private:

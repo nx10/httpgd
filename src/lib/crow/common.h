@@ -232,6 +232,7 @@ namespace crow
 
         void debug_print() const
         {
+            /*
             std::cerr << "routing_params" << std::endl;
             for (auto i : int_params)
                 std::cerr << i << ", ";
@@ -245,6 +246,7 @@ namespace crow
             for (auto& i : string_params)
                 std::cerr << i << ", ";
             std::cerr << std::endl;
+            */
         }
 
         template<typename T>
