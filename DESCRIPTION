@@ -14,7 +14,6 @@ Description: A graphics device for R that is accessible via network protocols.
     The included 'HTML/JavaScript' client (plot viewer) aims to provide a better overall user experience when dealing with R graphics.
     The device asynchronously serves graphics via 'HTTP' and 'WebSockets'.
 License: GPL (>= 2)
-Remotes: github::nx10/unigd
 Depends:
     R (>= 3.2.0)
 Imports: 
