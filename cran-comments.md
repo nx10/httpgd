@@ -1,51 +1,42 @@
 ## Test environments
-GitHub rlib/actions:
-* Windows Server 2019 10.0.17763, R 4.1.2
-* Mac OS X 11.6.2, R 4.1.2
-* Ubuntu 20.04.3, R 4.1.2
-* Ubuntu 20.04.3, R devel
-R-hub builder:
-* Windows Server 2022, R-devel, 64 bit
-* Ubuntu Linux 20.04.1 LTS, R-release, GCC
-* Fedora Linux, R-devel, clang, gfortran
-* Debian Linux, R-devel, GCC ASAN/UBSAN
+- GitHub rlib/actions
+- R-hub builder
 
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
 
 There was 1 NOTE:
 
-* checking installed package size ... NOTE
-    installed size is  5.6Mb
-    sub-directories of 1Mb or more:
-      libs   5.4Mb
+* checking C++ specification ... NOTE
+    Specified C++14: please drop specification unless essential
 
-  This is the directory where build time dependency png.h is downloaded on windows.
+C++14 is essential.
 
 ## Downstream dependencies
 There are no downstream dependencies.
 
-## UCRT
+## httpgd
 
-I have applied the provided patches for UCRT.
+We are splitting the `httpgd` package up into this package and the `unigd` package.
+`unigd` has all the plotting and rendering code, and the `httpgd` package has the web-service code.
 
-## Failing test on CRAN Windows Server 2022
+`unigd` was published on CRAN on 2024-01-25.
 
-> Failed tests
-> Failure (test-svglite-text-fonts.R:7:3): font sets weight/style 
+## I recently received the following email from CRAN:
+
+> Prof Brian Ripley <ripley@stats.ox.ac.uk>
+> Wed, Jan 10, 1:51 PM (12 days ago)
+> to me, CRAN
 > 
->   style_attr(text, "font-weight") not equal to c(NA, "bold", NA, "bold").
->   2/4 mismatches
->   x[2]: NA
->   y[2]: "bold"
->   
->   x[4]: NA
->   y[4]: "bold"
->   
->   [ FAIL 1 | WARN 1 | SKIP 1 | PASS 101 ]
->   Error: Test failures
+> Dear maintainer,
+> 
+> Please see the problems shown on
+> <https://cran.r-project.org/web/checks/check_results_httpgd.html>.
+> 
+> Please correct before 2024-01-24 to safely retain your package on CRAN.
+> 
+> Do remember to look at the 'Additional issues'.
+> 
+> The CRAN Team
 
-I can not replicate the issue with RHub.
-This seems to be a problem with the `systemfonts` package and the new CRAN windows server 2022 machine. (See: https://github.com/r-lib/svglite/issues/145#issuecomment-1004716572)
-
-I have disabled the font tests on windows and will reenable them as soon as the `systemfonts` issues are resolved.
+The clang 18 warnings have been addressed in the `unigd` package.
