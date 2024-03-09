@@ -1,0 +1,80 @@
+{
+  "name": "R devel (Debian stable, Clang)",
+  "build": {
+    "dockerfile": "../Debian.Dockerfile",
+    "context": "..",
+    "args": {
+      "BASE_IMAGE": "debian",
+      "BASE_IMAGE_TAG": "stable",
+      "COMPILER": "clang",
+      "CRAN": "https://cloud.r-project.org",
+      "R_VERSION": "devel",
+      // "NCPUS": "1",
+      "USE_ZSH_FOR_ROOT": "unset-to-use-bash",
+      "SET_LANG": "en_US.UTF-8",
+      "SET_TZ": "Etc/UTC"
+    }
+  },
+
+  "onCreateCommand": "onCreateCommand.sh",
+  "postCreateCommand": "postCreateCommand.sh",
+  "postStartCommand": "postStartCommand.sh",
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": true,
+      "upgradePackages": false,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic"
+    },
+    // A comma separated list of packages to install
+    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+      "packages": "qpdf"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "DavidAnson.vscode-markdownlint",
+        "eamodio.gitlens@11.7.0",
+        "editorconfig.editorconfig",
+        "GitHub.vscode-pull-request-github",
+        "grapecity.gc-excelviewer",
+        "mhutchie.git-graph",
+        "mutantdino.resourcemonitor",
+        "redhat.vscode-yaml",
+        "REditorSupport.r",
+        "timonwong.shellcheck",
+        "exiasr.hadolint",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.cpptools"
+      ],
+      "settings": {
+        "gitlens.showWelcomeOnInstall": false,
+        "gitlens.showWhatsNewAfterUpgrades": false,
+        "r.bracketedPaste": true,
+        "r.plot.useHttpgd": true,
+        "r.rterm.linux": "/usr/local/bin/radian",
+        "r.rterm.option": [
+          "--no-save",
+          "--no-restore"
+        ],
+        "r.workspaceViewer.showObjectSize": true,
+        "resmon.show.battery": false,
+        "resmon.show.cpufreq": false
+      }
+    }
+  },
+
+  // Set 'remoteUser' to 'root' to connect as root instead.
+  "remoteUser": "vscode",
+
+  "remoteEnv": {
+    // Pip: Install packages to the user site
+    "PIP_USER": "1",
+    // A comma separated list of packages to install
+    "R_PACKAGES": "future"
+  }
+}

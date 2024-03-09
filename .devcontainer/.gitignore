@@ -1,5 +1,6 @@
 *
 
+!/debian-*/
 !/conf/
 !/conf/shell/
 !/conf/shell/etc/
@@ -12,12 +13,14 @@
 !/scripts/usr/local/
 !/scripts/usr/local/bin/
 
+!/debian-*/devcontainer.json
 !/conf/shell/etc/skel/.profile
 !/conf/shell/var/tmp/snippets/*.sh
 !/scripts/usr/local/bin/*.sh
 
 !/.gitignore
 !/devcontainer.json
+!/Debian.Dockerfile
 !/R.Dockerfile
 !/LICENSE
 !/README.md
