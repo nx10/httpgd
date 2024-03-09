@@ -1,6 +1,8 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/r/tidyverse
 ARG R_VERSION=latest
 
+FROM docker.io/koalaman/shellcheck:stable as sci
+
 FROM ${BUILD_ON_IMAGE}:${R_VERSION} as files
 
 RUN mkdir /files
@@ -8,15 +10,13 @@ RUN mkdir /files
 COPY conf/shell /files
 COPY scripts /files
 
-## Ensure file modes are correct
+  ## Ensure file modes are correct
 RUN find /files -type d -exec chmod 755 {} \; \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \; \
   && cp -r /files/etc/skel/. /files/root \
   && bash -c 'rm -rf /files/root/{.bashrc,.profile}' \
   && chmod 700 /files/root
-
-FROM docker.io/koalaman/shellcheck:stable as sci
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
 
@@ -33,6 +33,9 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
     CRAN=${CRAN_OVERRIDE:-$CRAN} \
     PARENT_IMAGE_BUILD_DATE=${BUILD_DATE}
 
+# Dev Container
+ARG NCPUS
+
 # hadolint ignore=DL3008,DL3015,SC2016
 RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Ensure that common CA certificates
@@ -48,7 +51,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && install2.r -r "https://r-lib.github.io/p/pak/stable/$pkgType/$os/$arch" -e \
     pak \
   ## Install languageserver and decor
-  && install2.r -s -d TRUE -n "$(($(nproc)+1))" -e \
+  && install2.r -s -d TRUE -n "${NCPUS:-$(($(nproc)+1))}" -e \
     languageserver \
     decor \
   ## Clean up
@@ -71,7 +74,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Clean up
   && rm -rf /var/lib/apt/lists/*
 
-## Update environment
+# Update environment
 ARG USE_ZSH_FOR_ROOT
 ARG SET_LANG
 ARG SET_TZ

@@ -1,11 +1,12 @@
 {
-  "name": "R latest",
+  "name": "R latest (Debian stable)",
   "build": {
-    "dockerfile": "Dockerfile",
+    "dockerfile": "R.Dockerfile",
     "args": {
       "BUILD_ON_IMAGE": "glcr.b-data.ch/r/tidyverse",
       "CRAN": "https://cloud.r-project.org",
       "R_VERSION": "latest",
+      // "NCPUS": "1",
       "USE_ZSH_FOR_ROOT": "unset-to-use-bash",
       "SET_LANG": "en_US.UTF-8",
       "SET_TZ": "Etc/UTC"
@@ -29,7 +30,7 @@
     },
     // A comma separated list of packages to install
     "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
-      "packages": "qpdf"
+      "packages": "libcairo2-dev,libtiff-dev,qpdf"
     }
   },
 
