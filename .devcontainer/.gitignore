@@ -1,6 +1,5 @@
 *
 
-!/debian-*/
 !/conf/
 !/conf/shell/
 !/conf/shell/etc/
@@ -8,14 +7,15 @@
 !/conf/shell/var/
 !/conf/shell/var/tmp/
 !/conf/shell/var/tmp/snippets/
+!/debian-*/
 !/scripts/
 !/scripts/usr/
 !/scripts/usr/local/
 !/scripts/usr/local/bin/
 
-!/debian-*/devcontainer.json
 !/conf/shell/etc/skel/.profile
 !/conf/shell/var/tmp/snippets/*.sh
+!/debian-*/devcontainer.json
 !/scripts/usr/local/bin/*.sh
 
 !/.gitignore

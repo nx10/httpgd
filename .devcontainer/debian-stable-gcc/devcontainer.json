@@ -47,7 +47,6 @@
         "REditorSupport.r",
         "timonwong.shellcheck",
         "exiasr.hadolint",
-        "ms-azuretools.vscode-docker",
         "ms-vscode.cpptools"
       ],
       "settings": {

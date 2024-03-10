@@ -26,12 +26,14 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ARG COMPILER
 ARG COMPILER_VERSION
+ARG CXX_STDLIB
 
 # hadolint ignore=DL3008,SC2086
-RUN apt-get update \
+RUN CXX_STDLIB_VERSION=${CXX_STDLIB:+$COMPILER_VERSION} \
+  && apt-get update \
   && apt-get install -y --no-install-recommends \
     dpkg-dev \
-    g++ \
+    "${CXX_STDLIB:-g++}${CXX_STDLIB_VERSION:+-}${CXX_STDLIB_VERSION}${CXX_STDLIB:+-dev}" \
     libc6-dev \
     make \
     ca-certificates \
@@ -108,11 +110,12 @@ RUN if [ "$R_VERSION" = "devel" ]; then \
     R_SRC="base/R-${R_VERSION%%.*}/R-${R_VERSION}.tar.gz"; \
   fi \
   && cd /tmp \
-  && wget --progress=dot:giga https://cran.r-project.org/src/${R_SRC} -O "R.tar.gz" \
+  && wget --progress=dot:mega https://cran.r-project.org/src/${R_SRC} -O "R.tar.gz" \
   && tar zxf R.tar.gz --no-same-owner \
   && cd R-* \
-  && export ${COMPILER:+CC=${COMPILER}${COMPILER_VERSION:+-}${COMPILER_VERSION}} \
-  && export ${COMPILER:+CXX=${COMPILER}++${COMPILER_VERSION:+-}${COMPILER_VERSION}} \
+  && export ${COMPILER:+CC="${COMPILER}${COMPILER_VERSION:+-}${COMPILER_VERSION}"} \
+  && export ${COMPILER:+CXX="${COMPILER}++${COMPILER_VERSION:+-}${COMPILER_VERSION}"} \
+  && export ${CXX_STDLIB:+CXX="$CXX -stdlib=${CXX_STDLIB}"} \
   && R_PAPERSIZE=letter \
   && R_BROWSER=xdg-open \
   && PAGER=/usr/bin/pager \
@@ -138,6 +141,7 @@ ARG BASE_IMAGE_TAG
 ARG BLAS=libopenblas-dev
 ARG COMPILER
 ARG COMPILER_VERSION
+ARG CXX_STDLIB
 ARG CRAN
 
 ENV BASE_IMAGE=${BASE_IMAGE}:${BASE_IMAGE_TAG} \
@@ -159,14 +163,16 @@ RUN apt-get update \
   && apt-get remove -y --purge devscripts \
   && apt-get autoremove -y \
   ## Install R runtime dependencies
+  && CXX_STDLIB_VERSION=${CXX_STDLIB:+$COMPILER_VERSION} \
   && apt-get install -y --no-install-recommends \
     dpkg-dev \
-    g++ \
+    "${CXX_STDLIB:-g++}${CXX_STDLIB_VERSION:+-}${CXX_STDLIB_VERSION}${CXX_STDLIB:+-dev}" \
     libc6-dev \
     make \
     ca-certificates \
     "${COMPILER:-gcc}${COMPILER_VERSION:+-}${COMPILER_VERSION}" \
     gfortran \
+    "${CXX_STDLIB}${CXX_STDLIB:+abi}${CXX_STDLIB_VERSION:+-}${CXX_STDLIB_VERSION}${CXX_STDLIB:+-dev}" \
     libbz2-dev \
     '^libcurl[3|4]$' \
     libicu-dev \

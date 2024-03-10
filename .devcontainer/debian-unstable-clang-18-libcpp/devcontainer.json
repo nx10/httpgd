@@ -1,11 +1,14 @@
 {
-  "name": "R devel (Debian unstable, GCC)",
+  "name": "R devel (Debian unstable, Clang 18, libc++)",
   "build": {
     "dockerfile": "../Debian.Dockerfile",
     "context": "..",
     "args": {
       "BASE_IMAGE": "debian",
       "BASE_IMAGE_TAG": "unstable",
+      "COMPILER": "clang",
+      "COMPILER_VERSION": "18",
+      "CXX_STDLIB": "libc++",
       "CRAN": "https://cloud.r-project.org",
       "R_VERSION": "devel",
       // "NCPUS": "1",

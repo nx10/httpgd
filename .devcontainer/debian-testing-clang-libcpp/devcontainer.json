@@ -1,15 +1,16 @@
 {
-  "name": "R devel (Debian unstable, GCC)",
+  "name": "R devel (Debian testing, Clang, libc++)",
   "build": {
     "dockerfile": "../Debian.Dockerfile",
     "context": "..",
     "args": {
       "BASE_IMAGE": "debian",
-      "BASE_IMAGE_TAG": "unstable",
+      "BASE_IMAGE_TAG": "testing",
+      "COMPILER": "clang",
+      "CXX_STDLIB": "libc++",
       "CRAN": "https://cloud.r-project.org",
       "R_VERSION": "devel",
       // "NCPUS": "1",
-      "INSTALL_COMMON_UTILS": "true",
       "USE_ZSH_FOR_ROOT": "unset-to-use-bash",
       "SET_LANG": "en_US.UTF-8",
       "SET_TZ": "Etc/UTC"
