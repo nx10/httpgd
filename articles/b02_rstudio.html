@@ -111,19 +111,19 @@ device, the <code>Plots</code>-tab will obtain focus, and
 the <code>Viewer</code>-tab.</p>
 <p>The list of graphics devices (<code><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.list()</a></code>) will look
 something like this:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dev.list</span>()</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>RStudioGD   agg_png    httpgd </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2</span>         <span class="dv">3</span>         <span class="dv">4</span> </span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dev.list</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>RStudioGD   agg_png    httpgd </span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>        <span class="dv">2</span>         <span class="dv">3</span>         <span class="dv">4</span> </span></code></pre></div>
 <p>This can be easily solved by closing the current (RStudioGD) graphics
 device:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dev.off</span>()</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>httpgd </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>     <span class="dv">4</span> </span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dev.off</span>()</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>httpgd </span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>     <span class="dv">4</span> </span></code></pre></div>
 <p>After that <code><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.list()</a></code> should only show a
 <code>httpgd</code> device:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dev.list</span>()</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>httpgd </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="dv">4</span> </span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">dev.list</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>httpgd </span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>     <span class="dv">4</span> </span></code></pre></div>
 <p>The problem should not reappear afterwards, even after resizing the
 pane.</p>
 </div>

@@ -98,19 +98,19 @@ linking the X11 window system.</p>
 to install <code>httpgd</code> on Linux.</p>
 <p>You can create a Docker image with <code>httpgd</code> installed by
 create a Dockerfile like below.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> r-base:latest</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Install httpgd and dependent packages.</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="dt">\</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> <span class="dt">\</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    libfontconfig1-dev <span class="dt">\</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> autoremove <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> clean <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span> <span class="dt">\</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">install2.r</span> <span class="at">--error</span> <span class="at">--skipinstalled</span> <span class="at">--ncpu</span> <span class="at">-1</span> <span class="dt">\</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    httpgd <span class="dt">\</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /tmp/downloaded_packages</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="kw">FROM</span> r-base:latest</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># Install httpgd and dependent packages.</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="dt">\</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> <span class="dt">\</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    libfontconfig1-dev <span class="dt">\</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> autoremove <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> clean <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span> <span class="dt">\</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">install2.r</span> <span class="at">--error</span> <span class="at">--skipinstalled</span> <span class="at">--ncpu</span> <span class="at">-1</span> <span class="dt">\</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>    httpgd <span class="dt">\</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /tmp/downloaded_packages</span></code></pre></div>
 <p>Run the <code>docker build</code> command from your shell to build a
 Docker image.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build . <span class="at">-f</span> Dockerfile <span class="at">-t</span> httpgd:test</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">docker</span> build . <span class="at">-f</span> Dockerfile <span class="at">-t</span> httpgd:test</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="create-a-container">Create a container<a class="anchor" aria-label="anchor" href="#create-a-container"></a>
@@ -121,7 +121,7 @@ bind the port to be used by <code>httpgd</code> with the <code>-p</code>
 <p>If you run R in a container with a command like the following, the
 8888 port of the container will be bound to the 8888 port of the Docker
 host.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="at">-p</span> 8888:8888 httpgd:test R</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> <span class="at">-it</span> <span class="at">-p</span> 8888:8888 httpgd:test R</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="start-httpgd-server">Start httpgd server<a class="anchor" aria-label="anchor" href="#start-httpgd-server"></a>
@@ -150,21 +150,21 @@ arguments when starting the httpgd server by <code><a href="../reference/hgd.htm
 <p>For example, if you create a Dockerfile with the following contents,
 you can build an image with these options already set in the
 Rprofile.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> r-base:latest</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Install httpgd and dependent packages.</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="dt">\</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> <span class="dt">\</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    libfontconfig1-dev <span class="dt">\</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> autoremove <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> clean <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span> <span class="dt">\</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">install2.r</span> <span class="at">--error</span> <span class="at">--skipinstalled</span> <span class="at">--ncpu</span> <span class="at">-1</span> <span class="dt">\</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    httpgd <span class="dt">\</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /tmp/downloaded_packages</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Set default values used in the httpgd::hgd() function.</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="bu">echo</span> <span class="st">'options(httpgd.host = "0.0.0.0", httpgd.port = 8888)'</span> <span class="op">&gt;&gt;</span> /etc/R/Rprofile.site</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 8888</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="kw">FROM</span> r-base:latest</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># Install httpgd and dependent packages.</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="dt">\</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> <span class="dt">\</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    libfontconfig1-dev <span class="dt">\</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> autoremove <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> clean <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span> <span class="dt">\</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="ex">install2.r</span> <span class="at">--error</span> <span class="at">--skipinstalled</span> <span class="at">--ncpu</span> <span class="at">-1</span> <span class="dt">\</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>    httpgd <span class="dt">\</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>    <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="at">-rf</span> /tmp/downloaded_packages</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co"># Set default values used in the httpgd::hgd() function.</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="kw">RUN</span> <span class="bu">echo</span> <span class="st">'options(httpgd.host = "0.0.0.0", httpgd.port = 8888)'</span> <span class="op">&gt;&gt;</span> /etc/R/Rprofile.site</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="kw">EXPOSE</span> 8888</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
