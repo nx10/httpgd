@@ -1,3 +1,7 @@
+# httpgd 2.0.1
+
+- Fix compilation issues with 'clang 18' and 'libc++'.
+
 # httpgd 2.0.0
 
 - Split graphics rendering and R interface to seperate package 'unigd'.
