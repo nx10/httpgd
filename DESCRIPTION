@@ -19,9 +19,9 @@ Depends:
 Imports: 
     unigd
 LinkingTo: 
+    unigd,
     cpp11 (>= 0.2.4),
-    AsioHeaders (>= 1.22.1),
-    unigd
+    AsioHeaders (>= 1.22.1)
 Suggests:
     testthat,
     xml2 (>= 1.0.0),
