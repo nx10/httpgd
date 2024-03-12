@@ -142,9 +142,11 @@ ARG BLAS=libopenblas-dev
 ARG COMPILER
 ARG COMPILER_VERSION
 ARG CXX_STDLIB
+ARG R_VERSION
 ARG CRAN
 
 ENV BASE_IMAGE=${BASE_IMAGE}:${BASE_IMAGE_TAG} \
+    R_VERSION=${R_VERSION} \
     CRAN=${CRAN}
 
 ENV LANG=en_US.UTF-8 \
@@ -194,6 +196,7 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     bash-completion \
     file \
+    fonts-texgyre \
     gsfonts \
     locales \
     tzdata \
