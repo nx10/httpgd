@@ -8,7 +8,7 @@ articles:
   b02_rstudio: b02_rstudio.html
   b03_docker: b03_docker.html
   c01_httpgd-api: c01_httpgd-api.html
-last_built: 2024-06-05T18:56Z
+last_built: 2024-06-05T19:17Z
 urls:
   reference: https://nx10.github.io/httpgd/reference
   article: https://nx10.github.io/httpgd/articles
