@@ -1,3 +1,7 @@
+# httpgd 2.0.2
+
+- Fix 'gcc 14' compile warning.
+
 # httpgd 2.0.1
 
 - Fix compilation issues with 'clang 18' and 'libc++'.
