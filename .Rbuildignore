@@ -23,4 +23,5 @@
 ^codecov\.yml$
 ^\.covrignore$
 ^\.clang-format$
+^\.devcontainer$
 ^valgrind.dockerfile$
