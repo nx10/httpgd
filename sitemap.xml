@@ -1,69 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://nx10.github.io/httpgd/404.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/articles/a00_installation.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/articles/a01_how-to-get-started.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/articles/b01_vscode.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/articles/b02_rstudio.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/articles/b03_docker.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/articles/c01_httpgd-api.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_browse.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_close.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_details.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_generate_token.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_url.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_view.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/hgd_watch.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/httpgd-package.html</loc>
-  </url>
-  <url>
-    <loc>https://nx10.github.io/httpgd/reference/index.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://nx10.github.io/httpgd/404.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/LICENSE-text.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/articles/a00_installation.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/articles/a01_how-to-get-started.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/articles/b01_vscode.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/articles/b02_rstudio.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/articles/b03_docker.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/articles/c01_httpgd-api.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/articles/index.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/authors.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/index.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/news/index.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd_browse.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd_close.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd_details.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd_generate_token.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd_url.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd_view.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/hgd_watch.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/httpgd-package.html</loc></url>
+<url><loc>https://nx10.github.io/httpgd/reference/index.html</loc></url>
 </urlset>
+
