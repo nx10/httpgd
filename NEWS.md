@@ -1,3 +1,7 @@
+# httpgd 2.0.3
+
+- Drop 'C++14' requirement.
+
 # httpgd 2.0.2
 
 - Fix 'gcc 14' compile warning.
