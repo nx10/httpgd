@@ -1,3 +1,7 @@
+# httpgd 2.0.4
+
+- Fix 'Clang 19' deprecation warning.
+
 # httpgd 2.0.3
 
 - Drop 'C++14' requirement.
