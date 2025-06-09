@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   a00_installation: a00_installation.html
@@ -8,7 +8,7 @@ articles:
   b02_rstudio: b02_rstudio.html
   b03_docker: b03_docker.html
   c01_httpgd-api: c01_httpgd-api.html
-last_built: 2025-03-15T22:59Z
+last_built: 2025-06-09T02:59Z
 urls:
   reference: https://nx10.github.io/httpgd/reference
   article: https://nx10.github.io/httpgd/articles
