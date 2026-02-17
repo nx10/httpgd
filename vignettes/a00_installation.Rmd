@@ -25,4 +25,4 @@ See [system requirements](#System-requirements) for troubleshooting.
 
 Depends on `R` version &geq; 4.2.
 
-Also see the [`unigd` system requirements](https://nx10.github.io/unigd/articles/a00_installation.html#system-requirements).
+Also see the [`unigd` system requirements](https://nx10.dev/unigd/articles/a00_installation.html#system-requirements).

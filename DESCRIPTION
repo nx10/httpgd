@@ -32,9 +32,9 @@ Suggests:
     httr,
     jsonlite
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Encoding: UTF-8
 URL: https://github.com/nx10/httpgd,
-    https://nx10.github.io/httpgd/
+    https://nx10.dev/httpgd/
 BugReports: https://github.com/nx10/httpgd/issues
 VignetteBuilder: knitr

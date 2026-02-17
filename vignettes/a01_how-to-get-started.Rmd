@@ -57,4 +57,4 @@ dev.off()
 
 ## See also
 
-See also the [plotting in `unigd`](https://nx10.github.io/unigd/articles/b00_guide.html) guide.
+See also the [plotting in `unigd`](https://nx10.dev/unigd/articles/b00_guide.html) guide.

@@ -1,3 +1,4 @@
-url: https://nx10.github.io/httpgd
+url: https://nx10.dev/httpgd/
 template:
   bootstrap: 5
+  light-switch: true

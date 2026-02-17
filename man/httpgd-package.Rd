@@ -12,7 +12,7 @@ Asynchronous HTTP server graphics device.
 Useful links:
 \itemize{
   \item \url{https://github.com/nx10/httpgd}
-  \item \url{https://nx10.github.io/httpgd/}
+  \item \url{https://nx10.dev/httpgd/}
   \item Report bugs at \url{https://github.com/nx10/httpgd/issues}
 }
 
