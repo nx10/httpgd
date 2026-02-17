@@ -7,7 +7,7 @@ namespace httpgd
 {
 namespace ugd
 {
-extern unigd_api_v1 *api;
+extern unigd_api_v1* api;
 extern UNIGD_CLIENT_ID httpgd_client_id;
 }  // namespace ugd
 

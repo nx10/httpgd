@@ -8,7 +8,7 @@
 #include <cpp11/raws.hpp>
 #include <cpp11/strings.hpp>
 
-//#include <R_ext/GraphicsEngine.h>
+// #include <R_ext/GraphicsEngine.h>
 
 #include <string>
 #include <vector>
@@ -40,13 +40,13 @@
   {
     cpp11::stop("unigd not initialized.");
   }
-  auto *client = httpgd::ugd::api->device_get(devnum, httpgd::ugd::httpgd_client_id);
+  auto* client = httpgd::ugd::api->device_get(devnum, httpgd::ugd::httpgd_client_id);
   if (!client)
   {
     cpp11::stop("Device is not a unigd device with attached httpgd client.");
   }
 
-  auto *server = static_cast<httpgd::web::WebServer *>(client);
+  auto* server = static_cast<httpgd::web::WebServer*>(client);
   const auto svr_config = server->get_config();
 
   using namespace cpp11::literals;

@@ -2,11 +2,11 @@
 #include "httpgd_webserver.h"
 
 #define CROW_MAIN
+#include <compat/optional.hpp>
+#include <memory>
+
 #include <crow.h>
 #include <fmt/format.h>
-#include <compat/optional.hpp>
-
-#include <memory>
 
 #include "httpgd_version.h"
 #include "optional_lex.h"
@@ -17,9 +17,9 @@ namespace web
 {
 namespace
 {
-const char *HTTPGD_CLIENT_INFO = "httpgd " HTTPGD_VERSION;
+const char* HTTPGD_CLIENT_INFO = "httpgd " HTTPGD_VERSION;
 
-inline crow::json::wvalue device_state_json(const unigd_device_state &state)
+inline crow::json::wvalue device_state_json(const unigd_device_state& state)
 {
   return crow::json::wvalue(
       {{"upid", state.upid}, {"hsize", state.hsize}, {"active", state.active}});
@@ -32,7 +32,7 @@ struct plot_return : public crow::returnable
     return std::string(m_render.buffer, m_render.buffer + m_render.size);
   }
 
-  plot_return(const unigd_renderer_info &t_info, unigd_render_access t_render)
+  plot_return(const unigd_renderer_info& t_info, unigd_render_access t_render)
       : crow::returnable(t_info.mime), m_render(std::move(t_render))
   {
   }
@@ -43,9 +43,9 @@ struct plot_return : public crow::returnable
   const unigd_render_access m_render;
 };
 
-inline std::experimental::optional<UNIGD_PLOT_ID> req_find_id(unigd_api_v1 *api,
-                                                  UNIGD_HANDLE ugd_handle,
-                                                  const crow::request &req)
+inline std::experimental::optional<UNIGD_PLOT_ID> req_find_id(unigd_api_v1* api,
+                                                              UNIGD_HANDLE ugd_handle,
+                                                              const crow::request& req)
 {
   if (!api)
   {
@@ -126,8 +126,8 @@ std::string HttpgdLogHandler::timestamp()
   return std::string(date, date + sz);
 }
 
-void WebServer::TokenGuard::before_handle(crow::request &req, crow::response &res,
-                                          context &ctx)
+void WebServer::TokenGuard::before_handle(crow::request& req, crow::response& res,
+                                          context& ctx)
 {
   if (!m_use_token)
   {
@@ -150,21 +150,31 @@ void WebServer::TokenGuard::before_handle(crow::request &req, crow::response &re
     res.end();
   }
 }
-void WebServer::TokenGuard::after_handle(crow::request &req, crow::response &res,
-                                         context &ctx)
+
+void WebServer::TokenGuard::after_handle(crow::request& req, crow::response& res,
+                                         context& ctx)
 {
 }
 
-WebServer::WebServer(const HttpgdServerConfig &t_conf)
+WebServer::WebServer(const HttpgdServerConfig& t_conf)
     : m_conf(t_conf), m_app(), m_mtx_update_subs(), m_update_subs()
 {
-  m_client.close = [](void *client_data)
-  { static_cast<WebServer *>(client_data)->device_close(); };
-  m_client.start = [](void *client_data)
-  { static_cast<WebServer *>(client_data)->device_start(); };
-  m_client.state_change = [](void *client_data)
-  { static_cast<WebServer *>(client_data)->device_state_change(); };
-  m_client.info = [](void *client_data) { return HTTPGD_CLIENT_INFO; };
+  m_client.close = [](void* client_data)
+  {
+    static_cast<WebServer*>(client_data)->device_close();
+  };
+  m_client.start = [](void* client_data)
+  {
+    static_cast<WebServer*>(client_data)->device_start();
+  };
+  m_client.state_change = [](void* client_data)
+  {
+    static_cast<WebServer*>(client_data)->device_state_change();
+  };
+  m_client.info = [](void* client_data)
+  {
+    return HTTPGD_CLIENT_INFO;
+  };
 }
 
 bool WebServer::attach(int devnum)
@@ -186,7 +196,10 @@ std::string WebServer::status_info()
                      m_api->info(), ws_count);
 }
 
-const HttpgdServerConfig &WebServer::get_config() { return m_conf; }
+const HttpgdServerConfig& WebServer::get_config()
+{
+  return m_conf;
+}
 
 unsigned short WebServer::port()
 {
@@ -194,7 +207,10 @@ unsigned short WebServer::port()
   return m_app.port();
 }
 
-void WebServer::device_start() { m_server_thread = std::thread(&WebServer::run, this); }
+void WebServer::device_start()
+{
+  m_server_thread = std::thread(&WebServer::run, this);
+}
 
 void WebServer::run()
 {
@@ -202,13 +218,13 @@ void WebServer::run()
 
   if (m_conf.cors)
   {
-    auto &cors = m_app.get_middleware<crow::CORSHandler>();
+    auto& cors = m_app.get_middleware<crow::CORSHandler>();
     cors.global().headers("Access-Control-Allow-Origin", "*");
   }
 
   if (m_conf.use_token)
   {
-    auto &middle = m_app.get_middleware<TokenGuard>();
+    auto& middle = m_app.get_middleware<TokenGuard>();
     middle.m_use_token = true;
     middle.m_token = m_conf.token;
   }
@@ -219,7 +235,7 @@ void WebServer::run()
 
   CROW_ROUTE(m_app, "/live")
       .CROW_MIDDLEWARES(m_app, TokenGuard)(
-          [&](const crow::request &, crow::response &res)
+          [&](const crow::request&, crow::response& res)
           {
             const auto filepath = std::string(m_conf.wwwpath) + "/index.html";
             res.set_static_file_info_unsafe(filepath);
@@ -251,7 +267,7 @@ void WebServer::run()
               a.reserve(renderers.size);
               for (uint64_t i = 0; i < renderers.size; ++i)
               {
-                const auto &ren = renderers.entries[i];
+                const auto& ren = renderers.entries[i];
                 a.push_back(crow::json::wvalue({{"id", ren.id},
                                                 {"mime", ren.mime},
                                                 {"ext", ren.fileext},
@@ -269,7 +285,7 @@ void WebServer::run()
 
   CROW_ROUTE(m_app, "/plots")
       .CROW_MIDDLEWARES(m_app, TokenGuard)(
-          [&](const crow::request &req)
+          [&](const crow::request& req)
           {
             const auto p_index = param_to<int>(req.url_params.get("index"));
             const auto p_limit = param_to<int>(req.url_params.get("limit"));
@@ -278,8 +294,8 @@ void WebServer::run()
             {
               UNIGD_FIND_HANDLE find_handle;
               unigd_find_results qr;
-              find_handle = m_api->device_plots_find(
-                  m_ugd_handle, p_index.value_or(0), p_limit.value_or(0), &qr);
+              find_handle = m_api->device_plots_find(m_ugd_handle, p_index.value_or(0),
+                                                     p_limit.value_or(0), &qr);
 
               std::vector<crow::json::wvalue> plot_list;
               plot_list.reserve(qr.size);
@@ -299,7 +315,7 @@ void WebServer::run()
 
   CROW_ROUTE(m_app, "/plot")
       .CROW_MIDDLEWARES(m_app, TokenGuard)(
-          [&](const crow::request &req)
+          [&](const crow::request& req)
           {
             const auto p_width = param_to<int>(req.url_params.get("width"));
             const auto p_height = param_to<int>(req.url_params.get("height"));
@@ -319,8 +335,7 @@ void WebServer::run()
             const auto p_id = req_find_id(m_api, m_ugd_handle, req).value_or(-1);
             const auto p_renderer =
                 param_to<std::string>(req.url_params.get("renderer")).value_or("svg");
-            const auto p_download =
-                param_to<const char *>(req.url_params.get("download"));
+            const auto p_download = param_to<const char*>(req.url_params.get("download"));
             if (m_api)
             {
               unigd_renderer_info rinfo;
@@ -368,7 +383,7 @@ void WebServer::run()
 
   CROW_ROUTE(m_app, "/remove")
       .CROW_MIDDLEWARES(m_app, TokenGuard)(
-          [&](const crow::request &req)
+          [&](const crow::request& req)
           {
             const auto p_id = req_find_id(m_api, m_ugd_handle, req);
             if (!p_id)
@@ -404,14 +419,14 @@ void WebServer::run()
 
   CROW_WEBSOCKET_ROUTE(m_app, "/")
       .onopen(
-          [&](crow::websocket::connection &conn)
+          [&](crow::websocket::connection& conn)
           {
             CROW_LOG_INFO << "new websocket connection from " << conn.get_remote_ip();
             std::lock_guard<std::mutex> _(m_mtx_update_subs);
             m_update_subs.insert(&conn);
           })
       .onclose(
-          [&](crow::websocket::connection &conn, const std::string &reason,
+          [&](crow::websocket::connection& conn, const std::string& reason,
               uint16_t /*code*/)
           {
             CROW_LOG_INFO << "websocket connection closed: " << reason;
@@ -419,21 +434,27 @@ void WebServer::run()
             m_update_subs.erase(&conn);
           })
       .onmessage(
-          [&](crow::websocket::connection & /*conn*/, const std::string &data,
+          [&](crow::websocket::connection& /*conn*/, const std::string& data,
               bool is_binary)
           {
             std::lock_guard<std::mutex> _(m_mtx_update_subs);
             for (auto u : m_update_subs)
+            {
               if (is_binary)
+              {
                 u->send_binary(data);
+              }
               else
+              {
                 u->send_text(data);
+              }
+            }
           });
 
   CROW_ROUTE(m_app,
              "/<str>")  // No token guard so static resources can be included in html
   (
-      [&](crow::response &res, std::string s)
+      [&](crow::response& res, std::string s)
       {
         CROW_LOG_INFO << "static: " << s;
         const auto filepath = std::string(m_conf.wwwpath) + "/" + s;
@@ -446,11 +467,10 @@ void WebServer::run()
 
 void WebServer::device_close()
 {
-  
-  //for (auto u : m_update_subs)
+  // for (auto u : m_update_subs)
   //{
-  //  u->userdata();
-  //}
+  //   u->userdata();
+  // }
 
   m_app.stop();
 
@@ -467,7 +487,7 @@ void WebServer::device_close()
   delete this;  // attention!
 }
 
-void WebServer::broadcast_state(const unigd_device_state &t_state)
+void WebServer::broadcast_state(const unigd_device_state& t_state)
 {
   std::lock_guard<std::mutex> _(m_mtx_update_subs);
   for (auto u : m_update_subs)

@@ -18,16 +18,19 @@ std::string uuid()
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dis(0, 15);
 
-  auto randomByte = [&]() {
-      const char hexChars[] = "0123456789abcdef";
-      return hexChars[dis(gen)];
+  auto randomByte = [&]()
+  {
+    const char hexChars[] = "0123456789abcdef";
+    return hexChars[dis(gen)];
   };
 
-  for (int i = 0; i < 32; ++i) {
-      if (i == 8 || i == 12 || i == 16 || i == 20) {
-          uuid += '-';
-      }
-      uuid += randomByte();
+  for (int i = 0; i < 32; ++i)
+  {
+    if (i == 8 || i == 12 || i == 16 || i == 20)
+    {
+      uuid += '-';
+    }
+    uuid += randomByte();
   }
 
   return uuid;

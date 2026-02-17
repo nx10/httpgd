@@ -21,8 +21,12 @@ class unigd_api_guard
 
   void create()
   {
-    if (api == nullptr) unigd_api_v1_create(&api);
+    if (api == nullptr)
+    {
+      unigd_api_v1_create(&api);
+    }
   }
+
   void destroy()
   {
     if (api != nullptr)
