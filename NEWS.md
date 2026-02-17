@@ -1,3 +1,11 @@
+# httpgd 2.1.0
+
+- Update vendored 'CrowCpp' library to v1.2.1.
+- Update 'AsioHeaders' dependency to >= 1.28.2 (fixes macOS deprecation warnings).
+- Remove unused code causing compiler warnings.
+- Modernize build system and CI/CD workflows.
+- Require R >= 4.2.0.
+
 # httpgd 2.0.4
 
 - Fix 'Clang 19' deprecation warning.

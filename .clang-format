@@ -1,7 +1,63 @@
-﻿---
+---
 BasedOnStyle: Google
-BreakBeforeBraces: Allman
-ColumnLimit: '90'
-SortIncludes: 'true'
+Language: Cpp
+Standard: c++14
+ColumnLimit: 90
 
+# Braces & blocks
+BreakBeforeBraces: Allman
+InsertBraces: true
+RemoveSemicolon: true
+
+# Indentation
+IndentWidth: 2
+AccessModifierOffset: -1
+IndentCaseLabels: true
+NamespaceIndentation: None
+
+# Pointers & references
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# Short forms
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Inline
+AllowShortEnumsOnASingleLine: false
+
+# Line management
+InsertNewlineAtEOF: true
+LineEnding: LF
+KeepEmptyLinesAtTheStartOfBlocks: false
+SeparateDefinitionBlocks: Always
+
+# Includes
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"[^/]*\.h"'
+    Priority: 3
+  - Regex: '^<(fmt|cpp11|crow)'
+    Priority: 2
+  - Regex: '^<'
+    Priority: 1
+
+# Constructor initializers
+PackConstructorInitializers: NextLine
+BreakConstructorInitializers: BeforeComma
+
+# Wrapping
+BinPackArguments: true
+BinPackParameters: true
+AlignAfterOpenBracket: Align
+
+# Misc
+Cpp11BracedListStyle: true
+SpaceAfterCStyleCast: false
+SpacesBeforeTrailingComments: 2
+QualifierAlignment: Left
 ...

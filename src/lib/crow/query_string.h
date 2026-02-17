@@ -138,7 +138,7 @@ inline size_t qs_parse(char* qs, char* qs_kv[], size_t qs_kv_size, bool parse_ur
 #endif
 
     return i;
-    }
+}
 
 
 inline int qs_decode(char * qs)
@@ -295,9 +295,7 @@ namespace crow
     public:
         static const int MAX_KEY_VALUE_PAIRS_COUNT = 256;
 
-        query_string()
-        {
-        }
+        query_string() = default;
 
         query_string(const query_string& qs):
           url_(qs.url_)
@@ -319,7 +317,7 @@ namespace crow
             return *this;
         }
 
-        query_string& operator=(query_string&& qs)
+        query_string& operator=(query_string&& qs) noexcept
         {
             key_value_pairs_ = std::move(qs.key_value_pairs_);
             char* old_data = (char*)qs.url_.c_str();
@@ -339,9 +337,10 @@ namespace crow
                 return;
 
             key_value_pairs_.resize(MAX_KEY_VALUE_PAIRS_COUNT);
-
             size_t count = qs_parse(&url_[0], &key_value_pairs_[0], MAX_KEY_VALUE_PAIRS_COUNT, url);
+
             key_value_pairs_.resize(count);
+            key_value_pairs_.shrink_to_fit();
         }
 
         void clear()
@@ -379,10 +378,11 @@ namespace crow
             char* ret = get(name);
             if (ret != nullptr)
             {
+                const std::string key_name = name + '=';
                 for (unsigned int i = 0; i < key_value_pairs_.size(); i++)
                 {
                     std::string str_item(key_value_pairs_[i]);
-                    if (str_item.substr(0, name.size() + 1) == name + '=')
+                    if (str_item.find(key_name)==0)
                     {
                         key_value_pairs_.erase(key_value_pairs_.begin() + i);
                         break;
@@ -417,14 +417,18 @@ namespace crow
         std::vector<char*> pop_list(const std::string& name, bool use_brackets = true)
         {
             std::vector<char*> ret = get_list(name, use_brackets);
+            const size_t name_len = name.length();
             if (!ret.empty())
             {
                 for (unsigned int i = 0; i < key_value_pairs_.size(); i++)
                 {
                     std::string str_item(key_value_pairs_[i]);
-                    if ((use_brackets ? (str_item.substr(0, name.size() + 3) == name + "[]=") : (str_item.substr(0, name.size() + 1) == name + '=')))
-                    {
+                    if (str_item.find(name)==0) {
+                      if (use_brackets && str_item.find("[]=",name_len)==name_len) {
                         key_value_pairs_.erase(key_value_pairs_.begin() + i--);
+                      } else if (!use_brackets && str_item.find('=',name_len)==name_len ) {
+                           key_value_pairs_.erase(key_value_pairs_.begin() + i--);
+                       }
                     }
                 }
             }
@@ -455,13 +459,14 @@ namespace crow
         /// Works the same as \ref get_dict() but removes the values from the query string.
         std::unordered_map<std::string, std::string> pop_dict(const std::string& name)
         {
+            const std::string name_value = name +'[';
             std::unordered_map<std::string, std::string> ret = get_dict(name);
             if (!ret.empty())
             {
                 for (unsigned int i = 0; i < key_value_pairs_.size(); i++)
                 {
                     std::string str_item(key_value_pairs_[i]);
-                    if (str_item.substr(0, name.size() + 1) == name + '[')
+                    if (str_item.find(name_value)==0)
                     {
                         key_value_pairs_.erase(key_value_pairs_.begin() + i--);
                     }
@@ -472,13 +477,19 @@ namespace crow
 
         std::vector<std::string> keys() const
         {
-            std::vector<std::string> ret;
-            for (auto element : key_value_pairs_)
+            std::vector<std::string> keys;
+            keys.reserve(key_value_pairs_.size());
+
+            for (const char* const element : key_value_pairs_)
             {
-                std::string str_element(element);
-                ret.emplace_back(str_element.substr(0, str_element.find('=')));
+                const char* delimiter = strchr(element, '=');
+                if (delimiter)
+                    keys.emplace_back(element, delimiter);
+                else
+                    keys.emplace_back(element);
             }
-            return ret;
+
+            return keys;
         }
 
     private:

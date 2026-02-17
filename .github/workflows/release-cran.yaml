@@ -1,0 +1,116 @@
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+name: Release to CRAN
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: Check ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,    r: 'release'}
+          - {os: macos-latest,    r: 'oldrel-1'}
+          - {os: windows-latest,  r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: ubuntu-latest,   r: 'oldrel-2'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Fix script permissions
+        if: runner.os != 'Windows'
+        run: chmod +x configure cleanup
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          error-on: '"warning"'
+
+  release:
+    needs: check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set release status to pending
+        if: github.event_name == 'release'
+        run: |
+          gh release edit "${{ github.event.release.tag_name }}" \
+            --notes "Release is being built and submitted to CRAN..."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fix script permissions
+        run: chmod +x configure cleanup
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools
+
+      - name: Build source tarball
+        run: |
+          pkgbuild::build(".", dest_path = ".")
+        shell: Rscript {0}
+
+      - name: Upload tarball to GitHub Release
+        if: github.event_name == 'release'
+        run: gh release upload "${{ github.event.release.tag_name }}" httpgd_*.tar.gz
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Submit to CRAN
+        run: |
+          assignInNamespace("yesno", function(...) FALSE, "devtools")
+          devtools::submit_cran()
+        shell: Rscript {0}
+
+      - name: Update release notes from NEWS.md
+        if: github.event_name == 'release'
+        run: |
+          {
+            awk '/^# /{if(found) exit; found=1; next} found' NEWS.md
+            echo ""
+            echo "---"
+            echo ""
+            echo "CRAN status: [![CRAN](https://www.r-pkg.org/badges/version/httpgd)](https://CRAN.R-project.org/package=httpgd)"
+          } | gh release edit "${{ github.event.release.tag_name }}" --notes-file -
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

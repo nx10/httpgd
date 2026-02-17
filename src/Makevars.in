@@ -1,6 +1,1 @@
 PKG_CPPFLAGS = -Ilib -DFMT_HEADER_ONLY
-
-all: clean
-
-clean:
-	rm -f $(SHLIB) $(OBJECTS)

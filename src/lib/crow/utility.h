@@ -8,15 +8,15 @@
 #include <cctype>
 #include <functional>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <unordered_map>
 #include <random>
+#include <algorithm>
 
 #include "crow/settings.h"
 
-#if defined(CROW_CAN_USE_CPP17) && !defined(CROW_FILESYSTEM_IS_EXPERIMENTAL)
 #include <filesystem>
-#endif
 
 // TODO(EDev): Adding C++20's [[likely]] and [[unlikely]] attributes might be useful
 #if defined(__GNUG__) || defined(__clang__)
@@ -289,21 +289,12 @@ namespace crow
         };
 
         // Extract element from forward tuple or get default
-#ifdef CROW_CAN_USE_CPP14
         template<typename T, typename Tup>
         typename std::enable_if<has_type<T&, Tup>::value, typename std::decay<T>::type&&>::type
           tuple_extract(Tup& tup)
         {
             return std::move(std::get<T&>(tup));
         }
-#else
-        template<typename T, typename Tup>
-        typename std::enable_if<has_type<T&, Tup>::value, T&&>::type
-          tuple_extract(Tup& tup)
-        {
-            return std::move(std::get<tuple_index<T&, Tup>::value>(tup));
-        }
-#endif
 
         template<typename T, typename Tup>
         typename std::enable_if<!has_type<T&, Tup>::value, T>::type
@@ -639,10 +630,10 @@ namespace crow
                 size = (size / 4 * 3) + 2; // Not subtracting extra characters because they're truncated in int division
 
             // Padded
-            else if (data[size - 2] == '=') // padded with '=='
-                size = (size / 4 * 3) - 2;  // == padding means the last block only has 1 character instead of 3, hence the '-2'
-            else if (data[size - 1] == '=') // padded with '='
-                size = (size / 4 * 3) - 1;  // = padding means the last block only has 2 character instead of 3, hence the '-1'
+            else if (size >= 2 && data[size - 2] == '=') // padded with '=='
+                size = (size / 4 * 3) - 2;               // == padding means the last block only has 1 character instead of 3, hence the '-2'
+            else if (size >= 1 && data[size - 1] == '=') // padded with '='
+                size = (size / 4 * 3) - 1;               // = padding means the last block only has 2 character instead of 3, hence the '-1'
 
             // Padding not needed
             else
@@ -702,6 +693,14 @@ namespace crow
             return base64decode(data.data(), data.length());
         }
 
+        inline static std::string normalize_path(const std::string& directoryPath)
+        {
+            std::string normalizedPath = directoryPath;
+            std::replace(normalizedPath.begin(), normalizedPath.end(), '\\', '/');
+            if (!normalizedPath.empty() && normalizedPath.back() != '/')
+                normalizedPath += '/';
+            return normalizedPath;
+        }
 
         inline static void sanitize_filename(std::string& data, char replacement = '_')
         {
@@ -714,9 +713,9 @@ namespace crow
             // Check for special device names. The Windows behavior is really odd here, it will consider both AUX and AUX.txt
             // a special device. Thus we search for the string (case-insensitive), and then check if the string ends or if
             // is has a dangerous follow up character (.:\/)
-            auto sanitizeSpecialFile = [](std::string& source, unsigned ofs, const char* pattern, bool includeNumber, char replacement) {
-	      unsigned i = ofs;
-	      size_t len = source.length();
+            auto sanitizeSpecialFile = [](std::string& source, unsigned ofs, const char* pattern, bool includeNumber, char replacement_) {
+                unsigned i = ofs;
+                size_t len = source.length();
                 const char* p = pattern;
                 while (*p)
                 {
@@ -733,7 +732,7 @@ namespace crow
                 if ((i >= len) || (source[i] == '.') || (source[i] == ':') || (source[i] == '/') || (source[i] == '\\'))
                 {
                     source.erase(ofs + 1, (i - ofs) - 1);
-                    source[ofs] = replacement;
+                    source[ofs] = replacement_;
                 }
             };
             bool checkForSpecialEntries = true;
@@ -802,14 +801,7 @@ namespace crow
 
         inline static std::string join_path(std::string path, const std::string& fname)
         {
-#if defined(CROW_CAN_USE_CPP17) && !defined(CROW_FILESYSTEM_IS_EXPERIMENTAL)
             return (std::filesystem::path(path) / fname).string();
-#else
-            if (!(path.back() == '/' || path.back() == '\\'))
-                path += '/';
-            path += fname;
-            return path;
-#endif
         }
 
         /**
@@ -817,7 +809,7 @@ namespace crow
          * Always returns false if strings differ in size.
          * Defaults to case-insensitive comparison.
          */
-        inline static bool string_equals(const std::string& l, const std::string& r, bool case_sensitive = false)
+        inline static bool string_equals(const std::string_view l, const std::string_view r, bool case_sensitive = false)
         {
             if (l.length() != r.length())
                 return false;
@@ -896,6 +888,45 @@ namespace crow
             }
 
             return v.substr(begin, end - begin);
+        }
+
+        /**
+         * @brief splits a string based on a separator
+         */
+        inline static std::vector<std::string> split(const std::string& v, const std::string& separator)
+        {
+            std::vector<std::string> result;
+            size_t startPos = 0;
+
+            for (size_t foundPos = v.find(separator); foundPos != std::string::npos; foundPos = v.find(separator, startPos))
+            {
+                result.push_back(v.substr(startPos, foundPos - startPos));
+                startPos = foundPos + separator.size();
+            }
+
+            result.push_back(v.substr(startPos));
+            return result;
+        }
+
+        /**
+         * @brief Returns the first occurence that matches between two ranges of iterators
+         * @param first1 begin() iterator of the first range
+         * @param last1 end() iterator of the first range
+         * @param first2 begin() iterator of the second range
+         * @param last2 end() iterator of the second range
+         * @return first occurence that matches between two ranges of iterators 
+        */
+        template<typename Iter1, typename Iter2>
+        inline static Iter1 find_first_of(Iter1 first1, Iter1 last1, Iter2 first2, Iter2 last2)
+        {
+            for (; first1 != last1; ++first1)
+            {
+                if (std::find(first2, last2, *first1) != last2)
+                {
+                    return first1;
+                }
+            }
+            return last1;
         }
     } // namespace utility
 } // namespace crow

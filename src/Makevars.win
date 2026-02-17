@@ -1,16 +1,2 @@
-VERSION_HARFBUZZ = 2.7.4
-
-RWINLIB_HARFBUZZ = ../windows/harfbuzz-${VERSION_HARFBUZZ}
-
-PKG_CPPFLAGS = -Ilib -I${RWINLIB_HARFBUZZ}/include \
-	-DFMT_HEADER_ONLY
-
-PKG_LIBS = -L${RWINLIB_HARFBUZZ}/lib${R_ARCH}${CRT} -lWs2_32 -lwsock32
-
-all: winlibs
-
-winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R" ${VERSION_HARFBUZZ}
-
-clean:
-	rm -f $(OBJECTS)
+PKG_CPPFLAGS = -Ilib -DFMT_HEADER_ONLY
+PKG_LIBS = -lws2_32 -lwsock32

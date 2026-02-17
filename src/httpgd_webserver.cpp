@@ -19,18 +19,6 @@ namespace
 {
 const char *HTTPGD_CLIENT_INFO = "httpgd " HTTPGD_VERSION;
 
-inline std::experimental::optional<std::string> read_txt(const std::string &filepath)
-{
-  std::ifstream t(filepath);
-  if (t.fail())
-  {
-    return std::experimental::nullopt;
-  }
-  std::stringstream buffer;
-  buffer << t.rdbuf();
-  return buffer.str();
-}
-
 inline crow::json::wvalue device_state_json(const unigd_device_state &state)
 {
   return crow::json::wvalue(
@@ -423,7 +411,8 @@ void WebServer::run()
             m_update_subs.insert(&conn);
           })
       .onclose(
-          [&](crow::websocket::connection &conn, const std::string &reason)
+          [&](crow::websocket::connection &conn, const std::string &reason,
+              uint16_t /*code*/)
           {
             CROW_LOG_INFO << "websocket connection closed: " << reason;
             std::lock_guard<std::mutex> _(m_mtx_update_subs);

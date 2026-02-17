@@ -1,33 +1,50 @@
 #pragma once
+
+#ifdef CROW_USE_BOOST
+#include <boost/asio.hpp>
+#include <boost/asio/version.hpp>
+#ifdef CROW_ENABLE_SSL
+#include <boost/asio/ssl.hpp>
+#endif
+#else
 #ifndef ASIO_STANDALONE
 #define ASIO_STANDALONE
 #endif
 #include <asio.hpp>
+#include <asio/version.hpp>
 #ifdef CROW_ENABLE_SSL
 #include <asio/ssl.hpp>
 #endif
-#include "crow/settings.h"
-#include <asio/version.hpp>
-#if ASIO_VERSION >= 101300 // 1.13.0
-#define GET_IO_SERVICE(s) ((asio::io_context&)(s).get_executor().context())
-#else
-#define GET_IO_SERVICE(s) ((s).get_io_service())
 #endif
+#include "crow/settings.h"
+
+#if (CROW_USE_BOOST && BOOST_VERSION >= 107000) || (ASIO_VERSION >= 101300)
+#define GET_IO_CONTEXT(s) ((asio::io_context&)(s).get_executor().context())
+#else
+#define GET_IO_CONTEXT(s) ((s).get_io_service())
+#endif
+
 namespace crow
 {
+#ifdef CROW_USE_BOOST
+    namespace asio = boost::asio;
+    using error_code = boost::system::error_code;
+#else
+    using error_code = asio::error_code;
+#endif
     using tcp = asio::ip::tcp;
 
     /// A wrapper for the asio::ip::tcp::socket and asio::ssl::stream
     struct SocketAdaptor
     {
         using context = void;
-        SocketAdaptor(asio::io_service& io_service, context*):
-          socket_(io_service)
+        SocketAdaptor(asio::io_context& io_context, context*):
+          socket_(io_context)
         {}
 
-        asio::io_service& get_io_service()
+        asio::io_context& get_io_context()
         {
-            return GET_IO_SERVICE(socket_);
+            return GET_IO_CONTEXT(socket_);
         }
 
         /// Get the TCP socket handling data trasfers, regardless of what layer is handling transfers on top of the socket.
@@ -54,32 +71,32 @@ namespace crow
 
         void close()
         {
-            asio::error_code ec;
+            error_code ec;
             socket_.close(ec);
         }
 
         void shutdown_readwrite()
         {
-            asio::error_code ec;
+            error_code ec;
             socket_.shutdown(asio::socket_base::shutdown_type::shutdown_both, ec);
         }
 
         void shutdown_write()
         {
-            asio::error_code ec;
+            error_code ec;
             socket_.shutdown(asio::socket_base::shutdown_type::shutdown_send, ec);
         }
 
         void shutdown_read()
         {
-            asio::error_code ec;
+            error_code ec;
             socket_.shutdown(asio::socket_base::shutdown_type::shutdown_receive, ec);
         }
 
         template<typename F>
         void start(F f)
         {
-            f(asio::error_code());
+            f(error_code());
         }
 
         tcp::socket socket_;
@@ -90,8 +107,8 @@ namespace crow
     {
         using context = asio::ssl::context;
         using ssl_socket_t = asio::ssl::stream<tcp::socket>;
-        SSLAdaptor(asio::io_service& io_service, context* ctx):
-          ssl_socket_(new ssl_socket_t(io_service, *ctx))
+        SSLAdaptor(asio::io_context& io_context, context* ctx):
+          ssl_socket_(new ssl_socket_t(io_context, *ctx))
         {}
 
         asio::ssl::stream<tcp::socket>& socket()
@@ -119,7 +136,7 @@ namespace crow
         {
             if (is_open())
             {
-                asio::error_code ec;
+                error_code ec;
                 raw_socket().close(ec);
             }
         }
@@ -128,7 +145,7 @@ namespace crow
         {
             if (is_open())
             {
-                asio::error_code ec;
+                error_code ec;
                 raw_socket().shutdown(asio::socket_base::shutdown_type::shutdown_both, ec);
             }
         }
@@ -137,7 +154,7 @@ namespace crow
         {
             if (is_open())
             {
-                asio::error_code ec;
+                error_code ec;
                 raw_socket().shutdown(asio::socket_base::shutdown_type::shutdown_send, ec);
             }
         }
@@ -146,21 +163,21 @@ namespace crow
         {
             if (is_open())
             {
-                asio::error_code ec;
+                error_code ec;
                 raw_socket().shutdown(asio::socket_base::shutdown_type::shutdown_receive, ec);
             }
         }
 
-        asio::io_service& get_io_service()
+        asio::io_context& get_io_context()
         {
-            return GET_IO_SERVICE(raw_socket());
+            return GET_IO_CONTEXT(raw_socket());
         }
 
         template<typename F>
         void start(F f)
         {
             ssl_socket_->async_handshake(asio::ssl::stream_base::server,
-                                         [f](const asio::error_code& ec) {
+                                         [f](const error_code& ec) {
                                              f(ec);
                                          });
         }

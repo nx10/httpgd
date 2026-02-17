@@ -1,7 +1,7 @@
 Package: httpgd
 Type: Package
 Title: A 'HTTP' Server Graphics Device
-Version: 2.0.4
+Version: 2.1.0
 Authors@R: 
     c(
       person(given = "Florian", family = "Rupprecht", email = "floruppr@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1795-8624")),
@@ -15,13 +15,13 @@ Description: A graphics device for R that is accessible via network protocols.
     The device asynchronously serves graphics via 'HTTP' and 'WebSockets'.
 License: GPL (>= 2)
 Depends:
-    R (>= 3.2.0)
+    R (>= 4.2.0)
 Imports: 
-    unigd
-LinkingTo: 
+    unigd (>= 0.2.0)
+LinkingTo:
     unigd,
     cpp11 (>= 0.2.4),
-    AsioHeaders (>= 1.22.1)
+    AsioHeaders (>= 1.28.2)
 Suggests:
     testthat,
     xml2 (>= 1.0.0),

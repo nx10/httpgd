@@ -1,27 +1,22 @@
 ## Test environments
-- GitHub rlib/actions
-- R-hub builder
+- GitHub Actions: macOS (release, oldrel-1), Windows (release), Ubuntu (devel, release, oldrel-1, oldrel-2)
+- R-hub
 
-## CRAN Check Results
+## R CMD check results
 
-> Version: 2.0.3
-> Check: whether package can be installed
-> Result: WARN 
->   Found the following significant warnings:
->     lib/crow/common.h:351:39: warning: identifier '_method' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
->   See ‘/home/hornik/tmp/R.check/r-devel-clang/Work/PKGS/httpgd.Rcheck/00install.out’ for details.
->   * used C++ compiler: ‘Debian clang version 19.1.7 (1+b1)’
-> Flavor: r-devel-linux-x86_64-debian-clang
+0 errors | 0 warnings | 0 notes
 
-The deprecated syntax has been updated.
+## Resubmission
 
-> rchk Warning
+This package was archived on 2025-04-23.
 
-This is caused by upstream package `cpp11`.
+Changes since archival:
 
-> R CMD CHECK allocator<void> deprecation warning
-
-This is caused by upstream package `AsioHeaders`.
+- Updated vendored CrowCpp library to v1.2.1 (fixes deprecated literal operator warning).
+- Updated AsioHeaders dependency to >= 1.28.2 (fixes macOS `allocator<void>` deprecation warnings).
+- Removed unused function and unused private fields that caused compiler warnings.
+- Modernized build system (removed legacy harfbuzz download, cleaned up Makevars).
+- R >= 4.2.0 now required.
 
 ## Downstream dependencies
 There are no downstream dependencies.

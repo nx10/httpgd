@@ -78,8 +78,6 @@ class WebServer
   HttpgdLogHandler m_log_handler;
   std::mutex m_mtx_update_subs;
   std::unordered_set<crow::websocket::connection*> m_update_subs;
-  int m_last_upid = -1;
-  bool m_last_active = true;
   std::thread m_server_thread;
 
   void run();
