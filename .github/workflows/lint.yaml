@@ -24,3 +24,23 @@ jobs:
 
       - name: Check formatting
         run: clang-format-21 --dry-run -Werror src/*.cpp src/*.h
+
+  client:
+    runs-on: ubuntu-latest
+    name: client
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run build
