@@ -2,3 +2,16 @@ url: https://nx10.dev/httpgd/
 template:
   bootstrap: 5
   light-switch: true
+articles:
+  - title: Getting Started
+    contents:
+    - a00_installation
+    - a01_how-to-get-started
+  - title: IDEs & Environments
+    contents:
+    - b01_vscode
+    - b02_rstudio
+    - b03_docker
+  - title: Developer Reference
+    contents:
+    - c01_httpgd-api
