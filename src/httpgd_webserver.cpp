@@ -462,7 +462,13 @@ void WebServer::run()
         res.end();
       });
 
-  m_app.bindaddr(m_conf.host).port(m_conf.port).multithreaded().run();
+  // Prevent Crow from intercepting SIGINT/SIGTERM - R must handle its own
+  // signals, otherwise Ctrl+C breaks when running alongside plumber/Shiny.
+  m_app.signal_clear();
+  // Use a fixed thread count instead of hardware_concurrency() to avoid
+  // spawning excessive threads on high-core-count machines. Bump to 4 if
+  // concurrent requests (e.g. sidebar thumbnails) become a bottleneck.
+  m_app.bindaddr(m_conf.host).port(m_conf.port).concurrency(2).run();
 }
 
 void WebServer::device_close()
