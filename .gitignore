@@ -10,8 +10,6 @@ windows
 *.Rproj
 inst/doc
 revdep
-configure.log
-src/Makevars
 docs
 src-i386
 src-x64

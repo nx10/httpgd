@@ -1,15 +1,19 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/client"
-    schedule:
-      interval: "weekly"
-    groups:
-      production-dependencies:
-        dependency-type: production
-      development-dependencies:
-        dependency-type: development
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+- package-ecosystem: "npm"
+  directory: "/client"
+  schedule:
+    interval: "weekly"
+  groups:
+    production-dependencies:
+      dependency-type: production
+    development-dependencies:
+      dependency-type: development
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "weekly"
+  groups:
+    actions:
+      patterns:
+      - "*"

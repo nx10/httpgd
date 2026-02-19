@@ -80,6 +80,4 @@ Webserver based on [`CrowCpp/Crow`](<https://github.com/CrowCpp/Crow>).
     
 This project is licensed GPL v2.0.
 
-The HTML client includes [Material Design icons by Google](https://github.com/google/material-design-icons) which are licensed under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt).
-
-Full copies of the license agreements used by these components are included in [`./inst/licenses`](https://github.com/nx10/httpgd/tree/master/inst/licenses).
+Full copies of the license agreements of vendored components are included in [`./inst/licenses`](https://github.com/nx10/httpgd/tree/master/inst/licenses).

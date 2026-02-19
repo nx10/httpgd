@@ -12,8 +12,6 @@
 ^cran-comments\.md$
 ^CRAN-RELEASE$
 ^revdep$
-^configure\.log$
-^src/Makevars$
 ^client/$
 ^client$
 ^_pkgdown\.yml$

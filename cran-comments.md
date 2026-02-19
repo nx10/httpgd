@@ -10,13 +10,11 @@
 
 This package was archived on 2025-04-23.
 
-Changes since archival:
+Relevant changes since archival:
 
 - Updated vendored CrowCpp library to v1.2.1 (fixes deprecated literal operator warning).
 - Updated AsioHeaders dependency to >= 1.28.2 (fixes macOS `allocator<void>` deprecation warnings).
 - Removed unused function and unused private fields that caused compiler warnings.
-- Modernized build system (removed legacy harfbuzz download, cleaned up Makevars).
-- R >= 4.2.0 now required.
 
 ## Downstream dependencies
 There are no downstream dependencies.
