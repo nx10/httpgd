@@ -7,20 +7,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Using `httpgd` to display R plots in a Docker container (Linux container) may be easier than the traditional and common method; linking the X11 window system.
+`httpgd` can display R plots from Docker containers without X11 forwarding.
 
 ## Basic usage
 
-### Build a docker image
-
-See the `vignette("a00_installation")` for details on how to install `httpgd` on Linux.
-
-You can create a Docker image with `httpgd` installed by create a Dockerfile like below.
+### Build the image
 
 ```Dockerfile
 FROM r-base:latest
 
-# Install httpgd and dependent packages.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     libfontconfig1-dev \
@@ -30,34 +25,27 @@ RUN apt-get update \
     && rm -rf /tmp/downloaded_packages
 ```
 
-Run the `docker build` command from your shell to build a Docker image.
-
 ```sh
 docker build . -f Dockerfile -t httpgd:test
 ```
 
-### Create a container
+### Run the container
 
-When creating a container with the `docker run` command, bind the port to be used by `httpgd` with the `-p` (`--publish`) option.
-
-If you run R in a container with a command like the following, the 8888 port of the container will be bound to the 8888 port of the Docker host.
+Bind the `httpgd` port with `-p`:
 
 ```sh
 docker run --rm -it -p 8888:8888 httpgd:test R
 ```
 
-### Start httpgd server
+### Start the device
 
-Running the following command in the R console will initialize the graphics device and start the server.
+Inside the container, start `httpgd` bound to all interfaces:
 
 ```R
 httpgd::hgd(host = "0.0.0.0", port = 8888)
 ```
 
-Then, copy the displayed link in your browser.
-
-If you want to display the link again, execute the `hgd_url()` function as follows.  
-The hostname can be replaced with any value (e.g. localhost).
+Open the displayed URL in your browser. To retrieve the URL later:
 
 ```R
 httpgd::hgd_url(host = "localhost")
@@ -65,16 +53,13 @@ httpgd::hgd_url(host = "localhost")
 
 ## Advanced usage
 
-### Set options in Rprofile
+### Set defaults in Rprofile
 
-By setting options `httpgd.host` and `httpgd.port` in the Rprofile, you can omit setting the arguments when starting the httpgd server by `hgd()`.
-
-For example, if you create a Dockerfile with the following contents, you can build an image with these options already set in the Rprofile.
+Set `httpgd.host` and `httpgd.port` options in the Rprofile so `hgd()` uses them automatically:
 
 ```Dockerfile
 FROM r-base:latest
 
-# Install httpgd and dependent packages.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     libfontconfig1-dev \
@@ -83,7 +68,6 @@ RUN apt-get update \
     httpgd \
     && rm -rf /tmp/downloaded_packages
 
-# Set default values used in the httpgd::hgd() function.
 RUN echo 'options(httpgd.host = "0.0.0.0", httpgd.port = 8888)' >> /etc/R/Rprofile.site
 
 EXPOSE 8888

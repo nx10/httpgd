@@ -7,22 +7,19 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Install `httpgd` from CRAN:
+Install from CRAN:
 
 ```R
 install.packages("httpgd")
 ```
 
-Or get the latest development version from GitHub:
+Or install the development version from GitHub:
 
 ```R
 remotes::install_github("nx10/httpgd")
 ```
 
-See [system requirements](#System-requirements) for troubleshooting.
-
 ## System requirements
 
-Depends on `R` version &geq; 4.2.
-
-Also see the [`unigd` system requirements](https://nx10.dev/unigd/articles/a00_installation.html#system-requirements).
+- R &geq; 4.2
+- See also: [`unigd` system requirements](https://nx10.dev/unigd/articles/a00_installation.html#system-requirements)

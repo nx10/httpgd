@@ -7,26 +7,21 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+Start the device:
+
 ```R
+library(httpgd)
 hgd()
 ```
 
-Copy the displayed link in the browser or call
+Open the displayed URL in a browser, or call `hgd_browse()` to open one automatically.
+
+Any plotting code will work:
 
 ```R
-hgd_browse()
-```
-
-to open a browser window automatically.
-
-Plot anything.
-
-```R
-x = seq(0, 3 * pi, by = 0.1)
+x <- seq(0, 3 * pi, by = 0.1)
 plot(x, sin(x), type = "l")
 ```
-
-Every plotting library will work.
 
 ```R
 library(ggplot2)
@@ -34,7 +29,7 @@ ggplot(mpg, aes(displ, hwy, colour = class)) +
   geom_point()
 ```
 
-Stop the server with:
+Close the device when done:
 
 ```R
 dev.off()
@@ -55,6 +50,4 @@ dev.off()
 | <kbd>C</kbd> | Copy plot to clipboard (as PNG). |
 | <kbd>H</kbd> | Toggle plot history (sidebar). |
 
-## See also
-
-See also the [plotting in `unigd`](https://nx10.dev/unigd/articles/b00_guide.html) guide.
+For more on rendering and output formats, see the [`unigd` plotting guide](https://nx10.dev/unigd/articles/b00_guide.html).

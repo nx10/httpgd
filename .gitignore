@@ -16,3 +16,4 @@ src-x64
 CLAUDE.md
 .claude
 tools
+*.tar.gz
