@@ -1,3 +1,8 @@
+# httpgd 2.1.3
+
+- Fix compilation failure with 'Clang 21' (middleware default constructor).
+- Add Clang 21 R CMD check to CI.
+
 # httpgd 2.1.2
 
 - Fix compilation failure with 'Clang 21' (vendored 'CrowCpp' tuple member initialization).
