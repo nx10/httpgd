@@ -52,3 +52,46 @@ jobs:
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
+  clang-check:
+    runs-on: ubuntu-latest
+    name: ubuntu-latest (devel, clang-21)
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Clang 21
+        run: |
+          wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+          sudo add-apt-repository "deb http://apt.llvm.org/noble/ llvm-toolchain-noble-21 main"
+          sudo apt-get update
+          sudo apt-get install -y clang-21
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: devel
+          use-public-rspm: true
+
+      - name: Configure R to use Clang 21
+        run: |
+          mkdir -p ~/.R
+          cat > ~/.R/Makevars <<EOF
+          CC = clang-21
+          CXX = clang++-21
+          EOF
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'

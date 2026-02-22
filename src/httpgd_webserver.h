@@ -41,6 +41,8 @@ class WebServer
 {
   struct TokenGuard : crow::ILocalMiddleware
   {
+    TokenGuard() = default;
+
     struct context
     {
     };
