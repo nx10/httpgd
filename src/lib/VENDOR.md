@@ -24,6 +24,10 @@
    `operator"" _method` → `operator""_method`. Clang 20 warns about this
    (`-Wdeprecated-literal-operator`); the spaced form is deprecated in C++23.
 
+5. **middlewares/cors.h:101** - Changed `CORSRules() = delete` to
+   `CORSRules() : handler_(nullptr) {}`. Clang 21 requires `CORSHandler` to be
+   default-constructible for `std::tuple` member initialization in `Crow()`.
+
 ### Patches that were needed in older versions but are now fixed upstream
 
 - **json.h** `_LIBCPP_VERSION` preprocessor guard - fixed in v1.2.1.

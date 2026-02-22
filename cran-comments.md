@@ -17,6 +17,7 @@ Relevant changes since archival:
 - Updated vendored CrowCpp library to v1.2.1 (fixes deprecated literal operator warning).
 - Updated AsioHeaders dependency to >= 1.28.2 (fixes macOS `allocator<void>` deprecation warnings).
 - Removed unused function and unused private fields that caused compiler warnings.
+- Fixed vendored CrowCpp CORS middleware default constructor for Clang 21 compatibility.
 
 ## Downstream dependencies
 There are no downstream dependencies.

@@ -98,7 +98,7 @@ namespace crow
         CORSRules& global();
 
     private:
-        CORSRules() = delete;
+        CORSRules() : handler_(nullptr) {}
         CORSRules(CORSHandler* handler):
           handler_(handler) {}
 

@@ -1,3 +1,7 @@
+# httpgd 2.1.1
+
+- Fix compilation failure with 'Clang 21' (vendored 'CrowCpp' CORS middleware default constructor).
+
 # httpgd 2.1.0
 
 - Update vendored 'CrowCpp' library to v1.2.1.
