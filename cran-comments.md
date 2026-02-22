@@ -1,6 +1,8 @@
 ## Test environments
 - GitHub Actions: macOS (release, oldrel-1), Windows (release), Ubuntu (devel, release, oldrel-1, oldrel-2)
-- R-hub
+- R-hub: linux, windows, macos-arm64, m1-san, clang-asan, clang-ubsan, gcc-asan,
+  gcc13, gcc15, clang16, clang17, clang18, clang19, clang20, ubuntu-clang,
+  ubuntu-gcc12, ubuntu-release, ubuntu-next, c23, lto, nold, rchk
 
 ## R CMD check results
 
