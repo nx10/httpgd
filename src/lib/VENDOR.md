@@ -20,11 +20,13 @@
    reading `parser->data` before the struct is initialized; replaced with
    `memset` + `parser->data = NULL`.
 
+4. **common.h:350** - Removed space in literal operator declaration
+   `operator"" _method` → `operator""_method`. Clang 20 warns about this
+   (`-Wdeprecated-literal-operator`); the spaced form is deprecated in C++23.
+
 ### Patches that were needed in older versions but are now fixed upstream
 
 - **json.h** `_LIBCPP_VERSION` preprocessor guard - fixed in v1.2.1.
-- **common.h** deprecated literal operator spacing (`operator""_method`) -
-  fixed in v1.2.1.
 
 ### How to update
 
