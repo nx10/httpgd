@@ -28,6 +28,11 @@
    `CORSRules() : handler_(nullptr) {}`. Clang 21 requires `CORSHandler` to be
    default-constructible for `std::tuple` member initialization in `Crow()`.
 
+6. **app.h:211** - Added explicit `middlewares_()` initialization in the
+   `Crow()` default constructor. Clang 21 errors when a member of type
+   `std::tuple<Middlewares...>` is not explicitly initialized in the
+   constructor.
+
 ### Patches that were needed in older versions but are now fixed upstream
 
 - **json.h** `_LIBCPP_VERSION` preprocessor guard - fixed in v1.2.1.

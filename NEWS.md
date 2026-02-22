@@ -1,3 +1,7 @@
+# httpgd 2.1.2
+
+- Fix compilation failure with 'Clang 21' (vendored 'CrowCpp' tuple member initialization).
+
 # httpgd 2.1.1
 
 - Fix compilation failure with 'Clang 21' (vendored 'CrowCpp' CORS middleware default constructor).

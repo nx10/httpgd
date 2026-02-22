@@ -1,8 +1,7 @@
 ## Test environments
 - GitHub Actions: macOS (release, oldrel-1), Windows (release), Ubuntu (devel, release, oldrel-1, oldrel-2)
-- R-hub: linux, windows, macos-arm64, m1-san, clang-asan, clang-ubsan, gcc-asan,
-  gcc13, gcc15, clang16, clang17, clang18, clang19, clang20, ubuntu-clang,
-  ubuntu-gcc12, ubuntu-release, ubuntu-next, c23, lto, nold, rchk
+- R-hub: linux, windows, macos-arm64, clang-asan, clang-ubsan, gcc-asan, clang16-clang20, etc.
+- Docker: Debian testing with Clang 21.1.8
 
 ## R CMD check results
 
@@ -12,12 +11,7 @@
 
 This package was archived on 2025-04-23.
 
-Relevant changes since archival:
-
-- Updated vendored CrowCpp library to v1.2.1 (fixes deprecated literal operator warning).
-- Updated AsioHeaders dependency to >= 1.28.2 (fixes macOS `allocator<void>` deprecation warnings).
-- Removed unused function and unused private fields that caused compiler warnings.
-- Fixed vendored CrowCpp CORS middleware default constructor for Clang 21 compatibility.
+v2.1.1 failed on Debian/Clang 21. Fixed vendored CrowCpp `std::tuple` member initialization.
 
 ## Downstream dependencies
 There are no downstream dependencies.

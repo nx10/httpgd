@@ -208,7 +208,8 @@ namespace crow
         /// \brief An HTTP server that runs on SSL with an SSLAdaptor
         using ssl_server_t = Server<Crow, SSLAdaptor, Middlewares...>;
 #endif
-        Crow()
+        Crow():
+          middlewares_()
         {}
 
         /// \brief Construct Crow with a subset of middleware
