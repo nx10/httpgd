@@ -5,7 +5,8 @@
   import { plotsStore } from "$lib/stores/plots.svelte";
   import { connectionStore } from "$lib/stores/connection.svelte";
   import { getPlotUrl } from "$lib/httpgd/api";
-  import { downloadURL } from "$lib/utils/download";
+  import { downloadURL } from "$lib/utils/export";
+
   const MIN_SIZE = 1;
   const MAX_SIZE = 10000;
   const MIN_ZOOM = 1;

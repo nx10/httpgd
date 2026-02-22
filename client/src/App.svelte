@@ -16,8 +16,7 @@
   import { plotsStore } from "$lib/stores/plots.svelte";
   import { uiStore } from "$lib/stores/ui.svelte";
   import { shortcuts } from "$lib/actions/shortcuts";
-  import { downloadImgSVG, downloadImgPNG } from "$lib/utils/download";
-  import { copyPNG } from "$lib/utils/clipboard";
+  import { downloadImgSVG, downloadImgPNG, copyPNG } from "$lib/utils/export";
   import { toggleMode } from "mode-watcher";
 
   let plotImage: HTMLImageElement | null = $state(null);
@@ -109,14 +108,12 @@
 
   async function handleCopyPNG() {
     if (!plotImage) return;
-    try {
-      const ok = await copyPNG(plotImage);
-      if (ok) {
-        uiStore.showToast("PNG copied to clipboard");
-      } else {
-        uiStore.showToast("Failed to copy PNG", "error");
-      }
-    } catch {
+    const result = await copyPNG(plotImage);
+    if (result === "copied") {
+      uiStore.showToast("PNG copied to clipboard");
+    } else if (result === "downloaded") {
+      uiStore.showToast("Clipboard unavailable — PNG downloaded instead");
+    } else {
       uiStore.showToast("Failed to copy PNG", "error");
     }
   }
