@@ -1,3 +1,8 @@
+# httpgd 2.1.4
+
+- Address CRAN review feedback (documentation, code style).
+- Add R linting CI.
+
 # httpgd 2.1.3
 
 - Fix compilation failure with 'Clang 21' (middleware default constructor).

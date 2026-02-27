@@ -10,7 +10,7 @@
 
 This package was archived on 2025-04-23.
 
-Changes since last CRAN release: updated vendored CrowCpp, fixed Clang 21 compilation issues, added Clang 21 CI, modernized build system.
+Addresses reviewer feedback from previous submission (v2.1.3): replaced T/F with TRUE/FALSE, added missing \value tag to hgd_watch.Rd, removed inline comment flagged as commented-out code in hgd_close.Rd examples.
 
 ## Downstream dependencies
 There are no downstream dependencies.

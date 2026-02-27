@@ -7,12 +7,10 @@
 "_PACKAGE"
 
 .onLoad <- function(libname, pkgname) {
-  #httpgd_ipc_open_()
 }
 
 #' @importFrom grDevices dev.list dev.off
-.onUnload <- function (libpath) {
+.onUnload <- function(libpath) {
   hgd_close(all = TRUE)
-  #httpgd_ipc_close_()
   library.dynam.unload("httpgd", libpath)
 }

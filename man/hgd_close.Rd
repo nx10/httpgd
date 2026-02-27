@@ -25,7 +25,7 @@ but will only close the device if it has the httpgd type.
 hgd()
 hgd_browse() # open browser
 hist(rnorm(100))
-hgd_close() # Equvalent to dev.off()
+hgd_close()
 
 hgd()
 hgd()

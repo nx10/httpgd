@@ -129,7 +129,7 @@ hgd_attach <- function(which = dev.cur(),
     hgd_print_welcome(which)
   }
 
-  return(attached)
+  attached
 }
 
 hgd_print_welcome <- function(which) {
@@ -303,7 +303,7 @@ hgd_view <- function() {
       "(Open a viewer in the system browser instead by calling: `hgd_browse()`)"
     )
   }
-  v(hgd_url(explicit = T))
+  v(hgd_url(explicit = TRUE))
 }
 
 #' Close httpgd device.
@@ -327,7 +327,7 @@ hgd_view <- function() {
 #' hgd()
 #' hgd_browse() # open browser
 #' hist(rnorm(100))
-#' hgd_close() # Equvalent to dev.off()
+#' hgd_close()
 #'
 #' hgd()
 #' hgd()
@@ -381,6 +381,8 @@ files_changed <- function(snap1, snap2) {
 #'   [graphics::par()]).
 #' @param ... Additional parameters passed to `hgd(webserver=FALSE, ...)`
 #'
+#' @return No return value, called for side effects.
+#'
 #' @importFrom utils changedFiles fileSnapshot
 #' @importFrom unigd ugd_clear
 #' @export
@@ -401,7 +403,7 @@ files_changed <- function(snap1, snap2) {
 #'   }
 #' )
 #' }
-hgd_watch <- function(watch = list.files(pattern = "\\.R$", ignore.case = T),
+hgd_watch <- function(watch = list.files(pattern = "\\.R$", ignore.case = TRUE),
                       on_change = function(changed_files) {
                         print(changed_files)
                       },

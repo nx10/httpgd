@@ -5,7 +5,7 @@
 \title{Watch for changes in code files and refresh plots automatically.}
 \usage{
 hgd_watch(
-  watch = list.files(pattern = "\\\\.R$", ignore.case = T),
+  watch = list.files(pattern = "\\\\.R$", ignore.case = TRUE),
   on_change = function(changed_files) {
      print(changed_files)
  },
@@ -38,6 +38,9 @@ on device start and reset every time \code{\link[unigd:ugd_clear]{unigd::ugd_cle
 \code{\link[graphics:par]{graphics::par()}}).}
 
 \item{...}{Additional parameters passed to \code{hgd(webserver=FALSE, ...)}}
+}
+\value{
+No return value, called for side effects.
 }
 \description{
 This function may be used to rapidly develop visualizations

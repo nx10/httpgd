@@ -44,3 +44,45 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run build
+
+  r-lint:
+    runs-on: ubuntu-latest
+    name: R
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: lintr
+          needs: lint
+
+      - name: Lint R code
+        run: |
+          lints <- lintr::lint_package(
+            linters = lintr::linters_with_defaults(
+              T_and_F_symbol_linter = lintr::T_and_F_symbol_linter()
+            )
+          )
+          if (length(lints) > 0) {
+            print(lints)
+            stop("Column lints found")
+          }
+        shell: Rscript {0}
+
+      - name: Check Rd files for missing value tags
+        run: |
+          rd_files=$(find man -name '*.Rd' ! -name '*-package.Rd')
+          missing=()
+          for f in $rd_files; do
+            if ! grep -q '\\value' "$f"; then
+              missing+=("$f")
+            fi
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Missing \\value tag in: ${missing[*]}"
+            exit 1
+          fi
