@@ -38,7 +38,7 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           fail_ci_if_error: false
           files: ./cobertura.xml
@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-test-failures
           path: ${{ runner.temp }}/package
