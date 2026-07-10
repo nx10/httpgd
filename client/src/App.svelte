@@ -21,7 +21,6 @@
 
   let plotImage: HTMLImageElement | null = $state(null);
   let connection: Connection;
-  let deviceInactiveTimer: ReturnType<typeof setTimeout> | undefined;
 
   onMount(() => {
     const params = parseConnectionParams();
@@ -52,14 +51,6 @@
         },
         onDeviceActiveChanged(active) {
           connectionStore.setDeviceActive(active);
-          if (deviceInactiveTimer) clearTimeout(deviceInactiveTimer);
-          if (!active) {
-            deviceInactiveTimer = setTimeout(() => {
-              uiStore.showOverlay("Device inactive.");
-            }, 1000);
-          } else {
-            uiStore.hideOverlay();
-          }
         },
         onRenderersChanged(renderers) {
           connectionStore.setRenderers(renderers);
@@ -76,7 +67,6 @@
 
     return () => {
       connection.disconnect();
-      if (deviceInactiveTimer) clearTimeout(deviceInactiveTimer);
     };
   });
 
