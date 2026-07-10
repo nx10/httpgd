@@ -44,6 +44,9 @@
 #' @param reset_par If set to `TRUE`, global graphics parameters will be saved
 #'   on device start and reset every time the plots are cleared (see
 #'   [graphics::par()]).
+#' @param title Document title shown in the browser tab of connected web
+#'   clients. Useful to tell multiple R processes apart. Can be changed later
+#'   with [hgd_title()].
 #'
 #' @return No return value, called to initialize graphics device.
 #'
@@ -75,7 +78,8 @@ hgd <-
            pointsize = getOption("httpgd.pointsize", 12),
            system_fonts = getOption("httpgd.system_fonts", list()),
            user_fonts = getOption("httpgd.user_fonts", list()),
-           reset_par = getOption("httpgd.reset_par", FALSE)) {
+           reset_par = getOption("httpgd.reset_par", FALSE),
+           title = getOption("httpgd.title", "httpgd")) {
     udev <- ugd(
       width / zoom,
       height / zoom,
@@ -92,7 +96,8 @@ hgd <-
       port = port,
       cors = cors,
       token = token,
-      silent = silent
+      silent = silent,
+      title = title
     )) {
       dev.off(which = udev)
       stop("Failed to start server. (Port might be in use.)")
@@ -104,7 +109,8 @@ hgd_attach <- function(which = dev.cur(),
                        port = getOption("httpgd.port", 0),
                        cors = getOption("httpgd.cors", FALSE),
                        token = getOption("httpgd.token", TRUE),
-                       silent = getOption("httpgd.silent", FALSE)) {
+                       silent = getOption("httpgd.silent", FALSE),
+                       title = getOption("httpgd.title", "httpgd")) {
   tok <- if (is.character(token)) {
     token
   } else if (is.numeric(token)) {
@@ -122,7 +128,8 @@ hgd_attach <- function(which = dev.cur(),
     cors,
     tok,
     silent,
-    wwwpath = system.file("www", package = "httpgd")
+    wwwpath = system.file("www", package = "httpgd"),
+    title = title
   )
 
   if (attached && !silent) {
@@ -172,6 +179,36 @@ hgd_print_welcome <- function(which) {
 #' }
 hgd_details <- function(which = dev.cur()) {
   httpgd_details_(which)
+}
+
+#' Set the browser tab title of a httpgd device.
+#'
+#' Sets the document title shown in the browser tab of web clients connected
+#' to a httpgd graphics device. Connected clients are updated immediately,
+#' without having to reload the page. The initial title can be set with the
+#' `title` argument of [hgd()].
+#' This function will only work after starting a device with [hgd()].
+#'
+#' @param title New title string.
+#' @param which Which device (ID).
+#'
+#' @return `title`, invisibly.
+#'
+#' @importFrom grDevices dev.cur
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' hgd(title = "Analysis A")
+#' hgd_title("Analysis B") # connected clients update immediately
+#'
+#' dev.off()
+#' }
+hgd_title <- function(title, which = dev.cur()) {
+  stopifnot(is.character(title), length(title) == 1, !is.na(title))
+  httpgd_title_(which, title)
+  invisible(title)
 }
 
 

@@ -26,6 +26,7 @@ struct HttpgdServerConfig
   bool record_history;
   bool silent;
   std::string id;
+  std::string title;
 };
 
 class HttpgdLogHandler : public crow::ILogHandler
@@ -70,6 +71,9 @@ class WebServer
   unsigned short port();
   void broadcast_state(const unigd_device_state& state);
 
+  void set_title(const std::string& t_title);
+  std::string title();
+
  private:
   unigd_api_v1* m_api = nullptr;
   UNIGD_HANDLE m_ugd_handle = nullptr;
@@ -80,8 +84,10 @@ class WebServer
   HttpgdLogHandler m_log_handler;
   std::mutex m_mtx_update_subs;
   std::unordered_set<crow::websocket::connection*> m_update_subs;
+  std::mutex m_mtx_title;
   std::thread m_server_thread;
 
+  crow::json::wvalue state_json(const unigd_device_state& state);
   void run();
 };
 }  // namespace web
