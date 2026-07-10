@@ -17,7 +17,8 @@ hgd(
   pointsize = getOption("httpgd.pointsize", 12),
   system_fonts = getOption("httpgd.system_fonts", list()),
   user_fonts = getOption("httpgd.user_fonts", list()),
-  reset_par = getOption("httpgd.reset_par", FALSE)
+  reset_par = getOption("httpgd.reset_par", FALSE),
+  title = getOption("httpgd.title", "httpgd")
 )
 }
 \arguments{
@@ -68,6 +69,10 @@ font file.}
 \item{reset_par}{If set to \code{TRUE}, global graphics parameters will be saved
 on device start and reset every time the plots are cleared (see
 \code{\link[graphics:par]{graphics::par()}}).}
+
+\item{title}{Document title shown in the browser tab of connected web
+clients. Useful to tell multiple R processes apart. Can be changed later
+with \code{\link[=hgd_title]{hgd_title()}}.}
 }
 \value{
 No return value, called to initialize graphics device.

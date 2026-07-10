@@ -19,7 +19,8 @@
 #include "unigd_impl.h"
 
 [[cpp11::register]] bool httpgd_(int devnum, std::string host, int port, bool cors,
-                                 std::string token, bool silent, std::string wwwpath)
+                                 std::string token, bool silent, std::string wwwpath,
+                                 std::string title)
 {
   // wwwpath must be determined in R, because devtools overrides system.path
   // with a shim which results in an empty string *sometimes*.
@@ -29,7 +30,8 @@
 
   const httpgd::web::HttpgdServerConfig conf{host,      port,      wwwpath,
                                              cors,      use_token, token,
-                                             recording, silent,    httpgd::rng::uuid()};
+                                             recording, silent,    httpgd::rng::uuid(),
+                                             title};
 
   return (new httpgd::web::WebServer(conf))->attach(devnum);
 }
@@ -54,6 +56,22 @@
       "host"_nm = svr_config.host.c_str(), "port"_nm = server->port(),
       "token"_nm = svr_config.token.c_str(), "status"_nm = server->status_info()};
   return cpp11::writable::list{};
+}
+
+[[cpp11::register]] bool httpgd_title_(int devnum, std::string title)
+{
+  if (httpgd::ugd::api == nullptr)
+  {
+    cpp11::stop("unigd not initialized.");
+  }
+  auto* client = httpgd::ugd::api->device_get(devnum, httpgd::ugd::httpgd_client_id);
+  if (!client)
+  {
+    cpp11::stop("Device is not a unigd device with attached httpgd client.");
+  }
+
+  static_cast<httpgd::web::WebServer*>(client)->set_title(title);
+  return true;
 }
 
 [[cpp11::register]] std::string httpgd_random_token_(int len)

@@ -10,6 +10,7 @@ class PlotsStore {
   upid = $state("0");
   page = $state(1);
   zoom = $state(SCALE_DEFAULT);
+  title = $state("httpgd");
 
   host = "";
   token?: string;
@@ -40,6 +41,9 @@ class PlotsStore {
     this.plots = data.plots;
     this.upid = data.state.upid.toString();
     this.page = data.plots.length;
+    if (data.state.title !== undefined) {
+      this.title = data.state.title;
+    }
   }
 
   getPlotImageUrl(
