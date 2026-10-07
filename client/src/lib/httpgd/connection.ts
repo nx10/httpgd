@@ -20,6 +20,7 @@ export interface ConnectionCallbacks {
   onConnectionChanged: (connected: boolean) => void;
   onDeviceActiveChanged: (active: boolean) => void;
   onRenderersChanged: (renderers: RendererResponse[]) => void;
+  onTitleChanged: (title: string) => void;
 }
 
 export class Connection {
@@ -157,6 +158,10 @@ export class Connection {
 
     if (!old || old.active !== state.active) {
       this.callbacks.onDeviceActiveChanged(state.active);
+    }
+
+    if (state.title !== undefined && (!old || old.title !== state.title)) {
+      this.callbacks.onTitleChanged(state.title);
     }
 
     if (!old || old.upid !== state.upid || old.hsize !== state.hsize) {

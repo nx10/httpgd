@@ -24,6 +24,7 @@ Other contributors:
 \itemize{
   \item Kun Ren \email{mail@renkun.me} [contributor]
   \item Jeroen Ooms \email{jeroen@berkeley.edu} (\href{https://orcid.org/0000-0002-4035-0289}{ORCID}) [contributor]
+  \item Bill Evans \email{Bill@8PawExpress.com} [contributor]
 }
 
 }

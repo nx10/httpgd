@@ -5,6 +5,7 @@ export interface StateResponse {
   upid: number;
   hsize: number;
   active: boolean;
+  title?: string;
 }
 
 export interface IdResponse {
