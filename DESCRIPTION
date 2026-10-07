@@ -7,6 +7,7 @@ Authors@R:
       person(given = "Florian", family = "Rupprecht", email = "floruppr@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1795-8624")),
       person(given = "Kun", family = "Ren", role = "ctb", email = "mail@renkun.me"),
       person("Jeroen", "Ooms", role = c("ctb"), email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289"))
+      ,person(given = "Bill", family = "Evans",  role = "ctb", email = "Bill@8PawExpress.com")
     )
 Description: A graphics device for R that is accessible via network protocols.
     This package was created to make it easier to embed live R graphics in 

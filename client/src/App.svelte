@@ -23,6 +23,10 @@
   let connection: Connection;
   let deviceInactiveTimer: ReturnType<typeof setTimeout> | undefined;
 
+  $effect(() => {
+    document.title = plotsStore.title;
+  });
+
   onMount(() => {
     const params = parseConnectionParams();
     plotsStore.configure(params.host, params.token);
@@ -63,6 +67,9 @@
         },
         onRenderersChanged(renderers) {
           connectionStore.setRenderers(renderers);
+        },
+        onTitleChanged(title) {
+          plotsStore.title = title;
         },
       },
     );

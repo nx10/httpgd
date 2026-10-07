@@ -14,6 +14,7 @@ List of status variables with the following named items:
 \verb{$host}: Server hostname,
 \verb{$port}: Server port,
 \verb{$token}: Security token,
+\verb{$title}: Browser tab title (see \code{\link[=hgd_title]{hgd_title()}}),
 \verb{$hsize}: Plot history size (how many plots are accessible),
 \verb{$upid}: Update ID (changes when the device has received new information),
 \verb{$active}: Is the device the currently activated device.
