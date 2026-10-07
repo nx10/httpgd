@@ -201,6 +201,28 @@ const HttpgdServerConfig& WebServer::get_config()
   return m_conf;
 }
 
+std::string WebServer::title()
+{
+  std::lock_guard<std::mutex> _(m_mtx_title);
+  return m_conf.title;
+}
+
+void WebServer::set_title(const std::string& t_title)
+{
+  {
+    std::lock_guard<std::mutex> _(m_mtx_title);
+    m_conf.title = t_title;
+  }
+  device_state_change();
+}
+
+crow::json::wvalue WebServer::state_json(const unigd_device_state& state)
+{
+  auto json = device_state_json(state);
+  json["title"] = title();
+  return json;
+}
+
 unsigned short WebServer::port()
 {
   m_app.wait_for_server_start();
@@ -249,7 +271,7 @@ void WebServer::run()
             if (m_api)
             {
               const auto state = m_api->device_state(m_ugd_handle);
-              return crow::response(device_state_json(state));
+              return crow::response(state_json(state));
             }
             return crow::response(crow::status::NOT_FOUND);
           });
@@ -304,7 +326,7 @@ void WebServer::run()
                 plot_list.push_back(
                     crow::json::wvalue({{"id", fmt::format("{}", qr.ids[i])}}));
               }
-              const auto sj = device_state_json(qr.state);
+              const auto sj = state_json(qr.state);
               m_api->device_plots_find_destroy(find_handle);
 
               return crow::response(
@@ -395,7 +417,7 @@ void WebServer::run()
               if (m_api->device_plots_remove(m_ugd_handle, *p_id))
               {
                 const auto state = m_api->device_state(m_ugd_handle);
-                return crow::response(device_state_json(state));
+                return crow::response(state_json(state));
               }
             }
             return crow::response(crow::status::NOT_FOUND);
@@ -412,7 +434,7 @@ void WebServer::run()
             if (m_api->device_plots_clear(m_ugd_handle))
             {
               const auto state = m_api->device_state(m_ugd_handle);
-              return crow::response(device_state_json(state));
+              return crow::response(state_json(state));
             }
             return crow::response(crow::status::NOT_FOUND);
           });
@@ -498,7 +520,7 @@ void WebServer::broadcast_state(const unigd_device_state& t_state)
   std::lock_guard<std::mutex> _(m_mtx_update_subs);
   for (auto u : m_update_subs)
   {
-    u->send_text(device_state_json(t_state).dump());
+    u->send_text(state_json(t_state).dump());
   }
 }
 

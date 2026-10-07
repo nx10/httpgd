@@ -13,12 +13,17 @@
 
   let { plotId, selected, onselect, onremove }: Props = $props();
 
+  // Only the newest plot can still change (incremental drawing on the active
+  // page), so only its thumbnail gets the upid cache-buster. Older plots are
+  // immutable; keeping their URLs stable avoids refetching every thumbnail
+  // whenever a new plot arrives.
+  const isNewest = $derived(plotsStore.plots.at(-1)?.id === plotId);
   const thumbUrl = $derived(
     getPlotUrl(
       plotsStore.host,
       { id: plotId },
       plotsStore.token,
-      plotsStore.upid,
+      isNewest ? plotsStore.upid : undefined,
     ),
   );
 </script>
@@ -41,6 +46,8 @@
     <img
       src={thumbUrl}
       alt="Plot thumbnail"
+      loading="lazy"
+      decoding="async"
       class="h-[12vw] min-h-[60px] w-full object-cover"
     />
   </div>
